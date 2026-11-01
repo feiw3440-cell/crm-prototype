@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>企业级 CRM 系统 · 高保真原型</title>
+<link rel="stylesheet" href="lib/element-plus.css">
+<style>
+:root{
+  --el-color-primary:#1f4e9c;
+  --el-color-primary-light-3:#6b8fc9;
+  --el-color-primary-light-5:#9ab3dc;
+  --el-color-primary-light-7:#c9d6ec;
+  --el-color-primary-light-8:#dbe4f3;
+  --el-color-primary-light-9:#eaf0f9;
+  --el-color-primary-dark-2:#18407f;
+  --navy:#0b1f3f; --navy2:#12305c; --bg:#f2f5fa; --line:#e6eaf1; --text:#1d2a3d; --sub:#6b778c;
+  --el-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei","Noto Sans CJK SC","Noto Sans SC",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:var(--el-font-family);font-size:14px}
+#app{height:100%}
+a{color:var(--el-color-primary);text-decoration:none;cursor:pointer}
+a:hover{text-decoration:underline}
+.layout{display:flex;flex-direction:column;height:100vh;min-width:1200px}
+.topbar{height:56px;flex:none;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 20px 0 0;gap:16px;z-index:10}
+.brand{width:220px;height:56px;background:var(--navy);color:#fff;display:flex;align-items:center;gap:10px;padding:0 20px;font-weight:600;font-size:16px;letter-spacing:.5px}
+.brand .logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#3d7be0,#1f4e9c);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700}
+.top-search{width:360px}
+.top-right{margin-left:auto;display:flex;align-items:center;gap:6px}
+.icon-btn{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#4a5872;font-size:19px;position:relative}
+.icon-btn:hover{background:var(--el-color-primary-light-9);color:var(--el-color-primary)}
+.icon-btn .el-badge{position:absolute;top:2px;right:0}
+.user-chip{display:flex;align-items:center;gap:8px;cursor:pointer;padding:4px 8px;border-radius:8px;margin-left:6px}
+.user-chip:hover{background:var(--el-color-primary-light-9)}
+.avatar{width:30px;height:30px;border-radius:50%;background:var(--el-color-primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600}
+.body{flex:1;display:flex;min-height:0}
+.sidebar{width:220px;flex:none;background:var(--navy);overflow-y:auto;padding-bottom:12px}
+.sidebar::-webkit-scrollbar{width:0}
+.sidebar .el-menu{background:transparent;border-right:0}
+.sidebar .el-menu-item,.sidebar .el-sub-menu__title{height:40px;line-height:40px;color:#b9c6dd;font-size:14px}
+.sidebar .el-menu-item:hover,.sidebar .el-sub-menu__title:hover{background:#12305c;color:#fff}
+.sidebar .el-menu-item.is-active{background:var(--el-color-primary);color:#fff}
+.sidebar .el-sub-menu.is-active>.el-sub-menu__title{color:#fff}
+.sidebar .el-sub-menu .el-menu{background:#081832}
+.sidebar .el-sub-menu .el-menu-item{height:36px;line-height:36px;padding-left:52px!important;font-size:13px}
+.sidebar .el-icon{color:inherit}
+.main{flex:1;overflow:auto;padding:16px 24px 28px;min-width:0}
+.crumb{margin-bottom:8px}
+.page-head{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}
+.page-head h1{margin:0;font-size:20px;font-weight:600;white-space:nowrap}
+.page-head .total{color:var(--sub);font-size:14px}
+.page-head .head-ops{margin-left:auto;display:flex;gap:8px;align-items:center}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px}
+.card-pad{padding:16px 18px}
+.card-title{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.card-title .more{margin-left:auto;font-weight:400;font-size:13px}
+.stat-row{display:grid;gap:14px;margin-bottom:14px}
+.stat-card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 18px;display:flex;flex-direction:column;gap:4px;position:relative;overflow:hidden}
+.stat-card .lb{color:var(--sub);font-size:13px}
+.stat-card .vl{font-size:26px;font-weight:600;line-height:1.2;font-variant-numeric:tabular-nums}
+.stat-card .ft{color:var(--sub);font-size:12px}
+.stat-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--el-color-primary)}
+.stat-card.warn:before{background:#e6a23c}.stat-card.danger:before{background:#d9534f}.stat-card.ok:before{background:#2e9e6a}
+.stat-card.danger .vl{color:#c0392b}
+.query{padding:14px 16px 2px;margin-bottom:12px}
+.query .el-form-item{margin-bottom:12px;margin-right:14px}
+.ops{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.ops .grow{margin-left:auto;color:var(--sub);font-size:13px}
+.table-card{padding:6px 6px 0}
+.table-card .el-table{--el-table-header-bg-color:#f6f8fc;--el-table-header-text-color:#475672}
+.table-card .el-table th.el-table__cell{font-weight:600}
+.pager{display:flex;justify-content:space-between;align-items:center;padding:12px 10px}
+.pager .batch{color:var(--sub);font-size:13px}
+.link{color:var(--el-color-primary);cursor:pointer}
+.link:hover{text-decoration:underline}
+.mono{font-variant-numeric:tabular-nums}
+.money{font-variant-numeric:tabular-nums;font-weight:500}
+.muted{color:var(--sub)}
+.danger-text{color:#c0392b}
+.ok-text{color:#2e9e6a}
+.row-actions .el-button+.el-button{margin-left:6px}
+/* workbench */
+.wb-grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:14px}
+.wb-hello{background:linear-gradient(120deg,#0f2d5c,#1f4e9c 70%,#2d6bc4);color:#fff;border-radius:10px;padding:18px 24px;display:flex;align-items:center;margin-bottom:14px}
+.wb-hello h2{margin:0 0 4px;font-size:20px;font-weight:600}
+.wb-hello .d{opacity:.8;font-size:13px}
+.wb-hello .seg{margin-left:auto;display:flex;gap:28px}
+.wb-hello .seg div{text-align:center}.wb-hello .seg b{display:block;font-size:22px}.wb-hello .seg span{font-size:12px;opacity:.8}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.quick .q{border:1px solid var(--line);border-radius:10px;padding:12px 4px;text-align:center;cursor:pointer;background:#fafbfd;transition:.15s}
+.quick .q:hover{border-color:var(--el-color-primary);background:var(--el-color-primary-light-9)}
+.quick .q .el-icon{font-size:22px;color:var(--el-color-primary);margin-bottom:6px}
+.quick .q div{font-size:13px}
+.todo-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;border:1px solid transparent}
+.todo-item:hover{background:var(--el-color-primary-light-9)}
+.todo-item .dot{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.todo-item .n{margin-left:auto;font-weight:600;font-size:16px}
+.todo-item .n small{font-size:12px;font-weight:400;color:var(--sub);margin-left:2px}
+.tl-line{display:flex;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line);align-items:flex-start}
+.tl-line:last-child{border-bottom:0}
+.tl-line .t{width:92px;flex:none;color:var(--el-color-primary);font-weight:600;font-variant-numeric:tabular-nums}
+.sch{display:flex;gap:10px;padding:8px 0;align-items:flex-start}
+.sch .tm{width:46px;font-weight:600;font-variant-numeric:tabular-nums}
+.sch .bar{width:3px;border-radius:2px;align-self:stretch;background:var(--el-color-primary)}
+.msg{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer;align-items:flex-start}
+.msg:last-child{border-bottom:0}
+.msg .u{width:7px;height:7px;border-radius:50%;background:#d9534f;margin-top:7px;flex:none}
+.msg .u.read{background:transparent}
+.msg.read{color:var(--sub)}
+.perf-num{display:flex;gap:26px;margin:4px 0 10px}
+.perf-num b{display:block;font-size:20px;font-variant-numeric:tabular-nums}.perf-num span{font-size:12px;color:var(--sub)}
+/* detail */
+.cust-head{padding:18px 22px;display:flex;gap:18px;align-items:center;margin-bottom:14px}
+.cust-logo{width:56px;height:56px;border-radius:12px;background:var(--el-color-primary-light-8);color:var(--el-color-primary);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700}
+.cust-head h2{margin:0 0 6px;font-size:20px;display:flex;align-items:center;gap:8px}
+.cust-meta{display:flex;gap:22px;color:var(--sub);font-size:13px;flex-wrap:wrap}
+.cust-meta b{color:var(--text);font-weight:500}
+.sum-cards{display:flex;gap:12px;margin-left:auto}
+.sum-card{border:1px solid var(--line);border-radius:10px;padding:10px 18px;min-width:116px;text-align:center;background:#fafbfd}
+.sum-card .v{font-size:22px;font-weight:600;color:var(--el-color-primary);font-variant-numeric:tabular-nums}
+.sum-card .l{font-size:12px;color:var(--sub)}
+.detail-tabs .el-tabs__header{margin-bottom:0}
+.tab-body{padding:16px 6px 6px}
+.tl-item-card{background:#f8fafd;border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin-top:2px}
+.sec-title{font-weight:600;margin:4px 0 12px;display:flex;align-items:center;gap:8px}
+.sec-title:before{content:"";width:3px;height:14px;background:var(--el-color-primary);border-radius:2px}
+.org-tree .el-tree-node__content{height:34px}
+/* kanban */
+.kanban{display:grid;grid-template-columns:repeat(6,minmax(176px,1fr));gap:12px;overflow-x:auto;padding-bottom:10px;align-items:start}
+.kcol{background:#e9eef7;border-radius:10px;padding:10px;min-height:560px;border:2px solid transparent}
+.kcol.over{border-color:var(--el-color-primary);background:#dfe8f6}
+.kcol-h{display:flex;align-items:center;gap:6px;padding:2px 4px 8px}
+.kcol-h b{font-size:14px}
+.kcol-h .cnt{background:#fff;border-radius:10px;padding:0 8px;font-size:12px;color:var(--el-color-primary);font-weight:600}
+.kcol-sum{font-size:12px;color:var(--sub);padding:0 4px 8px;border-bottom:1px solid #d5dded;margin-bottom:10px}
+.kcard{background:#fff;border-radius:8px;padding:10px 10px;margin-bottom:10px;cursor:grab;border:1px solid var(--line);box-shadow:0 1px 2px rgba(15,40,80,.05)}
+.kcard:hover{box-shadow:0 4px 12px rgba(15,40,80,.12);border-color:var(--el-color-primary-light-5)}
+.kcard .nm{font-weight:600;margin-bottom:4px;line-height:1.4}
+.kcard .cu{font-size:12px;color:var(--sub);margin-bottom:8px}
+.kcard .am{font-size:16px;font-weight:600;color:var(--el-color-primary);font-variant-numeric:tabular-nums}
+.kcard .ft{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--sub);margin-top:8px;white-space:nowrap}
+.kcard .tags{margin-top:6px;display:flex;gap:4px;flex-wrap:wrap}
+.kcard .ft .adv{margin-left:auto}
+.kmore{text-align:center;font-size:12px;color:var(--sub);padding:6px}
+.gate-row{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:8px;margin-bottom:10px;background:#fafbfd}
+.gate-row.bad{border-color:#f1b0a8;background:#fff5f3}
+.gate-row .st{width:20px;flex:none;margin-top:4px}
+.stage-flow{display:flex;align-items:center;gap:10px;margin-bottom:14px;font-size:14px}
+/* quote */
+.amt-box{margin-left:auto;width:360px;border:1px solid var(--line);border-radius:10px;padding:12px 18px;background:#fafbfd}
+.amt-box .r{display:flex;justify-content:space-between;padding:5px 0;font-variant-numeric:tabular-nums}
+.amt-box .r.total{border-top:1px solid var(--line);margin-top:6px;padding-top:10px;font-size:18px;font-weight:700;color:var(--el-color-primary)}
+.flow{display:flex;align-items:flex-start;gap:0;padding:6px 0 4px}
+.fnode{display:flex;flex-direction:column;align-items:center;min-width:132px;text-align:center;position:relative}
+.fnode .c{width:30px;height:30px;border-radius:50%;background:#e4e9f2;color:#7a869c;display:flex;align-items:center;justify-content:center;font-weight:600;z-index:1;border:2px solid #e4e9f2}
+.fnode.done .c{background:#2e9e6a;border-color:#2e9e6a;color:#fff}
+.fnode.cur .c{background:#fff;border-color:var(--el-color-primary);color:var(--el-color-primary);box-shadow:0 0 0 4px rgba(31,78,156,.15)}
+.fnode.rej .c{background:#d9534f;border-color:#d9534f;color:#fff}
+.fnode .nm{margin-top:6px;font-size:13px;font-weight:600}.fnode .pp{font-size:12px;color:var(--sub)}
+.fline{flex:1;min-width:28px;height:2px;background:#e4e9f2;margin-top:15px}
+.fline.done{background:#2e9e6a}
+.appr-wrap{display:grid;grid-template-columns:480px minmax(0,1fr);gap:14px;align-items:start}
+.appr-item{padding:12px 14px;border-bottom:1px solid var(--line);cursor:pointer;display:flex;flex-direction:column;gap:6px;border-left:3px solid transparent}
+.appr-item:hover{background:#f5f8fd}
+.appr-item.active{background:var(--el-color-primary-light-9);border-left-color:var(--el-color-primary)}
+.appr-item .tt{font-weight:600;display:flex;gap:8px;align-items:center}
+.appr-item .tt .el-tag{margin-left:auto}
+.appr-item .sm{font-size:12px;color:var(--sub);display:flex;gap:12px}
+.opinion{padding:10px 14px;background:#f8fafd;border-radius:8px;border:1px solid var(--line);margin-bottom:8px}
+/* mobile preview */
+.mob-wrap{display:flex;gap:48px;justify-content:center;align-items:flex-start;padding:10px 0}
+.phone{width:370px;height:730px;border-radius:46px;background:#111;padding:12px;box-shadow:0 20px 50px rgba(15,40,80,.3),inset 0 0 0 2px #333;flex:none}
+.screen{width:100%;height:100%;border-radius:36px;background:#f3f6fb;overflow:hidden;display:flex;flex-direction:column;position:relative}
+.m-status{height:34px;display:flex;justify-content:space-between;align-items:center;padding:6px 22px 0;font-size:12px;font-weight:600;background:transparent}
+.m-notch{position:absolute;left:50%;top:8px;transform:translateX(-50%);width:96px;height:22px;background:#111;border-radius:12px}
+.m-body{flex:1;overflow-y:auto;padding:0 14px 14px}
+.m-body::-webkit-scrollbar{width:0}
+.m-hero{background:linear-gradient(135deg,#12305c,#1f4e9c);color:#fff;border-radius:16px;padding:16px;margin:4px 0 12px}
+.m-hero h3{margin:0 0 4px;font-size:18px}
+.m-hero p{margin:0;font-size:12px;opacity:.85}
+.m-stats{display:flex;gap:10px;margin-top:14px}
+.m-stats div{flex:1;background:rgba(255,255,255,.14);border-radius:12px;padding:10px;text-align:center}
+.m-stats b{font-size:24px;display:block}.m-stats span{font-size:12px;opacity:.85}
+.m-card{background:#fff;border-radius:14px;padding:14px;margin-bottom:12px}
+.m-card h4{margin:0 0 12px;font-size:15px}
+.m-quick{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center}
+.m-quick .qi{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;cursor:pointer}
+.m-quick .qi i{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;font-style:normal}
+.m-todo{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #eef1f6;align-items:center}
+.m-todo:last-child{border-bottom:0}
+.m-todo .tm{font-weight:700;color:var(--el-color-primary);width:48px;font-variant-numeric:tabular-nums}
+.m-tabbar{height:64px;background:#fff;display:flex;border-top:1px solid #e8ecf3;padding-bottom:6px}
+.m-tabbar div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;color:#8a95a8;cursor:pointer}
+.m-tabbar div .el-icon{font-size:22px}
+.m-tabbar div.on{color:var(--el-color-primary);font-weight:600}
+.m-list-item{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid #eef1f6;align-items:center}
+.m-list-item:last-child{border-bottom:0}
+.m-ava{width:38px;height:38px;border-radius:10px;background:var(--el-color-primary-light-8);color:var(--el-color-primary);display:flex;align-items:center;justify-content:center;font-weight:700;flex:none}
+.mob-side{max-width:440px}
+.mob-side h3{margin:0 0 10px}
+.mob-side table{border-collapse:collapse;width:100%;font-size:13px;background:#fff;border-radius:10px;overflow:hidden}
+.mob-side td,.mob-side th{border-bottom:1px solid var(--line);padding:9px 12px;text-align:left}
+.mob-side th{background:#f6f8fc}
+.ph-note{margin-bottom:12px}
+.el-drawer__header{margin-bottom:12px!important;font-weight:600;color:var(--text)}
+.drawer-sec{margin-bottom:18px}
+.dup-tag{cursor:pointer}
+.el-table .row-overdue td.el-table__cell{background:#fff6f5!important}
+.left-num .el-input__inner{text-align:left!important}
+
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="lib/vue.global.prod.js"></script>
+<script src="lib/element-plus.min.js"></script>
+<script src="lib/zh-cn.min.js"></script>
+<script src="lib/icons.min.js"></script>
+<script src="lib/echarts.min.js"></script>
+<script>
+/* ===== 工具函数 ===== */
+const toC = n => Math.round(n * 100);                       // 元 → 分（金额一律用整数分计算，避免浮点误差）
+const fmtC = c => (c / 100).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const fmtY = n => Number(n).toLocaleString('zh-CN');
+const yuan = n => '¥' + fmtY(n);
+const wan = n => '¥' + (n / 10000).toLocaleString('zh-CN', { maximumFractionDigits: 1 }) + '万';
+const TODAY = '2026-11-02';
+const daysBetween = (a, b) => Math.round((new Date(b) - new Date(a)) / 86400000);
+
+/* ===== 导航（方案 4.1 的 15 个一级模块） ===== */
+const NAV = [
+  { key: 'workbench', title: '工作台', icon: 'HomeFilled', children: [
+    { path: '/workbench', title: '个人工作台' }, { path: '/approvals', title: '审批中心' }, { path: '/mobile', title: '移动端预览' } ] },
+  { key: 'leads', title: '线索管理', icon: 'Aim', children: [
+    { path: '/leads', title: '线索列表' }, { path: '/leads/my', title: '我的线索' }, { path: '/leads/pool', title: '线索公海' }, { path: '/leads/records', title: '线索转化记录' } ] },
+  { key: 'customers', title: '客户管理', icon: 'OfficeBuilding', children: [
+    { path: '/customers', title: '客户列表' }, { path: '/customers/my', title: '我的客户' }, { path: '/customers/pool', title: '客户公海' }, { path: '/customers/key', title: '重点客户' } ] },
+  { key: 'contacts', title: '联系人管理', icon: 'User', path: '/contacts' },
+  { key: 'opps', title: '商机管理', icon: 'TrendCharts', children: [
+    { path: '/opps', title: '商机看板' }, { path: '/opps/list', title: '商机列表' } ] },
+  { key: 'products', title: '产品管理', icon: 'Goods', path: '/products' },
+  { key: 'quotes', title: '报价管理', icon: 'Tickets', children: [
+    { path: '/quotes', title: '报价列表' }, { path: '/quote/BJ-202611-0008', title: '报价单详情' } ] },
+  { key: 'contracts', title: '合同管理', icon: 'Document', path: '/contracts' },
+  { key: 'orders', title: '订单管理', icon: 'ShoppingCart', path: '/orders' },
+  { key: 'payments', title: '回款管理', icon: 'Wallet', path: '/payments' },
+  { key: 'activities', title: '活动管理', icon: 'Calendar', path: '/activities' },
+  { key: 'delivery', title: '交付管理', icon: 'Box', path: '/delivery' },
+  { key: 'service', title: '服务管理', icon: 'Headset', path: '/service' },
+  { key: 'analytics', title: '数据分析', icon: 'DataAnalysis', path: '/analytics' },
+  { key: 'system', title: '系统管理', icon: 'Setting', path: '/system' },
+];
+
+/* ===== 消息 / 待办 ===== */
+const MESSAGES = [
+  { id: 1, title: '线索 XS-202611-0008 已分配给你', time: '今天 09:12', type: '分配通知', read: false },
+  { id: 2, title: '报价 BJ-202611-0008 (V3) 折扣审批待处理', time: '今天 08:40', type: '审批提醒', read: false },
+  { id: 3, title: '回款计划「项目上线」已逾期 5 天', time: '今天 08:00', type: '逾期提醒', read: false },
+  { id: 4, title: '合同 HT-202607-0004 将于 12 天后到期', time: '昨天 17:30', type: '到期提醒', read: true },
+  { id: 5, title: '你提交的客户转移申请已通过', time: '11-01 15:20', type: '审批结果', read: true },
+];
+
+/* ===== 线索（方案 5.2 字段） ===== */
+const LEADS_INIT = [
+  { no: 'XS-202611-0008', name: '智能产线改造项目', company: '苏州某某智能装备有限公司', contact: '王经理', phone: '139****1234', source: '官网', need: 'MES 系统', amount: 300000, status: '新建', owner: '张三', next: '2026-11-03 10:00', created: '2026-11-02 09:05', dup: { type: '线索', ref: 'XS-202610-0031', why: '手机号相同' } },
+  { no: 'XS-202611-0007', name: 'ERP 二期扩容需求', company: '南京某某科技有限公司', contact: '陈总监', phone: '138****8888', source: '转介绍', need: 'ERP 增购', amount: 450000, status: '跟进中', owner: '张三', next: '2026-11-02 14:30', created: '2026-11-01 16:20', dup: { type: '客户', ref: 'KH-202611-0001 南京某某科技有限公司', why: '公司名称一致', customerNo: 'KH-202611-0001' } },
+  { no: 'XS-202611-0006', name: '连锁门店 CRM 咨询', company: '杭州某某连锁餐饮有限公司', contact: '李店长', phone: '137****5566', source: '广告', need: 'CRM 软件', amount: 120000, status: '新建', owner: '', next: '', created: '2026-11-01 11:42' },
+  { no: 'XS-202611-0005', name: '渠道代理合作', company: '合肥某某贸易有限公司', contact: '赵先生', phone: '136****7788', source: '渠道', need: '渠道代理', amount: 80000, status: '新建', owner: '', next: '', created: '2026-11-01 10:08' },
+  { no: 'XS-202611-0004', name: '酒店集团协议客户', company: '江苏某某集团', contact: '周主任', phone: '135****9021', source: '活动', need: '协议客户系统', amount: 680000, status: '跟进中', owner: '李四', next: '2026-11-04 09:30', created: '2026-10-31 14:15', dup: { type: '客户', ref: 'KH-202611-0002 江苏某某集团', why: '公司名称一致', customerNo: 'KH-202611-0002' } },
+  { no: 'XS-202610-0033', name: '售后服务系统建设', company: '无锡某某汽配有限公司', contact: '孙工', phone: '188****3321', source: '官网', need: '服务工单', amount: 150000, status: '跟进中', owner: '张三', next: '2026-11-05 15:00', created: '2026-10-30 09:40' },
+  { no: 'XS-202610-0031', name: '智能装备 MES 咨询', company: '苏州某某智能装备有限公司', contact: '王经理', phone: '139****1234', source: '广告', need: 'MES 系统', amount: 280000, status: '跟进中', owner: '王五', next: '2026-11-03 16:00', created: '2026-10-28 13:30', dup: { type: '线索', ref: 'XS-202611-0008', why: '手机号相同' } },
+  { no: 'XS-202610-0028', name: '实施交付外包', company: '常州某某物流有限公司', contact: '吴经理', phone: '133****4410', source: '转介绍', need: '实施服务', amount: 60000, status: '无效', owner: '李四', next: '', created: '2026-10-26 10:00' },
+  { no: 'XS-202610-0024', name: '会员系统升级', company: '宁波某某商贸有限公司', contact: '郑总', phone: '134****6602', source: '活动', need: '会员运营', amount: 220000, status: '已转化', owner: '张三', next: '', created: '2026-10-22 15:48', convertedAt: '2026-10-29 11:20', convertedTo: 'KH-202610-0036' },
+  { no: 'XS-202610-0019', name: '数据平台试点', company: '上海某某信息技术有限公司', contact: '冯总', phone: '151****0098', source: '官网', need: 'BI 数据平台', amount: 360000, status: '已转化', owner: '王五', next: '', created: '2026-10-18 09:12', convertedAt: '2026-10-24 16:05', convertedTo: 'KH-202610-0018' },
+  { no: 'XS-202610-0012', name: '库房协同管理', company: '宿迁某某仓储有限公司', contact: '韩经理', phone: '152****7755', source: '渠道', need: 'ERP 对接', amount: 95000, status: '新建', owner: '', next: '', created: '2026-10-12 17:30' },
+  { no: 'XS-202610-0009', name: '培训服务采购', company: '扬州某某教育科技公司', contact: '许老师', phone: '159****2218', source: '广告', need: '培训服务', amount: 40000, status: '新建', owner: '', next: '', created: '2026-10-09 08:55' },
+];
+const EXISTING_CUSTOMERS = [
+  { no: 'KH-202611-0001', name: '南京某某科技有限公司' }, { no: 'KH-202611-0002', name: '江苏某某集团' },
+  { no: 'KH-202610-0021', name: '安徽某某连锁有限公司' }, { no: 'KH-202610-0018', name: '上海某某信息技术有限公司' },
+  { no: 'KH-202609-0032', name: '苏州某某汽配有限公司' } ];
+const OWNERS = ['张三', '李四', '王五', '赵六'];
+const INDUSTRIES = ['制造业', '零售', '酒店餐饮', '汽车后市场', '企业软件 / SaaS', '企业服务', '物流仓储'];
+
+/* ===== 客户（方案 5.3 字段） ===== */
+const CUSTOMERS_INIT = [
+  { no: 'KH-202611-0001', name: '南京某某科技有限公司', type: '企业客户', industry: '制造业', level: '重点客户', source: '渠道转介绍', region: '江苏省南京市', scale: '中型', owner: '张三', status: '正常', lastFollow: '2026-11-02', lastDeal: '2026-10-19', total: 1260000, created: '2026-10-15', phone: '138****8888', key: true },
+  { no: 'KH-202611-0002', name: '江苏某某集团', type: '企业客户', industry: '酒店餐饮', level: '战略客户', source: '官网', region: '江苏省苏州市', scale: '大型', owner: '李四', status: '跟进中', lastFollow: '2026-11-02', lastDeal: '2026-08-12', total: 3860000, created: '2026-10-28', phone: '135****9021', key: true },
+  { no: 'KH-202610-0021', name: '安徽某某连锁有限公司', type: '企业客户', industry: '零售', level: '重点客户', source: '活动', region: '安徽省合肥市', scale: '中型', owner: '张三', status: '跟进中', lastFollow: '2026-10-31', lastDeal: '-', total: 0, created: '2026-10-20', phone: '137****5566', key: true },
+  { no: 'KH-202610-0018', name: '上海某某信息技术有限公司', type: '企业客户', industry: '企业软件 / SaaS', level: '普通客户', source: '官网', region: '上海市浦东新区', scale: '小型', owner: '王五', status: '正常', lastFollow: '2026-10-29', lastDeal: '2026-10-30', total: 360000, created: '2026-10-24', phone: '151****0098', key: false },
+  { no: 'KH-202610-0015', name: '杭州某某酒店管理有限公司', type: '企业客户', industry: '酒店餐饮', level: '普通客户', source: '广告', region: '浙江省杭州市', scale: '中型', owner: '赵六', status: '正常', lastFollow: '2026-10-25', lastDeal: '2026-07-05', total: 520000, created: '2026-09-30', phone: '136****2210', key: false },
+  { no: 'KH-202609-0032', name: '苏州某某汽配有限公司', type: '渠道客户', industry: '汽车后市场', level: '重点客户', source: '渠道', region: '江苏省苏州市', scale: '中型', owner: '李四', status: '正常', lastFollow: '2026-10-30', lastDeal: '2026-09-18', total: 890000, created: '2026-09-12', phone: '139****3380', key: true },
+  { no: 'KH-202609-0027', name: '无锡某某精密制造有限公司', type: '企业客户', industry: '制造业', level: '普通客户', source: '转介绍', region: '江苏省无锡市', scale: '中型', owner: '张三', status: '暂停合作', lastFollow: '2026-09-02', lastDeal: '2026-03-20', total: 240000, created: '2026-09-05', phone: '133****7791', key: false },
+  { no: 'KH-202608-0009', name: '常州某某物流有限公司', type: '企业客户', industry: '物流仓储', level: '潜在客户', source: '官网', region: '江苏省常州市', scale: '小型', owner: '王五', status: '流失', lastFollow: '2026-07-15', lastDeal: '-', total: 0, created: '2026-08-02', phone: '158****4021', key: false },
+  { no: 'KH-202608-0004', name: '合肥某某餐饮连锁有限公司', type: '企业客户', industry: '酒店餐饮', level: '普通客户', source: '活动', region: '安徽省合肥市', scale: '大型', owner: '赵六', status: '跟进中', lastFollow: '2026-10-28', lastDeal: '2026-06-18', total: 410000, created: '2026-08-01', phone: '188****6612', key: false },
+  { no: 'KH-202607-0012', name: '宁波某某贸易有限公司', type: '个人客户', industry: '零售', level: '潜在客户', source: '广告', region: '浙江省宁波市', scale: '小型', owner: '张三', status: '正常', lastFollow: '2026-10-20', lastDeal: '-', total: 0, created: '2026-07-11', phone: '150****8803', key: false },
+];
+
+/* ===== 商机与阶段（方案 5.5 / 6.3） ===== */
+const STAGES = [
+  { key: 'contact', name: '初步接触', prob: 10, color: '#6b8fc9', total: 8, amount: 1560000 },
+  { key: 'need', name: '需求确认', prob: 25, color: '#4b78bd', total: 10, amount: 2380000 },
+  { key: 'plan', name: '方案沟通', prob: 45, color: '#2f62b0', total: 8, amount: 1920000 },
+  { key: 'quote', name: '报价谈判', prob: 65, color: '#1f4e9c', total: 6, amount: 1680000 },
+  { key: 'approve', name: '商务审批', prob: 85, color: '#163b7a', total: 4, amount: 960000 },
+  { key: 'close', name: '赢单 / 输单', prob: 100, color: '#0f2a57', total: 5, amount: 830000 },
+];
+const STAGE_RULES = {
+  need: { title: '需求确认', fields: [
+    { k: 'demand', label: '客户需求', type: 'textarea' }, { k: 'buyDate', label: '采购时间', type: 'date' }, { k: 'budget', label: '预算范围', type: 'input', ph: '如 30–40 万元' } ] },
+  plan: { title: '方案沟通', fields: [
+    { k: 'solution', label: '方案说明', type: 'textarea' }, { k: 'participants', label: '参与沟通的联系人', type: 'select', opts: ['陈总监（决策人）', '刘经理（使用人）', '周会计（财务）', '黄工（技术）'] } ] },
+  quote: { title: '报价谈判', checks: [{ k: 'hasQuote', label: '必须存在有效报价单', hint: '请先创建并通过审批的报价单', link: '/quote/BJ-202611-0008' }] },
+  approve: { title: '商务审批', fields: [
+    { k: 'terms', label: '商务条件', type: 'textarea', ph: '付款方式、交付周期、服务期限、折扣依据…' }, { k: 'materials', label: '审批材料', type: 'select', opts: ['报价单 V3 + 折扣说明.pdf', '客户采购意向函.pdf'] } ] },
+  win: { title: '赢单', checks: [{ k: 'contractApproved', label: '合同已审批或订单已确认（企业配置的成交条件）', hint: '禁止直接标记赢单，需先完成合同审批', link: '/contracts' }] },
+  lose: { title: '输单', fields: [
+    { k: 'loseReason', label: '输单原因', type: 'select', opts: ['价格偏高', '功能不满足', '竞品中标', '客户预算取消', '项目延期'] }, { k: 'competitor', label: '竞争对手', type: 'input', ph: '适用时填写' } ] },
+};
+const OPPS_INIT = [
+  { no: 'SJ-202611-0031', name: '苏州某某智能装备 MES 项目', customer: '苏州某某智能装备有限公司', amount: 300000, date: '2026-12-20', owner: '张三', stage: 'contact', prob: 10, info: {}, flags: {} },
+  { no: 'SJ-202611-0029', name: '杭州某某连锁门店 CRM', customer: '杭州某某连锁餐饮有限公司', amount: 120000, date: '2027-01-15', owner: '李四', stage: 'contact', prob: 10, info: {}, flags: {} },
+  { no: 'SJ-202611-0027', name: '合肥某某渠道代理系统', customer: '合肥某某贸易有限公司', amount: 80000, date: '2027-01-30', owner: '赵六', stage: 'contact', prob: 10, info: {}, flags: {} },
+  { no: 'SJ-202610-0026', name: '安徽某某连锁会员系统', customer: '安徽某某连锁有限公司', amount: 260000, date: '2026-12-10', owner: '张三', stage: 'need', prob: 25, info: { demand: '会员积分体系、门店收银对接', buyDate: '2026-12-01', budget: '25–30 万元' }, flags: { stalled: 12 } },
+  { no: 'SJ-202610-0024', name: '无锡某某服务工单系统', customer: '无锡某某汽配有限公司', amount: 150000, date: '2026-12-05', owner: '张三', stage: 'need', prob: 25, info: {}, flags: {} },
+  { no: 'SJ-202610-0022', name: '上海某某数据平台二期', customer: '上海某某信息技术有限公司', amount: 360000, date: '2026-11-30', owner: '王五', stage: 'need', prob: 25, info: { demand: 'BI 看板、跨系统数据同步', buyDate: '2026-11-20', budget: '35–40 万元' }, flags: {} },
+  { no: 'SJ-202610-0018', name: '江苏某某集团协议客户平台', customer: '江苏某某集团', amount: 680000, date: '2026-12-18', owner: '李四', stage: 'plan', prob: 45, info: { demand: '集团协议客户统一管理', buyDate: '2026-12-01', budget: '60–70 万元', solution: '集团版 + 门店端移动应用', participants: '陈总监（决策人）' }, flags: {} },
+  { no: 'SJ-202610-0015', name: '杭州某某酒店续约方案', customer: '杭州某某酒店管理有限公司', amount: 180000, date: '2026-11-28', owner: '赵六', stage: 'plan', prob: 45, info: { demand: '年度续约+增购 20 用户', buyDate: '2026-11-20', budget: '18 万元', solution: '续约 + 增购方案', participants: '刘经理（使用人）' }, flags: { stalled: 9 } },
+  { no: 'SJ-202609-0012', name: '南京某某 ERP 升级项目', customer: '南京某某科技有限公司', amount: 340000, date: '2026-11-25', owner: '张三', stage: 'quote', prob: 65, info: { demand: 'ERP 升级、移动端扩展', buyDate: '2026-11-15', budget: '30–35 万元', solution: 'CRM 企业版 + 移动扩展 + 实施', participants: '陈总监（决策人）' }, flags: { hasQuote: true }, quoteNo: 'BJ-202611-0008' },
+  { no: 'SJ-202609-0010', name: '苏州某某汽配渠道平台', customer: '苏州某某汽配有限公司', amount: 420000, date: '2026-11-22', owner: '李四', stage: 'quote', prob: 65, info: { demand: '渠道订货、返利', buyDate: '2026-11-10', budget: '40 万元', solution: '渠道门户+订货', participants: '黄工（技术）' }, flags: {} },
+  { no: 'SJ-202609-0006', name: '合肥某某餐饮连锁续费', customer: '合肥某某餐饮连锁有限公司', amount: 260000, date: '2026-11-18', owner: '赵六', stage: 'approve', prob: 85, info: { demand: '到期续费', buyDate: '2026-11-10', budget: '26 万元', solution: '原方案续费', participants: '周会计（财务）', terms: '年付，95 折', materials: '报价单 V3 + 折扣说明.pdf' }, flags: { hasQuote: true, contractApproved: false }, quoteNo: 'BJ-202610-0019' },
+  { no: 'SJ-202610-0020', name: '无锡某某精密制造设备管理项目', customer: '无锡某某精密制造有限公司', amount: 240000, date: '2026-11-12', owner: '张三', stage: 'approve', prob: 85, info: { demand: '设备台账与维保管理', buyDate: '2026-11-05', budget: '24 万元', solution: '设备管理模块定制', participants: '黄工（技术）', terms: '合同签署付 50%，验收付 50%', materials: '报价单 V3 + 折扣说明.pdf' }, flags: { hasQuote: true, contractApproved: true }, quoteNo: 'BJ-202610-0015' },
+  { no: 'SJ-202608-0004', name: '南京某某 ERP 实施项目', customer: '南京某某科技有限公司', amount: 100000, date: '2026-10-19', owner: '张三', stage: 'close', prob: 100, result: '赢单', info: {}, flags: {} },
+  { no: 'SJ-202608-0002', name: '宁波某某会员运营', customer: '宁波某某商贸有限公司', amount: 220000, date: '2026-10-29', owner: '张三', stage: 'close', prob: 100, result: '赢单', info: {}, flags: {} },
+  { no: 'SJ-202607-0008', name: '常州某某物流调度', customer: '常州某某物流有限公司', amount: 190000, date: '2026-10-15', owner: '王五', stage: 'close', prob: 0, result: '输单', loseReason: '竞品中标', info: {}, flags: {} },
+];
+const STAGE_IDX = Object.fromEntries(STAGES.map((s, i) => [s.key, i]));
+
+/* ===== 报价单（方案 5.7）· 金额全部以“分”精确计算 ===== */
+const QUOTE_ITEMS = [
+  { id: 1, name: 'CRM 企业版软件授权', spec: '50 用户 · 年付', qty: 50, unit: '用户·年', price: 3600, disc: 90 },
+  { id: 2, name: '移动端扩展包', spec: '含企业微信集成', qty: 1, unit: '套', price: 28000, disc: 85 },
+  { id: 3, name: '标准实施服务', spec: '标准实施 · 人天', qty: 40, unit: '人天', price: 2000, disc: 100 },
+  { id: 4, name: '数据迁移服务', spec: '历史数据清洗导入', qty: 1, unit: '项', price: 15800, disc: 80 },
+  { id: 5, name: '年度运维服务', spec: '7×12 小时响应', qty: 1, unit: '年', price: 18000, disc: 100 },
+];
+const TAX_RATE_BP = 1300; // 13.00%（基点）
+const DISCOUNT_RULES = [
+  { max: 500, role: '销售人员（授权范围内，自动通过）' }, { max: 1000, role: '销售经理' }, { max: 2000, role: '销售总监' }, { max: 10001, role: '总经理 / 财务负责人（低于价格底线）' } ];
+function calcQuote(items) {
+  let orig = 0, sub = 0;
+  const rows = items.map(it => {
+    const stdC = toC(it.price);
+    const dealC = Math.round(stdC * it.disc / 100);           // 成交单价（分）
+    const lineOrig = stdC * it.qty, lineSub = dealC * it.qty;
+    orig += lineOrig; sub += lineSub;
+    return { ...it, stdC, dealC, lineSub };
+  });
+  const discount = orig - sub;
+  const tax = Math.round(sub * TAX_RATE_BP / 10000);
+  const discBp = orig ? Math.round(discount * 10000 / orig) : 0;
+  const rule = DISCOUNT_RULES.find(r => discBp <= r.max);
+  return { rows, orig, sub, discount, tax, total: sub + tax, discBp, rule };
+}
+
+/* ===== 回款（方案 5.10）· 合同 100,000 元 30/40/30 ===== */
+function buildPay() {
+  return {
+    contracts: [
+      { no: 'HT-202611-0003', name: '南京某某科技 ERP 实施合同', customer: '南京某某科技有限公司', order: 'DD-202611-0002', owner: '张三', amount: toC(100000), plans: [
+        { id: 'P1', stage: '合同签署', ratio: 30, date: '2026-10-20', amount: toC(30000) },
+        { id: 'P2', stage: '项目上线', ratio: 40, date: '2026-10-28', amount: toC(40000) },
+        { id: 'P3', stage: '项目验收', ratio: 30, date: '2026-12-15', amount: toC(30000) } ] },
+      { no: 'HT-202608-0012', name: '江苏某某集团平台建设合同', customer: '江苏某某集团', order: 'DD-202608-0009', owner: '李四', amount: toC(600000), plans: [
+        { id: 'P4', stage: '预付款', ratio: 50, date: '2026-08-20', amount: toC(300000) },
+        { id: 'P5', stage: '验收款', ratio: 50, date: '2026-11-20', amount: toC(300000) } ] },
+      { no: 'HT-202607-0004', name: '杭州某某酒店年度服务合同', customer: '杭州某某酒店管理有限公司', order: 'DD-202607-0004', owner: '赵六', amount: toC(180000), plans: [
+        { id: 'P6', stage: '首付款', ratio: 60, date: '2026-07-10', amount: toC(108000) },
+        { id: 'P7', stage: '尾款', ratio: 40, date: '2026-10-25', amount: toC(72000) } ] },
+    ],
+    records: [
+      { id: 'SK-202610-0007', contract: 'HT-202611-0003', date: '2026-10-19', amount: toC(30000), method: '银行转账', confirm: '财务已确认', operator: '财务-王芳', alloc: [{ plan: 'P1', amt: toC(30000) }] },
+      { id: 'SK-202610-0012', contract: 'HT-202611-0003', date: '2026-10-30', amount: toC(25000), method: '银行转账', confirm: '财务已确认', operator: '财务-王芳', alloc: [{ plan: 'P2', amt: toC(25000) }] },
+      { id: 'SK-202608-0003', contract: 'HT-202608-0012', date: '2026-08-19', amount: toC(300000), method: '银行转账', confirm: '财务已确认', operator: '财务-王芳', alloc: [{ plan: 'P4', amt: toC(300000) }] },
+      { id: 'SK-202607-0002', contract: 'HT-202607-0004', date: '2026-07-09', amount: toC(108000), method: '电汇', confirm: '财务已确认', operator: '财务-王芳', alloc: [{ plan: 'P6', amt: toC(108000) }] },
+      { id: 'SK-202610-0015', contract: 'HT-202607-0004', date: '2026-10-31', amount: toC(40000), method: '银行转账', confirm: '待财务复核', operator: '财务-王芳', alloc: [{ plan: 'P7', amt: toC(40000) }] },
+    ],
+  };
+}
+
+/* ===== 审批（方案 7.1） ===== */
+const APPROVALS_INIT = [
+  { id: 'SP-202611-0042', tab: 'todo', type: '报价折扣审批', title: '报价 BJ-202611-0008 (V3) 折扣审批', biz: '南京某某 ERP 升级项目', applicant: '王五', dept: '华东销售一部', time: '2026-11-02 08:40', amount: toC(334977.2), summary: [['客户', '南京某某科技有限公司'], ['关联商机', 'SJ-202609-0012'], ['整体折扣', '7.88%（超出销售授权 5%）'], ['含税金额', '¥334,977.20'], ['报价版本', 'V3']], nodes: [
+    { n: '发起申请', p: '王五', st: 'done', t: '11-02 08:40' }, { n: '销售经理', p: '张三（我）', st: 'cur', t: '' }, { n: '销售总监', p: '（折扣>10% 时触发）', st: 'skip', t: '' }, { n: '审批完成', p: '', st: 'wait', t: '' } ], history: [{ who: '王五', act: '提交申请', op: '客户为重点客户，申请 92 折以内的组合折扣，竞品报价较低。', t: '11-02 08:40' }], cc: false },
+  { id: 'SP-202611-0040', tab: 'todo', type: '合同审批', title: '合同 HT-202611-0006 新建合同审批', biz: '苏州某某汽配渠道平台合同', applicant: '李四', dept: '华东销售二部', time: '2026-11-01 17:10', amount: toC(420000), summary: [['客户', '苏州某某汽配有限公司'], ['合同金额', '¥420,000.00'], ['付款方式', '3 / 3 / 4 分期'], ['签约方', '我方：某某软件有限公司']], nodes: [
+    { n: '发起申请', p: '李四', st: 'done', t: '11-01 17:10' }, { n: '业务负责人（销售经理）', p: '张三（我）', st: 'cur', t: '' }, { n: '法务', p: '陈法务', st: 'wait', t: '' }, { n: '财务', p: '王财务', st: 'wait', t: '' } ], history: [{ who: '李四', act: '提交申请', op: '合同已与客户确认条款。', t: '11-01 17:10' }], cc: false },
+  { id: 'SP-202611-0038', tab: 'todo', type: '客户转移', title: '重点客户转移 · 苏州某某汽配有限公司', biz: '负责人 李四 → 王五', applicant: '李四', dept: '华东销售二部', time: '2026-10-31 14:20', amount: 0, summary: [['客户', '苏州某某汽配有限公司（重点客户）'], ['原负责人', '李四'], ['新负责人', '王五'], ['转移原因', '区域调整']], nodes: [
+    { n: '发起申请', p: '李四', st: 'done', t: '10-31 14:20' }, { n: '原负责人直属经理', p: '张三（我）', st: 'cur', t: '' }, { n: '审批完成', p: '', st: 'wait', t: '' } ], history: [{ who: '李四', act: '提交申请', op: '区域调整，客户移交王五。', t: '10-31 14:20' }], cc: false },
+  { id: 'SP-202611-0035', tab: 'mine', type: '报价折扣审批', title: '报价 BJ-202610-0019 低价报价审批', biz: '合肥某某餐饮连锁续费', applicant: '张三', dept: '华东销售一部', time: '2026-10-30 10:05', amount: toC(260000), summary: [['客户', '合肥某某餐饮连锁有限公司'], ['含税金额', '¥260,000.00'], ['整体折扣', '12%']], nodes: [
+    { n: '发起申请', p: '张三', st: 'done', t: '10-30 10:05' }, { n: '销售经理', p: '李明', st: 'done', t: '10-30 11:20' }, { n: '销售总监', p: '周总监', st: 'cur', t: '' }, { n: '审批完成', p: '', st: 'wait', t: '' } ], history: [{ who: '张三', act: '提交申请', op: '续费客户，申请优惠。', t: '10-30 10:05' }, { who: '李明', act: '同意', op: '同意，转总监。', t: '10-30 11:20' }], cc: false },
+  { id: 'SP-202610-0031', tab: 'mine', type: '应收冲销', title: '回款冲销 · SK-202610-0009', biz: '录入错误更正', applicant: '张三', dept: '华东销售一部', time: '2026-10-27 09:30', amount: toC(5000), summary: [['合同', 'HT-202607-0004'], ['冲销金额', '¥5,000.00'], ['原因', '重复录入']], nodes: [
+    { n: '发起申请', p: '张三', st: 'done', t: '10-27 09:30' }, { n: '财务负责人', p: '王财务', st: 'rej', t: '10-27 15:00' } ], history: [{ who: '张三', act: '提交申请', op: '重复录入，申请冲销。', t: '10-27 09:30' }, { who: '王财务', act: '拒绝', op: '银行回单核对为两笔不同到账，请勿冲销。', t: '10-27 15:00' }], cc: false, result: '已拒绝' },
+  { id: 'SP-202610-0027', tab: 'done', type: '线索批量分配', title: '线索批量分配 · 12 条', biz: '超出普通销售权限', applicant: '赵六', dept: '华东销售二部', time: '2026-10-25 13:40', amount: 0, summary: [['线索数量', '12 条'], ['分配对象', '华东销售二部']], nodes: [
+    { n: '发起申请', p: '赵六', st: 'done', t: '10-25 13:40' }, { n: '销售经理', p: '张三', st: 'done', t: '10-25 14:10' } ], history: [{ who: '赵六', act: '提交申请', op: '活动线索统一分配。', t: '10-25 13:40' }, { who: '张三', act: '同意', op: '同意分配。', t: '10-25 14:10' }], cc: false, result: '已同意' },
+  { id: 'SP-202610-0022', tab: 'done', type: '商机特殊折扣', title: '商机 SJ-202609-0010 特殊折扣', biz: '苏州某某汽配渠道平台', applicant: '李四', dept: '华东销售二部', time: '2026-10-22 09:50', amount: toC(420000), summary: [['折扣', '9 折'], ['客户', '苏州某某汽配有限公司']], nodes: [
+    { n: '发起申请', p: '李四', st: 'done', t: '10-22 09:50' }, { n: '销售经理', p: '张三', st: 'rej', t: '10-22 11:00' } ], history: [{ who: '李四', act: '提交申请', op: '渠道客户申请折扣。', t: '10-22 09:50' }, { who: '张三', act: '拒绝', op: '折扣不合理，请调整到 95 折以内。', t: '10-22 11:00' }], cc: false, result: '已拒绝' },
+  { id: 'SP-202611-0041', tab: 'cc', type: '合同变更', title: '合同 HT-202604-0018 金额变更', biz: '南京某某科技 ERP 软件授权合同', applicant: '王五', dept: '华东销售一部', time: '2026-11-01 16:30', amount: toC(600000), summary: [['合同', 'HT-202604-0018'], ['变更内容', '增加 10 个用户授权'], ['变更后金额', '¥600,000.00']], nodes: [
+    { n: '发起申请', p: '王五', st: 'done', t: '11-01 16:30' }, { n: '销售总监', p: '周总监', st: 'cur', t: '' }, { n: '法务', p: '陈法务', st: 'wait', t: '' } ], history: [{ who: '王五', act: '提交申请', op: '客户新增用户，申请变更合同金额。', t: '11-01 16:30' }], cc: true },
+  { id: 'SP-202610-0029', tab: 'cc', type: '合同终止', title: '合同 HT-202511-0009 提前终止', biz: '无锡某某精密制造', applicant: '张三', dept: '华东销售一部', time: '2026-10-26 11:15', amount: toC(240000), summary: [['合同', 'HT-202511-0009'], ['终止原因', '客户暂停合作']], nodes: [
+    { n: '发起申请', p: '张三', st: 'done', t: '10-26 11:15' }, { n: '指定负责人', p: '李明', st: 'done', t: '10-26 14:00' }, { n: '管理层', p: '周总监', st: 'done', t: '10-27 09:00' } ], history: [{ who: '张三', act: '提交申请', op: '客户暂停合作。', t: '10-26 11:15' }], cc: true, result: '已同意' },
+];
+
+/* ===== 占位模块配置（统一布局 · 少量 mock 行） ===== */
+const T = (map) => map;
+const PH = {
+  contacts: { title: '联系人管理', crumbs: ['联系人管理', '联系人列表'], unit: '位', total: 3426, stats: [['联系人总数', '3,426'], ['关键决策人', '412', 'ok'], ['本月新增', '86'], ['长期未联系 (>60天)', '37', 'warn']],
+    filters: [{ k: 'kw', label: '搜索联系人', ph: '姓名 / 电话 / 客户' }, { k: 'role', label: '联系人角色', opts: ['决策人', '使用人', '采购人', '财务', '技术'] }, { k: 'infl', label: '影响力', opts: ['高', '中', '低'] }],
+    ops: ['新增联系人', '导入', '导出'],
+    cols: [{ p: 'name', l: '联系人姓名', link: true, w: 120 }, { p: 'customer', l: '所属客户', w: 220, link: 'cust' }, { p: 'phone', l: '联系电话', w: 130 }, { p: 'email', l: '电子邮箱', w: 190 }, { p: 'dept', l: '部门', w: 100 }, { p: 'title', l: '职务', w: 110 }, { p: 'role', l: '联系人角色', w: 110, tag: { 决策人: 'danger', 使用人: 'info', 采购人: 'warning', 财务: 'success', 技术: 'primary' } }, { p: 'infl', l: '影响力', w: 80 }, { p: 'pref', l: '联系偏好', w: 90 }, { p: 'key', l: '关键联系人', w: 100, bool: true }],
+    rows: [
+      { name: '陈总监', customer: '南京某某科技有限公司', phone: '138****8888', email: 'chen@example.com', dept: '信息中心', title: 'CIO', role: '决策人', infl: '高', pref: '电话', key: true },
+      { name: '刘经理', customer: '南京某某科技有限公司', phone: '139****0021', email: 'liu@example.com', dept: '运营部', title: '运营经理', role: '使用人', infl: '中', pref: '微信', key: false },
+      { name: '周会计', customer: '南京某某科技有限公司', phone: '137****6603', email: 'zhou@example.com', dept: '财务部', title: '财务主管', role: '财务', infl: '中', pref: '邮件', key: false },
+      { name: '周主任', customer: '江苏某某集团', phone: '135****9021', email: 'zhouzr@example.com', dept: '采购部', title: '采购主任', role: '采购人', infl: '高', pref: '电话', key: true },
+      { name: '黄工', customer: '苏州某某汽配有限公司', phone: '133****2290', email: 'huang@example.com', dept: '技术部', title: '系统工程师', role: '技术', infl: '低', pref: '微信', key: false } ] },
+  products: { title: '产品管理', crumbs: ['产品管理', '产品目录'], unit: '项', total: 168, stats: [['产品总数', '168'], ['在售', '142', 'ok'], ['停售', '18', 'warn'], ['价格表', '6']],
+    filters: [{ k: 'kw', label: '搜索产品', ph: '产品编号 / 名称' }, { k: 'cat', label: '产品分类', opts: ['软件', '服务', '实施费用', '维护费用', '增值服务', '套餐'] }, { k: 'status', label: '产品状态', opts: ['在售', '停售', '停用'] }],
+    ops: ['新增产品', '导入', '价格表管理'],
+    cols: [{ p: 'no', l: '产品编号', w: 120 }, { p: 'name', l: '产品名称', w: 200, link: true }, { p: 'cat', l: '产品分类', w: 100 }, { p: 'spec', l: '产品规格', w: 150 }, { p: 'unit', l: '标准单位', w: 90 }, { p: 'price', l: '标准售价', w: 120, money: true }, { p: 'cost', l: '成本价', w: 110, money: true }, { p: 'status', l: '产品状态', w: 100, tag: { 在售: 'success', 停售: 'warning', 停用: 'info' } }, { p: 'book', l: '适用价格表', w: 150 }],
+    rows: [
+      { no: 'CP-0001', name: 'CRM 企业版软件授权', cat: '软件', spec: '50 用户 · 年付', unit: '用户·年', price: 3600, cost: 1200, status: '在售', book: '标准价 / 重点客户价' },
+      { no: 'CP-0002', name: '移动端扩展包', cat: '软件', spec: '含企业微信集成', unit: '套', price: 28000, cost: 9000, status: '在售', book: '标准价' },
+      { no: 'CP-0011', name: '标准实施服务', cat: '实施费用', spec: '人天', unit: '人天', price: 2000, cost: 1100, status: '在售', book: '标准价 / 渠道价' },
+      { no: 'CP-0012', name: '数据迁移服务', cat: '服务', spec: '历史数据清洗导入', unit: '项', price: 15800, cost: 6000, status: '在售', book: '标准价' },
+      { no: 'CP-0021', name: '年度运维服务', cat: '维护费用', spec: '7×12 小时响应', unit: '年', price: 18000, cost: 7000, status: '在售', book: '标准价' } ] },
+  contracts: { title: '合同管理', crumbs: ['合同管理', '合同台账'], unit: '份', total: 436, stats: [['合同总数', '436'], ['待审批', '7', 'warn'], ['履约中', '218', 'ok'], ['30天内到期', '9', 'danger']],
+    filters: [{ k: 'kw', label: '搜索合同', ph: '合同编号 / 名称 / 客户' }, { k: 'type', label: '合同类型', opts: ['销售合同', '服务合同', '续费合同'] }, { k: 'status', label: '合同状态', opts: ['草稿', '审批中', '履约中', '已完成', '已驳回'] }],
+    ops: ['新增合同', '导出'],
+    cols: [{ p: 'no', l: '合同编号', w: 150, link: true }, { p: 'name', l: '合同名称', w: 230 }, { p: 'customer', l: '客户名称', w: 210, link: 'cust' }, { p: 'opp', l: '关联商机', w: 150, link: true }, { p: 'type', l: '合同类型', w: 100 }, { p: 'amount', l: '合同金额', w: 120, money: true }, { p: 'sign', l: '签署日期', w: 110 }, { p: 'end', l: '到期日期', w: 110 }, { p: 'owner', l: '负责人', w: 80 }, { p: 'status', l: '合同状态', w: 100, tag: { 草稿: 'info', 审批中: 'warning', 履约中: 'primary', 已完成: 'success', 已驳回: 'danger' } }],
+    rows: [
+      { no: 'HT-202611-0006', name: '苏州某某汽配渠道平台合同', customer: '苏州某某汽配有限公司', opp: 'SJ-202609-0010', type: '销售合同', amount: 420000, sign: '-', end: '2027-11-21', owner: '李四', status: '审批中' },
+      { no: 'HT-202611-0003', name: '南京某某科技 ERP 实施合同', customer: '南京某某科技有限公司', opp: 'SJ-202608-0004', type: '服务合同', amount: 100000, sign: '2026-10-19', end: '2027-04-19', owner: '张三', status: '履约中' },
+      { no: 'HT-202608-0012', name: '江苏某某集团平台建设合同', customer: '江苏某某集团', opp: 'SJ-202607-0003', type: '销售合同', amount: 600000, sign: '2026-08-12', end: '2027-08-11', owner: '李四', status: '履约中' },
+      { no: 'HT-202607-0004', name: '杭州某某酒店年度服务合同', customer: '杭州某某酒店管理有限公司', opp: 'SJ-202606-0007', type: '续费合同', amount: 180000, sign: '2026-07-05', end: '2026-11-14', owner: '赵六', status: '履约中' },
+      { no: 'HT-202601-0007', name: '南京某某科技 ERP 二期定制开发合同', customer: '南京某某科技有限公司', opp: 'SJ-202512-0003', type: '销售合同', amount: 560000, sign: '2026-01-16', end: '2027-01-15', owner: '张三', status: '履约中' },
+      { no: 'HT-202604-0018', name: '南京某某科技 ERP 软件授权合同', customer: '南京某某科技有限公司', opp: 'SJ-202603-0005', type: '销售合同', amount: 600000, sign: '2026-04-18', end: '2027-04-17', owner: '张三', status: '履约中' } ] },
+  orders: { title: '订单管理', crumbs: ['订单管理', '销售订单'], unit: '笔', total: 389, stats: [['订单总数', '389'], ['待确认', '11', 'warn'], ['交付中', '96', 'ok'], ['异常（暂停/取消）', '5', 'danger']],
+    filters: [{ k: 'kw', label: '搜索订单', ph: '订单编号 / 客户 / 合同' }, { k: 'status', label: '订单状态', opts: ['待确认', '已确认', '待交付', '交付中', '已完成', '已取消'] }],
+    ops: ['新增订单', '导出'],
+    cols: [{ p: 'no', l: '订单编号', w: 140, link: true }, { p: 'customer', l: '客户', w: 210, link: 'cust' }, { p: 'contract', l: '合同', w: 150, link: true }, { p: 'opp', l: '商机', w: 150 }, { p: 'amount', l: '订单金额', w: 120, money: true }, { p: 'date', l: '订单日期', w: 110 }, { p: 'dlv', l: '交付日期', w: 110 }, { p: 'owner', l: '负责人', w: 80 }, { p: 'status', l: '订单状态', w: 100, tag: { 待确认: 'info', 已确认: 'primary', 待交付: 'warning', 交付中: 'primary', 已完成: 'success', 已取消: 'danger' } }],
+    rows: [
+      { no: 'DD-202611-0002', customer: '南京某某科技有限公司', contract: 'HT-202611-0003', opp: 'SJ-202608-0004', amount: 100000, date: '2026-10-19', dlv: '2026-12-10', owner: '张三', status: '交付中' },
+      { no: 'DD-202608-0009', customer: '江苏某某集团', contract: 'HT-202608-0012', opp: 'SJ-202607-0003', amount: 600000, date: '2026-08-12', dlv: '2026-12-30', owner: '李四', status: '交付中' },
+      { no: 'DD-202607-0004', customer: '杭州某某酒店管理有限公司', contract: 'HT-202607-0004', opp: 'SJ-202606-0007', amount: 180000, date: '2026-07-05', dlv: '2026-08-05', owner: '赵六', status: '已完成' },
+      { no: 'DD-202611-0003', customer: '宁波某某商贸有限公司', contract: 'HT-202611-0004', opp: 'SJ-202608-0002', amount: 220000, date: '2026-11-01', dlv: '2027-01-10', owner: '张三', status: '待确认' } ] },
+  activities: { title: '活动管理', crumbs: ['活动管理', '跟进记录'], unit: '条', total: 9217, stats: [['本月跟进记录', '1,284'], ['今日待跟进', '8', 'warn'], ['本周拜访', '23', 'ok'], ['逾期未跟进', '6', 'danger']],
+    filters: [{ k: 'kw', label: '搜索', ph: '客户 / 内容' }, { k: 'type', label: '活动类型', opts: ['电话', '微信', '拜访', '会议', '邮件', '演示', '培训'] }],
+    ops: ['记录跟进', '新建日程', '导出'],
+    cols: [{ p: 'no', l: '跟进编号', w: 130 }, { p: 'customer', l: '关联客户', w: 210, link: 'cust' }, { p: 'contact', l: '关联联系人', w: 100 }, { p: 'opp', l: '关联商机', w: 150 }, { p: 'type', l: '活动类型', w: 90, tag: { 电话: 'primary', 拜访: 'success', 会议: 'warning', 微信: 'info', 演示: 'danger' } }, { p: 'time', l: '跟进时间', w: 150 }, { p: 'content', l: '跟进内容', w: 280 }, { p: 'result', l: '跟进结果', w: 100 }, { p: 'next', l: '下次跟进', w: 150 }],
+    rows: [
+      { no: 'GJ-20261102-001', customer: '南京某某科技有限公司', contact: '陈总监', opp: 'SJ-202609-0012', type: '电话', time: '2026-11-02 10:00', content: '产品方案沟通，客户本周内部评审', result: '待反馈', next: '2026-11-05 10:00' },
+      { no: 'GJ-20261102-002', customer: '江苏某某集团', contact: '周主任', opp: 'SJ-202610-0018', type: '拜访', time: '2026-11-02 14:30', content: '商务拜访，讨论集团协议客户平台', result: '需求明确', next: '2026-11-08 09:00' },
+      { no: 'GJ-20261101-006', customer: '安徽某某连锁有限公司', contact: '李店长', opp: 'SJ-202610-0026', type: '微信', time: '2026-11-01 16:20', content: '报价反馈沟通', result: '已联系', next: '2026-11-03 09:00' },
+      { no: 'GJ-20261031-003', customer: '苏州某某汽配有限公司', contact: '黄工', opp: 'SJ-202609-0010', type: '演示', time: '2026-10-31 15:00', content: '渠道订货平台演示', result: '需求明确', next: '2026-11-06 14:00' } ] },
+  delivery: { title: '交付管理', crumbs: ['交付管理', '项目列表'], unit: '个', total: 74, stats: [['项目总数', '74'], ['实施中', '31', 'ok'], ['延期预警', '4', 'danger'], ['待验收', '6', 'warn']],
+    filters: [{ k: 'kw', label: '搜索项目', ph: '项目编号 / 名称 / 客户' }, { k: 'status', label: '项目状态', opts: ['未开始', '实施中', '已延期', '已完成'] }],
+    ops: ['新建项目', '导出'],
+    cols: [{ p: 'no', l: '项目编号', w: 130, link: true }, { p: 'customer', l: '客户名称', w: 210, link: 'cust' }, { p: 'name', l: '项目名称', w: 200 }, { p: 'contract', l: '合同', w: 140 }, { p: 'pm', l: '项目经理', w: 90 }, { p: 'start', l: '计划开始', w: 110 }, { p: 'endd', l: '计划完成', w: 110 }, { p: 'progress', l: '进度', w: 160, progress: true }, { p: 'status', l: '项目状态', w: 100, tag: { 未开始: 'info', 实施中: 'primary', 已延期: 'danger', 已完成: 'success' } }, { p: 'accept', l: '验收状态', w: 100 }],
+    rows: [
+      { no: 'XM-202611-0002', customer: '南京某某科技有限公司', name: 'ERP 实施项目', contract: 'HT-202611-0003', pm: '孙工', start: '2026-10-22', endd: '2026-12-10', progress: 55, status: '实施中', accept: '阶段验收中' },
+      { no: 'XM-202608-0004', customer: '江苏某某集团', name: '协议客户平台建设', contract: 'HT-202608-0012', pm: '钱工', start: '2026-08-20', endd: '2026-11-15', progress: 82, status: '已延期', accept: '待验收' },
+      { no: 'XM-202607-0002', customer: '杭州某某酒店管理有限公司', name: '年度服务交付', contract: 'HT-202607-0004', pm: '孙工', start: '2026-07-08', endd: '2026-08-30', progress: 100, status: '已完成', accept: '已验收' } ] },
+  service: { title: '服务管理', crumbs: ['服务管理', '服务工单'], unit: '单', total: 612, stats: [['工单总数', '612'], ['待受理', '9', 'warn'], ['SLA 即将超时', '3', 'danger'], ['平均满意度', '4.7 / 5', 'ok']],
+    filters: [{ k: 'kw', label: '搜索工单', ph: '工单编号 / 客户 / 描述' }, { k: 'status', label: '当前状态', opts: ['待受理', '待分派', '处理中', '待客户确认', '已解决', '已关闭'] }, { k: 'level', label: '问题等级', opts: ['紧急', '高', '中', '低'] }],
+    ops: ['新建工单', '导出'],
+    cols: [{ p: 'no', l: '工单编号', w: 140, link: true }, { p: 'customer', l: '客户名称', w: 210, link: 'cust' }, { p: 'type', l: '工单类型', w: 100 }, { p: 'level', l: '问题等级', w: 90, tag: { 紧急: 'danger', 高: 'warning', 中: 'primary', 低: 'info' } }, { p: 'desc', l: '问题描述', w: 260 }, { p: 'time', l: '提交时间', w: 150 }, { p: 'handler', l: '处理人', w: 80 }, { p: 'status', l: '当前状态', w: 110, tag: { 待受理: 'info', 处理中: 'primary', 待客户确认: 'warning', 已解决: 'success', 已关闭: 'info' } }, { p: 'sla', l: 'SLA 剩余', w: 100 }, { p: 'sat', l: '满意度', w: 80 }],
+    rows: [
+      { no: 'GD-202611-0007', customer: '江苏某某集团', type: '客户投诉', level: '紧急', desc: '协议客户报表导出失败，影响月结', time: '2026-11-02 08:20', handler: '客服-小林', status: '处理中', sla: '1小时20分', sat: '-' },
+      { no: 'GD-202611-0005', customer: '南京某某科技有限公司', type: '服务请求', level: '中', desc: '申请新增 5 个用户账号', time: '2026-11-01 15:30', handler: '客服-小陈', status: '待客户确认', sla: '-', sat: '-' },
+      { no: 'GD-202610-0042', customer: '苏州某某汽配有限公司', type: '故障报修', level: '高', desc: '移动端无法同步订单数据', time: '2026-10-30 11:05', handler: '技术-黄工', status: '已解决', sla: '-', sat: '5' } ] },
+  analytics: { title: '数据分析', crumbs: ['数据分析', '经营报表'], unit: '张', total: 9, stats: [['销售额（按合同签署金额）', '¥286万'], ['目标完成率', '78.6%', 'ok'], ['赢单率', '31.4%'], ['平均成交周期', '47 天']],
+    filters: [{ k: 'kw', label: '搜索报表', ph: '报表名称' }, { k: 'role', label: '适用角色', opts: ['老板', '经理', '销售', '财务', '客服'] }],
+    ops: ['新建看板', '导出'],
+    cols: [{ p: 'name', l: '报表名称', w: 180, link: true }, { p: 'metric', l: '核心指标', w: 360 }, { p: 'caliber', l: '统计口径', w: 300 }, { p: 'role', l: '适用角色', w: 100 }, { p: 'upd', l: '更新时间', w: 150 }],
+    rows: [
+      { name: '销售总览', metric: '销售额、目标完成率、赢单率、平均成交周期', caliber: '销售额 = 已审批合同签署金额（不含税）', role: '老板', upd: '2026-11-02 06:00' },
+      { name: '线索分析', metric: '线索量、来源分布、有效率、转化率', caliber: '转化率 = 已转化线索 / 当期新增线索', role: '经理', upd: '2026-11-02 06:00' },
+      { name: '回款分析', metric: '应收金额、已收金额、逾期金额、回款率', caliber: '已收 = 财务已确认到账金额', role: '财务', upd: '2026-11-02 06:00' },
+      { name: '服务分析', metric: '工单数量、处理时长、超时率、满意度', caliber: '超时率 = 超出 SLA 工单 / 已处理工单', role: '客服', upd: '2026-11-02 06:00' } ] },
+  system: { title: '系统管理', crumbs: ['系统管理', '用户管理'], unit: '人', total: 86, stats: [['用户总数', '86'], ['在线', '23', 'ok'], ['已停用', '5', 'warn'], ['角色数', '9']],
+    filters: [{ k: 'kw', label: '搜索用户', ph: '姓名 / 账号' }, { k: 'role', label: '角色', opts: ['系统管理员', '销售总监', '销售经理', '销售人员', '财务人员', '客服人员'] }, { k: 'status', label: '状态', opts: ['启用', '停用'] }],
+    ops: ['新增用户', '重置密码', '导入'],
+    cols: [{ p: 'acc', l: '账号', w: 130 }, { p: 'name', l: '姓名', w: 90, link: true }, { p: 'dept', l: '所属部门', w: 140 }, { p: 'role', l: '角色', w: 110 }, { p: 'scope', l: '数据权限', w: 150 }, { p: 'last', l: '最近登录', w: 150 }, { p: 'status', l: '状态', w: 90, tag: { 启用: 'success', 停用: 'info' } }],
+    rows: [
+      { acc: 'zhangsan', name: '张三', dept: '华东销售一部', role: '销售经理', scope: '本部门及下属', last: '2026-11-02 08:31', status: '启用' },
+      { acc: 'wangwu', name: '王五', dept: '华东销售一部', role: '销售人员', scope: '仅本人', last: '2026-11-02 08:12', status: '启用' },
+      { acc: 'zhouzj', name: '周总监', dept: '华东销售中心', role: '销售总监', scope: '所管辖部门', last: '2026-11-01 18:40', status: '启用' },
+      { acc: 'wangfang', name: '王芳', dept: '财务部', role: '财务人员', scope: '合同/回款（只读跟进）', last: '2026-11-02 09:01', status: '启用' } ] },
+  quotes: { title: '报价管理', crumbs: ['报价管理', '报价列表'], unit: '份', total: 521, stats: [['报价总数', '521'], ['审批中', '3', 'warn'], ['已发送客户', '64', 'ok'], ['即将过期', '5', 'danger']],
+    filters: [{ k: 'kw', label: '搜索报价', ph: '报价编号 / 客户 / 商机' }, { k: 'appr', label: '审批状态', opts: ['草稿', '审批中', '已通过', '已驳回'] }],
+    ops: ['新增报价', '导出'],
+    cols: [{ p: 'no', l: '报价编号', w: 150, link: 'quote' }, { p: 'customer', l: '客户名称', w: 210, link: 'cust' }, { p: 'opp', l: '关联商机', w: 150 }, { p: 'amount', l: '报价金额（含税）', w: 140, money: true }, { p: 'disc', l: '折扣金额', w: 110, money: true }, { p: 'date', l: '报价日期', w: 110 }, { p: 'valid', l: '有效期至', w: 110 }, { p: 'owner', l: '负责人', w: 80 }, { p: 'appr', l: '审批状态', w: 100, tag: { 草稿: 'info', 审批中: 'warning', 已通过: 'success', 已驳回: 'danger' } }, { p: 'ver', l: '版本', w: 70 }],
+    rows: [
+      { no: 'BJ-202611-0008', customer: '南京某某科技有限公司', opp: 'SJ-202609-0012', amount: 334977.2, disc: 25360, date: '2026-11-02', valid: '2026-12-02', owner: '张三', appr: '审批中', ver: 'V3' },
+      { no: 'BJ-202610-0019', customer: '合肥某某餐饮连锁有限公司', opp: 'SJ-202609-0006', amount: 260000, disc: 35000, date: '2026-10-30', valid: '2026-11-30', owner: '张三', appr: '审批中', ver: 'V2' },
+      { no: 'BJ-202610-0011', customer: '南京某某科技有限公司', opp: 'SJ-202608-0004', amount: 100000, disc: 0, date: '2026-10-08', valid: '2026-11-08', owner: '张三', appr: '已通过', ver: 'V1' },
+      { no: 'BJ-202610-0006', customer: '苏州某某汽配有限公司', opp: 'SJ-202609-0010', amount: 420000, disc: 18000, date: '2026-10-05', valid: '2026-11-05', owner: '李四', appr: '已通过', ver: 'V2' } ] },
+};
+
+const { ref, reactive, computed, watch, onMounted, nextTick, onBeforeUnmount } = Vue;
+const { ElMessage, ElMessageBox, ElNotification } = ElementPlus;
+const go = path => { location.hash = '#' + path; };
+const custByName = name => store.customers.find(c => c.name === name);
+
+/* ===== 全局 mock 数据仓库（可交互修改） ===== */
+const store = reactive({
+  leads: JSON.parse(JSON.stringify(LEADS_INIT)),
+  customers: JSON.parse(JSON.stringify(CUSTOMERS_INIT)).concat([
+    { no: 'KH-202606-0008', name: '扬州某某教育科技有限公司', type: '企业客户', industry: '企业服务', level: '潜在客户', source: '广告', region: '江苏省扬州市', scale: '小型', owner: '', status: '正常', lastFollow: '2026-07-01', lastDeal: '-', total: 0, created: '2026-06-18', phone: '159****2218', key: false } ]),
+  opps: JSON.parse(JSON.stringify(OPPS_INIT)),
+  pay: buildPay(),
+  approvals: JSON.parse(JSON.stringify(APPROVALS_INIT)),
+  messages: JSON.parse(JSON.stringify(MESSAGES)),
+  seq: { customer: 2, contact: 12 },
+});
+
+/* ===== 通用组件 ===== */
+const PageHead = {
+  props: { crumbs: Array, title: String, total: String },
+  template: `<div>
+    <el-breadcrumb separator="/" class="crumb">
+      <el-breadcrumb-item v-for="(c,i) in crumbs" :key="i" :to="c.to ? {} : undefined" @click="c.to && $go(c.to)">{{ c.t || c }}</el-breadcrumb-item>
+    </el-breadcrumb>
+    <div class="page-head"><h1>{{ title }}</h1><span class="total" v-if="total">{{ total }}</span><div class="head-ops"><slot/></div></div>
+  </div>`,
+};
+
+const EChart = {
+  props: { option: Object, height: { type: String, default: '260px' } },
+  setup(props) {
+    const el = ref(null); let chart = null;
+    const render = () => { if (chart && props.option) chart.setOption(props.option, true); };
+    onMounted(() => {
+      chart = echarts.init(el.value, null, { renderer: 'canvas' }); render();
+      window.addEventListener('resize', resize);
+    });
+    const resize = () => chart && chart.resize();
+    onBeforeUnmount(() => { window.removeEventListener('resize', resize); chart && chart.dispose(); });
+    watch(() => props.option, render, { deep: true });
+    return { el };
+  },
+  template: `<div ref="el" :style="{width:'100%',height:height}"></div>`,
+};
+
+const ListPage = {
+  components: { PageHead },
+  props: { crumbs: Array, title: String, totalText: String, stats: Array, filters: Array, rows: Array, cols: Array, total: Number, actionWidth: { type: Number, default: 200 }, selectable: { type: Boolean, default: true }, drawerTitle: String, noteTag: String },
+  emits: ['link', 'reset'],
+  setup(props, { emit }) {
+    const q = reactive({}); const sel = ref([]); const page = ref(1); const size = ref(20);
+    const drawer = ref(false); const cur = ref(null);
+    const filtered = computed(() => props.rows.filter(r => (props.filters || []).every(f => {
+      const v = q[f.k]; if (!v) return true;
+      if (f.k === 'kw') return Object.values(r).some(x => typeof x === 'string' && x.includes(v));
+      return r[f.k] === v;
+    })));
+    const reset = () => { Object.keys(q).forEach(k => delete q[k]); emit('reset'); };
+    const open = row => { cur.value = row; drawer.value = true; };
+    const onLink = (c, row) => {
+      if (c.link === 'cust') { const cu = custByName(row.customer); if (cu) return go('/customer/' + cu.no); }
+      if (c.link === 'quote') return go('/quote/' + row.no);
+      emit('link', c, row);
+    };
+    const tagType = (c, v) => (c.tag && c.tag[v]) || 'info';
+    const doVoid = row => ElMessageBox.prompt('重要业务对象不做物理删除，将作废并归档。请填写作废原因（必填，并记录操作人）：', '作废确认', { confirmButtonText: '确认作废', cancelButtonText: '取消', inputPattern: /\S+/, inputErrorMessage: '作废原因不能为空' }).then(() => ElMessage.success('已作废并归档，操作日志已记录（操作人：张三）')).catch(() => {});
+    return { q, sel, page, size, drawer, cur, filtered, reset, open, onLink, tagType, doVoid, yuan, fmtC };
+  },
+  template: `<div>
+    <page-head :crumbs="crumbs" :title="title" :total="totalText"><el-tag v-if="noteTag" type="info" effect="plain">{{ noteTag }}</el-tag><slot name="head-ops"/></page-head>
+    <slot name="top"/>
+    <div class="stat-row" v-if="stats" :style="{gridTemplateColumns:'repeat('+stats.length+',1fr)'}">
+      <div class="stat-card" :class="s[2]" v-for="s in stats" :key="s[0]"><span class="lb">{{ s[0] }}</span><span class="vl">{{ s[1] }}</span><span class="ft" v-if="s[3]">{{ s[3] }}</span></div>
+    </div>
+    <div class="card query" v-if="filters && filters.length">
+      <el-form inline>
+        <el-form-item v-for="f in filters" :key="f.k" :label="f.opts ? f.label : ''">
+          <el-input v-if="!f.opts" v-model="q[f.k]" :placeholder="f.ph || f.label" clearable style="width:240px" :prefix-icon="'Search'" />
+          <el-select v-else v-model="q[f.k]" :placeholder="'全部'" clearable style="width:150px"><el-option v-for="o in f.opts" :key="o" :label="o" :value="o"/></el-select>
+        </el-form-item>
+        <el-form-item><el-button type="primary" icon="Search">查询</el-button><el-button @click="reset">重置</el-button></el-form-item>
+      </el-form>
+    </div>
+    <div class="ops"><slot name="ops" :sel="sel"/><span class="grow" v-if="sel.length">已选 {{ sel.length }} 条</span></div>
+    <div class="card table-card">
+      <el-table :data="filtered" @selection-change="v => sel = v" row-key="no" style="width:100%" empty-text="暂无数据" :header-cell-style="{height:'42px'}">
+        <el-table-column v-if="selectable" type="selection" width="46" fixed />
+        <el-table-column v-for="c in cols" :key="c.p" :prop="c.p" :label="c.l" :min-width="c.w" :show-overflow-tooltip="!c.noTip">
+          <template #default="{row}">
+            <slot :name="'cell-'+c.p" :row="row">
+              <a v-if="c.link" class="link" @click.stop="onLink(c,row)">{{ row[c.p] }}</a>
+              <el-tag v-else-if="c.tag" :type="tagType(c,row[c.p])" size="small" effect="light">{{ row[c.p] }}</el-tag>
+              <span v-else-if="c.money" class="money">{{ row[c.p] === '-' ? '-' : ('¥' + (Number(row[c.p]) % 1 ? fmtC(Math.round(row[c.p]*100)) : Number(row[c.p]).toLocaleString('zh-CN'))) }}</span>
+              <el-tag v-else-if="c.bool" size="small" :type="row[c.p] ? 'danger' : 'info'" effect="plain">{{ row[c.p] ? '是' : '否' }}</el-tag>
+              <el-progress v-else-if="c.progress" :percentage="row[c.p]" :stroke-width="8" :status="row[c.p]===100?'success':''" />
+              <span v-else>{{ row[c.p] === '' ? '-' : row[c.p] }}</span>
+            </slot>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" fixed="right" :min-width="actionWidth" class-name="row-actions">
+          <template #default="{row}">
+            <slot name="actions" :row="row" :open="open">
+              <el-button link type="primary" @click="open(row)">查看</el-button>
+              <el-button link type="primary" @click="$msg.info('示例：进入编辑表单（必填项标星，保存前校验）')">编辑</el-button>
+              <el-button link type="danger" @click="doVoid(row)">作废</el-button>
+            </slot>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div class="pager"><span class="batch">共 {{ total || filtered.length }} 条 · 当前展示示例数据<template v-if="sel.length"> · 已选 {{ sel.length }} 条</template></span>
+        <el-pagination v-model:current-page="page" v-model:page-size="size" :page-sizes="[20,50,100]" layout="sizes, prev, pager, next, jumper" :total="total || filtered.length" background size="small"/></div>
+    </div>
+    <el-drawer v-model="drawer" :title="drawerTitle || '详情（快速查看）'" size="480px" destroy-on-close>
+      <slot name="drawer" :row="cur" :close="() => drawer = false">
+        <el-descriptions v-if="cur" :column="1" border>
+          <el-descriptions-item v-for="c in cols" :key="c.p" :label="c.l">{{ typeof cur[c.p] === 'boolean' ? (cur[c.p] ? '是' : '否') : (c.money && cur[c.p] !== '-' ? '¥' + fmtY(cur[c.p]) : cur[c.p]) }}</el-descriptions-item>
+        </el-descriptions>
+        <div style="margin-top:16px"><el-button type="primary" @click="$msg.info('示例：进入完整详情页')">查看完整详情</el-button><el-button @click="drawer=false">关闭</el-button></div>
+      </slot>
+    </el-drawer>
+  </div>`,
+};
+
+const PlaceholderPage = {
+  components: { ListPage },
+  props: { k: String },
+  setup(props) {
+    const cfg = computed(() => PH[props.k]);
+    const stats = computed(() => cfg.value.stats);
+    const crumbs = computed(() => cfg.value.crumbs);
+    return { cfg, stats, crumbs };
+  },
+  template: `<list-page :key="k" :crumbs="crumbs" :title="cfg.crumbs[1]" :total-text="cfg.crumbs[1] + '共 ' + cfg.total.toLocaleString('zh-CN') + ' ' + cfg.unit" :stats="cfg.stats" :filters="cfg.filters" :rows="cfg.rows" :cols="cfg.cols" :total="cfg.total" note-tag="占位页 · 示例数据">
+    <template #ops="{sel}">
+      <el-button v-for="(o,i) in cfg.ops" :key="o" :type="i===0?'primary':''" :icon="i===0?'Plus':(o==='导出'?'Download':(o==='导入'?'Upload':''))" @click="$msg.info('示例：' + o)">{{ o }}</el-button>
+      <el-button :disabled="!sel.length" @click="$msg.info('将批量操作 ' + sel.length + ' 条记录')">批量操作</el-button>
+    </template>
+  </list-page>`,
+};
+const cno = name => { const c = custByName(name); return c ? c.no : 'NA'; };
+
+const WorkbenchPage = {
+  components: { PageHead, EChart },
+  setup() {
+    const period = ref('month');
+    const funnelData = {
+      month: { c: [8, 10, 8, 6, 4], a: [156, 238, 192, 168, 96] },
+      quarter: { c: [21, 26, 19, 14, 9], a: [412, 586, 455, 372, 214] },
+      year: { c: [56, 64, 47, 33, 21], a: [1108, 1490, 1126, 852, 540] },
+    };
+    const SHAPE = [100, 80, 60, 40, 25];
+    const funnelOpt = computed(() => {
+      const d = funnelData[period.value];
+      return {
+        tooltip: { trigger: 'item', formatter: p => `<b>${p.name}</b><br/>商机数量：${d.c[p.dataIndex]} 个<br/>预计金额：¥${d.a[p.dataIndex]} 万` },
+        series: [{ type: 'funnel', left: '4%', right: '4%', top: 6, bottom: 6, width: '92%', min: 0, max: 100, minSize: '40%', maxSize: '100%', sort: 'none', gap: 3,
+          label: { show: true, position: 'inside', color: '#fff', fontSize: 12, formatter: p => `${p.name}  ${d.c[p.dataIndex]} 个 · ¥${d.a[p.dataIndex]}万` },
+          itemStyle: { borderWidth: 0 },
+          data: STAGES.slice(0, 5).map((s, i) => ({ name: s.name, value: SHAPE[i], itemStyle: { color: s.color } })) }],
+      };
+    });
+    const perfPeriod = ref('month');
+    const perfData = { month: { target: 1000000, done: 786000, label: '本月' }, quarter: { target: 3000000, done: 2460000, label: '本季度' }, year: { target: 12000000, done: 8160000, label: '本年' } };
+    const perf = computed(() => { const p = perfData[perfPeriod.value]; return { ...p, rate: Math.round(p.done * 1000 / p.target) / 10 }; });
+    const msgs = computed(() => store.messages);
+    const unread = computed(() => store.messages.filter(m => !m.read).length);
+    const todos = [
+      { t: '今日客户跟进', n: 8, u: '项', icon: 'PhoneFilled', bg: '#e8f0fb', c: '#1f4e9c', to: '/activities' },
+      { t: '待审批报价', n: 3, u: '项', icon: 'Stamp', bg: '#fff3e0', c: '#e08a00', to: '/approvals' },
+      { t: '即将到期合同', n: 2, u: '项', icon: 'Clock', bg: '#fdeceb', c: '#d9534f', to: '/contracts' },
+      { t: '待处理客户投诉', n: 1, u: '项', icon: 'WarningFilled', bg: '#fdeceb', c: '#c0392b', to: '/service' },
+    ];
+    const recent = [
+      { t: '今天 10:00', c: '南京某某科技', a: '方案沟通', cno: 'KH-202611-0001' },
+      { t: '今天 14:30', c: '江苏某某集团', a: '商务拜访', cno: 'KH-202611-0002' },
+      { t: '明天 09:00', c: '安徽某某连锁', a: '报价反馈', cno: 'KH-202610-0021' },
+    ];
+    const sched = [
+      { tm: '09:30', t: '电话跟进 · 南京某某科技', s: '已完成', c: '#2e9e6a' },
+      { tm: '10:00', t: '方案沟通 · 南京某某科技', s: '已完成', c: '#2e9e6a' },
+      { tm: '14:30', t: '商务拜访 · 江苏某某集团', s: '待开始', c: '#1f4e9c' },
+      { tm: '16:00', t: '周例会 · 销售团队会议', s: '待开始', c: '#e08a00' },
+    ];
+    const quick = [['新建线索', 'Aim', '/leads'], ['新建客户', 'OfficeBuilding', '/customers'], ['新建商机', 'TrendCharts', '/opps'], ['记录跟进', 'EditPen', '/activities']];
+    const readMsg = m => { m.read = true; };
+    const readAll = () => store.messages.forEach(m => m.read = true);
+    return { period, funnelOpt, perfPeriod, perf, msgs, unread, todos, recent, sched, quick, readMsg, readAll, yuan, fmtY };
+  },
+  template: `<div>
+    <el-breadcrumb separator="/" class="crumb"><el-breadcrumb-item>工作台</el-breadcrumb-item><el-breadcrumb-item>个人工作台</el-breadcrumb-item></el-breadcrumb>
+    <div class="wb-hello">
+      <div><h2>欢迎回来，张三</h2><div class="d">2026年11月2日 星期一 · 华东销售一部 · 销售经理（数据范围：本部门及下属）</div></div>
+      <div class="seg"><div><b>8</b><span>今日待跟进</span></div><div><b>3</b><span>待我审批</span></div><div><b>{{ unread }}</b><span>未读消息</span></div></div>
+    </div>
+    <div class="wb-grid">
+      <div>
+        <div class="stat-row" style="grid-template-columns:repeat(4,1fr)">
+          <div class="stat-card"><span class="lb">我的客户</span><span class="vl">128</span><span class="ft">本月新增 12 家</span></div>
+          <div class="stat-card warn"><span class="lb">跟进中商机</span><span class="vl">36</span><span class="ft">待跟进 8 个</span></div>
+          <div class="stat-card ok"><span class="lb">本月预计成交</span><span class="vl">¥86万</span><span class="ft">预计金额</span></div>
+          <div class="stat-card"><span class="lb">本月已回款</span><span class="vl">¥32万</span><span class="ft">实际到账</span></div>
+        </div>
+        <div style="display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:14px;margin-bottom:14px">
+          <div class="card card-pad">
+            <div class="card-title">销售漏斗
+              <el-radio-group v-model="period" size="small" style="margin-left:auto"><el-radio-button label="month">本月</el-radio-button><el-radio-button label="quarter">本季</el-radio-button><el-radio-button label="year">本年</el-radio-button></el-radio-group></div>
+            <e-chart :option="funnelOpt" height="290px"/>
+            <div class="muted" style="font-size:12px;margin-top:4px">注：漏斗宽度仅为阶段示意（100% → 25%），不代表实际转化率；统计口径：按商机当前阶段、预计金额（不含税）。</div>
+          </div>
+          <div class="card card-pad">
+            <div class="card-title">业绩进度
+              <el-radio-group v-model="perfPeriod" size="small" style="margin-left:auto"><el-radio-button label="month">月</el-radio-button><el-radio-button label="quarter">季</el-radio-button><el-radio-button label="year">年</el-radio-button></el-radio-group></div>
+            <div style="display:flex;align-items:center;gap:22px;margin-top:6px">
+              <el-progress type="dashboard" :percentage="perf.rate" :width="150" :stroke-width="12" color="#1f4e9c"><template #default="{percentage}"><div style="font-size:24px;font-weight:700">{{ percentage }}%</div><div class="muted" style="font-size:12px">完成率</div></template></el-progress>
+              <div style="flex:1"><div class="perf-num" style="flex-direction:column;gap:12px;margin:0"><div><span>{{ perf.label }}目标</span><b>{{ yuan(perf.target) }}</b></div><div><span>已完成（合同签署金额）</span><b style="color:#1f4e9c">{{ yuan(perf.done) }}</b></div><div><span>距目标</span><b>{{ yuan(perf.target - perf.done) }}</b></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card card-pad">
+          <div class="card-title">近期客户跟进<a class="more" @click="$go('/activities')">全部跟进记录 ›</a></div>
+          <div class="tl-line" v-for="r in recent" :key="r.t"><span class="t">{{ r.t }}</span><span><a @click="$go('/customer/'+r.cno)">{{ r.c }}</a> · {{ r.a }}</span><el-button link type="primary" style="margin-left:auto" @click="$go('/customer/'+r.cno)">查看客户</el-button></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="card card-pad"><div class="card-title">快捷入口</div>
+          <div class="quick"><div class="q" v-for="q in quick" :key="q[0]" @click="$go(q[2])"><el-icon><component :is="q[1]"/></el-icon><div>{{ q[0] }}</div></div></div></div>
+        <div class="card card-pad"><div class="card-title">我的待办</div>
+          <div class="todo-item" v-for="t in todos" :key="t.t" @click="$go(t.to)"><span class="dot" :style="{background:t.bg,color:t.c}"><el-icon><component :is="t.icon"/></el-icon></span><span>{{ t.t }}</span><span class="n">{{ t.n }}<small>{{ t.u }}</small></span></div></div>
+        <div class="card card-pad"><div class="card-title">今日日程<a class="more" @click="$msg.info('示例：新建日程并设置提醒')">+ 新建</a></div>
+          <div class="sch" v-for="s in sched" :key="s.tm"><span class="tm">{{ s.tm }}</span><span class="bar" :style="{background:s.c}"></span><div style="flex:1">{{ s.t }}<div class="muted" style="font-size:12px">{{ s.s }}</div></div></div></div>
+        <div class="card card-pad"><div class="card-title">消息通知<el-badge :value="unread" v-if="unread" /><a class="more" @click="readAll">全部已读</a></div>
+          <div class="msg" :class="{read:m.read}" v-for="m in msgs.slice(0,4)" :key="m.id" @click="readMsg(m)"><span class="u" :class="{read:m.read}"></span><div><div>{{ m.title }}</div><div class="muted" style="font-size:12px">{{ m.type }} · {{ m.time }}</div></div></div></div>
+      </div>
+    </div>
+  </div>`,
+};
+
+const LeadsPage = {
+  components: { ListPage },
+  props: { tab: { type: String, default: 'all' } },
+  setup(props) {
+    const TABS = { all: '线索列表', my: '我的线索', pool: '线索公海', records: '线索转化记录' };
+    const rows = computed(() => store.leads.filter(l => props.tab === 'my' ? l.owner === '张三' : props.tab === 'pool' ? !l.owner && l.status !== '已转化' : props.tab === 'records' ? l.status === '已转化' : true));
+    const dupCount = computed(() => store.leads.filter(l => l.dup && l.status !== '已转化').length);
+    const stats = computed(() => [
+      ['线索总数', '2,146', '', '本页示例 ' + store.leads.length + ' 条'], ['待分配（公海）', String(store.leads.filter(l => !l.owner && l.status !== '已转化').length), 'warn'],
+      ['跟进中', String(store.leads.filter(l => l.status === '跟进中').length)], ['疑似重复', String(dupCount.value), 'danger'], ['本月已转化', String(store.leads.filter(l => l.status === '已转化').length), 'ok']]);
+    const cols = computed(() => {
+      const base = [
+        { p: 'no', l: '线索编号', w: 140, link: true }, { p: 'name', l: '线索名称', w: 160 }, { p: 'company', l: '公司名称', w: 270, noTip: true }, { p: 'contact', l: '联系人', w: 90 },
+        { p: 'phone', l: '手机号码', w: 120 }, { p: 'source', l: '来源渠道', w: 90 }, { p: 'need', l: '需求类型', w: 120 }, { p: 'amount', l: '预计金额', w: 110, money: true },
+        { p: 'status', l: '线索状态', w: 100, tag: { 新建: 'info', 跟进中: 'primary', 已转化: 'success', 无效: 'danger' } }, { p: 'owner', l: '负责人', w: 90 }, { p: 'next', l: '下次联系时间', w: 150 }, { p: 'created', l: '创建时间', w: 150 }];
+      return props.tab === 'records' ? base.concat([{ p: 'convertedAt', l: '转化时间', w: 150 }, { p: 'convertedTo', l: '转化为客户', w: 140 }]) : base;
+    });
+    const t = computed(() => TABS[props.tab]);
+    // ---------- 弹窗状态 ----------
+    const dlg = reactive({ assign: false, follow: false, invalid: false, convert: false, add: false });
+    const curLead = ref(null); const batch = ref([]);
+    const assignForm = reactive({ owner: '', reason: '' });
+    const followForm = reactive({ type: '电话', content: '', feedback: '', next: '' });
+    const invalidForm = reactive({ reason: '', remark: '' });
+    const addForm = reactive({ company: '', contact: '', phone: '', source: '官网', need: '', amount: 0 });
+    const dupCheck = computed(() => {
+      const res = [];
+      if (addForm.phone && addForm.phone.length >= 7) store.leads.concat([]).forEach(l => { if (l.phone.replace(/\*/g, '').length && addForm.phone.replace(/\D/g, '').slice(-4) === l.phone.slice(-4) && addForm.phone.replace(/\D/g, '').slice(0, 3) === l.phone.slice(0, 3)) res.push({ why: '手机号相同', ref: l.no + ' · ' + l.company }); });
+      if (addForm.company && addForm.company.length >= 4) {
+        store.customers.forEach(c => { if (c.name.includes(addForm.company) || addForm.company.includes(c.name)) res.push({ why: '公司名称与已有客户一致', ref: c.no + ' · ' + c.name }); });
+        store.leads.forEach(l => { if (l.company === addForm.company) res.push({ why: '公司名称相同', ref: l.no + ' · ' + l.company }); });
+      }
+      return res;
+    });
+    const openAssign = (row, sel) => { batch.value = row ? [row] : sel; if (!batch.value.length) return ElMessage.warning('请先勾选需要分配的线索'); assignForm.owner = ''; assignForm.reason = ''; dlg.assign = true; };
+    const doAssign = () => { if (!assignForm.owner) return ElMessage.warning('请选择负责人');
+      batch.value.forEach(l => { l.owner = assignForm.owner; if (l.status === '新建') l.status = '新建'; }); dlg.assign = false; ElMessage.success(`已将 ${batch.value.length} 条线索分配给 ${assignForm.owner}，操作记录已写入`); };
+    const claim = row => ElMessageBox.confirm(`确认从公海领取线索「${row.company}」？领取后保护期 7 天，每人领取上限 50 条（当前已领 18 条）。`, '领取线索', { type: 'info' }).then(() => { row.owner = '张三'; row.status = '跟进中'; ElMessage.success('领取成功，已加入「我的线索」'); }).catch(() => {});
+    const openFollow = row => { curLead.value = row; Object.assign(followForm, { type: '电话', content: '', feedback: '', next: '' }); dlg.follow = true; };
+    const doFollow = () => { if (!followForm.content) return ElMessage.warning('请填写跟进内容');
+      curLead.value.status = '跟进中'; if (followForm.next) curLead.value.next = followForm.next.replace('T', ' ').slice(0, 16); dlg.follow = false; ElMessage.success('跟进记录已保存' + (followForm.next ? '，已按下次联系时间自动生成待办' : '')); };
+    const openInvalid = row => { curLead.value = row; Object.assign(invalidForm, { reason: '', remark: '' }); dlg.invalid = true; };
+    const doInvalid = () => { if (!invalidForm.reason) return ElMessage.warning('请选择无效原因（必填）'); curLead.value.status = '无效'; dlg.invalid = false; ElMessage.success('已标记为无效，原因已记录'); };
+    const release = row => ElMessageBox.confirm(`确认将线索「${row.company}」退回公海？`, '退回公海', { type: 'warning' }).then(() => { row.owner = ''; row.status = '新建'; ElMessage.success('已退回公海，历史跟进记录保留'); }).catch(() => {});
+    const cmd = (c, row) => ({ assign: () => openAssign(row), invalid: () => openInvalid(row), release: () => release(row) })[c]();
+    const submitAdd = () => { if (!addForm.company || !addForm.contact || !addForm.phone) return ElMessage.warning('公司名称、联系人、手机号码为必填项');
+      if (!/^1\d{10}$/.test(addForm.phone) && !/^1\d{2}\*{4}\d{4}$/.test(addForm.phone)) return ElMessage.warning('手机号格式不正确');
+      const n = String(store.leads.length + 20).padStart(4, '0');
+      store.leads.unshift({ no: 'XS-202611-' + n, name: addForm.need || '新建线索', company: addForm.company, contact: addForm.contact, phone: addForm.phone.replace(/^(\d{3})\d{4}(\d{4})$/, '$1****$2'), source: addForm.source, need: addForm.need || '-', amount: addForm.amount || 0, status: '新建', owner: '', next: '', created: '2026-11-02 07:00', dup: dupCheck.value.length ? { type: '线索/客户', ref: dupCheck.value[0].ref, why: dupCheck.value[0].why } : undefined });
+      dlg.add = false; ElMessage.success('线索已创建并进入待分配线索池'); };
+    const openAdd = () => { Object.assign(addForm, { company: '', contact: '', phone: '', source: '官网', need: '', amount: 0 }); dlg.add = true; };
+    // ---------- 转化客户（方案 6.1） ----------
+    const cv = reactive({ mode: 'new', custName: '', custType: '企业客户', industry: '', owner: '张三', linkNo: '', contactName: '', contactPhone: '', contactTitle: '', createOpp: true, oppName: '', oppAmount: 0, oppDate: '', saving: false });
+    const cvDup = computed(() => curLead.value && curLead.value.dup && curLead.value.dup.customerNo ? curLead.value.dup : null);
+    const openConvert = row => {
+      curLead.value = row;
+      Object.assign(cv, { mode: row.dup && row.dup.customerNo ? 'link' : 'new', custName: row.company, custType: '企业客户', industry: '', owner: '张三', linkNo: row.dup && row.dup.customerNo ? row.dup.customerNo : '', contactName: row.contact, contactPhone: row.phone, contactTitle: '', createOpp: true, oppName: row.company.replace(/有限公司|有限责任公司/, '') + ' ' + row.need + ' 项目', oppAmount: row.amount, oppDate: '2026-12-31', saving: false });
+      dlg.convert = true;
+    };
+    const doConvert = () => {
+      if (cv.mode === 'new' && (!cv.custName || !cv.industry)) return ElMessage.warning('请填写客户名称并选择所属行业');
+      if (cv.mode === 'link' && !cv.linkNo) return ElMessage.warning('请选择要关联的现有客户');
+      if (!cv.contactName || !cv.contactPhone) return ElMessage.warning('请填写联系人姓名及联系方式');
+      if (cv.createOpp && (!cv.oppName || !cv.oppAmount || !cv.oppDate)) return ElMessage.warning('请完整填写商机名称、预计金额、预计成交日期');
+      cv.saving = true;
+      setTimeout(() => {
+        const l = curLead.value; let custNo = cv.linkNo; const created = [];
+        if (cv.mode === 'new') {
+          store.seq.customer++; custNo = 'KH-202611-' + String(store.seq.customer).padStart(4, '0');
+          store.customers.unshift({ no: custNo, name: cv.custName, type: cv.custType, industry: cv.industry, level: '潜在客户', source: l.source, region: '江苏省南京市', scale: '中型', owner: cv.owner, status: '跟进中', lastFollow: TODAY, lastDeal: '-', total: 0, created: TODAY, phone: cv.contactPhone, key: false });
+          created.push('客户 ' + custNo);
+        } else created.push('关联现有客户 ' + custNo);
+        created.push('联系人 ' + cv.contactName);
+        if (cv.createOpp) { store.opps.unshift({ no: 'SJ-202611-0' + (40 + store.opps.length), name: cv.oppName, customer: cv.mode === 'new' ? cv.custName : (store.customers.find(c => c.no === custNo) || {}).name, amount: cv.oppAmount, date: cv.oppDate, owner: cv.owner, stage: 'contact', prob: 10, info: {}, flags: {} }); created.push('商机「' + cv.oppName + '」'); }
+        l.status = '已转化'; l.convertedAt = '2026-11-02 07:00'; l.convertedTo = custNo; cv.saving = false; dlg.convert = false;
+        ElNotification({ title: '线索转化完成', message: '已在同一事务中创建：' + created.join('、') + '。原始线索与跟进历史已保留。', type: 'success', duration: 5000 });
+      }, 700);
+    };
+    const dupLink = row => ({ type: row.dup.type, text: row.dup.why + '：' + row.dup.ref });
+    const hasCust = no => store.customers.some(c => c.no === no);
+    return { hasCust, rows, stats, cols, t, TABS, dlg, curLead, batch, assignForm, followForm, invalidForm, addForm, dupCheck, openAssign, doAssign, claim, openFollow, doFollow, openInvalid, doInvalid, release, cmd, openAdd, submitAdd, cv, cvDup, openConvert, doConvert, dupLink, dupCount, OWNERS, INDUSTRIES, EXISTING_CUSTOMERS: computed(() => store.customers.slice(0, 12)), go, yuan, tab: computed(() => props.tab) };
+  },
+  template: `<div>
+    <list-page :crumbs="['线索管理', t]" :title="t" :total-text="'线索共 2,146 条'" :stats="stats" :rows="rows" :cols="cols" :total="2146" :action-width="260" drawer-title="线索详情（快速查看）"
+      :filters="[{k:'kw',label:'搜索线索',ph:'线索编号 / 公司 / 联系人 / 手机'},{k:'source',label:'来源渠道',opts:['官网','广告','转介绍','活动','渠道']},{k:'status',label:'线索状态',opts:['新建','跟进中','已转化','无效']},{k:'owner',label:'负责人',opts:OWNERS}]">
+      <template #top>
+        <el-tabs :model-value="tab" @tab-change="k => $go(k==='all'?'/leads':'/leads/'+k)" style="margin-bottom:6px"><el-tab-pane v-for="(v,k) in TABS" :key="k" :label="v" :name="k"/></el-tabs>
+        <el-alert v-if="dupCount && tab!=='records'" type="warning" show-icon :closable="false" style="margin-bottom:12px" :title="'查重提示：当前有 '+dupCount+' 条线索的手机号或公司名称与已有线索/客户重复，请核对后合并、关联已有客户，避免重复建档。'"/>
+      </template>
+      <template #ops="{sel}">
+        <el-button type="primary" icon="Plus" @click="openAdd">新增线索</el-button>
+        <el-button icon="Upload" @click="$msg.info('示例：导入 Excel（含查重、必填校验、错误行反馈）')">导入</el-button>
+        <el-button icon="Download" @click="$msg.info('示例：导出（按字段权限脱敏）')">导出</el-button>
+        <el-button icon="User" :disabled="false" @click="openAssign(null, sel)">批量分配<template v-if="sel.length">（{{ sel.length }}）</template></el-button>
+      </template>
+      <template #cell-company="{row}">
+        <span>{{ row.company }}</span>
+        <el-popover v-if="row.dup && row.status!=='已转化'" placement="bottom" :width="300" trigger="hover">
+          <template #reference><el-tag type="danger" size="small" effect="plain" class="dup-tag" style="margin-left:6px">疑似重复</el-tag></template>
+          <div><b>查重结果</b><div style="margin:6px 0;color:#c0392b">{{ dupLink(row).text }}</div><div class="muted" style="font-size:12px">检测依据：手机号、公司名称。可「关联已有客户」后再转化，或人工确认合并。</div></div>
+        </el-popover>
+      </template>
+      <template #actions="{row,open}">
+        <template v-if="row.status==='已转化'"><el-button link type="primary" @click="open(row)">查看</el-button><el-button link type="primary" v-if="hasCust(row.convertedTo)" @click="$go('/customer/'+row.convertedTo)">查看客户</el-button></template>
+        <template v-else-if="!row.owner"><el-button link type="primary" @click="claim(row)">领取</el-button><el-button link type="primary" @click="openAssign(row)">分配</el-button><el-button link @click="open(row)">查看</el-button></template>
+        <template v-else>
+          <el-button link type="primary" @click="openFollow(row)">记录跟进</el-button>
+          <el-button link type="success" :disabled="row.status==='无效'" @click="openConvert(row)">转化客户</el-button>
+          <el-dropdown trigger="click" @command="c => cmd(c,row)"><el-button link type="primary">更多<el-icon class="el-icon--right"><arrow-down/></el-icon></el-button>
+            <template #dropdown><el-dropdown-menu><el-dropdown-item command="assign">分配</el-dropdown-item><el-dropdown-item command="invalid">标记无效</el-dropdown-item><el-dropdown-item command="release">退回公海</el-dropdown-item></el-dropdown-menu></template></el-dropdown>
+        </template>
+      </template>
+      <template #drawer="{row}">
+        <div v-if="row">
+          <el-descriptions title="基本信息" :column="2" border size="small"><el-descriptions-item label="线索编号">{{ row.no }}</el-descriptions-item><el-descriptions-item label="线索状态">{{ row.status }}</el-descriptions-item><el-descriptions-item label="公司名称" :span="2">{{ row.company }}</el-descriptions-item><el-descriptions-item label="联系人">{{ row.contact }}</el-descriptions-item><el-descriptions-item label="手机号码">{{ row.phone }}</el-descriptions-item><el-descriptions-item label="来源渠道">{{ row.source }}</el-descriptions-item><el-descriptions-item label="负责人">{{ row.owner || '（公海）' }}</el-descriptions-item></el-descriptions>
+          <el-descriptions title="需求信息" :column="2" border size="small" style="margin-top:16px"><el-descriptions-item label="需求类型">{{ row.need }}</el-descriptions-item><el-descriptions-item label="预计金额">{{ yuan(row.amount) }}</el-descriptions-item><el-descriptions-item label="下次联系">{{ row.next || '-' }}</el-descriptions-item><el-descriptions-item label="创建时间">{{ row.created }}</el-descriptions-item></el-descriptions>
+          <div class="sec-title" style="margin-top:18px">跟进记录</div>
+          <el-timeline><el-timeline-item timestamp="2026-11-02 09:20" placement="top">电话沟通：客户有 MES 系统需求，预算待确认。<div class="muted">张三</div></el-timeline-item><el-timeline-item timestamp="2026-11-02 09:05" placement="top">线索创建（来源：{{ row.source }}）</el-timeline-item></el-timeline>
+          <div class="sec-title">操作记录</div><div class="muted" style="font-size:13px">创建 → 分配 → 修改 → 转化 / 退回，均保留操作人与时间。</div>
+        </div>
+      </template>
+    </list-page>
+
+    <!-- 新增线索（含实时查重） -->
+    <el-dialog v-model="dlg.add" title="新增线索" width="560px">
+      <el-alert v-if="dupCheck.length" type="warning" show-icon :closable="false" style="margin-bottom:14px" title="发现疑似重复">
+        <div v-for="d in dupCheck" :key="d.ref" style="font-size:13px">· {{ d.why }}：{{ d.ref }}</div></el-alert>
+      <el-form label-width="96px">
+        <el-form-item label="公司名称" required><el-input v-model="addForm.company" placeholder="如：南京某某科技有限公司" /></el-form-item>
+        <el-form-item label="联系人" required><el-input v-model="addForm.contact" /></el-form-item>
+        <el-form-item label="手机号码" required><el-input v-model="addForm.phone" maxlength="11" placeholder="11 位手机号（参与重复检测）" /></el-form-item>
+        <el-form-item label="来源渠道"><el-select v-model="addForm.source"><el-option v-for="s in ['官网','广告','转介绍','活动','渠道']" :key="s" :value="s"/></el-select></el-form-item>
+        <el-form-item label="需求类型"><el-input v-model="addForm.need" /></el-form-item>
+        <el-form-item label="预计金额"><el-input-number v-model="addForm.amount" :min="0" :step="10000" :controls="false" style="width:200px"/> 元</el-form-item>
+      </el-form>
+      <template #footer><el-button @click="dlg.add=false">取消</el-button><el-button type="primary" @click="submitAdd">保存</el-button></template>
+    </el-dialog>
+
+    <!-- 分配 -->
+    <el-dialog v-model="dlg.assign" :title="batch.length>1 ? '批量分配线索' : '分配线索'" width="460px">
+      <el-alert type="info" show-icon :closable="false" style="margin-bottom:14px" :title="'本次操作将影响 '+batch.length+' 条线索'" />
+      <el-form label-width="84px"><el-form-item label="分配给" required><el-select v-model="assignForm.owner" placeholder="选择销售人员"><el-option v-for="o in OWNERS" :key="o" :value="o"/></el-select></el-form-item>
+      <el-form-item label="备注"><el-input v-model="assignForm.reason" type="textarea" :rows="2"/></el-form-item></el-form>
+      <template #footer><el-button @click="dlg.assign=false">取消</el-button><el-button type="primary" @click="doAssign">确认分配</el-button></template>
+    </el-dialog>
+
+    <!-- 记录跟进 -->
+    <el-dialog v-model="dlg.follow" title="记录跟进" width="520px">
+      <el-form label-width="96px"><el-form-item label="活动类型"><el-radio-group v-model="followForm.type"><el-radio-button v-for="x in ['电话','微信','拜访','邮件']" :key="x" :label="x"/></el-radio-group></el-form-item>
+      <el-form-item label="跟进内容" required><el-input v-model="followForm.content" type="textarea" :rows="3"/></el-form-item>
+      <el-form-item label="客户反馈"><el-input v-model="followForm.feedback" type="textarea" :rows="2"/></el-form-item>
+      <el-form-item label="下次联系"><el-date-picker v-model="followForm.next" type="datetime" value-format="YYYY-MM-DDTHH:mm" placeholder="自动生成待办"/></el-form-item></el-form>
+      <template #footer><el-button @click="dlg.follow=false">取消</el-button><el-button type="primary" @click="doFollow">保存</el-button></template>
+    </el-dialog>
+
+    <!-- 标记无效 -->
+    <el-dialog v-model="dlg.invalid" title="标记无效" width="460px">
+      <el-form label-width="84px"><el-form-item label="无效原因" required><el-select v-model="invalidForm.reason" placeholder="请选择"><el-option v-for="x in ['联系方式无效','无采购意向','已被竞品签约','信息不真实','重复线索']" :key="x" :value="x"/></el-select></el-form-item>
+      <el-form-item label="补充说明"><el-input v-model="invalidForm.remark" type="textarea" :rows="3"/></el-form-item></el-form>
+      <template #footer><el-button @click="dlg.invalid=false">取消</el-button><el-button type="danger" @click="doInvalid">确认标记</el-button></template>
+    </el-dialog>
+
+    <!-- 转化客户（方案 6.1） -->
+    <el-dialog v-model="dlg.convert" title="转化客户" width="700px" top="6vh" :close-on-click-modal="false" class="convert-dlg">
+      <template v-if="curLead">
+        <el-alert v-if="cvDup" type="warning" show-icon :closable="false" style="margin-bottom:14px">
+          <template #title>转化前查重：检测到已存在客户「{{ cvDup.ref }}」（{{ cvDup.why }}）</template>
+          <div style="font-size:12px;margin-top:4px">为避免重复建客户，建议关联现有客户；仍需新建请确认不是同一组织。</div></el-alert>
+        <el-alert v-else type="success" show-icon :closable="false" style="margin-bottom:14px" title="转化前查重：未发现重复客户（已按手机号、公司名称检查），可创建新客户。" />
+        <el-form label-width="108px" size="default">
+          <div class="sec-title">客户处理方式</div>
+          <el-form-item label="处理方式" required><el-radio-group v-model="cv.mode"><el-radio-button label="new">创建新客户</el-radio-button><el-radio-button label="link">关联现有客户</el-radio-button></el-radio-group></el-form-item>
+          <template v-if="cv.mode==='new'">
+            <el-row :gutter="12"><el-col :span="12"><el-form-item label="客户名称" required><el-input v-model="cv.custName"/></el-form-item></el-col>
+            <el-col :span="12"><el-form-item label="客户类型" required><el-select v-model="cv.custType" style="width:100%"><el-option v-for="x in ['企业客户','个人客户','渠道客户']" :key="x" :value="x"/></el-select></el-form-item></el-col></el-row>
+            <el-row :gutter="12"><el-col :span="12"><el-form-item label="所属行业" required><el-select v-model="cv.industry" placeholder="请选择" style="width:100%"><el-option v-for="x in INDUSTRIES" :key="x" :value="x"/></el-select></el-form-item></el-col>
+            <el-col :span="12"><el-form-item label="新客户负责人" required><el-select v-model="cv.owner" style="width:100%"><el-option v-for="x in OWNERS" :key="x" :value="x"/></el-select></el-form-item></el-col></el-row>
+          </template>
+          <el-form-item v-else label="现有客户" required><el-select v-model="cv.linkNo" filterable placeholder="搜索并选择现有客户" style="width:100%"><el-option v-for="c in EXISTING_CUSTOMERS" :key="c.no" :value="c.no" :label="c.no+' · '+c.name"/></el-select></el-form-item>
+          <div class="sec-title">联系人</div>
+          <el-row :gutter="12"><el-col :span="12"><el-form-item label="联系人姓名" required><el-input v-model="cv.contactName"/></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="联系方式" required><el-input v-model="cv.contactPhone"/></el-form-item></el-col></el-row>
+          <div class="sec-title">商机</div>
+          <el-form-item label="创建商机"><el-switch v-model="cv.createOpp" active-text="是" inactive-text="否"/></el-form-item>
+          <template v-if="cv.createOpp">
+            <el-form-item label="商机名称" required><el-input v-model="cv.oppName"/></el-form-item>
+            <el-row :gutter="12"><el-col :span="12"><el-form-item label="预计金额" required><el-input-number v-model="cv.oppAmount" :min="0" :step="10000" :controls="false" :formatter="v => '¥ ' + String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ',')" :parser="v => v.replace(/[^\d.]/g, '')" style="width:100%;text-align:left" class="left-num"/></el-form-item></el-col>
+            <el-col :span="12"><el-form-item label="预计成交日期" required><el-date-picker v-model="cv.oppDate" type="date" value-format="YYYY-MM-DD" style="width:100%"/></el-form-item></el-col></el-row>
+          </template>
+        </el-form>
+        <div class="muted" style="font-size:12px;padding-left:4px"><el-icon><lock/></el-icon> 保存时客户、联系人、商机在同一事务中创建，任一步失败则整体回滚，原始线索与跟进历史始终保留。</div>
+      </template>
+      <template #footer><el-button @click="dlg.convert=false">取消</el-button><el-button type="primary" :loading="cv.saving" @click="doConvert">确认转化</el-button></template>
+    </el-dialog>
+  </div>`,
+};
+
+const LEVEL_TAG = { 战略客户: 'warning', 重点客户: 'primary', 普通客户: 'info', 潜在客户: 'success' };
+const CUST_STATUS_TAG = { 正常: 'success', 跟进中: 'primary', 暂停合作: 'warning', 流失: 'danger' };
+const CustomersPage = {
+  components: { ListPage },
+  props: { tab: { type: String, default: 'all' } },
+  setup(props) {
+    const TABS = { all: '客户列表', my: '我的客户', pool: '客户公海', key: '重点客户' };
+    const rows = computed(() => store.customers.filter(c => props.tab === 'my' ? c.owner === '张三' : props.tab === 'pool' ? !c.owner : props.tab === 'key' ? c.key : true));
+    const t = computed(() => TABS[props.tab]);
+    const stats = computed(() => [['客户总数', '1,268', '', '示例 ' + store.customers.length + ' 条'], ['本月新增', '12', 'ok'], ['重点 / 战略客户', String(store.customers.filter(c => c.key).length), ''], ['超 14 天未跟进', String(store.customers.filter(c => c.owner && daysBetween(c.lastFollow, TODAY) > 14).length), 'warn'], ['流失预警', '2', 'danger']]);
+    const cols = [
+      { p: 'no', l: '客户编号', w: 140 }, { p: 'name', l: '客户名称', w: 220, link: true }, { p: 'type', l: '客户类型', w: 100 }, { p: 'industry', l: '行业分类', w: 120 },
+      { p: 'level', l: '客户等级', w: 100, tag: LEVEL_TAG }, { p: 'source', l: '客户来源', w: 100 }, { p: 'region', l: '所属区域', w: 130 }, { p: 'scale', l: '客户规模', w: 80 },
+      { p: 'owner', l: '客户负责人', w: 100 }, { p: 'status', l: '客户状态', w: 100, tag: CUST_STATUS_TAG }, { p: 'lastFollow', l: '最近跟进', w: 110 }, { p: 'lastDeal', l: '最近成交', w: 110 },
+      { p: 'total', l: '累计成交金额', w: 130, money: true }, { p: 'created', l: '创建时间', w: 110 }];
+    const dlg = reactive({ transfer: false, batch: false });
+    const target = ref([]); const tf = reactive({ owner: '', reason: '' });
+    const quick = reactive({ level: '', status: '' });
+    const openTransfer = (rows) => { if (!rows.length) return ElMessage.warning('请先勾选客户'); target.value = rows; Object.assign(tf, { owner: '', reason: '' }); dlg.transfer = true; };
+    const doTransfer = () => {
+      if (!tf.owner) return ElMessage.warning('请选择新负责人'); if (!tf.reason) return ElMessage.warning('请填写转移原因（将写入负责人变更日志）');
+      const keyOnes = target.value.filter(c => c.key);
+      if (keyOnes.length) { dlg.transfer = false; return ElNotification({ title: '已提交审批', message: `其中 ${keyOnes.length} 家重点客户转移需「原负责人直属经理」审批，审批通过后生效；其余 ${target.value.length - keyOnes.length} 家已直接转移。`, type: 'warning', duration: 5000 }) && target.value.filter(c => !c.key).forEach(c => c.owner = tf.owner); }
+      target.value.forEach(c => c.owner = tf.owner); dlg.transfer = false; ElMessage.success(`已转移 ${target.value.length} 家客户，变更日志已保留（原负责人 → ${tf.owner}）`);
+    };
+    const claim = row => ElMessageBox.confirm(`确认领取客户「${row.name}」？领取后保护期 30 天。`, '领取客户', { type: 'info' }).then(() => { row.owner = '张三'; ElMessage.success('领取成功'); }).catch(() => {});
+    const openDrawerInit = row => { quick.level = row.level; quick.status = row.status; };
+    const saveQuick = (row, close) => { row.level = quick.level; row.status = quick.status; ElMessage.success('已保存（快捷编辑）'); close(); };
+    return { rows, t, TABS, stats, cols, dlg, target, tf, quick, openTransfer, doTransfer, claim, openDrawerInit, saveQuick, OWNERS, INDUSTRIES, go, fmtY, tab: computed(() => props.tab), levelTag: LEVEL_TAG, stTag: CUST_STATUS_TAG };
+  },
+  template: `<div>
+    <list-page :crumbs="['客户管理', t]" :title="t" :total-text="'客户列表共 1,268 家'" :stats="stats" :rows="rows" :cols="cols" :total="1268" :action-width="230" drawer-title="客户快速查看 / 快捷编辑"
+      :filters="[{k:'kw',label:'搜索客户',ph:'搜索客户（编号 / 名称）'},{k:'type',label:'客户类型',opts:['企业客户','个人客户','渠道客户']},{k:'level',label:'客户等级',opts:['战略客户','重点客户','普通客户','潜在客户']},{k:'owner',label:'负责人',opts:OWNERS},{k:'status',label:'客户状态',opts:['正常','跟进中','暂停合作','流失']}]"
+      @link="(c,row) => $go('/customer/'+row.no)">
+      <template #top><el-tabs :model-value="tab" @tab-change="k => $go(k==='all'?'/customers':'/customers/'+k)" style="margin-bottom:6px"><el-tab-pane v-for="(v,k) in TABS" :key="k" :label="v" :name="k"/></el-tabs></template>
+      <template #ops="{sel}">
+        <el-button type="primary" icon="Plus" @click="$msg.info('示例：新增客户表单（必填项标星，保存前校验格式）')">新增客户</el-button>
+        <el-button icon="Upload" @click="$msg.info('示例：导入客户（查重 → 必填校验 → 错误行反馈 → 结果统计）')">导入</el-button>
+        <el-button icon="Download" @click="$msg.info('示例：导出（敏感字段按权限脱敏）')">导出</el-button>
+        <el-button icon="Switch" @click="openTransfer(sel)">批量分配 / 转移<template v-if="sel.length">（{{ sel.length }}）</template></el-button>
+      </template>
+      <template #cell-name="{row}"><a class="link" @click="$go('/customer/'+row.no)">{{ row.name }}</a><el-tag v-if="row.key" size="small" type="danger" effect="plain" style="margin-left:6px;transform:scale(.9)">重点</el-tag></template>
+      <template #cell-owner="{row}"><span v-if="row.owner">{{ row.owner }}</span><span v-else class="muted">（公海）</span></template>
+      <template #actions="{row,open}">
+        <el-button link type="primary" @click="openDrawerInit(row); open(row)">查看</el-button>
+        <el-button link type="primary" @click="$go('/customer/'+row.no)">详情</el-button>
+        <el-button v-if="!row.owner" link type="success" @click="claim(row)">领取</el-button>
+        <el-button v-else link type="primary" @click="openTransfer([row])">转移</el-button>
+        <el-dropdown trigger="click" @command="c => $msg.info('示例：'+c)"><el-button link type="primary">更多<el-icon class="el-icon--right"><arrow-down/></el-icon></el-button>
+          <template #dropdown><el-dropdown-menu><el-dropdown-item command="新建商机">新建商机</el-dropdown-item><el-dropdown-item command="记录跟进">记录跟进</el-dropdown-item><el-dropdown-item command="客户合并（保留关联商机/合同/跟进记录）">客户合并</el-dropdown-item><el-dropdown-item command="作废/归档（需填写原因）">作废</el-dropdown-item></el-dropdown-menu></template></el-dropdown>
+      </template>
+      <template #drawer="{row,close}">
+        <div v-if="row">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px"><div class="cust-logo" style="width:46px;height:46px;font-size:20px">{{ row.name[0] }}</div><div><div style="font-size:17px;font-weight:600">{{ row.name }}</div><div class="muted">{{ row.no }} · {{ row.industry }} · {{ row.region }}</div></div></div>
+          <div class="sum-cards" style="margin:0 0 16px"><div class="sum-card" style="flex:1"><div class="v">{{ yuan0(row.total) }}</div><div class="l">累计成交</div></div><div class="sum-card" style="flex:1"><div class="v">{{ row.lastFollow }}</div><div class="l">最近跟进</div></div></div>
+          <el-descriptions :column="1" border size="small"><el-descriptions-item label="负责人">{{ row.owner || '（公海）' }}</el-descriptions-item><el-descriptions-item label="联系电话">{{ row.phone }}</el-descriptions-item><el-descriptions-item label="客户来源">{{ row.source }}</el-descriptions-item><el-descriptions-item label="客户规模">{{ row.scale }}</el-descriptions-item></el-descriptions>
+          <div class="sec-title" style="margin-top:18px">快捷编辑</div>
+          <el-form label-width="84px"><el-form-item label="客户等级"><el-select v-model="quick.level"><el-option v-for="x in ['战略客户','重点客户','普通客户','潜在客户']" :key="x" :value="x"/></el-select></el-form-item>
+          <el-form-item label="客户状态"><el-select v-model="quick.status"><el-option v-for="x in ['正常','跟进中','暂停合作','流失']" :key="x" :value="x"/></el-select></el-form-item></el-form>
+          <el-button type="primary" @click="saveQuick(row, close)">保存</el-button><el-button @click="$go('/customer/'+row.no)">查看完整详情</el-button>
+        </div>
+      </template>
+    </list-page>
+    <el-dialog v-model="dlg.transfer" title="客户转移 / 批量分配" width="480px">
+      <el-alert type="info" show-icon :closable="false" style="margin-bottom:14px" :title="'本次操作将影响 '+target.length+' 家客户：'+target.slice(0,3).map(c=>c.name).join('、')+(target.length>3?' 等':'')"/>
+      <el-alert v-if="target.some(c=>c.key)" type="warning" show-icon :closable="false" style="margin-bottom:14px" title="包含重点客户：转移需原负责人直属经理审批（方案 7.2）"/>
+      <el-form label-width="90px"><el-form-item label="新负责人" required><el-select v-model="tf.owner" placeholder="请选择"><el-option v-for="o in OWNERS" :key="o" :value="o"/></el-select></el-form-item>
+      <el-form-item label="转移原因" required><el-input type="textarea" :rows="3" v-model="tf.reason" placeholder="将写入负责人变更日志（原负责人、新负责人、时间、原因）"/></el-form-item></el-form>
+      <template #footer><el-button @click="dlg.transfer=false">取消</el-button><el-button type="primary" @click="doTransfer">确认</el-button></template>
+    </el-dialog>
+  </div>`,
+};
+const yuan0 = n => n ? '¥' + (n >= 10000 ? (n / 10000).toLocaleString('zh-CN', { maximumFractionDigits: 1 }) + '万' : fmtY(n)) : '¥0';
+
+/* ===== 客户详情（方案 5.3） ===== */
+const CustomerDetail = {
+  components: { PageHead },
+  props: { no: String },
+  setup(props) {
+    const c = computed(() => store.customers.find(x => x.no === props.no));
+    const isMain = computed(() => props.no === 'KH-202611-0001');
+    const tab = ref('base');
+    const showPhone = ref(false);
+    const follows = ref([
+      { t: '2026-11-02 10:00', type: '电话沟通', who: '张三', c: '已完成产品方案沟通，客户计划本周内部评审。', fb: '客户对移动端扩展包较感兴趣，关注数据安全与企业微信集成。', next: '2026-11-05 10:00 回访评审结果', op: 'SJ-202609-0012' },
+      { t: '2026-10-30 15:30', type: '拜访', who: '张三', c: '拜访陈总监与运营部刘经理，演示 ERP 升级方案。', fb: '希望报价包含数据迁移服务。', next: '提交报价 V3', op: 'SJ-202609-0012' },
+      { t: '2026-10-25 09:40', type: '微信', who: '王五', c: '确认实施排期与人员配置。', fb: '同意 11 月中旬启动。', next: '-', op: 'SJ-202608-0004' },
+      { t: '2026-10-19 11:00', type: '会议', who: '张三', c: '合同签署会，完成 ERP 实施合同签订。', fb: '客户满意，约定项目上线后付第二期款。', next: '-', op: 'SJ-202608-0004' },
+      { t: '2026-10-15 14:20', type: '电话', who: '张三', c: '渠道转介绍首次沟通，建立联系。', fb: '有 ERP 升级意向。', next: '-', op: '-' },
+    ]);
+    const fType = ref('');
+    const fShow = computed(() => follows.value.filter(f => !fType.value || f.type.includes(fType.value)));
+    const dlg = reactive({ follow: false, owner: false, create: false });
+    const ff = reactive({ type: '电话', content: '', fb: '', next: '' });
+    const logs = ref([
+      { t: '2026-11-02 10:12', who: '张三', act: '新增跟进记录', d: '电话沟通 · 产品方案沟通' },
+      { t: '2026-11-01 16:40', who: '张三', act: '生成报价单版本', d: 'BJ-202611-0008 V3' },
+      { t: '2026-10-19 12:05', who: '王芳（财务）', act: '登记收款', d: 'SK-202610-0007 ¥30,000.00' },
+      { t: '2026-10-16 09:00', who: '李明', act: '变更负责人', d: '王五 → 张三；原因：区域客户归属调整' },
+      { t: '2026-10-15 14:00', who: '张三', act: '创建客户', d: '来源：渠道转介绍' },
+    ]);
+    const ownerForm = reactive({ owner: '', reason: '' });
+    const doOwner = () => {
+      if (!ownerForm.owner || !ownerForm.reason) return ElMessage.warning('请选择新负责人并填写变更原因');
+      if (ownerForm.owner === c.value.owner) return ElMessage.warning('新负责人与当前负责人相同');
+      logs.value.unshift({ t: '2026-11-02 07:00', who: '张三', act: '变更负责人', d: `${c.value.owner} → ${ownerForm.owner}；原因：${ownerForm.reason}` });
+      if (c.value.key) { dlg.owner = false; ElNotification({ title: '已提交审批', message: '重点客户变更负责人需直属经理审批，审批通过后生效；变更日志已记录。', type: 'warning' }); return; }
+      c.value.owner = ownerForm.owner; dlg.owner = false; ElMessage.success('负责人已变更，变更日志已保留');
+    };
+    const doFollow = () => { if (!ff.content) return ElMessage.warning('请填写跟进内容');
+      follows.value.unshift({ t: '2026-11-02 07:00', type: ff.type, who: '张三', c: ff.content, fb: ff.fb || '-', next: ff.next ? ff.next.replace('T', ' ') + ' 跟进（已生成待办）' : '-', op: '-' });
+      logs.value.unshift({ t: '2026-11-02 07:00', who: '张三', act: '新增跟进记录', d: ff.type + ' · ' + ff.content.slice(0, 20) });
+      c.value.lastFollow = TODAY; dlg.follow = false; Object.assign(ff, { type: '电话', content: '', fb: '', next: '' }); ElMessage.success('跟进记录已添加到时间线'); };
+    const createCfg = {
+      contact: { title: '新建联系人', f: [['姓名', 'name'], ['联系电话', 'phone'], ['职务', 'title']] },
+      opp: { title: '新建商机', f: [['商机名称', 'name'], ['预计金额（元）', 'amount'], ['预计成交日期', 'date']] },
+      quote: { title: '新建报价', f: [['关联商机', 'opp'], ['有效期至', 'date']] },
+      contract: { title: '新建合同', f: [['合同名称', 'name'], ['合同金额（元）', 'amount']] },
+      order: { title: '新建订单', f: [['关联合同', 'contract'], ['订单金额（元）', 'amount']] },
+    };
+    const createType = ref('contact'); const cform = reactive({});
+    const openCreate = t => { createType.value = t; Object.keys(cform).forEach(k => delete cform[k]); dlg.create = true; };
+    const doCreate = () => {
+      const cfg = createCfg[createType.value]; if (cfg.f.some(([l, k]) => !cform[k])) return ElMessage.warning('请填写所有必填项');
+      logs.value.unshift({ t: '2026-11-02 07:00', who: '张三', act: cfg.title, d: '客户：' + c.value.name }); dlg.create = false; ElMessage.success(cfg.title.replace('新建', '') + '已创建，并关联到当前客户');
+    };
+    const sum = computed(() => isMain.value ? { opp: 8, ct: 3, total: '¥126万' } : { opp: store.opps.filter(o => o.customer === c.value.name).length, ct: c.value.total ? 1 : 0, total: yuan0(c.value.total) });
+    const contacts = [
+      { name: '陈总监', title: 'CIO', dept: '信息中心', role: '决策人', infl: '高', phone: '138****8888', key: true, rel: '支持者' },
+      { name: '刘经理', title: '运营经理', dept: '运营部', role: '使用人', infl: '中', phone: '139****0021', key: false, rel: '实际使用者' },
+      { name: '周会计', title: '财务主管', dept: '财务部', role: '财务', infl: '中', phone: '137****6603', key: false, rel: '中立' },
+      { name: '黄工', title: '系统工程师', dept: '信息中心', role: '技术', infl: '低', phone: '133****2290', key: false, rel: '支持者' } ];
+    const opps = [
+      { no: 'SJ-202609-0012', name: '南京某某 ERP 升级项目', stage: '报价谈判', amount: 340000, date: '2026-11-25', owner: '张三' },
+      { no: 'SJ-202610-0027', name: '南京某某 数据分析平台', stage: '方案沟通', amount: 260000, date: '2026-12-15', owner: '张三' },
+      { no: 'SJ-202610-0019', name: '南京某某 门店管理模块', stage: '需求确认', amount: 180000, date: '2027-01-10', owner: '张三' },
+      { no: 'SJ-202611-0033', name: '南京某某 供应商协同', stage: '初步接触', amount: 120000, date: '2027-02-28', owner: '王五' },
+      { no: 'SJ-202608-0004', name: '南京某某 ERP 实施项目', stage: '赢单', amount: 100000, date: '2026-10-19', owner: '张三' },
+      { no: 'SJ-202604-0003', name: '南京某某 ERP 软件授权', stage: '赢单', amount: 600000, date: '2026-04-18', owner: '张三' },
+      { no: 'SJ-202512-0003', name: '南京某某 ERP 二期定制开发', stage: '赢单', amount: 560000, date: '2026-01-16', owner: '张三' },
+      { no: 'SJ-202509-0008', name: '南京某某 办公协同试点', stage: '输单', amount: 90000, date: '2025-11-30', owner: '王五' } ];
+    const stageTag = { 报价谈判: 'primary', 方案沟通: 'primary', 需求确认: 'info', 初步接触: 'info', 赢单: 'success', 输单: 'danger' };
+    const quotes = [
+      { no: 'BJ-202611-0008', opp: 'SJ-202609-0012', amount: 334977.2, date: '2026-11-02', ver: 'V3', st: '审批中' },
+      { no: 'BJ-202610-0011', opp: 'SJ-202608-0004', amount: 100000, date: '2026-10-08', ver: 'V1', st: '已通过' } ];
+    const contractsT = [
+      { no: 'HT-202611-0003', name: 'ERP 实施合同', amount: 100000, sign: '2026-10-19', end: '2027-04-19', st: '履约中' },
+      { no: 'HT-202604-0018', name: 'ERP 软件授权合同', amount: 600000, sign: '2026-04-18', end: '2027-04-17', st: '履约中' },
+      { no: 'HT-202601-0007', name: 'ERP 二期定制开发合同', amount: 560000, sign: '2026-01-16', end: '2027-01-15', st: '履约中' } ];
+    const orders = [
+      { no: 'DD-202611-0002', ct: 'HT-202611-0003', amount: 100000, date: '2026-10-19', st: '交付中' },
+      { no: 'DD-202604-0006', ct: 'HT-202604-0018', amount: 600000, date: '2026-04-18', st: '已完成' },
+      { no: 'DD-202601-0003', ct: 'HT-202601-0007', amount: 560000, date: '2026-01-16', st: '已完成' } ];
+    const pay = computed(() => {
+      const ct = store.pay.contracts[0]; const plans = ct.plans; const recv = id => store.pay.records.filter(r => r.contract === ct.no).reduce((s, r) => s + r.alloc.filter(a => a.plan === id).reduce((x, a) => x + a.amt, 0), 0);
+      const got = plans.reduce((s, p) => s + recv(p.id), 0);
+      return { got, rest: ct.amount - got, ct };
+    });
+    const tickets = [
+      { no: 'GD-202611-0005', type: '服务请求', desc: '申请新增 5 个用户账号', st: '待客户确认', level: '中', time: '2026-11-01 15:30' },
+      { no: 'GD-202609-0031', type: '故障报修', desc: '报表导出超时', st: '已关闭', level: '高', time: '2026-09-18 10:12' } ];
+    const files = [{ n: 'ERP 实施合同（签署版）.pdf', t: '合同附件', s: '2.4 MB', d: '2026-10-19', by: '张三' }, { n: '报价单 BJ-202611-0008 V3.pdf', t: '报价 PDF', s: '386 KB', d: '2026-11-02', by: '张三' }, { n: '首笔回款银行回单.png', t: '回款凭证', s: '512 KB', d: '2026-10-19', by: '王芳' }];
+    const orgTree = [{ label: '南京某某科技有限公司（总公司）', children: [{ label: '南京某某科技（苏州）分公司', children: [{ label: '苏州工业园门店' }] }, { label: '南京某某科技（无锡）分公司' }, { label: '南京新街口门店' }] }];
+    return { c, isMain, tab, showPhone, fShow, fType, dlg, ff, logs, ownerForm, doOwner, doFollow, createCfg, createType, cform, openCreate, doCreate, sum, contacts, opps, stageTag, quotes, contractsT, orders, pay, tickets, files, orgTree, OWNERS, levelTag: LEVEL_TAG, stTag: CUST_STATUS_TAG, fmtC, fmtY, yuan, fcount: computed(() => fShow.value.length) };
+  },
+  template: `<div v-if="c">
+    <el-breadcrumb separator="/" class="crumb"><el-breadcrumb-item><a @click="$go('/customers')">客户管理</a></el-breadcrumb-item><el-breadcrumb-item><a @click="$go('/customers')">客户列表</a></el-breadcrumb-item><el-breadcrumb-item>{{ c.name }}</el-breadcrumb-item></el-breadcrumb>
+    <div class="card cust-head">
+      <div class="cust-logo">{{ c.name[0] }}</div>
+      <div>
+        <h2>{{ c.name }}<el-tag :type="levelTag[c.level]" size="small">{{ c.level }}</el-tag><el-tag :type="stTag[c.status]" size="small" effect="plain">{{ c.status === '正常' ? '正常合作' : c.status }}</el-tag><el-tag type="info" size="small" effect="plain">{{ c.industry }}</el-tag></h2>
+        <div class="cust-meta"><span>客户编号：<b>{{ c.no }}</b></span><span>负责人：<b>{{ c.owner || '（公海）' }}</b> <a @click="dlg.owner=true;ownerForm.owner='';ownerForm.reason=''" style="margin-left:4px">变更</a></span><span>联系电话：<b>{{ showPhone ? '13888888888' : c.phone }}</b> <a @click="showPhone=!showPhone;$msg.info(showPhone?'已显示完整号码（敏感字段访问已记录日志）':'已脱敏')">{{ showPhone ? '隐藏' : '显示' }}</a></span></div>
+        <div style="margin-top:10px;display:flex;gap:8px">
+          <el-button type="primary" size="small" icon="EditPen" @click="dlg.follow=true">记录跟进</el-button>
+          <el-dropdown trigger="click" @command="openCreate"><el-button size="small" icon="Plus">新建<el-icon class="el-icon--right"><arrow-down/></el-icon></el-button>
+            <template #dropdown><el-dropdown-menu><el-dropdown-item command="contact">联系人</el-dropdown-item><el-dropdown-item command="opp">商机</el-dropdown-item><el-dropdown-item command="quote">报价</el-dropdown-item><el-dropdown-item command="contract">合同</el-dropdown-item><el-dropdown-item command="order">订单</el-dropdown-item></el-dropdown-menu></template></el-dropdown>
+          <el-button size="small" @click="$msg.info('示例：编辑客户')">编辑</el-button>
+          <el-button size="small" @click="$msg.info('示例：客户合并——主档案保留，关联商机/合同/跟进记录及原始编号全部保留')">客户合并</el-button>
+        </div>
+      </div>
+      <div class="sum-cards"><div class="sum-card"><div class="v">{{ sum.opp }} 个</div><div class="l">关联商机</div></div><div class="sum-card"><div class="v">{{ sum.ct }} 份</div><div class="l">成交合同</div></div><div class="sum-card"><div class="v">{{ sum.total }}</div><div class="l">累计成交</div></div></div>
+    </div>
+    <div class="card card-pad">
+      <el-tabs v-model="tab" class="detail-tabs">
+        <el-tab-pane label="基本信息" name="base"><div class="tab-body">
+          <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:20px">
+            <div>
+              <div class="sec-title">客户基本信息</div>
+              <el-descriptions :column="3" border size="default">
+                <el-descriptions-item label="客户来源">{{ c.source === '转介绍' ? '渠道转介绍' : c.source }}</el-descriptions-item><el-descriptions-item label="所属区域">{{ c.region }}</el-descriptions-item><el-descriptions-item label="创建时间">{{ c.created }}</el-descriptions-item>
+                <el-descriptions-item label="客户类型">{{ c.type }}</el-descriptions-item><el-descriptions-item label="客户规模">{{ c.scale }}</el-descriptions-item><el-descriptions-item label="行业分类">{{ c.industry }}</el-descriptions-item>
+                <el-descriptions-item label="主负责人">{{ c.owner || '-' }}</el-descriptions-item><el-descriptions-item label="协同负责人">{{ isMain ? '王五（协同）' : '-' }}</el-descriptions-item><el-descriptions-item label="客户状态">{{ c.status }}</el-descriptions-item>
+                <el-descriptions-item label="最近跟进时间">{{ c.lastFollow }}</el-descriptions-item><el-descriptions-item label="最近成交时间">{{ c.lastDeal }}</el-descriptions-item><el-descriptions-item label="累计成交金额">{{ c.total ? '¥' + fmtY(c.total) : '-' }}</el-descriptions-item>
+              </el-descriptions>
+              <div class="sec-title" style="margin-top:20px">最近跟进</div>
+              <div class="tl-item-card"><div>11月2日 10:00，已完成产品方案沟通，客户计划本周内部评审。</div><div class="muted" style="margin-top:4px;font-size:13px">张三 · 电话沟通</div></div>
+              <div class="sec-title" style="margin-top:20px">全生命周期（成交 / 回款 / 服务）</div>
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+                <div class="sum-card"><div class="v">¥126万</div><div class="l">累计成交（合同签署金额）</div></div>
+                <div class="sum-card"><div class="v">¥{{ isMain ? fmtY(1160000 + pay.got/100) : 0 }}</div><div class="l">累计已回款</div></div>
+                <div class="sum-card"><div class="v" style="color:#c0392b">¥{{ isMain ? fmtC(pay.rest) : "0.00" }}</div><div class="l">未回款（含逾期 ¥15,000.00）</div></div>
+                <div class="sum-card"><div class="v">2 单</div><div class="l">服务工单（1 单进行中）</div></div></div>
+            </div>
+            <div>
+              <div class="sec-title">组织关系</div>
+              <el-tree class="org-tree" :data="orgTree" default-expand-all :expand-on-click-node="false"/>
+              <div class="sec-title" style="margin-top:20px">公海规则提示</div>
+              <el-alert type="info" :closable="false" show-icon title="本客户为重点客户且存在履约合同，不会被自动释放至公海。负责人变更需保留变更日志。"/>
+            </div>
+          </div>
+        </div></el-tab-pane>
+        <el-tab-pane label="联系人" name="contacts"><div class="tab-body"><div class="ops"><el-button type="primary" size="small" icon="Plus" @click="openCreate('contact')">新建联系人</el-button></div>
+          <el-table :data="contacts"><el-table-column prop="name" label="联系人姓名" width="120"><template #default="{row}"><a class="link">{{ row.name }}</a></template></el-table-column><el-table-column prop="dept" label="部门" width="110"/><el-table-column prop="title" label="职务" width="110"/>
+          <el-table-column prop="role" label="联系人角色" width="110"><template #default="{row}"><el-tag size="small" :type="row.role==='决策人'?'danger':'info'">{{ row.role }}</el-tag></template></el-table-column><el-table-column prop="infl" label="影响力" width="80"/><el-table-column prop="rel" label="决策链关系" width="120"/><el-table-column prop="phone" label="联系电话" width="130"/><el-table-column label="关键联系人" width="100"><template #default="{row}">{{ row.key ? '是' : '否' }}</template></el-table-column>
+          <el-table-column label="操作" width="160"><template #default><el-button link type="primary">查看</el-button><el-button link type="primary">编辑</el-button></template></el-table-column></el-table></div></el-tab-pane>
+        <el-tab-pane label="跟进记录" name="follow"><div class="tab-body">
+          <div class="ops"><el-button type="primary" size="small" icon="EditPen" @click="dlg.follow=true">新增跟进</el-button>
+            <el-select v-model="fType" clearable placeholder="全部活动类型" size="small" style="width:150px"><el-option v-for="x in ['电话','微信','拜访','会议','邮件']" :key="x" :value="x"/></el-select><span class="grow">共 {{ fcount }} 条 · 汇总客户与商机的所有互动</span></div>
+          <el-timeline style="padding-left:6px"><el-timeline-item v-for="(f,i) in fShow" :key="f.t+i" :timestamp="f.t" placement="top" :type="i===0?'primary':''" :hollow="i!==0">
+            <div class="tl-item-card"><div style="display:flex;gap:8px;align-items:center"><el-tag size="small">{{ f.type }}</el-tag><b>{{ f.c }}</b></div>
+              <div class="muted" style="font-size:13px;margin-top:6px">客户反馈：{{ f.fb }}</div><div class="muted" style="font-size:13px">下一步：{{ f.next }}　·　{{ f.who }}　·　关联商机：{{ f.op }}</div></div></el-timeline-item></el-timeline></div></el-tab-pane>
+        <el-tab-pane label="商机" name="opps"><div class="tab-body"><div class="ops"><el-button type="primary" size="small" icon="Plus" @click="openCreate('opp')">新建商机</el-button></div>
+          <el-table :data="opps"><el-table-column prop="no" label="商机编号" width="150"><template #default="{row}"><a class="link" @click="$go('/opps')">{{ row.no }}</a></template></el-table-column><el-table-column prop="name" label="商机名称" min-width="220"/><el-table-column label="当前阶段" width="110"><template #default="{row}"><el-tag size="small" :type="stageTag[row.stage]">{{ row.stage }}</el-tag></template></el-table-column><el-table-column label="预计金额" width="130" align="right"><template #default="{row}"><span class="money">¥{{ fmtY(row.amount) }}</span></template></el-table-column><el-table-column prop="date" label="预计成交日期" width="130"/><el-table-column prop="owner" label="负责人" width="90"/></el-table></div></el-tab-pane>
+        <el-tab-pane label="报价" name="quotes"><div class="tab-body"><div class="ops"><el-button type="primary" size="small" icon="Plus" @click="openCreate('quote')">新建报价</el-button></div>
+          <el-table :data="quotes"><el-table-column prop="no" label="报价编号" width="160"><template #default="{row}"><a class="link" @click="$go('/quote/'+row.no)">{{ row.no }}</a></template></el-table-column><el-table-column prop="opp" label="关联商机" width="160"/><el-table-column label="含税金额" width="150" align="right"><template #default="{row}"><span class="money">¥{{ fmtC(Math.round(row.amount*100)) }}</span></template></el-table-column><el-table-column prop="ver" label="版本" width="80"/><el-table-column prop="date" label="报价日期" width="120"/><el-table-column label="审批状态"><template #default="{row}"><el-tag size="small" :type="row.st==='已通过'?'success':'warning'">{{ row.st }}</el-tag></template></el-table-column></el-table></div></el-tab-pane>
+        <el-tab-pane label="合同" name="contracts"><div class="tab-body"><div class="ops"><el-button type="primary" size="small" icon="Plus" @click="openCreate('contract')">新建合同</el-button></div>
+          <el-table :data="contractsT"><el-table-column prop="no" label="合同编号" width="160"><template #default="{row}"><a class="link" @click="$go('/contracts')">{{ row.no }}</a></template></el-table-column><el-table-column prop="name" label="合同名称" min-width="200"/><el-table-column label="合同金额" width="140" align="right"><template #default="{row}"><span class="money">¥{{ fmtY(row.amount) }}</span></template></el-table-column><el-table-column prop="sign" label="签署日期" width="120"/><el-table-column prop="end" label="到期日期" width="120"/><el-table-column label="状态" width="100"><template #default="{row}"><el-tag size="small" type="primary">{{ row.st }}</el-tag></template></el-table-column></el-table></div></el-tab-pane>
+        <el-tab-pane label="订单" name="orders"><div class="tab-body"><div class="ops"><el-button type="primary" size="small" icon="Plus" @click="openCreate('order')">新建订单</el-button></div>
+          <el-table :data="orders"><el-table-column prop="no" label="订单编号" width="160"/><el-table-column prop="ct" label="合同" width="160"/><el-table-column label="订单金额" width="140" align="right"><template #default="{row}"><span class="money">¥{{ fmtY(row.amount) }}</span></template></el-table-column><el-table-column prop="date" label="订单日期" width="120"/><el-table-column label="订单状态"><template #default="{row}"><el-tag size="small" :type="row.st==='已完成'?'success':'primary'">{{ row.st }}</el-tag></template></el-table-column></el-table></div></el-tab-pane>
+        <el-tab-pane label="回款" name="payments"><div class="tab-body">
+          <el-table :data="[{no:'HT-202611-0003',amt:100000,got:pay.got,rest:pay.rest,od:'逾期 ¥15,000.00 · 5 天'},{no:'HT-202604-0018',amt:600000,got:60000000,rest:0,od:'已结清'},{no:'HT-202601-0007',amt:560000,got:56000000,rest:0,od:'已结清'}]">
+            <el-table-column label="合同编号" width="170"><template #default="{row}"><a class="link" @click="$go('/payments')">{{ row.no }}</a></template></el-table-column>
+            <el-table-column label="合同金额" width="150" align="right"><template #default="{row}"><span class="money">¥{{ fmtY(row.amt) }}</span></template></el-table-column>
+            <el-table-column label="累计已收" width="150" align="right"><template #default="{row}"><span class="money">¥{{ fmtC(row.got) }}</span></template></el-table-column>
+            <el-table-column label="未收" width="150" align="right"><template #default="{row}"><span class="money" :class="{'danger-text':row.rest>0}">¥{{ fmtC(row.rest) }}</span></template></el-table-column>
+            <el-table-column label="状态"><template #default="{row}"><el-tag size="small" :type="row.rest>0?'danger':'success'">{{ row.od }}</el-tag></template></el-table-column></el-table></div></el-tab-pane>
+        <el-tab-pane label="服务" name="service"><div class="tab-body"><el-table :data="tickets"><el-table-column prop="no" label="工单编号" width="160"/><el-table-column prop="type" label="工单类型" width="110"/><el-table-column prop="desc" label="问题描述" min-width="220"/><el-table-column prop="level" label="等级" width="80"/><el-table-column prop="time" label="提交时间" width="150"/><el-table-column label="状态" width="120"><template #default="{row}"><el-tag size="small" :type="row.st==='已关闭'?'info':'warning'">{{ row.st }}</el-tag></template></el-table-column></el-table></div></el-tab-pane>
+        <el-tab-pane label="附件" name="files"><div class="tab-body"><div class="ops"><el-button size="small" icon="Upload" @click="$msg.info('示例：上传附件（按权限控制）')">上传附件</el-button></div>
+          <el-table :data="files"><el-table-column prop="n" label="文件名" min-width="260"><template #default="{row}"><el-icon><document/></el-icon> <a class="link">{{ row.n }}</a></template></el-table-column><el-table-column prop="t" label="类型" width="110"/><el-table-column prop="s" label="大小" width="90"/><el-table-column prop="d" label="上传日期" width="120"/><el-table-column prop="by" label="上传人" width="90"/></el-table></div></el-tab-pane>
+        <el-tab-pane label="操作日志" name="logs"><div class="tab-body"><el-table :data="logs"><el-table-column prop="t" label="时间" width="160"/><el-table-column prop="who" label="操作人" width="130"/><el-table-column prop="act" label="操作" width="160"/><el-table-column prop="d" label="详情" min-width="320"/></el-table></div></el-tab-pane>
+      </el-tabs>
+    </div>
+    <el-dialog v-model="dlg.follow" title="新增跟进记录" width="520px"><el-form label-width="90px"><el-form-item label="关联客户"><el-input :model-value="c.name" disabled/></el-form-item><el-form-item label="活动类型"><el-radio-group v-model="ff.type"><el-radio-button v-for="x in ['电话','微信','拜访','会议','邮件']" :key="x" :label="x"/></el-radio-group></el-form-item><el-form-item label="跟进内容" required><el-input type="textarea" :rows="3" v-model="ff.content"/></el-form-item><el-form-item label="客户反馈"><el-input type="textarea" :rows="2" v-model="ff.fb"/></el-form-item><el-form-item label="下次跟进"><el-date-picker v-model="ff.next" type="datetime" value-format="YYYY-MM-DDTHH:mm" placeholder="自动生成待办"/></el-form-item></el-form>
+      <template #footer><el-button @click="dlg.follow=false">取消</el-button><el-button type="primary" @click="doFollow">保存</el-button></template></el-dialog>
+    <el-dialog v-model="dlg.owner" title="变更客户负责人" width="460px"><el-alert type="info" :closable="false" show-icon style="margin-bottom:14px" title="负责人变更将保留：原负责人、新负责人、变更时间及原因。"/>
+      <el-form label-width="90px"><el-form-item label="当前负责人"><el-input :model-value="c.owner" disabled/></el-form-item><el-form-item label="新负责人" required><el-select v-model="ownerForm.owner"><el-option v-for="o in OWNERS" :key="o" :value="o"/></el-select></el-form-item><el-form-item label="变更原因" required><el-input type="textarea" :rows="3" v-model="ownerForm.reason"/></el-form-item></el-form>
+      <template #footer><el-button @click="dlg.owner=false">取消</el-button><el-button type="primary" @click="doOwner">确认变更</el-button></template></el-dialog>
+    <el-dialog v-model="dlg.create" :title="createCfg[createType].title" width="480px"><el-form label-width="120px"><el-form-item label="所属客户"><el-input :model-value="c.name" disabled/></el-form-item><el-form-item v-for="f in createCfg[createType].f" :key="f[1]" :label="f[0]" required><el-input v-model="cform[f[1]]"/></el-form-item></el-form>
+      <template #footer><el-button @click="dlg.create=false">取消</el-button><el-button type="primary" @click="doCreate">保存</el-button></template></el-dialog>
+  </div>
+  <div v-else class="card card-pad" style="text-align:center;padding:60px"><el-empty description="未找到该客户（示例数据中不存在）"><el-button type="primary" @click="$go('/customers')">返回客户列表</el-button></el-empty></div>`,
+};
+
+const OppsPage = {
+  components: { PageHead },
+  props: { view: { type: String, default: 'board' } },
+  setup(props) {
+    const owner = ref(''); const kw = ref('');
+    const cards = computed(() => store.opps.filter(o => (!owner.value || o.owner === owner.value) && (!kw.value || (o.name + o.customer + o.no).includes(kw.value))));
+    const base = JSON.parse(JSON.stringify(OPPS_INIT));
+    const colCards = key => cards.value.filter(o => o.stage === key);
+    const initial = key => base.filter(o => o.stage === key);
+    const colCount = key => STAGES.find(s => s.key === key).total + (store.opps.filter(o => o.stage === key).length - initial(key).length);
+    const colAmount = key => STAGES.find(s => s.key === key).amount + store.opps.filter(o => o.stage === key).reduce((s, o) => s + o.amount, 0) - initial(key).reduce((s, o) => s + o.amount, 0);
+    const totalOpen = computed(() => STAGES.slice(0, 5).reduce((s, st) => s + colCount(st.key), 0));
+    const totalAmt = computed(() => STAGES.slice(0, 5).reduce((s, st) => s + colAmount(st.key), 0));
+    const stalled = computed(() => store.opps.filter(o => o.flags && o.flags.stalled).length);
+    // ---- 拖拽 ----
+    const dragNo = ref(''); const overKey = ref('');
+    const onDrop = key => { overKey.value = ''; const o = store.opps.find(x => x.no === dragNo.value); if (o) request(o, key); };
+    // ---- 阶段推进校验 ----
+    const gate = reactive({ show: false, opp: null, target: '', mode: 'win', form: {}, errors: {}, failed: false, remark: '' });
+    const nextStage = o => STAGES[STAGE_IDX[o.stage] + 1];
+    const request = (o, key) => {
+      const cur = STAGE_IDX[o.stage], tgt = STAGE_IDX[key];
+      if (cur === tgt) return;
+      if (o.stage === 'close') return ElMessage.warning('该商机已结束并归档，不能再推进');
+      if (tgt < cur) return ElMessage.warning('暂不支持直接回退阶段；如需回退请提交「阶段回退」申请并填写原因');
+      if (tgt - cur > 1) return ElMessage.error(`禁止跳阶段：「${o.name}」当前处于「${STAGES[cur].name}」，下一阶段应为「${STAGES[cur + 1].name}」`);
+      Object.assign(gate, { show: true, opp: o, target: key, mode: 'win', form: JSON.parse(JSON.stringify(o.info || {})), errors: {}, failed: false, remark: '' });
+    };
+    const rule = computed(() => gate.target === 'close' ? STAGE_RULES[gate.mode] : STAGE_RULES[gate.target]);
+    const sysOk = chk => !!(gate.opp && gate.opp.flags && gate.opp.flags[chk.k]);
+    const confirmMove = () => {
+      const r = rule.value; const errs = {}; let bad = false;
+      (r.fields || []).forEach(f => { if (!gate.form[f.k] && !(f.k === 'competitor')) errs[f.k] = '必填'; });
+      (r.checks || []).forEach(c => { if (!sysOk(c)) { errs[c.k] = '未满足'; bad = true; } });
+      gate.errors = errs; gate.failed = Object.keys(errs).length > 0;
+      if (gate.failed) return ElMessage.error('不满足进入条件，无法推进，请补全必填项');
+      const o = gate.opp; const from = STAGES[STAGE_IDX[o.stage]].name;
+      o.info = { ...o.info, ...gate.form };
+      if (gate.target === 'close') { o.result = gate.mode === 'win' ? '赢单' : '输单'; o.prob = gate.mode === 'win' ? 100 : 0; if (gate.mode === 'lose') o.loseReason = gate.form.loseReason; }
+      else o.prob = STAGES[STAGE_IDX[gate.target]].prob;
+      o.stage = gate.target; o.history = (o.history || []).concat([{ from, to: gate.target === 'close' ? o.result : STAGES[STAGE_IDX[gate.target]].name, by: '张三', time: '2026-11-02 07:00', remark: gate.remark || '-' }]);
+      gate.show = false; ElMessage.success(`阶段已变更：${from} → ${gate.target === 'close' ? o.result : STAGES[STAGE_IDX[gate.target]].name}，变更记录已保留`);
+    };
+    const drawer = ref(false); const cur = ref(null);
+    const openCard = o => { cur.value = o; drawer.value = true; };
+    const stageName = k => (STAGES.find(s => s.key === k) || {}).name;
+    const stageTagType = o => o.stage === 'close' ? (o.result === '赢单' ? 'success' : 'danger') : 'primary';
+    const listRows = computed(() => cards.value);
+    return { owner, kw, cards, colCards, colCount, colAmount, totalOpen, totalAmt, stalled, dragNo, overKey, onDrop, gate, nextStage, request, rule, sysOk, confirmMove, drawer, cur, openCard, stageName, stageTagType, listRows, STAGES, OWNERS, fmtY, yuan, wan, go, view: computed(() => props.view), STAGE_IDX };
+  },
+  template: `<div>
+    <page-head :crumbs="['商机管理', view==='board' ? '商机看板' : '商机列表']" :title="view==='board' ? '商机看板' : '商机列表'" :total="'跟进中商机共 '+totalOpen+' 个'">
+      <el-radio-group :model-value="view" @change="v => $go(v==='board'?'/opps':'/opps/list')"><el-radio-button label="board"><el-icon><grid/></el-icon> 看板视图</el-radio-button><el-radio-button label="list"><el-icon><list/></el-icon> 列表视图</el-radio-button></el-radio-group>
+      <el-button type="primary" icon="Plus" @click="$msg.info('示例：新建商机（必须关联客户）')">新建商机</el-button>
+    </page-head>
+    <div class="stat-row" style="grid-template-columns:repeat(5,1fr)">
+      <div class="stat-card"><span class="lb">跟进中商机</span><span class="vl">{{ totalOpen }}</span><span class="ft">初步接触 → 商务审批</span></div>
+      <div class="stat-card"><span class="lb">商机预计金额</span><span class="vl">{{ wan(totalAmt) }}</span><span class="ft">不含已结束商机</span></div>
+      <div class="stat-card ok"><span class="lb">本月预计成交</span><span class="vl">¥86万</span><span class="ft">按预计成交日期</span></div>
+      <div class="stat-card warn"><span class="lb">停滞商机</span><span class="vl">{{ stalled }}</span><span class="ft">超 7 天未推进，已提醒负责人与经理</span></div>
+      <div class="stat-card"><span class="lb">本月赢单 / 输单</span><span class="vl">{{ colCards('close').filter(o=>o.result==='赢单').length + 1 }} / {{ colCards('close').filter(o=>o.result==='输单').length + 1 }}</span><span class="ft">输单需填原因与竞争对手</span></div>
+    </div>
+    <div class="card query" style="padding-bottom:2px"><el-form inline><el-form-item><el-input v-model="kw" placeholder="搜索商机名称 / 客户 / 编号" clearable style="width:260px" prefix-icon="Search"/></el-form-item><el-form-item label="负责人"><el-select v-model="owner" clearable placeholder="全部" style="width:130px"><el-option v-for="o in OWNERS" :key="o" :value="o"/></el-select></el-form-item><el-form-item><el-button type="primary" icon="Search">查询</el-button><el-button @click="owner='';kw=''">重置</el-button></el-form-item>
+      <el-form-item style="margin-left:auto;margin-right:0"><span class="muted" style="font-size:12px">提示：可拖拽卡片到相邻阶段，或点击卡片上的「推进」；系统将校验阶段必填项，禁止跳阶段、禁止直接赢单。</span></el-form-item></el-form></div>
+
+    <div v-if="view==='board'" class="kanban">
+      <div class="kcol" :class="{over:overKey===s.key}" v-for="s in STAGES" :key="s.key" @dragover.prevent="overKey=s.key" @dragleave="overKey=''" @drop.prevent="onDrop(s.key)">
+        <div class="kcol-h"><b>{{ s.name }}</b><span class="cnt">{{ colCount(s.key) }}</span><span class="muted" style="margin-left:auto;font-size:12px">{{ s.key==='close' ? '本月' : '概率 '+s.prob+'%' }}</span></div>
+        <div class="kcol-sum">预计金额 {{ wan(colAmount(s.key)) }}</div>
+        <div class="kcard" v-for="o in colCards(s.key)" :key="o.no" draggable="true" @dragstart="dragNo=o.no" @click="openCard(o)">
+          <div class="nm">{{ o.name }}</div><div class="cu">{{ o.customer }}</div>
+          <div class="am">{{ yuan(o.amount) }}</div>
+          <div class="tags" v-if="(o.flags && o.flags.stalled) || s.key==='close'">
+            <el-tag v-if="o.flags && o.flags.stalled" size="small" type="warning" effect="plain">停滞 {{ o.flags.stalled }} 天</el-tag>
+            <el-tag v-if="s.key==='close'" size="small" :type="o.result==='赢单'?'success':'danger'" effect="light">{{ o.result }}</el-tag></div>
+          <div class="ft"><el-icon><calendar/></el-icon>{{ o.date.slice(5) }}<span>· {{ o.owner }}</span>
+            <el-button v-if="s.key!=='close'" class="adv" size="small" type="primary" plain @click.stop="request(o, STAGES[STAGE_IDX[o.stage]+1].key)">推进</el-button></div>
+        </div>
+        <div class="kmore" v-if="s.key!=='close' && colCount(s.key) > colCards(s.key).length">… 另有 {{ colCount(s.key) - colCards(s.key).length }} 个（查看全部）</div>
+      </div>
+    </div>
+    <div v-else class="card table-card"><el-table :data="listRows" style="width:100%">
+      <el-table-column type="selection" width="46"/>
+      <el-table-column prop="no" label="商机编号" min-width="140"><template #default="{row}"><a class="link" @click="openCard(row)">{{ row.no }}</a></template></el-table-column>
+      <el-table-column prop="name" label="商机名称" min-width="230"/>
+      <el-table-column label="关联客户" min-width="220"><template #default="{row}"><a class="link" @click="$go('/customer/'+($cno(row.customer)))">{{ row.customer }}</a></template></el-table-column>
+      <el-table-column label="预计金额" min-width="120" align="right"><template #default="{row}"><span class="money">{{ yuan(row.amount) }}</span></template></el-table-column>
+      <el-table-column label="当前阶段" min-width="110"><template #default="{row}"><el-tag size="small" :type="stageTagType(row)">{{ row.stage==='close' ? row.result : stageName(row.stage) }}</el-tag></template></el-table-column>
+      <el-table-column label="成交概率" min-width="130"><template #default="{row}"><el-progress :percentage="row.prob" :stroke-width="6"/></template></el-table-column>
+      <el-table-column prop="date" label="预计成交日期" min-width="120"/><el-table-column prop="owner" label="负责人" min-width="80"/>
+      <el-table-column label="操作" width="170" fixed="right"><template #default="{row}"><el-button link type="primary" @click="openCard(row)">查看</el-button><el-button link type="primary" :disabled="row.stage==='close'" @click="request(row, STAGES[STAGE_IDX[row.stage]+1].key)">推进阶段</el-button></template></el-table-column>
+    </el-table><div class="pager"><span class="batch">共 {{ listRows.length }} 条示例商机</span><el-pagination layout="prev, pager, next" :total="listRows.length" :page-size="20" background size="small"/></div></div>
+
+    <el-dialog v-model="gate.show" :title="'推进阶段校验 · '+(rule ? rule.title : '')" width="620px" :close-on-click-modal="false">
+      <template v-if="gate.opp && rule">
+        <div class="stage-flow"><el-tag effect="plain">{{ stageName(gate.opp.stage) }}</el-tag><el-icon><right/></el-icon><el-tag type="primary">{{ gate.target==='close' ? '赢单 / 输单' : stageName(gate.target) }}</el-tag><span class="muted" style="margin-left:auto">{{ gate.opp.name }}</span></div>
+        <el-alert v-if="gate.failed" type="error" show-icon :closable="false" style="margin-bottom:12px" title="不满足阶段进入条件，不能推进。请补全下列必填信息或先完成前置业务。"/>
+        <el-alert v-else type="info" show-icon :closable="false" style="margin-bottom:12px" :title="'进入「'+(gate.target==='close' ? (gate.mode==='win'?'赢单':'输单') : stageName(gate.target))+'」的最少必填信息（阶段规则可在后台配置）'"/>
+        <el-form-item v-if="gate.target==='close'" label="成交结果" label-width="90px"><el-radio-group v-model="gate.mode" @change="gate.errors={};gate.failed=false"><el-radio-button label="win">赢单</el-radio-button><el-radio-button label="lose">输单</el-radio-button></el-radio-group></el-form-item>
+        <div class="gate-row" :class="{bad:gate.errors[f.k]}" v-for="f in (rule.fields||[])" :key="f.k">
+          <el-icon class="st" :color="gate.errors[f.k]?'#d9534f':(gate.form[f.k]?'#2e9e6a':'#9aa5b8')"><component :is="gate.errors[f.k]?'CircleCloseFilled':(gate.form[f.k]?'SuccessFilled':'InfoFilled')"/></el-icon>
+          <div style="flex:1"><div style="margin-bottom:6px"><b>{{ f.label }}</b><span v-if="f.k!=='competitor'" style="color:#d9534f"> *</span><span v-if="gate.errors[f.k]" class="danger-text" style="margin-left:8px;font-size:12px">请填写{{ f.label }}</span></div>
+            <el-input v-if="f.type==='input'" v-model="gate.form[f.k]" :placeholder="f.ph"/>
+            <el-input v-else-if="f.type==='textarea'" type="textarea" :rows="2" v-model="gate.form[f.k]" :placeholder="f.ph"/>
+            <el-date-picker v-else-if="f.type==='date'" v-model="gate.form[f.k]" type="date" value-format="YYYY-MM-DD" style="width:100%"/>
+            <el-select v-else v-model="gate.form[f.k]" style="width:100%" placeholder="请选择"><el-option v-for="x in f.opts" :key="x" :value="x"/></el-select></div></div>
+        <div class="gate-row" :class="{bad:!sysOk(c)}" v-for="c in (rule.checks||[])" :key="c.k">
+          <el-icon class="st" :color="sysOk(c)?'#2e9e6a':'#d9534f'"><component :is="sysOk(c)?'SuccessFilled':'CircleCloseFilled'"/></el-icon>
+          <div style="flex:1"><b>{{ c.label }}</b><div class="muted" style="font-size:13px;margin-top:4px">系统校验：<span :class="sysOk(c)?'ok-text':'danger-text'">{{ sysOk(c) ? '已满足' : '未满足 — ' + c.hint }}</span></div></div>
+          <el-button v-if="!sysOk(c)" size="small" type="primary" plain @click="gate.show=false;$go(c.link)">前往处理</el-button></div>
+        <el-form-item label="变更备注" label-width="90px" style="margin-top:6px"><el-input v-model="gate.remark" placeholder="选填，将与变更前后阶段、变更人、变更时间一并记录"/></el-form-item>
+      </template>
+      <template #footer><el-button @click="gate.show=false">取消</el-button><el-button type="primary" @click="confirmMove">确认推进</el-button></template>
+    </el-dialog>
+
+    <el-drawer v-model="drawer" title="商机详情（快速查看）" size="460px">
+      <div v-if="cur">
+        <div style="font-size:17px;font-weight:600;margin-bottom:4px">{{ cur.name }}</div><div class="muted" style="margin-bottom:14px">{{ cur.no }} · <a @click="$go('/customer/'+$cno(cur.customer))">{{ cur.customer }}</a></div>
+        <el-steps :active="STAGE_IDX[cur.stage]+(cur.stage==='close'?1:0)" finish-status="success" align-center style="margin-bottom:18px"><el-step v-for="s in STAGES" :key="s.key" :title="s.name.replace(' / ','/')"/></el-steps>
+        <el-descriptions :column="2" border size="small"><el-descriptions-item label="预计金额">{{ yuan(cur.amount) }}</el-descriptions-item><el-descriptions-item label="成交概率">{{ cur.prob }}%</el-descriptions-item><el-descriptions-item label="预计成交日期">{{ cur.date }}</el-descriptions-item><el-descriptions-item label="负责人">{{ cur.owner }}</el-descriptions-item><el-descriptions-item label="主要需求" :span="2">{{ (cur.info && cur.info.demand) || '待补充' }}</el-descriptions-item><el-descriptions-item label="预算范围">{{ (cur.info && cur.info.budget) || '-' }}</el-descriptions-item><el-descriptions-item label="采购时间">{{ (cur.info && cur.info.buyDate) || '-' }}</el-descriptions-item></el-descriptions>
+        <div class="sec-title" style="margin-top:18px">阶段变更记录</div>
+        <el-timeline v-if="cur.history && cur.history.length"><el-timeline-item v-for="(h,i) in cur.history" :key="i" :timestamp="h.time+' · '+h.by" placement="top">{{ h.from }} → {{ h.to }}<div class="muted">备注：{{ h.remark }}</div></el-timeline-item></el-timeline>
+        <div v-else class="muted" style="font-size:13px">暂无阶段变更（创建时进入「初步接触」）。每次变更将记录变更前后阶段、变更人、变更时间、备注。</div>
+        <div style="margin-top:18px"><el-button type="primary" :disabled="cur.stage==='close'" @click="drawer=false;request(cur, STAGES[STAGE_IDX[cur.stage]+1].key)">推进到下一阶段</el-button></div>
+      </div>
+    </el-drawer>
+  </div>`,
+};
+
+const QuotePage = {
+  components: { PageHead },
+  props: { no: String },
+  setup(props) {
+    const items = ref(JSON.parse(JSON.stringify(QUOTE_ITEMS)));
+    const base = JSON.stringify(QUOTE_ITEMS);
+    const modified = computed(() => JSON.stringify(items.value) !== base);
+    const calc = computed(() => calcQuote(items.value));
+    const status = ref('审批中');
+    const version = ref('V3');
+    const versions = ref([
+      { v: 'V3', date: '2026-11-02 08:40', by: '张三', total: toC(334977.2), disc: 25360, st: '审批中（当前版本）', note: '含数据迁移服务，折扣 7.88%', cur: true },
+      { v: 'V2', date: '2026-10-30 15:10', by: '张三', total: 34465000, disc: 1680000, st: '已发送客户 · 客户要求调整', note: '未含移动端扩展包', cur: false },
+      { v: 'V1', date: '2026-10-20 10:30', by: '张三', total: 36363400, disc: 0, st: '已发送客户（已锁定）', note: '初版，按标准价', cur: false } ]);
+    // 付款条件：前两期按比例取整，末期倒挤，保证分项之和 = 含税金额
+    const pays = computed(() => { const t = calc.value.total; const a = Math.round(t * 0.3), b = Math.round(t * 0.4); return [
+      { n: '预付款（合同签署后 5 个工作日）', r: 30, a }, { n: '阶段款（系统上线）', r: 40, a: b }, { n: '验收款（终验通过后 10 个工作日）', r: 30, a: t - a - b } ]; });
+    const payOk = computed(() => pays.value.reduce((s, p) => s + p.a, 0) === calc.value.total);
+    const appr = ref([
+      { t: '2026-11-02 08:40', who: '王五', role: '申请人（销售人员）', act: '提交审批', op: '客户为重点客户，申请组合折扣，竞品报价较低。', st: 'done' },
+      { t: '待处理', who: '张三', role: '销售经理', act: '审批中', op: '整体折扣 7.88% 超出销售授权（5%），需销售经理审批。', st: 'cur' } ]);
+    const delta = ref('');
+    const save = () => {
+      if (!modified.value) return ElMessage.info('没有变更，无需保存');
+      versions.value.forEach(v => v.cur = false);
+      const nv = 'V' + (versions.value.length + 1);
+      versions.value.unshift({ v: nv, date: '2026-11-02 07:05', by: '张三', total: calc.value.total, disc: calc.value.discount, st: '草稿（当前版本）', note: '修改明细后保存草稿', cur: true });
+      version.value = nv; status.value = '草稿'; ElMessage.success(`已生成新版本 ${nv}；已提交审批的 V3 保持锁定、不被覆盖`);
+    };
+    const submit = () => ElMessageBox.confirm(`将提交审批：整体折扣 ${(calc.value.discBp / 100).toFixed(2)}%，需「${calc.value.rule.role}」审批。`, '提交审批', { type: 'info' }).then(() => { status.value = '审批中'; ElMessage.success('已提交审批，审批人已收到通知'); }).catch(() => {});
+    const withdraw = () => ElMessageBox.confirm('撤回后报价回到草稿状态，可修改后重新提交。', '撤回审批', { type: 'warning' }).then(() => { status.value = '草稿'; ElMessage.success('已撤回'); }).catch(() => {});
+    const toContract = () => { if (status.value !== '已通过') return ElMessage.warning('报价审批通过后才能转为合同（当前：' + status.value + '）'); ElMessage.success('已生成合同草稿，可在合同模块继续完善'); };
+    const approvedSim = () => { status.value = '已通过'; appr.value[1] = { t: '2026-11-02 07:10', who: '张三', role: '销售经理', act: '同意', op: '同意，折扣在经理授权范围内。', st: 'done' }; ElMessage.success('（演示）审批已通过，已审批版本被锁定，可转为合同'); };
+    const stTag = computed(() => ({ 草稿: 'info', 审批中: 'warning', 已通过: 'success' }[status.value]));
+    const reset = () => { items.value = JSON.parse(base); };
+    return { items, modified, calc, status, version, versions, pays, payOk, appr, save, submit, withdraw, toContract, approvedSim, stTag, reset, fmtC, fmtY, TAX_RATE_BP, tab: ref('appr'), locked: computed(() => status.value === '已通过') };
+  },
+  template: `<div>
+    <el-breadcrumb separator="/" class="crumb"><el-breadcrumb-item>报价管理</el-breadcrumb-item><el-breadcrumb-item><a @click="$go('/quotes')">报价列表</a></el-breadcrumb-item><el-breadcrumb-item>{{ no }}</el-breadcrumb-item></el-breadcrumb>
+    <div class="page-head"><h1>报价单 {{ no }}</h1><el-tag :type="stTag">{{ status }}</el-tag><el-tag type="primary" effect="plain">{{ version }}</el-tag><span class="total">南京某某 ERP 升级项目</span></div>
+    <div class="ops" style="margin-top:-4px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><el-button @click="save">保存草稿</el-button><el-button type="primary" @click="submit" :disabled="status==='审批中'">提交审批</el-button><el-button @click="withdraw" :disabled="status!=='审批中'">撤回</el-button><el-button @click="$msg.success('已复制为新报价草稿')">复制报价</el-button><el-button icon="Download" @click="$msg.info('示例：下载正式报价 PDF')">下载 PDF</el-button><el-button @click="$msg.info('示例：发送给客户（仅审批通过版本）')">发送客户</el-button><el-button type="success" @click="toContract">转为合同</el-button></div></div>
+    <el-alert v-if="locked" type="success" show-icon :closable="false" style="margin-bottom:12px" title="该版本已审批通过并锁定；修改价格将生成新版本并重新审批。"/>
+    <div class="card card-pad" style="margin-bottom:14px"><div class="card-title">报价基本信息</div>
+      <el-descriptions :column="4" border><el-descriptions-item label="报价编号">{{ no }}</el-descriptions-item><el-descriptions-item label="客户"><a class="link" @click="$go('/customer/KH-202611-0001')">南京某某科技有限公司</a></el-descriptions-item><el-descriptions-item label="联系人">陈总监</el-descriptions-item><el-descriptions-item label="关联商机"><a class="link" @click="$go('/opps')">SJ-202609-0012</a></el-descriptions-item><el-descriptions-item label="报价日期">2026-11-02</el-descriptions-item><el-descriptions-item label="有效期至">2026-12-02</el-descriptions-item><el-descriptions-item label="负责人">张三</el-descriptions-item><el-descriptions-item label="币种 / 税率">人民币 / 增值税 {{ TAX_RATE_BP/100 }}%</el-descriptions-item></el-descriptions></div>
+    <div class="card card-pad" style="margin-bottom:14px">
+      <div class="card-title">产品明细<span class="muted" style="font-weight:400;font-size:12px">金额按「分」整数精确计算，无浮点误差；数量与折扣可编辑</span>
+        <span style="margin-left:auto"><el-button size="small" icon="Plus" @click="$msg.info('示例：从产品目录添加')">添加产品</el-button><el-button size="small" @click="reset" :disabled="!modified">还原</el-button></span></div>
+      <el-alert v-if="modified" type="warning" show-icon :closable="false" style="margin-bottom:10px" title="明细已修改：保存将生成新版本（V4），已提交审批的 V3 保持锁定；并需按新折扣重新审批。"/>
+      <el-table :data="calc.rows" show-summary :summary-method="() => ['','合计','','','','','','','¥'+fmtC(calc.sub)]" border>
+        <el-table-column type="index" label="#" width="50"/>
+        <el-table-column prop="name" label="产品" min-width="170"/><el-table-column prop="spec" label="规格" min-width="150"/>
+        <el-table-column label="数量" width="130"><template #default="{row}"><el-input-number v-model="items[row.id-1].qty" :min="1" size="small" :disabled="locked" controls-position="right" style="width:100px"/></template></el-table-column>
+        <el-table-column prop="unit" label="单位" width="80"/>
+        <el-table-column label="标准单价" width="120" align="right"><template #default="{row}"><span class="money">¥{{ fmtC(row.stdC) }}</span></template></el-table-column>
+        <el-table-column label="折扣（%）" width="130"><template #default="{row}"><el-input-number v-model="items[row.id-1].disc" :min="50" :max="100" size="small" :disabled="locked" controls-position="right" style="width:100px"/></template></el-table-column>
+        <el-table-column label="成交单价" width="120" align="right"><template #default="{row}"><span class="money">¥{{ fmtC(row.dealC) }}</span></template></el-table-column>
+        <el-table-column label="小计" width="140" align="right"><template #default="{row}"><span class="money"><b>¥{{ fmtC(row.lineSub) }}</b></span></template></el-table-column>
+      </el-table>
+      <div style="display:flex;margin-top:16px;gap:24px;align-items:flex-start">
+        <div style="flex:1">
+          <div class="sec-title">审批规则触发</div>
+          <el-alert :type="calc.discBp<=500?'success':'warning'" show-icon :closable="false" :title="'整体折扣 '+(calc.discBp/100).toFixed(2)+'%（优惠 ¥'+fmtC(calc.discount)+'）→ 需「'+calc.rule.role+'」审批'"/>
+          <div class="muted" style="font-size:12px;margin-top:8px;line-height:1.8">规则：≤5% 销售授权内自动通过；≤10% 销售经理；≤20% 销售总监；超过 20% 或低于价格底线 → 总经理 / 财务负责人。</div>
+          <div class="sec-title" style="margin-top:14px">交付说明</div>
+          <el-descriptions :column="1" size="small" border><el-descriptions-item label="交付周期">合同生效后 90 个自然日内完成上线</el-descriptions-item><el-descriptions-item label="实施范围">CRM 企业版部署、移动端集成、历史数据迁移、用户培训 3 场</el-descriptions-item><el-descriptions-item label="服务期限">软件授权 1 年；运维服务自验收之日起 12 个月</el-descriptions-item></el-descriptions>
+        </div>
+        <div class="amt-box" style="margin-left:0">
+          <div class="r"><span>原价合计</span><span class="money">¥{{ fmtC(calc.orig) }}</span></div>
+          <div class="r"><span>优惠金额</span><span class="money danger-text">- ¥{{ fmtC(calc.discount) }}</span></div>
+          <div class="r"><span>不含税金额</span><span class="money">¥{{ fmtC(calc.sub) }}</span></div>
+          <div class="r"><span>税额（{{ TAX_RATE_BP/100 }}%）</span><span class="money">¥{{ fmtC(calc.tax) }}</span></div>
+          <div class="r total"><span>含税金额</span><span class="money">¥{{ fmtC(calc.total) }}</span></div>
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:14px">
+      <div class="card card-pad"><div class="card-title">付款条件<el-tag size="small" :type="payOk?'success':'danger'" effect="plain" style="margin-left:6px">分项合计 {{ payOk ? '= 含税金额 ✓' : '≠ 含税金额' }}</el-tag></div>
+        <el-table :data="pays" border size="small"><el-table-column prop="n" label="款项" min-width="220"/><el-table-column label="比例" width="70"><template #default="{row}">{{ row.r }}%</template></el-table-column><el-table-column label="金额（含税）" width="140" align="right"><template #default="{row}"><span class="money">¥{{ fmtC(row.a) }}</span></template></el-table-column></el-table></div>
+      <div class="card card-pad"><el-tabs v-model="tab">
+        <el-tab-pane label="审批记录" name="appr">
+          <div class="flow" style="margin-bottom:12px"><template v-for="(a,i) in appr" :key="i"><div class="fnode" :class="a.st"><div class="c">{{ a.st==='done' ? '✓' : i+1 }}</div><div class="nm">{{ a.role.split('（')[0] }}</div><div class="pp">{{ a.who }}</div></div><div v-if="i<appr.length-1" class="fline" :class="{done:a.st==='done'}"></div></template><div class="fline"></div><div class="fnode"><div class="c">✓</div><div class="nm">完成</div></div></div>
+          <el-table :data="appr" size="small"><el-table-column prop="t" label="时间" width="140"/><el-table-column label="审批人" width="150"><template #default="{row}">{{ row.who }}<div class="muted" style="font-size:12px">{{ row.role }}</div></template></el-table-column><el-table-column prop="act" label="结果" width="80"/><el-table-column prop="op" label="审批意见" min-width="180"/></el-table>
+          <div style="margin-top:8px"><el-button size="small" link type="primary" @click="approvedSim" v-if="status==='审批中'">（演示）模拟经理审批通过</el-button><el-button size="small" link type="primary" @click="$go('/approvals')">前往审批中心</el-button></div></el-tab-pane>
+        <el-tab-pane label="版本记录" name="ver"><el-table :data="versions" size="small"><el-table-column prop="v" label="版本" width="60"/><el-table-column prop="date" label="时间" width="140"/><el-table-column label="含税金额" width="130" align="right"><template #default="{row}"><span class="money">¥{{ fmtC(row.total) }}</span></template></el-table-column><el-table-column label="状态" min-width="170"><template #default="{row}"><el-tag size="small" :type="row.cur?'warning':'info'">{{ row.st }}</el-tag></template></el-table-column><el-table-column prop="note" label="说明" min-width="150"/></el-table><div class="muted" style="font-size:12px;margin-top:8px">已发送客户的历史版本不会被覆盖。</div></el-tab-pane>
+        <el-tab-pane label="附件" name="files"><el-table :data="[{n:'正式报价单 V2.pdf',s:'352 KB',t:'正式报价 PDF'},{n:'折扣申请说明.docx',s:'48 KB',t:'补充文件'}]" size="small"><el-table-column prop="n" label="文件名"><template #default="{row}"><a class="link">{{ row.n }}</a></template></el-table-column><el-table-column prop="t" label="类型" width="110"/><el-table-column prop="s" label="大小" width="80"/></el-table></el-tab-pane>
+      </el-tabs></div>
+    </div>
+  </div>`,
+};
+
+const PaymentsPage = {
+  components: { PageHead },
+  setup() {
+    const tab = ref('plan');
+    const kw = ref(''); const fst = ref('');
+    const recvOf = (planId) => store.pay.records.reduce((s, r) => s + r.alloc.filter(a => a.plan === planId).reduce((x, a) => x + a.amt, 0), 0);
+    const lastDate = (planId) => { const ds = store.pay.records.filter(r => r.alloc.some(a => a.plan === planId)).map(r => r.date).sort(); return ds.length ? ds[ds.length - 1] : '-'; };
+    const confirmOf = (planId) => { const rs = store.pay.records.filter(r => r.alloc.some(a => a.plan === planId)); if (!rs.length) return '-'; return rs.every(r => r.confirm === '财务已确认') ? '财务已确认' : '待财务复核'; };
+    const planRows = computed(() => {
+      const out = [];
+      store.pay.contracts.forEach(ct => ct.plans.forEach((p, i) => {
+        const got = recvOf(p.id); const rest = p.amount - got; const due = p.date <= TODAY;
+        const overdue = rest > 0 && p.date < TODAY; const days = overdue ? daysBetween(p.date, TODAY) : 0;
+        const status = got >= p.amount ? '已核销' : overdue ? (got > 0 ? '部分核销 · 逾期' : '逾期未收') : got > 0 ? '部分核销' : '未到期';
+        out.push({ no: 'HK-' + p.id.replace('P', '').padStart(4, '0'), ct, contract: ct.no, customer: ct.customer, order: ct.order, stage: p.stage, ratio: p.ratio, date: p.date, plan: p.amount, got, rest, due, overdue, days, status, last: lastDate(p.id), confirm: confirmOf(p.id), owner: ct.owner, pid: p.id, seq: i + 1 });
+      }));
+      return out;
+    });
+    const rows = computed(() => planRows.value.filter(r => (!kw.value || (r.contract + r.customer + r.stage).includes(kw.value)) && (!fst.value || r.status.includes(fst.value))));
+    const sum = computed(() => { const a = planRows.value; const S = f => a.reduce((s, r) => s + f(r), 0);
+      return { due: S(r => r.due ? r.plan : 0), got: S(r => r.got), rest: S(r => r.rest), overdue: S(r => r.overdue ? r.rest : 0), n: a.filter(r => r.overdue).length, all: S(r => r.plan) }; });
+    const stTag = s => s === '已核销' ? 'success' : s.includes('逾期') ? 'danger' : s === '部分核销' ? 'warning' : 'info';
+    const recRows = computed(() => store.pay.records.map(r => ({ ...r, customer: store.pay.contracts.find(c => c.no === r.contract).customer })));
+    // ---- 抽屉：合同回款详情 ----
+    const drawer = ref(false); const curNo = ref('');
+    const curCt = computed(() => store.pay.contracts.find(c => c.no === curNo.value));
+    const ctPlans = computed(() => planRows.value.filter(r => r.contract === curNo.value));
+    const ctRecs = computed(() => store.pay.records.filter(r => r.contract === curNo.value));
+    const ctSum = computed(() => { const p = ctPlans.value; const S = f => p.reduce((s, r) => s + f(r), 0); return { amount: curCt.value ? curCt.value.amount : 0, due: S(r => r.due ? r.plan : 0), got: S(r => r.got), rest: S(r => r.rest), overdue: S(r => r.overdue ? r.rest : 0) }; });
+    const openCt = no => { curNo.value = no; drawer.value = true; };
+    // ---- 登记收款 + 自动核销 ----
+    const dlg = ref(false);
+    const rf = reactive({ contract: '', amount: 0, date: TODAY, method: '银行转账', plan: 'auto', remark: '' });
+    const openReg = (no, pid) => { Object.assign(rf, { contract: no || store.pay.contracts[0].no, amount: 0, date: TODAY, method: '银行转账', plan: pid || 'auto', remark: '' }); dlg.value = true; };
+    const preview = computed(() => {
+      const ct = store.pay.contracts.find(c => c.no === rf.contract); if (!ct) return { rows: [], excess: 0 };
+      let left = toC(rf.amount || 0); const plans = ct.plans.slice().sort((a, b) => (b.id === rf.plan) - (a.id === rf.plan) || a.date.localeCompare(b.date));
+      const rows = [];
+      plans.forEach(p => { const rest = p.amount - recvOf(p.id); if (rest <= 0 || left <= 0) return; const use = Math.min(rest, left); left -= use; rows.push({ id: p.id, stage: p.stage, rest, use, after: rest - use, date: p.date }); });
+      return { rows, excess: left };
+    });
+    const doReg = () => {
+      if (!rf.amount || rf.amount <= 0) return ElMessage.warning('请输入实际到账金额');
+      const pv = preview.value; const id = 'SK-202611-' + String(store.pay.records.length + 20).padStart(4, '0');
+      store.pay.records.push({ id, contract: rf.contract, date: rf.date, amount: toC(rf.amount), method: rf.method, confirm: '待财务复核', operator: '财务-王芳', alloc: pv.rows.map(r => ({ plan: r.id, amt: r.use })), excess: pv.excess });
+      dlg.value = false;
+      if (pv.excess > 0) ElNotification({ title: '超额收款提示', message: `本次到账超出应收 ¥${fmtC(pv.excess)}，已转入「待核实 / 预收款」，请财务确认。其余金额已自动核销。`, type: 'warning', duration: 6000 });
+      else ElMessage.success('收款已登记，已自动核销对应回款计划，并重新计算未收金额与逾期状态');
+    };
+    const reverse = r => ElMessageBox.prompt('回款录入错误须走冲销/更正流程并保留原记录。请填写冲销原因：', '申请冲销 ' + r.id, { inputPattern: /\S+/, inputErrorMessage: '原因必填' }).then(() => ElMessage.success('已提交「应收冲销」审批（财务负责人），原记录保留')).catch(() => {});
+    const confirmRec = r => { r.confirm = '财务已确认'; ElMessage.success('财务复核通过'); };
+    return { tab, kw, fst, rows, sum, stTag, recRows, drawer, curNo, curCt, ctPlans, ctRecs, ctSum, openCt, dlg, rf, openReg, preview, doReg, reverse, confirmRec, fmtC, store, TODAY };
+  },
+  template: `<div>
+    <page-head :crumbs="['回款管理', '回款计划与收款']" title="回款管理" :total="'回款计划共 '+rows.length+' 笔 · 示例合同 '+store.pay.contracts.length+' 份'">
+      <el-button type="primary" icon="Plus" @click="openReg()">登记收款</el-button><el-button icon="Download" @click="$msg.info('示例：导出')">导出</el-button></page-head>
+    <div class="stat-row" style="grid-template-columns:repeat(5,1fr)">
+      <div class="stat-card"><span class="lb">累计应收（已到期）</span><span class="vl">¥{{ fmtC(sum.due) }}</span><span class="ft">计划回款日期 ≤ 今日</span></div>
+      <div class="stat-card ok"><span class="lb">累计已收</span><span class="vl">¥{{ fmtC(sum.got) }}</span><span class="ft">含待财务复核</span></div>
+      <div class="stat-card warn"><span class="lb">未收金额（含未到期）</span><span class="vl">¥{{ fmtC(sum.rest) }}</span><span class="ft">计划总额 ¥{{ fmtC(sum.all) }}</span></div>
+      <div class="stat-card danger"><span class="lb">逾期金额</span><span class="vl">¥{{ fmtC(sum.overdue) }}</span><span class="ft">{{ sum.n }} 笔逾期，已提醒财务与销售负责人</span></div>
+      <div class="stat-card"><span class="lb">回款率（已收 / 已到期应收）</span><span class="vl">{{ (sum.got*100/sum.due).toFixed(1) }}%</span><span class="ft">统计口径：财务确认 + 待复核到账</span></div>
+    </div>
+    <el-tabs v-model="tab"><el-tab-pane label="回款计划（计划 vs 实际）" name="plan"/><el-tab-pane label="收款记录" name="rec"/></el-tabs>
+    <div class="card query"><el-form inline><el-form-item><el-input v-model="kw" placeholder="合同编号 / 客户 / 款项阶段" clearable style="width:260px" prefix-icon="Search"/></el-form-item><el-form-item label="状态"><el-select v-model="fst" clearable placeholder="全部" style="width:140px"><el-option v-for="x in ['已核销','部分核销','逾期','未到期']" :key="x" :value="x"/></el-select></el-form-item><el-form-item><el-button type="primary" icon="Search">查询</el-button><el-button @click="kw='';fst=''">重置</el-button></el-form-item></el-form></div>
+    <div class="card table-card" v-if="tab==='plan'">
+      <el-table :data="rows" style="width:100%" :row-class-name="({row}) => row.overdue ? 'row-overdue' : ''" size="small">
+        <el-table-column label="合同编号 / 回款编号" min-width="150"><template #default="{row}"><a class="link" @click="openCt(row.contract)">{{ row.contract }}</a><div class="muted" style="font-size:12px">{{ row.no }} · {{ row.owner }}</div></template></el-table-column>
+        <el-table-column label="客户名称" min-width="170" show-overflow-tooltip><template #default="{row}"><a class="link" @click="$go('/customer/'+$cno(row.customer))">{{ row.customer }}</a></template></el-table-column>
+        <el-table-column label="款项阶段" min-width="105"><template #default="{row}">{{ row.stage }}<div class="muted" style="font-size:12px">{{ row.ratio }}%</div></template></el-table-column>
+        <el-table-column label="计划回款" min-width="115" align="right"><template #default="{row}"><span class="money">¥{{ fmtC(row.plan) }}</span><div class="muted" style="font-size:12px">{{ row.date }}</div></template></el-table-column>
+        <el-table-column label="实际到账" min-width="115" align="right"><template #default="{row}"><span class="money ok-text">¥{{ fmtC(row.got) }}</span><div class="muted" style="font-size:12px">{{ row.last }}</div></template></el-table-column>
+        <el-table-column label="未收金额" min-width="105" align="right"><template #default="{row}"><span class="money" :class="{'danger-text':row.overdue}">¥{{ fmtC(row.rest) }}</span></template></el-table-column>
+        <el-table-column label="核销进度" min-width="110"><template #default="{row}"><el-progress :percentage="Math.round(row.got*100/row.plan)" :stroke-width="7" :status="row.got>=row.plan?'success':(row.overdue?'exception':'')"/></template></el-table-column>
+        <el-table-column label="状态 / 逾期天数 / 财务确认" min-width="190"><template #default="{row}"><el-tag size="small" :type="stTag(row.status)">{{ row.status }}</el-tag><div class="muted" style="font-size:12px;margin-top:2px"><b v-if="row.overdue" class="danger-text">逾期 {{ row.days }} 天 · </b>{{ row.confirm }}</div></template></el-table-column>
+        <el-table-column label="操作" width="140" fixed="right"><template #default="{row}"><el-button link type="primary" @click="openCt(row.contract)">详情</el-button><el-button link type="primary" :disabled="row.rest<=0" @click="openReg(row.contract,row.pid)">登记收款</el-button></template></el-table-column>
+      </el-table>
+      <div class="pager"><span class="batch">逾期行以红色标记；金额均为精确小数（分）计算</span><el-pagination layout="prev, pager, next" :total="rows.length" :page-size="20" background size="small"/></div>
+    </div>
+    <div class="card table-card" v-else>
+      <el-table :data="recRows" style="width:100%"><el-table-column prop="id" label="收款编号" width="150"/><el-table-column prop="contract" label="合同编号" width="150"/><el-table-column prop="customer" label="客户名称" min-width="200"/><el-table-column prop="date" label="到账日期" width="110"/>
+        <el-table-column label="到账金额" width="130" align="right"><template #default="{row}"><span class="money">¥{{ fmtC(row.amount) }}</span></template></el-table-column>
+        <el-table-column label="核销对象" min-width="200"><template #default="{row}"><span v-for="a in row.alloc" :key="a.plan" style="margin-right:8px">{{ a.plan }}：¥{{ fmtC(a.amt) }}</span><el-tag v-if="row.excess>0" size="small" type="warning">超额 ¥{{ fmtC(row.excess) }} 待核实</el-tag></template></el-table-column>
+        <el-table-column prop="method" label="收款方式" width="100"/><el-table-column label="财务确认" width="120"><template #default="{row}"><el-tag size="small" :type="row.confirm==='财务已确认'?'success':'warning'">{{ row.confirm }}</el-tag></template></el-table-column>
+        <el-table-column label="操作" width="170" fixed="right"><template #default="{row}"><el-button link type="primary" v-if="row.confirm!=='财务已确认'" @click="confirmRec(row)">财务复核</el-button><el-button link type="danger" @click="reverse(row)">申请冲销</el-button></template></el-table-column></el-table></div>
+
+    <el-drawer v-model="drawer" size="640px" :title="'回款详情 · '+curNo">
+      <div v-if="curCt">
+        <div style="font-size:16px;font-weight:600">{{ curCt.name }}</div><div class="muted" style="margin:4px 0 14px">{{ curCt.customer }} · 订单 {{ curCt.order }} · 负责人 {{ curCt.owner }}</div>
+        <div class="stat-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:10px">
+          <div class="stat-card"><span class="lb">合同金额</span><span class="vl" style="font-size:20px">¥{{ fmtC(ctSum.amount) }}</span></div>
+          <div class="stat-card"><span class="lb">累计应收（已到期）</span><span class="vl" style="font-size:20px">¥{{ fmtC(ctSum.due) }}</span></div>
+          <div class="stat-card ok"><span class="lb">累计已收</span><span class="vl" style="font-size:20px">¥{{ fmtC(ctSum.got) }}</span></div>
+          <div class="stat-card warn"><span class="lb">未收金额</span><span class="vl" style="font-size:20px">¥{{ fmtC(ctSum.rest) }}</span></div>
+          <div class="stat-card danger"><span class="lb">其中逾期</span><span class="vl" style="font-size:20px">¥{{ fmtC(ctSum.overdue) }}</span></div>
+          <div class="stat-card"><span class="lb">回款完成度</span><span class="vl" style="font-size:20px">{{ (ctSum.got*100/ctSum.amount).toFixed(1) }}%</span></div></div>
+        <div class="sec-title" style="margin-top:14px">回款计划（计划 vs 实际）</div>
+        <el-table :data="ctPlans" size="small" border><el-table-column prop="stage" label="阶段" width="90"/><el-table-column label="比例" width="60"><template #default="{row}">{{ row.ratio }}%</template></el-table-column><el-table-column prop="date" label="计划日期" width="100"/>
+          <el-table-column label="计划金额" width="110" align="right"><template #default="{row}">¥{{ fmtC(row.plan) }}</template></el-table-column><el-table-column label="实收" width="110" align="right"><template #default="{row}">¥{{ fmtC(row.got) }}</template></el-table-column>
+          <el-table-column label="未收" width="100" align="right"><template #default="{row}"><span :class="{'danger-text':row.overdue}">¥{{ fmtC(row.rest) }}</span></template></el-table-column>
+          <el-table-column label="状态" min-width="110"><template #default="{row}"><el-tag size="small" :type="stTag(row.status)">{{ row.status }}</el-tag><div v-if="row.overdue" class="danger-text" style="font-size:12px">逾期 {{ row.days }} 天</div></template></el-table-column></el-table>
+        <div class="sec-title" style="margin-top:18px">到账记录<el-button size="small" type="primary" style="margin-left:auto" @click="openReg(curNo)">登记收款</el-button></div>
+        <el-table :data="ctRecs" size="small" border><el-table-column prop="id" label="收款编号" width="140"/><el-table-column prop="date" label="到账日期" width="100"/><el-table-column label="金额" width="110" align="right"><template #default="{row}">¥{{ fmtC(row.amount) }}</template></el-table-column><el-table-column label="核销" min-width="100"><template #default="{row}"><span v-for="a in row.alloc" :key="a.plan">{{ a.plan }} </span></template></el-table-column><el-table-column label="确认" width="100"><template #default="{row}"><el-tag size="small" :type="row.confirm==='财务已确认'?'success':'warning'">{{ row.confirm }}</el-tag></template></el-table-column></el-table>
+        <div class="sec-title" style="margin-top:18px">相关凭证</div><div><el-tag style="margin-right:8px"><el-icon><picture/></el-icon> 银行回单-1019.png</el-tag><el-tag><el-icon><picture/></el-icon> 银行回单-1030.png</el-tag></div>
+      </div>
+    </el-drawer>
+
+    <el-dialog v-model="dlg" title="登记收款（自动核销）" width="620px">
+      <el-form label-width="104px">
+        <el-form-item label="合同" required><el-select v-model="rf.contract" style="width:100%"><el-option v-for="c in store.pay.contracts" :key="c.no" :value="c.no" :label="c.no+' · '+c.name"/></el-select></el-form-item>
+        <el-row :gutter="12"><el-col :span="12"><el-form-item label="到账金额" required><el-input-number v-model="rf.amount" :min="0" :precision="2" :step="1000" :controls="false" style="width:100%"/></el-form-item></el-col><el-col :span="12"><el-form-item label="到账日期" required><el-date-picker v-model="rf.date" type="date" value-format="YYYY-MM-DD" style="width:100%"/></el-form-item></el-col></el-row>
+        <el-row :gutter="12"><el-col :span="12"><el-form-item label="收款方式"><el-select v-model="rf.method" style="width:100%"><el-option v-for="x in ['银行转账','电汇','支票','微信/支付宝']" :key="x" :value="x"/></el-select></el-form-item></el-col><el-col :span="12"><el-form-item label="核销计划"><el-select v-model="rf.plan" style="width:100%"><el-option label="自动（按计划日期顺序）" value="auto"/><el-option v-for="p in (store.pay.contracts.find(c=>c.no===rf.contract)||{plans:[]}).plans" :key="p.id" :value="p.id" :label="'优先：'+p.stage"/></el-select></el-form-item></el-col></el-row>
+        <el-form-item label="备注 / 凭证"><el-input v-model="rf.remark" placeholder="银行回单号等；凭证可上传"/></el-form-item>
+      </el-form>
+      <div class="sec-title">核销预览</div>
+      <el-table :data="preview.rows" size="small" border empty-text="请输入到账金额以预览核销结果"><el-table-column prop="stage" label="计划" width="100"/><el-table-column label="核销前未收" align="right"><template #default="{row}">¥{{ fmtC(row.rest) }}</template></el-table-column><el-table-column label="本次核销" align="right"><template #default="{row}"><b class="ok-text">¥{{ fmtC(row.use) }}</b></template></el-table-column><el-table-column label="核销后未收" align="right"><template #default="{row}">¥{{ fmtC(row.after) }}</template></el-table-column><el-table-column label="结果" width="100"><template #default="{row}"><el-tag size="small" :type="row.after===0?'success':'warning'">{{ row.after===0 ? '全额核销' : '部分核销' }}</el-tag></template></el-table-column></el-table>
+      <el-alert v-if="preview.excess>0" type="warning" show-icon :closable="false" style="margin-top:10px" :title="'超额收款：超出应收 ¥'+fmtC(preview.excess)+'，将转入「待核实 / 预收款」，不会自动核销。'"/>
+      <template #footer><el-button @click="dlg=false">取消</el-button><el-button type="primary" @click="doReg">确认登记</el-button></template>
+    </el-dialog>
+  </div>`,
+};
+
+const ApprovalsPage = {
+  components: { PageHead },
+  setup() {
+    const tab = ref('todo'); const sel = ref('SP-202611-0042');
+    const TABS = { todo: '待我审批', mine: '我发起的', done: '我已审批', cc: '抄送我的' };
+    const list = computed(() => store.approvals.filter(a => a.tab === tab.value));
+    const count = k => store.approvals.filter(a => a.tab === k).length;
+    const cur = computed(() => store.approvals.find(a => a.id === sel.value));
+    watch(tab, () => { const l = list.value; if (l.length && !l.find(a => a.id === sel.value)) sel.value = l[0].id; });
+    const dlg = reactive({ show: false, kind: '', opinion: '', user: '' });
+    const KIND = { approve: ['同意', 'success'], reject: ['拒绝', 'danger'], back: ['退回修改', 'warning'], transfer: ['转交', 'primary'], sign: ['加签', 'primary'], cc: ['抄送', 'info'] };
+    const act = k => { Object.assign(dlg, { show: true, kind: k, opinion: '', user: '' }); };
+    const need = computed(() => ['reject', 'back'].includes(dlg.kind));
+    const needUser = computed(() => ['transfer', 'sign', 'cc'].includes(dlg.kind));
+    const submit = () => {
+      if (need.value && !dlg.opinion) return ElMessage.warning('请填写审批意见（必填）');
+      if (needUser.value && !dlg.user) return ElMessage.warning('请选择人员');
+      const a = cur.value; const k = dlg.kind; const nodeIdx = a.nodes.findIndex(n => n.st === 'cur');
+      const label = KIND[k][0];
+      a.history.push({ who: '张三', act: label + (needUser.value ? ' → ' + dlg.user : ''), op: dlg.opinion || '-', t: '11-02 07:00' });
+      if (k === 'approve') {
+        a.nodes[nodeIdx].st = 'done'; a.nodes[nodeIdx].t = '11-02 07:00';
+        const nx = a.nodes.findIndex((n, i) => i > nodeIdx && n.st === 'wait'); if (nx >= 0) a.nodes[nx].st = 'cur';
+        a.tab = 'done'; a.result = '已同意（流程' + (nx >= 0 ? '流转至下一节点' : '结束') + '）';
+      } else if (k === 'reject') { a.nodes[nodeIdx].st = 'rej'; a.tab = 'done'; a.result = '已拒绝'; }
+      else if (k === 'back') { a.nodes[nodeIdx].st = 'rej'; a.tab = 'done'; a.result = '已退回修改'; }
+      else if (k === 'transfer') { a.nodes[nodeIdx].p = dlg.user; ElMessage.success('已转交给 ' + dlg.user); dlg.show = false; return; }
+      else if (k === 'sign') { a.nodes.splice(nodeIdx + 1, 0, { n: '加签：' + dlg.user, p: dlg.user, st: 'wait', t: '' }); ElMessage.success('已加签 ' + dlg.user); dlg.show = false; return; }
+      else if (k === 'cc') { ElMessage.success('已抄送给 ' + dlg.user); dlg.show = false; return; }
+      dlg.show = false; ElNotification({ title: '审批已提交', message: `「${a.title}」${label}，申请人已收到通知。`, type: k === 'approve' ? 'success' : 'warning' });
+      const l = list.value; if (l.length) sel.value = l[0].id;
+    };
+    const resTag = a => (a.result || '').startsWith('已同意') ? 'success' : a.result ? 'danger' : 'warning';
+    const nodeIcon = n => ({ done: '✓', cur: '●', rej: '✕', skip: '—', wait: '' }[n.st]);
+    return { tab, TABS, list, count, cur, sel, dlg, KIND, act, need, needUser, submit, resTag, nodeIcon, fmtC, canAct: computed(() => tab.value === 'todo' && cur.value && cur.value.tab === 'todo') };
+  },
+  template: `<div>
+    <page-head :crumbs="['工作台', '审批中心']" title="审批中心" :total="'待我审批 '+count('todo')+' 项'"><el-button icon="Setting" @click="$msg.info('示例：审批模板配置（审批类型与节点，支持按金额/折扣/客户等级动态配置）')">审批模板</el-button><el-button icon="DataLine" @click="$msg.info('示例：审批统计（数量、用时、驳回率）')">审批统计</el-button></page-head>
+    <div class="stat-row" style="grid-template-columns:repeat(5,1fr)">
+      <div class="stat-card warn"><span class="lb">待我审批</span><span class="vl">{{ count('todo') }}</span><span class="ft">需及时处理</span></div>
+      <div class="stat-card"><span class="lb">我发起的</span><span class="vl">{{ count('mine') }}</span><span class="ft">审批中 / 已完成</span></div>
+      <div class="stat-card ok"><span class="lb">我已审批</span><span class="vl">{{ count('done') }}</span><span class="ft">本月累计</span></div>
+      <div class="stat-card"><span class="lb">平均审批用时</span><span class="vl">4.2 小时</span><span class="ft">近 30 天</span></div>
+      <div class="stat-card danger"><span class="lb">驳回率</span><span class="vl">12.5%</span><span class="ft">近 30 天</span></div>
+    </div>
+    <div class="appr-wrap">
+      <div class="card">
+        <el-tabs v-model="tab" style="padding:4px 14px 0"><el-tab-pane v-for="(v,k) in TABS" :key="k" :name="k"><template #label>{{ v }} <el-badge :value="count(k)" :type="k==='todo'?'danger':'info'" style="margin-left:2px"/></template></el-tab-pane></el-tabs>
+        <div v-for="a in list" :key="a.id" class="appr-item" :class="{active:sel===a.id}" @click="sel=a.id">
+          <div class="tt"><span>{{ a.title }}</span><el-tag size="small" :type="a.result?resTag(a):'warning'" effect="light">{{ a.result ? a.result.slice(0,6) : '审批中' }}</el-tag></div>
+          <div class="sm"><span>{{ a.type }}</span><span>申请人：{{ a.applicant }}</span><span>{{ a.time.slice(5,16) }}</span><span v-if="a.amount" class="money" style="margin-left:auto;color:#1d2a3d">¥{{ fmtC(a.amount) }}</span></div>
+        </div>
+        <el-empty v-if="!list.length" description="暂无审批" :image-size="80"/>
+      </div>
+      <div class="card card-pad" v-if="cur">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px"><h3 style="margin:0;font-size:17px">{{ cur.title }}</h3><el-tag size="small">{{ cur.type }}</el-tag><span class="muted" style="margin-left:auto;font-size:12px">{{ cur.id }}</span></div>
+        <el-descriptions :column="3" size="small" border style="margin-bottom:14px"><el-descriptions-item label="申请人">{{ cur.applicant }}</el-descriptions-item><el-descriptions-item label="申请部门">{{ cur.dept }}</el-descriptions-item><el-descriptions-item label="申请时间">{{ cur.time }}</el-descriptions-item></el-descriptions>
+        <div class="sec-title">业务单据摘要</div>
+        <el-descriptions :column="2" size="small" border><el-descriptions-item v-for="s in cur.summary" :key="s[0]" :label="s[0]">{{ s[1] }}</el-descriptions-item></el-descriptions>
+        <div class="sec-title" style="margin-top:16px">审批流程 <span class="muted" style="font-weight:400;font-size:12px">当前节点高亮</span></div>
+        <div class="flow" style="overflow-x:auto;padding-bottom:6px"><template v-for="(n,i) in cur.nodes" :key="i"><div class="fnode" :class="n.st" :style="n.st==='skip'?'opacity:.55':''"><div class="c">{{ nodeIcon(n) || (i+1) }}</div><div class="nm">{{ n.n }}</div><div class="pp">{{ n.p }}</div><div class="pp" v-if="n.t">{{ n.t }}</div></div><div class="fline" :class="{done:n.st==='done'}" v-if="i<cur.nodes.length-1"></div></template></div>
+        <div class="sec-title" style="margin-top:12px">历史审批意见</div>
+        <div class="opinion" v-for="(h,i) in cur.history" :key="i"><div><b>{{ h.who }}</b> · <el-tag size="small" :type="h.act.startsWith('拒绝')||h.act.startsWith('退回')?'danger':(h.act==='提交申请'?'info':'success')">{{ h.act }}</el-tag><span class="muted" style="float:right;font-size:12px">{{ h.t }}</span></div><div class="muted" style="margin-top:4px">{{ h.op }}</div></div>
+        <div class="sec-title" style="margin-top:12px">业务附件</div>
+        <div style="margin-bottom:16px"><el-tag style="margin-right:8px"><el-icon><document/></el-icon> 报价单 V3.pdf</el-tag><el-tag><el-icon><document/></el-icon> 折扣申请说明.docx</el-tag></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;padding-top:14px;border-top:1px solid var(--line)">
+          <el-tooltip :disabled="canAct" content="仅「待我审批」且当前节点轮到我时可操作（按授权启用）"><span><el-button type="success" :disabled="!canAct" @click="act('approve')">同意</el-button></span></el-tooltip>
+          <el-button type="danger" plain :disabled="!canAct" @click="act('reject')">拒绝</el-button><el-button type="warning" plain :disabled="!canAct" @click="act('back')">退回修改</el-button>
+          <el-button :disabled="!canAct" @click="act('transfer')">转交</el-button><el-button :disabled="!canAct" @click="act('sign')">加签</el-button><el-button @click="act('cc')">抄送</el-button>
+          <el-button v-if="cur.type==='报价折扣审批'" link type="primary" style="margin-left:auto" @click="$go('/quote/BJ-202611-0008')">查看报价单 ›</el-button></div>
+      </div>
+    </div>
+    <el-dialog v-model="dlg.show" :title="'审批操作 · '+(KIND[dlg.kind]||[''])[0]" width="480px">
+      <el-form label-width="84px"><el-form-item v-if="needUser" label="选择人员" required><el-select v-model="dlg.user" placeholder="请选择" style="width:100%"><el-option v-for="u in ['周总监','陈法务','王财务','李明']" :key="u" :value="u"/></el-select></el-form-item>
+      <el-form-item label="审批意见" :required="need"><el-input type="textarea" :rows="4" v-model="dlg.opinion" :placeholder="need ? '拒绝/退回时必须填写原因，将保存并通知申请人' : '选填'"/></el-form-item></el-form>
+      <template #footer><el-button @click="dlg.show=false">取消</el-button><el-button :type="(KIND[dlg.kind]||['','primary'])[1]" @click="submit">确认{{ (KIND[dlg.kind]||[''])[0] }}</el-button></template>
+    </el-dialog>
+  </div>`,
+};
+
+const MobilePage = {
+  components: { PageHead },
+  setup() {
+    const tab = ref('home');
+    const tabs = [['home', '首页', 'HomeFilled'], ['cust', '客户', 'OfficeBuilding'], ['sched', '日程', 'Calendar'], ['todo', '待办', 'List'], ['me', '我的', 'User']];
+    const todos = [{ t: '09:30', c: '南京某某科技', a: '电话跟进', done: true }, { t: '14:00', c: '江苏某某集团', a: '客户拜访', done: false }];
+    const appr = ref([{ id: 1, t: '报价 BJ-202611-0008 折扣审批', s: '张三 · 南京某某科技 · ¥334,977.20' }, { id: 2, t: '合同 HT-202611-0006 审批', s: '李四 · 苏州某某汽配 · ¥420,000.00' }, { id: 3, t: '客户转移 · 苏州某某汽配', s: '李四 → 王五' }]);
+    const act = (a, ok) => { appr.value = appr.value.filter(x => x.id !== a.id); ElMessage[ok ? 'success' : 'warning'](ok ? '已同意' : '已拒绝（需填写原因）'); };
+    const quick = [['新增线索', 'Aim', '#e8f0fb', '#1f4e9c'], ['新增客户', 'OfficeBuilding', '#e6f6ee', '#2e9e6a'], ['新增商机', 'TrendCharts', '#fff3e0', '#e08a00'], ['安排拜访', 'Location', '#f3e8fb', '#8a4fc7']];
+    const custs = [['南', '南京某某科技有限公司', '重点客户 · 张三'], ['江', '江苏某某集团', '战略客户 · 李四'], ['安', '安徽某某连锁有限公司', '重点客户 · 张三'], ['上', '上海某某信息技术有限公司', '普通客户 · 王五']];
+    const feats = [['线索管理', '查看、创建、分配、跟进'], ['客户管理', '客户查询、客户详情、客户画像'], ['拜访管理', '创建日程、拜访签到、拜访记录'], ['商机管理', '查看商机、更新销售阶段'], ['跟进记录', '电话、拜访、沟通内容'], ['审批', '查看、同意、拒绝、退回'], ['回款', '查询计划和实际到账情况'], ['服务工单', '查看、接单、处理、上传现场图片'], ['通知', '跟进提醒、审批提醒、逾期提醒']];
+    return { tab, tabs, todos, appr, act, quick, custs, feats };
+  },
+  template: `<div>
+    <page-head :crumbs="['工作台', '移动端预览']" title="移动端工作台预览" total="H5 / 企业微信 · 外勤、拜访、审批、工单场景"/>
+    <div class="mob-wrap">
+      <div class="phone"><div class="screen">
+        <div class="m-notch"></div>
+        <div class="m-status"><span>9:41</span><span>5G ▮▮▮ 86%</span></div>
+        <div class="m-body">
+          <template v-if="tab==='home'">
+            <div style="font-size:13px;font-weight:600;padding:6px 2px 8px;color:#1d2a3d">CRM 工作台</div>
+            <div class="m-hero"><h3>早上好，张三</h3><p>今天还有 8 项工作需要处理</p>
+              <div class="m-stats"><div><b>5</b><span>待跟进</span></div><div @click="tab='todo'" style="cursor:pointer"><b>{{ appr.length }}</b><span>待审批</span></div></div></div>
+            <div class="m-card"><h4>快捷操作</h4><div class="m-quick"><div class="qi" v-for="q in quick" :key="q[0]" @click="$msg.info('示例：'+q[0])"><i :style="{background:q[2],color:q[3]}"><el-icon><component :is="q[1]"/></el-icon></i>{{ q[0] }}</div></div></div>
+            <div class="m-card"><h4>最近待办</h4>
+              <div class="m-todo" v-for="t in todos" :key="t.t"><span class="tm">{{ t.t }}</span><div style="flex:1"><div style="font-size:14px">{{ t.c }}</div><div class="muted" style="font-size:12px">{{ t.a }}</div></div><el-tag size="small" :type="t.done?'success':'primary'">{{ t.done?'已完成':'去拜访' }}</el-tag></div></div>
+          </template>
+          <template v-else-if="tab==='cust'"><div style="font-weight:600;font-size:17px;padding:8px 2px">客户</div><el-input prefix-icon="Search" placeholder="搜索客户 / 电话" style="margin-bottom:10px"/><div class="m-card"><div class="m-list-item" v-for="c in custs" :key="c[1]"><div class="m-ava">{{ c[0] }}</div><div><div style="font-size:14px;font-weight:600">{{ c[1] }}</div><div class="muted" style="font-size:12px">{{ c[2] }}</div></div><el-icon style="margin-left:auto;color:#9aa5b8"><arrow-right/></el-icon></div></div></template>
+          <template v-else-if="tab==='sched'"><div style="font-weight:600;font-size:17px;padding:8px 2px">日程 · 11月2日</div><div class="m-card"><div class="m-todo"><span class="tm">09:30</span><div style="flex:1">南京某某科技 · 电话跟进</div></div><div class="m-todo"><span class="tm">14:00</span><div style="flex:1">江苏某某集团 · 客户拜访<div class="muted" style="font-size:12px">可拜访签到（需授权定位）</div></div><el-button size="small" type="primary" @click="$msg.success('已签到（示例）')">签到</el-button></div><div class="m-todo"><span class="tm">16:00</span><div style="flex:1">周例会</div></div></div></template>
+          <template v-else-if="tab==='todo'"><div style="font-weight:600;font-size:17px;padding:8px 2px">待办 · 待审批 {{ appr.length }}</div><div class="m-card" v-for="a in appr" :key="a.id"><div style="font-weight:600">{{ a.t }}</div><div class="muted" style="font-size:12px;margin:4px 0 10px">{{ a.s }}</div><el-button size="small" type="success" @click="act(a,true)">同意</el-button><el-button size="small" type="danger" plain @click="act(a,false)">拒绝</el-button><el-button size="small" plain @click="$msg.info('示例：退回修改')">退回</el-button></div><el-empty v-if="!appr.length" description="审批已处理完" :image-size="70"/></template>
+          <template v-else><div class="m-hero"><h3>张三</h3><p>华东销售一部 · 销售经理</p></div><div class="m-card"><div class="m-list-item">我的业绩<span class="muted" style="margin-left:auto">本月 78.6%</span></div><div class="m-list-item">消息通知<el-badge value="3" style="margin-left:auto"/></div><div class="m-list-item">隐私与授权<span class="muted" style="margin-left:auto;font-size:12px">定位 / 录音 / 通讯录</span></div></div></template>
+        </div>
+        <div class="m-tabbar"><div v-for="t in tabs" :key="t[0]" :class="{on:tab===t[0]}" @click="tab=t[0]"><el-icon><component :is="t[2]"/></el-icon>{{ t[1] }}</div></div>
+      </div></div>
+      <div class="mob-side">
+        <h3>移动端优先支持的功能（方案第十一章）</h3>
+        <table><tr><th>功能</th><th>移动端能力</th></tr><tr v-for="f in feats" :key="f[0]"><td>{{ f[0] }}</td><td>{{ f[1] }}</td></tr></table>
+        <el-alert type="info" :closable="false" show-icon style="margin-top:14px" title="快速录入 / 拍照上传 / 语音转文字" description="录音、定位、客户联系方式等数据需设置明确的授权与隐私规则。"/>
+        <p class="muted" style="font-size:13px">底部导航：首页 · 客户 · 日程 · 待办 · 我的。左侧手机内可点击切换并操作（如在「待办」中审批）。</p>
+      </div>
+    </div>
+  </div>`,
+};
+
+const App = {
+  components: { WorkbenchPage, LeadsPage, CustomersPage, CustomerDetail, OppsPage, QuotePage, PaymentsPage, ApprovalsPage, MobilePage, PlaceholderPage },
+  setup() {
+    const parse = () => { const h = (location.hash || '#/workbench').slice(1); return h || '/workbench'; };
+    const path = ref(parse());
+    window.addEventListener('hashchange', () => { path.value = parse(); document.querySelector('.main') && (document.querySelector('.main').scrollTop = 0); });
+    const view = computed(() => {
+      const p = path.value; const seg = p.split('/').filter(Boolean);
+      const [a, b] = seg;
+      switch (a) {
+        case 'workbench': return { c: 'WorkbenchPage', props: {} };
+        case 'leads': return { c: 'LeadsPage', props: { tab: b || 'all' } };
+        case 'customers': return { c: 'CustomersPage', props: { tab: b || 'all' } };
+        case 'customer': return { c: 'CustomerDetail', props: { no: b, key: b } };
+        case 'opps': return { c: 'OppsPage', props: { view: b === 'list' ? 'list' : 'board' } };
+        case 'quote': return { c: 'QuotePage', props: { no: b, key: b } };
+        case 'payments': return { c: 'PaymentsPage', props: {} };
+        case 'approvals': return { c: 'ApprovalsPage', props: {} };
+        case 'mobile': return { c: 'MobilePage', props: {} };
+        default: return PH[a] ? { c: 'PlaceholderPage', props: { k: a } } : { c: 'WorkbenchPage', props: {} };
+      }
+    });
+    const active = computed(() => { const p = path.value; if (p.startsWith('/customer/')) return '/customers'; if (p === '/quote/BJ-202611-0008') return p; if (p.startsWith('/quote/')) return '/quotes'; return p; });
+    const menu = ref(null);
+    const opened = computed(() => { const n = NAV.find(n => n.children && n.children.some(c => c.path === active.value)); return n ? [n.key] : []; });
+    watch(opened, v => { v.length && menu.value && menu.value.open(v[0]); });
+    // 全局搜索
+    const kw = ref('');
+    const searchFn = (q, cb) => {
+      if (!q) return cb([]);
+      const r = [];
+      store.customers.forEach(c => { if (c.name.includes(q) || c.no.includes(q)) r.push({ value: c.name, tag: '客户', to: '/customer/' + c.no }); });
+      store.leads.forEach(l => { if (l.company.includes(q) || l.no.includes(q) || l.contact.includes(q)) r.push({ value: l.company + '（' + l.no + '）', tag: '线索', to: '/leads' }); });
+      store.opps.forEach(o => { if (o.name.includes(q) || o.no.includes(q)) r.push({ value: o.name, tag: '商机', to: '/opps' }); });
+      PH.contacts.rows.forEach(c => { if (c.name.includes(q)) r.push({ value: c.name + ' · ' + c.customer, tag: '联系人', to: '/contacts' }); });
+      cb(r.slice(0, 8));
+    };
+    const selectSearch = it => { go(it.to); kw.value = ''; };
+    const unread = computed(() => store.messages.filter(m => !m.read).length);
+    const todoCount = computed(() => store.approvals.filter(a => a.tab === 'todo').length + 8);
+    const readAll = () => store.messages.forEach(m => m.read = true);
+    return { path, view, active, menu, opened, NAV, kw, searchFn, selectSearch, unread, todoCount, store, go, readAll };
+  },
+  template: `<div class="layout">
+    <div class="topbar">
+      <div class="brand"><div class="logo">C</div>CRM 客户管理系统</div>
+      <el-autocomplete v-model="kw" class="top-search" :fetch-suggestions="searchFn" placeholder="全局搜索：客户 / 线索 / 商机 / 联系人" prefix-icon="Search" clearable @select="selectSearch" :trigger-on-focus="false">
+        <template #default="{item}"><el-tag size="small" effect="plain" style="margin-right:8px">{{ item.tag }}</el-tag>{{ item.value }}</template></el-autocomplete>
+      <div class="top-right">
+        <el-button size="small" plain icon="Iphone" @click="go('/mobile')">移动端预览</el-button>
+        <el-popover placement="bottom-end" :width="360" trigger="click">
+          <template #reference><div class="icon-btn" title="消息通知"><el-icon><bell/></el-icon><el-badge :value="unread" :hidden="!unread"/></div></template>
+          <div style="display:flex;align-items:center;margin-bottom:6px"><b>消息通知</b><a style="margin-left:auto;font-size:13px" @click="readAll">全部已读</a></div>
+          <div class="msg" :class="{read:m.read}" v-for="m in store.messages" :key="m.id" @click="m.read=true"><span class="u" :class="{read:m.read}"></span><div><div>{{ m.title }}</div><div class="muted" style="font-size:12px">{{ m.type }} · {{ m.time }}</div></div></div>
+        </el-popover>
+        <div class="icon-btn" title="待办 / 审批" @click="go('/approvals')"><el-icon><finished/></el-icon><el-badge :value="todoCount" type="warning"/></div>
+        <el-dropdown trigger="click"><div class="user-chip"><div class="avatar">张</div><div style="line-height:1.2"><div style="font-size:13px;font-weight:600">张三</div><div style="font-size:11px;color:#8a95a8">销售经理</div></div><el-icon><arrow-down/></el-icon></div>
+          <template #dropdown><el-dropdown-menu><el-dropdown-item>个人设置</el-dropdown-item><el-dropdown-item>切换数据范围</el-dropdown-item><el-dropdown-item divided>退出登录</el-dropdown-item></el-dropdown-menu></template></el-dropdown>
+      </div>
+    </div>
+    <div class="body">
+      <div class="sidebar">
+        <el-menu ref="menu" :default-active="active" :default-openeds="opened" unique-opened @select="p => go(p)">
+          <template v-for="n in NAV" :key="n.key">
+            <el-sub-menu v-if="n.children" :index="n.key"><template #title><el-icon><component :is="n.icon"/></el-icon><span>{{ n.title }}</span></template>
+              <el-menu-item v-for="c in n.children" :key="c.path" :index="c.path">{{ c.title }}</el-menu-item></el-sub-menu>
+            <el-menu-item v-else :index="n.path"><el-icon><component :is="n.icon"/></el-icon><span>{{ n.title }}</span></el-menu-item>
+          </template>
+        </el-menu>
+      </div>
+      <div class="main"><component :is="view.c" v-bind="view.props"/></div>
+    </div>
+  </div>`,
+};
+const app = Vue.createApp(App);
+app.use(ElementPlus, { locale: ElementPlusLocaleZhCn });
+Object.entries(ElementPlusIconsVue).forEach(([k, v]) => app.component(k, v));
+Object.assign(app.config.globalProperties, { $go: go, $msg: ElMessage, $cno: cno, $yuan: yuan, $fmtY: fmtY, $fmtC: fmtC });
+app.mount('#app');
+
+</script>
+</body>
+</html>
