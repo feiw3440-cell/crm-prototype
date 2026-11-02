@@ -1871,8 +1871,8 @@ const NotFoundPage = {
   </div>`,
 };
 
-/* ===== 占位模块路由（contracts / orders / contacts / products / quotes 已改为真实页面，各 page-*.js 自行 registerRoute） ===== */
-[['activities', 'activities'], ['delivery', 'delivery'], ['service', 'service'], ['analytics', 'analytics'], ['system', 'system']]
+/* ===== 占位模块路由（activities / delivery / service 已由 page-activities.js / page-delivery.js / page-service.js 替代） ===== */
+[['analytics', 'analytics'], ['system', 'system']]
   .forEach(([path, docKey]) => registerRoute('/' + path, PlaceholderPage, docKey, () => ({ k: docKey })));
 
 /* ===== 需求文档说明面板：三种状态（隐藏 / 半隐藏 / 完全展开），内容可增删改，存 localStorage ===== */
@@ -2150,6 +2150,360 @@ store.ext = reactive(buildExt(store.customers, store.leads, store.opps));
 
 /* 全局便捷函数：computed 友好（纯函数，返回该客户 360 视图的全部数据） */
 const custBundle = name => customerBundle(store.ext, name, store.opps);
+
+/* ===== 第 5 阶段：活动管理 /activities（列表 + 日历 + 新增）与活动详情 /activity/:no ===== */
+DOCS_DEFAULT['activities'] = mkDoc('activities', {
+  name: '跟进活动', module: '活动管理',
+  goal: '沉淀与展示客户全生命周期的每一次跟进活动（电话 / 微信 / 拜访 / 会议 / 邮件），支持按类型、客户、负责人、状态与时间区间检索并提供日历视图；销售可在此新增活动与拜访计划，完成后反馈沉淀，形成可复盘的跟进时间线。',
+  roles: ['销售：查看与新增本人跟进活动，可标记完成计划中活动', '销售经理：查看团队全部活动，可代填跟进反馈', '交付 / 客服：读写与客户相关的服务类活动', '管理员：全量数据与字段配置'],
+  enter: ['左侧导航：活动管理 → 跟进记录', '客户详情「跟进」Tab 的新增跟进 / 活动链接', '商机详情关联跟进活动链接'],
+  layout: ['顶部：面包屑 + 页面标题 + 视图切换（列表 / 日历）+ 新增活动按钮', '统计卡：活动总数、已完成、计划中、本月活动、已取消（由数据实算）', '列表视图：筛选区（关键词 / 类型 / 状态 / 负责人 / 时间区间）+ 表格 + 真分页', '日历视图：月历网格，按日显示活动数，点日期查看当日活动并可跳转筛选'],
+  fields: [
+    '活动编号｜文本｜只读｜格式：HD-6位序号，全库唯一',
+    '活动类型｜枚举｜必填：是｜说明：电话 / 微信 / 拜访 / 会议 / 邮件',
+    '关联客户｜选择｜必填：是｜校验：必须为有效客户',
+    '关联联系人 / 商机｜选择｜必填：否｜选项随客户联动',
+    '活动时间｜日期时间｜必填：是｜校验：不能早于当前时间（计划类）',
+    '跟进内容｜长文本｜必填：是｜校验：非空',
+    '客户反馈｜长文本｜必填：否｜说明：活动完成后填写，为复盘依据',
+    '下一步计划｜日期时间｜必填：否｜说明：完成后可设置，进入销售待办',
+    '签到信息｜结构｜必填：否｜说明：拜访类完成时记录地址 / 坐标 / 时间 / 现场照片',
+  ],
+  rules: ['列表数据来自 store.ext.activities，真分页，统计卡由数据实算', '时间区间为前端过滤，其余筛选条件变化后回到第 1 页', '点击活动编号进入 /activity/:no 详情；日历点日期可查看当日活动详情列表', '新增活动默认状态为「计划中」；标记完成后状态改为「已完成」并必须沉淀客户反馈'],
+  flow: ['活动状态流转：计划中 →（标记完成）→ 已完成；计划中 / 未开始也可「取消活动」→ 已取消', '已完成活动可设置「下一步计划」时间，到期自动进入销售待办'],
+  errors: ['新增未选客户：校验拦截并提示', '内容为空：必填校验拦截', '时间区间起止颠倒：自动交换起止日期', '筛选无结果：显示空态，可一键重置'],
+  api: ['活动分页查询、活动新增、活动状态标记完成接口、按日期聚合统计接口（示例）'],
+  accept: ['列表 / 日历切换可用，统计卡数字由数据实算', '新增活动写入 store.ext.activities 且出现在列表首位', '详情页 /activity/:no 数据与列表一致，标记完成后状态与反馈即时更新；无控制台报错'],
+});
+DOCS_DEFAULT['activity-detail'] = mkDoc('activity-detail', {
+  name: '活动详情', module: '活动管理',
+  goal: '呈现单条跟进活动的完整上下文：关联客户 / 联系人 / 商机、跟进内容、客户反馈与下一步计划；拜访类活动展示签到信息（地址 / 时间 / 坐标 / 现场照片占位），并作为「标记完成」等状态操作的落点页面。',
+  roles: ['负责人销售：标记完成、补充反馈与下一步计划', '销售经理：查看并可代填反馈', '其他角色：只读'],
+  enter: ['活动列表点击活动编号', '日历视图点日期后点击活动', '客户详情 / 商机详情的跟进时间线关联跳转'],
+  layout: ['头部：面包屑 + 活动编号 + 类型 / 状态标签 + 操作按钮（标记完成 / 打印）', '左列：基本信息（时间 / 类型 / 负责人）+ 跟进内容卡 + 客户反馈卡 + 下一步计划 + 拜访签到信息卡（地址 / 时间 / 坐标 / 照片占位）', '右列：关联客户 / 联系人 / 商机卡（可点击跳转）+ 状态提示'],
+  fields: ['活动编号 / 类型 / 状态 / 时间｜只读', '跟进内容｜长文本｜只读（历史不可改）', '客户反馈｜长文本｜完成时填写，可编辑', '下一步计划｜日期时间｜可选', '签到信息｜地址 / 时间 / 经纬度 / 照片｜拜访类完成时记录，照片为占位'],
+  rules: ['「标记完成」仅对状态为计划中的活动可用；完成后状态改为已完成且必须填写客户反馈', '拜访类完成时若无签到记录则自动按客户所在地区生成签到占位数据', '所有状态变化写入操作日志（store.ext.logs）'],
+  flow: ['计划中 →（标记完成：反馈必填）→ 已完成', '计划中 →（取消）→ 已取消'],
+  errors: ['活动编号不存在：空态并引导返回列表', '标记完成未填写反馈：弹窗校验拦截', '关联商机或联系人被作废：对应链接置灰提示'],
+  api: ['活动详情查询、标记完成（带反馈 / 下一步）接口、签到信息查询（示例）'],
+  accept: ['各卡片数据与该活动自身数据一致', '标记完成后状态、反馈、日志即时更新', '无控制台报错'],
+});
+/* --- 工具 --- */
+function acLog(no, act, detail) { store.ext.logs.unshift({ time: TODAY + ' ' + String(new Date().getHours()).padStart(2, '0') + ':' + String(new Date().getMinutes()).padStart(2, '0'), who: '张三', module: '活动', act, detail: detail + '（活动：' + no + '）' }); }
+function acNextNo() {
+  let mx = 99;
+  store.ext.activities.forEach(x => { const n = Number(String(x.no).split('-')[1]); if (n > mx) mx = n; });
+  return 'HD-' + String(mx + 1).padStart(6, '0');
+}
+const AC_TAG = { 电话: 'primary', 微信: 'info', 拜访: 'success', 会议: 'warning', 邮件: 'primary' };
+const AC_STATUS_TAG = { 计划中: 'warning', 已完成: 'success', 已取消: 'info' };
+
+/* ===== 活动列表 /activities ===== */
+const ActivitiesPage = {
+  components: { ListPage },
+  setup() {
+    const view = ref('list');
+    const d1 = ref(''); const d2 = ref('');
+    const rows = computed(() => {
+      let a = store.ext.activities;
+      if (d1.value && d2.value && d1.value > d2.value) { const t = d1.value; d1.value = d2.value; d2.value = t; }
+      if (d1.value) a = a.filter(x => x.time.slice(0, 10) >= d1.value);
+      if (d2.value) a = a.filter(x => x.time.slice(0, 10) <= d2.value);
+      return a;
+    });
+    const totalText = computed(() => '跟进活动共 ' + rows.value.length + ' 条');
+    const monthStr = computed(() => { let c = 0; store.ext.activities.forEach(x => { if (x.time.slice(0, 7) === TODAY.slice(0, 7)) c++; }); return c; });
+    const stats = computed(() => {
+      const a = store.ext.activities;
+      return [
+        ['活动总数', String(a.length), ''],
+        ['已完成', String(a.filter(x => x.status === '已完成').length), 'ok'],
+        ['计划中', String(a.filter(x => x.status === '计划中').length), 'warn'],
+        ['本月活动', String(monthStr.value), ''],
+        ['已取消', String(a.filter(x => x.status === '已取消').length), 'danger'],
+      ];
+    });
+    const cols = [
+      { p: 'no', l: '活动编号', w: 130, link: true }, { p: 'type', l: '活动类型', w: 90, tag: { 电话: 'primary', 微信: 'info', 拜访: 'success', 会议: 'warning', 邮件: 'primary' } },
+      { p: 'customer', l: '客户', w: 200, link: 'cust' }, { p: 'contact', l: '联系人', w: 90 }, { p: 'opp', l: '商机', w: 140 },
+      { p: 'time', l: '时间', w: 140 }, { p: 'content', l: '内容', w: 260 }, { p: 'owner', l: '负责人', w: 80 },
+      { p: 'feedback', l: '客户反馈', w: 160 }, { p: 'status', l: '状态', w: 90, tag: { 计划中: 'warning', 已完成: 'success', 已取消: 'info' } },
+    ];
+    const filters = [
+      { k: 'kw', label: '搜索活动', ph: '编号 / 客户 / 内容 / 联系人' },
+      { k: 'type', label: '活动类型', opts: ['电话', '微信', '拜访', '会议', '邮件'] },
+      { k: 'status', label: '活动状态', opts: ['已完成', '计划中', '已取消'] },
+      { k: 'owner', label: '负责人', opts: OWNERS },
+    ];
+    const onLink = (c, row) => { if (c.p === 'no') go('/activity/' + row.no); };
+    /* ---- 日历视图 ---- */
+    const month = ref(TODAY.slice(0, 7));
+    const byDate = computed(() => { const m = {}; store.ext.activities.forEach(x => { const d = x.time.slice(0, 10); (m[d] = m[d] || []).push(x); }); return m; });
+    const calCells = computed(() => {
+      const [y, mo] = month.value.split('-').map(Number);
+      const first = new Date(y + '-' + String(mo).padStart(2, '0') + '-01T00:00:00');
+      let off = (first.getDay() + 6) % 7;
+      const start = new Date(first.getTime() - off * 86400000);
+      const cells = [];
+      for (let i = 0; i < 42; i++) {
+        const dd = new Date(start.getTime() + i * 86400000);
+        const ds = dd.toISOString().slice(0, 10);
+        cells.push({ d: ds, inMonth: ds.slice(0, 7) === month.value, today: ds === TODAY, acts: byDate.value[ds] || [] });
+      }
+      return cells;
+    });
+    const monthLabel = computed(() => { const [y, mo] = month.value.split('-'); return y + ' 年 ' + Number(mo) + ' 月'; });
+    const mv = off => { const [y, mo] = month.value.split('-').map(Number); const dt = new Date(y, mo - 1 + off, 1); month.value = dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0'); };
+    const dayDlg = ref(false); const dayDate = ref(''); const dayActs = ref([]);
+    const openDay = cell => { dayDate.value = cell.d; dayActs.value = cell.acts; dayDlg.value = true; };
+    const listByDay = () => { d1.value = dayDate.value; d2.value = dayDate.value; dayDlg.value = false; view.value = 'list'; ElMessage.info('已按日期「' + dayDate.value + '」筛选列表'); };
+    /* ---- 新增活动弹窗 ---- */
+    const fref = ref(null); const dlg = ref(false);
+    const draft = reactive({ type: '拜访', customer: '', contact: '', opp: '', owner: '张三', time: '', content: '' });
+    const rule = {
+      customer: [{ required: true, message: '请选择客户', trigger: 'change' }],
+      time: [{ required: true, message: '请选择活动时间', trigger: 'change' }],
+      content: [{ required: true, message: '请填写跟进内容', trigger: 'blur' }],
+    };
+    const custOpts = computed(() => store.customers.filter(c => c.status !== '流失'));
+    const ctOpts = computed(() => draft.customer ? (store.ext.contacts || []).filter(c => c.customer === draft.customer).map(c => ({ v: c.name, l: c.name + ' · ' + (c.title || '') })) : []);
+    const oppOpts = computed(() => draft.customer ? store.opps.filter(o => o.customer === draft.customer).map(o => ({ v: o.no, l: o.no + ' · ' + o.name })) : []);
+    const save = () => fref.value.validate(ok => {
+      if (!ok) return;
+      const no = acNextNo();
+      store.ext.activities.unshift({
+        no, type: draft.type, customer: draft.customer, contact: draft.contact, opp: draft.opp, owner: draft.owner,
+        time: draft.time, content: draft.content, feedback: '', next: '', status: '计划中', checkin: null,
+      });
+      acLog(no, '新增', '新增' + draft.type + '活动（客户：' + draft.customer + '，时间：' + draft.time + '）');
+      dlg.value = false;
+      ElMessage.success('活动已创建（编号 ' + no + '，状态：计划中）');
+      go('/activity/' + no);
+    });
+    return { view, d1, d2, rows, totalText, stats, cols, filters, onLink, month, calCells, monthLabel, mv, dayDlg, dayDate, dayActs, openDay, listByDay, AC_TAG, AC_STATUS_TAG, dlg, fref, draft, rule, custOpts, ctOpts, oppOpts, save, TODAY };
+  },
+  template: `<div>
+    <list-page :crumbs="['活动管理','跟进活动']" title="跟进活动" :total-text="totalText" :stats="stats" :filters="filters" :rows="rows" :cols="cols" :action-width="140" note-tag="真实数据 · 点击编号进入详情"
+      @link="onLink">
+      <template #top>
+        <div class="card query" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <el-radio-group v-model="view" size="small">
+            <el-radio-button label="list"><el-icon style="vertical-align:-2px"><tickets/></el-icon> 列表</el-radio-button>
+            <el-radio-button label="cal"><el-icon style="vertical-align:-2px"><calendar/></el-icon> 日历</el-radio-button>
+          </el-radio-group>
+          <el-date-picker v-model="d1" type="date" value-format="YYYY-MM-DD" placeholder="开始日期" clearable style="width:150px" @change="v => { if(!v) d2 = ''; }"/>
+          <span class="muted">至</span>
+          <el-date-picker v-model="d2" type="date" value-format="YYYY-MM-DD" placeholder="结束日期" clearable style="width:150px"/>
+          <el-button v-if="d1 || d2" @click="d1='';d2=''">清除时间区间</el-button>
+          <span class="grow muted" style="font-size:12px" v-if="d1 || d2">已按时间区间过滤，区间外活动暂不显示</span>
+        </div>
+        <div v-if="view==='cal'" class="card card-pad" style="margin-bottom:12px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <el-button size="small" icon="ArrowLeft" @click="mv(-1)">上月</el-button>
+            <b style="font-size:16px">{{ monthLabel }}</b>
+            <el-button size="small" @click="mv(1)">下月<el-icon><ArrowRight/></el-icon></el-button>
+            <el-button size="small" @click="month = TODAY.slice(0,7)">回到本月</el-button>
+            <span class="grow muted" style="font-size:12px">格子中数字为当日活动数，点击日期可查看当日活动详情</span>
+          </div>
+          <div class="ac-cal">
+            <div class="ac-week muted" v-for="w in ['一','二','三','四','五','六','日']" :key="w">周{{ w }}</div>
+            <div v-for="c in calCells" :key="c.d" class="ac-cell" :class="{out:!c.inMonth, today:c.today}" @click="openDay(c)">
+              <div class="ac-d" :class="{caltoday:c.today, has:c.acts.length}">{{ Number(c.d.slice(8,10)) }}</div>
+              <el-tag v-if="c.acts.length" size="small" effect="light" :type="c.acts.length > 3 ? 'danger' : 'primary'">{{ c.acts.length }} 场</el-tag>
+              <div class="ac-min" v-else>&nbsp;</div>
+              <div class="ac-sub muted" v-if="c.acts.length">
+                <div v-for="(a,i) in c.acts.slice(0,2)" :key="a.no">{{ a.time.slice(11,16) }} {{ a.type }} · {{ (a.customer||'').slice(0,9) }}</div>
+                <div v-if="c.acts.length > 2">… 等 {{ c.acts.length }} 项</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+      <template #ops>
+        <el-button type="primary" icon="Plus" @click="dlg=true">新增活动 / 拜访计划</el-button>
+        <el-button icon="Download" @click="$msg.info('示例：导出跟进活动')">导出</el-button>
+      </template>
+      <template #actions="{row}">
+        <el-button link type="primary" @click="$go('/activity/'+row.no)">查看</el-button>
+        <el-button v-if="row.checkin" link @click="$msg.info('查看签到详情请进入活动详情页')">签到</el-button>
+      </template>
+    </list-page>
+    <el-dialog v-model="dlg" title="新增活动 / 拜访计划" width="620px">
+      <el-form ref="fref" :model="draft" :rules="rule" label-width="100px">
+        <el-row :gutter="12">
+          <el-col :span="12"><el-form-item label="活动类型">
+            <el-select v-model="draft.type" style="width:100%">
+              <el-option v-for="t in ['电话','微信','拜访','会议','邮件']" :key="t" :value="t"/>
+            </el-select>
+          </el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="负责人">
+            <el-select v-model="draft.owner" style="width:100%"><el-option v-for="o in OWNERS" :key="o" :value="o"/></el-select>
+          </el-form-item></el-col>
+        </el-row>
+        <el-form-item label="关联客户" prop="customer">
+          <el-select v-model="draft.customer" filterable placeholder="选择客户（联系人 / 商机选项随客户联动）" style="width:100%" @change="draft.contact='';draft.opp=''">
+            <el-option v-for="c in custOpts" :key="c.no" :label="c.name" :value="c.name"/>
+          </el-select>
+        </el-form-item>
+        <el-row :gutter="12">
+          <el-col :span="12"><el-form-item label="关联联系人">
+            <el-select v-model="draft.contact" clearable placeholder="可选" style="width:100%">
+              <el-option v-for="c in ctOpts" :key="c.v" :label="c.l" :value="c.v"/>
+            </el-select>
+          </el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="关联商机">
+            <el-select v-model="draft.opp" clearable placeholder="可选" style="width:100%">
+              <el-option v-for="o in oppOpts" :key="o.v" :label="o.l" :value="o.v"/>
+            </el-select>
+          </el-form-item></el-col>
+        </el-row>
+        <el-form-item label="活动时间" prop="time">
+          <el-date-picker v-model="draft.time" type="datetime" value-format="YYYY-MM-DD HH:mm" placeholder="如：2026-11-10 14:00" style="width:100%"/>
+        </el-form-item>
+        <el-form-item label="跟进内容" prop="content">
+          <el-input v-model="draft.content" type="textarea" :rows="3" placeholder="拜访计划可写明目的与准备事项；跟进活动写沟通要义"/>
+        </el-form-item>
+        <el-alert type="info" show-icon :closable="false" title="新增活动默认状态为「计划中」；完成后在活动详情页「标记完成」并填写客户反馈。"/>
+      </el-form>
+      <template #footer><el-button @click="dlg=false">取消</el-button><el-button type="primary" @click="save">保存为计划中活动</el-button></template>
+    </el-dialog>
+    <el-dialog v-model="dayDlg" :title="dayDate + ' 的活动（' + dayActs.length + ' 场）'" width="560px">
+      <el-empty v-if="!dayActs.length" description="当天暂无活动"/>
+      <div v-else>
+        <div v-for="a in dayActs" :key="a.no" style="display:flex;gap:10px;align-items:center;padding:9px 4px;border-bottom:1px dashed var(--line);cursor:pointer" @click="dayDlg=false;$go('/activity/'+a.no)">
+          <b class="mono" style="width:44px">{{ a.time.slice(11,16) }}</b>
+          <el-tag size="small" :type="({电话:'primary',微信:'info',拜访:'success',会议:'warning',邮件:'primary'})[a.type]">{{ a.type }}</el-tag>
+          <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ a.customer }}<span class="muted" style="font-size:12px;margin-left:8px">{{ a.content }}</span></span>
+          <el-tag size="small" :type="({计划中:'warning',已完成:'success',已取消:'info'})[a.status]">{{ a.status }}</el-tag>
+        </div>
+        <div style="margin-top:12px;text-align:right"><el-button type="primary" plain @click="listByDay">在列表中筛选该日</el-button></div>
+      </div>
+    </el-dialog>
+  </div>`,
+};
+registerRoute('/activities', ActivitiesPage, 'activities');
+
+/* ===== 活动详情 /activity/:no ===== */
+const ActivityDetailPage = {
+  props: { no: String },
+  setup(props) {
+    const a = computed(() => store.ext.activities.find(x => x.no === props.no) || null);
+    const cust = computed(() => a.value ? (store.customers.find(c => c.name === a.value.customer) || null) : null);
+    const custNo = computed(() => cust.value ? cust.value.no : '');
+    const contact = computed(() => a.value && a.value.contact ? store.ext.contacts.find(c => c.customer === a.value.customer && c.name === a.value.contact) || null : null);
+    const opp = computed(() => a.value && a.value.opp ? store.opps.find(o => o.no === a.value.opp) || null : null);
+    const doneDlg = ref(false); const doneRf = reactive({ feedback: '', next: '' });
+    const doComplete = () => {
+      if (!doneRf.feedback.trim()) return ElMessage.warning('客户反馈为必填，请填写沟通结果');
+      const act = a.value;
+      act.status = '已完成';
+      act.feedback = doneRf.feedback.trim();
+      act.next = doneRf.next || '';
+      if (act.type === '拜访' && !act.checkin) {
+        const cu = cust.value || {};
+        act.checkin = { lat: 31.99, lng: 118.75, addr: (cu.region || '') + '某某产业园', time: act.time, photo: 'img/checkin/' + act.no + '-1.jpg' };
+      }
+      acLog(act.no, '标记完成', '状态由「计划中」变为「已完成」；客户反馈：' + act.feedback.slice(0, 20) + (act.feedback.length > 20 ? '…' : ''));
+      doneDlg.value = false;
+      ElMessage.success('活动已完成，反馈已沉淀' + (act.next ? '，且已设置下一步跟进' : ''));
+    };
+    const cancel = () => ElMessageBox.prompt('取消后活动进入「已取消」状态（保留记录）。请填写取消原因（必填）：', '取消活动 ' + (a.value ? a.value.no : ''), { inputPattern: /\S+/, inputErrorMessage: '取消原因不能为空' })
+      .then(({ value }) => { a.value.status = '已取消'; acLog(a.value.no, '取消', '取消原因：' + value); ElMessage.success('活动已取消'); }).catch(() => {});
+    return { a, cust, custNo, contact, opp, doneDlg, doneRf, doComplete, cancel, AC_TAG, AC_STATUS_TAG, custByName, store };
+  },
+  template: `<div v-if="a">
+    <el-breadcrumb separator="/" class="crumb"><el-breadcrumb-item><a @click="$go('/activities')">活动管理</a></el-breadcrumb-item><el-breadcrumb-item><a @click="$go('/activities')">跟进活动</a></el-breadcrumb-item><el-breadcrumb-item>{{ a.no }}</el-breadcrumb-item></el-breadcrumb>
+    <div class="page-head"><h1>活动 {{ a.no }}</h1>
+      <el-tag :type="({电话:'primary',微信:'info',拜访:'success',会议:'warning',邮件:'primary'})[a.type]">{{ a.type }}</el-tag>
+      <el-tag :type="({计划中:'warning',已完成:'success',已取消:'info'})[a.status]">{{ a.status }}</el-tag>
+      <span class="total">{{ a.time }} · 负责人 {{ a.owner }}</span></div>
+    <div class="ops" style="margin-top:-4px">
+      <el-button v-if="a.status === '计划中'" type="primary" icon="Check" @click="doneDlg=true">标记完成</el-button>
+      <el-button v-if="a.status === '计划中'" icon="CircleClose" @click="cancel">取消活动</el-button>
+      <el-button icon="Printer" @click="$msg.info('示例：打印活动跟进单')">打印</el-button>
+    </div>
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:14px;align-items:start">
+      <div>
+        <div class="card card-pad" style="margin-bottom:14px">
+          <div class="sec-title">基本信息</div>
+          <el-descriptions :column="2" border>
+            <el-descriptions-item label="活动时间">{{ a.time }}</el-descriptions-item>
+            <el-descriptions-item label="活动类型">{{ a.type }}</el-descriptions-item>
+            <el-descriptions-item label="负责人">{{ a.owner }}</el-descriptions-item>
+            <el-descriptions-item label="活动编号">{{ a.no }}</el-descriptions-item>
+          </el-descriptions>
+        </div>
+        <div class="card card-pad" style="margin-bottom:14px">
+          <div class="sec-title">跟进内容</div>
+          <p style="margin:0;line-height:1.8">{{ a.content || '—' }}</p>
+        </div>
+        <div class="card card-pad" style="margin-bottom:14px">
+          <div class="sec-title">客户反馈</div>
+          <p v-if="a.feedback" style="margin:0;line-height:1.8">{{ a.feedback }}</p>
+          <el-empty v-else :description="a.status === '计划中' ? '活动完成后填写客户反馈' : '该活动未记录客户反馈'" :image-size="70"/>
+        </div>
+        <div class="card card-pad" style="margin-bottom:14px">
+          <div class="sec-title">下一步</div>
+          <template v-if="a.next"><el-tag type="warning" effect="light" size="large"><el-icon style="vertical-align:-2px"><bell/></el-icon> 下次跟进时间：{{ a.next }}</el-tag><span class="muted" style="margin-left:8px;font-size:13px">到期后自动进入销售「待办」提醒</span></template>
+          <span v-else class="muted" style="font-size:13px">暂未设置下一步跟进计划</span>
+        </div>
+        <div class="card card-pad" v-if="a.type === '拜访'">
+          <div class="sec-title">拜访签到信息</div>
+          <template v-if="a.checkin">
+            <el-descriptions :column="2" border>
+              <el-descriptions-item label="签到地址">{{ a.checkin.addr }}</el-descriptions-item>
+              <el-descriptions-item label="签到时间">{{ a.checkin.time }}</el-descriptions-item>
+              <el-descriptions-item label="经纬度（坐标占位）">{{ a.checkin.lat + ', ' + a.checkin.lng }}</el-descriptions-item>
+              <el-descriptions-item label="签到方式">定位打卡（原型占位）</el-descriptions-item>
+            </el-descriptions>
+            <div style="display:flex;gap:12px;margin-top:12px">
+              <div style="width:132px;height:96px;border:1px dashed var(--line);border-radius:8px;background:var(--soft);display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--sub);font-size:12px;gap:4px">
+                <el-icon style="font-size:24px"><camera/></el-icon>现场照片·占位
+              </div>
+              <div>
+                <p style="margin:2px 0;font-size:13px">照片文件：{{ a.checkin.photo }}</p>
+                <p class="muted" style="margin:2px 0;font-size:12px">原型阶段以占位图代替真实照片；正式版本上传后显示现场照片与地图打点。</p>
+                <el-button size="small" plain @click="$msg.info('示例：打开现场照片查看大图')">查看照片</el-button>
+              </div>
+            </div>
+          </template>
+          <el-empty v-else :description="a.status === '计划中' ? '拜访完成后签到；标记完成时自动生成签到占位记录' : '未记录签到信息'" :image-size="70"/>
+        </div>
+      </div>
+      <div>
+        <div class="card card-pad" style="margin-bottom:14px">
+          <div class="sec-title">关联对象</div>
+          <el-descriptions :column="1" border>
+            <el-descriptions-item label="关联客户">
+              <a v-if="cust" class="link" @click="$go('/customer/' + custNo)">{{ a.customer }}</a>
+              <span v-else>{{ a.customer }}</span>
+            </el-descriptions-item>
+            <el-descriptions-item label="客户等级" v-if="cust">{{ cust.level }}<el-tag v-if="cust.key" size="small" type="danger" effect="plain" style="margin-left:8px">重点</el-tag></el-descriptions-item>
+            <el-descriptions-item label="关联联系人">
+              <template v-if="contact"><a class="link" @click="$go('/contact/' + contact.no)">{{ a.contact }}</a><span class="muted" style="margin-left:6px;font-size:12px">{{ contact.title || '' }} · {{ contact.role || '' }}</span></template>
+              <span v-else>{{ a.contact || '未关联' }}</span>
+            </el-descriptions-item>
+            <el-descriptions-item label="关联商机">
+              <template v-if="opp"><a class="link" @click="$go('/opp/' + opp.no)">{{ a.opp }}</a><span class="muted" style="margin-left:6px;font-size:12px">{{ opp.name }} · 预计 ¥{{ opp.amount.toLocaleString('zh-CN') }}</span></template>
+              <span v-else>未关联</span>
+            </el-descriptions-item>
+          </el-descriptions>
+        </div>
+        <el-alert v-if="a.status === '计划中'" type="warning" show-icon :closable="false" title="该活动尚未完成：完成后请填写客户反馈与下一步计划。"/>
+        <el-alert v-else-if="a.status === '已取消'" type="info" show-icon :closable="false" title="该活动已取消，记录仅供查看。"/>
+        <el-alert v-else type="success" show-icon :closable="false" :title="'已完成' + (a.next ? '，下一步跟进时间 ' + a.next : '')"/>
+      </div>
+    </div>
+    <el-dialog v-model="doneDlg" title="标记完成（客户反馈必填）" width="520px">
+      <el-form label-width="90px">
+        <el-form-item label="客户反馈" required><el-input v-model="doneRf.feedback" type="textarea" :rows="3" placeholder="本次沟通的客户态度 / 结论 / 待办（写入活动记录）"/></el-form-item>
+        <el-form-item label="下一步时间"><el-date-picker v-model="doneRf.next" type="datetime" value-format="YYYY-MM-DD HH:mm" placeholder="可选，到期进入销售待办" style="width:100%"/></el-form-item>
+      </el-form>
+      <template #footer><el-button @click="doneDlg=false">取消</el-button><el-button type="primary" @click="doComplete">确认完成</el-button></template>
+    </el-dialog>
+  </div>`,
+};
+registerRoute('/activity/:no', ActivityDetailPage, 'activity-detail');
 
 const ApprovalsPage = {
   components: { PageHead },
@@ -3182,6 +3536,194 @@ registerRoute('/customers/key', CustomersPage, 'customers', () => ({ tab: 'key' 
 registerRoute('/customers/pool', CustomersPage, 'customer-pool', () => ({ tab: 'pool' }));
 registerRoute('/customer/:no', CustomerDetail, 'customer-detail');
 
+/* ===== 第 5 阶段：交付管理 /delivery（交付项目列表）与项目详情 /delivery/:no ===== */
+DOCS_DEFAULT['delivery'] = mkDoc('delivery', {
+  name: '交付项目', module: '交付管理',
+  goal: '跟踪订单签订后的实施交付：以里程碑驱动项目进度，支持按状态、项目经理、客户检索，及时发现延期与风险项目，保证交付过程可追溯、进度真实可信。',
+  roles: ['交付 / 客服（项目经理）：查看与推进名下交付项目、标记里程碑完成', '销售经理：查看团队客户的项目进度与风险', '管理员：全量数据维护'],
+  enter: ['左侧导航：交付管理 → 项目列表', '订单详情「关联交付项目」Tab、客户详情「交付」Tab 链接'],
+  layout: ['顶部：面包屑 + 页面标题 + 项目总数', '统计卡：项目总数、实施中、延期预警、已完成（由数据实算）', '筛选区：关键词 / 项目状态 / 项目经理', '表格：编号、名称、客户、订单、项目经理、起止日期、进度条、状态、风险等列 + 行内操作（查看 / 标记里程碑）', '分页：真实分页'],
+  fields: [
+    '项目编号｜文本｜只读｜格式：XM-年月-序号',
+    '项目名称 / 客户 / 订单｜文本｜只读｜来源：订单派生',
+    '项目经理｜人员｜必填：是',
+    '计划开始 / 计划完成｜日期｜必填：是｜校验：开始 ≤ 完成',
+    '进度｜百分比｜只读｜说明：由完成里程碑数实算，不允许手改',
+    '项目状态｜枚举｜说明：未启动 / 实施中 / 验收中 / 已完成',
+    '风险提示｜长文本｜说明：非空即视为风险项目，标红提醒',
+  ],
+  rules: ['列表数据来自 store.ext.deliveries，真分页，统计卡由数据实算', '进度由里程碑完成情况自动重算，完成后不可回退', '延期预警规则：状态非「已完成」且计划完成日期早于今天', '点击项目编号进入 /delivery/:no 详情'],
+  flow: ['项目状态：未启动 → 实施中 → 验收中 →（全部里程碑完成）→ 已完成'],
+  errors: ['筛选无结果：空态可重置', '里程碑被并发修改：提示刷新', '项目计划完成日期已过期：列表与详情出现红色预警'],
+  api: ['交付项目分页查询、里程碑完成状态更新（含进度重算）、项目风险查询（示例）'],
+  accept: ['统计卡数字由数据实算', '进度与里程碑一致，标记完成后自动重算', '无控制台报错'],
+});
+DOCS_DEFAULT['delivery-detail'] = mkDoc('delivery-detail', {
+  name: '交付项目详情', module: '交付管理',
+  goal: '展示单个交付项目的里程碑时间线、风险提示、关联订单 / 合同 / 客户与实施记录；项目经理可逐个标记里程碑完成，完成后项目进度自动重算，并记录进项目日志。',
+  roles: ['项目经理：标记里程碑完成、补充实施记录', '交付负责人与销售经理：查看进度与风险', '其他角色：只读'],
+  enter: ['交付项目列表点击项目编号', '订单详情 / 客户详情的关联交付项目链接'],
+  layout: ['头部：面包屑 + 项目编号 + 进度条 + 状态标签 + 操作按钮', '左列：里程碑时间线（可标记完成）+ 实施记录时间线', '右列：基本信息（工期 / 项目经理）+ 关联订单 / 合同 / 客户卡', '顶部：风险提示红色告警（无风险时隐藏）'],
+  fields: ['里程碑｜名称 / 日期 / 状态｜必填：是｜说明：未开始 / 进行中 / 已完成，完成后不可回退', '进度｜百分比｜只读｜说明：完成里程碑 / 总里程碑数', '实施记录｜时间 / 记录人 / 事项｜说明：完成里程碑与操作时自动追加'],
+  rules: ['仅「未开始 / 进行中」里程碑可标记完成，完成后状态锁定', '每次标记完成立即重算进度并写操作日志与实施记录', '里程碑全部完成后项目状态自动变为「已完成」'],
+  flow: ['里程碑：未开始 / 进行中 →（标记完成）→ 已完成', '项目：未启动 → 实施中 → 已完成'],
+  errors: ['项目编号不存在：空态并引导返回', '重复标记完成：提示已处于完成状态', '关联合同已终止：仍可查看但显示提示'],
+  api: ['项目详情查询、里程碑状态更新（进度重算）、实施记录追加接口（示例）'],
+  accept: ['标记完成后进度条与状态即时更新并留痕', '里程碑、订单、客户链接正确', '无控制台报错'],
+});
+function dlLog(no, act, detail) { store.ext.logs.unshift({ time: TODAY + ' ' + String(new Date().getHours()).padStart(2, '0') + ':' + String(new Date().getMinutes()).padStart(2, '0'), who: '张三', module: '交付', act, detail: detail + '（项目：' + no + '）' }); }
+function dlProg(d) {
+  const ms = d.milestones || [];
+  const done = ms.filter(m => m.status === '已完成').length;
+  d.progress = ms.length ? Math.round(done * 100 / ms.length) : 0;
+  if (done === ms.length && ms.length) d.status = '已完成';
+  else if (!d.status || d.status === '未启动') d.status = '实施中';
+}
+function dlTouch(d) { if (!d.recs) d.recs = (d.milestones || []).filter(m => m.status === '已完成').map(m => ({ time: m.date, who: d.pm, act: '里程碑完成', note: m.name + '（里程碑验收通过）' })); }
+function dlNext(d) { const nx = (d.milestones || []).find(m => m.status !== '已完成'); if (nx && nx.status !== '进行中') nx.status = '进行中'; return nx; }
+const DL_TAG = { 未开始: 'info', 进行中: 'primary', 已完成: 'success' };
+const DL_STATUS_TAG = { 未启动: 'info', 实施中: 'primary', 验收中: 'warning', 已完成: 'success' };
+
+/* ===== 交付项目列表 /delivery ===== */
+const DeliveryPage = {
+  components: { ListPage },
+  setup() {
+    const rows = computed(() => store.ext.deliveries);
+    const totalText = computed(() => '交付项目共 ' + rows.value.length + ' 个');
+    const stats = computed(() => {
+      const a = store.ext.deliveries;
+      return [
+        ['项目总数', String(a.length), ''],
+        ['实施中', String(a.filter(x => x.status === '实施中').length), 'ok'],
+        ['延期预警', String(a.filter(x => x.status !== '已完成' && x.planEnd < TODAY).length), 'danger'],
+        ['风险项目', String(a.filter(x => x.risk).length), 'warn'],
+        ['已完成', String(a.filter(x => x.status === '已完成').length), 'ok'],
+      ];
+    });
+    const cols = [
+      { p: 'no', l: '项目编号', w: 140, link: true }, { p: 'name', l: '项目名称', w: 200 },
+      { p: 'customer', l: '客户', w: 200, link: 'cust' }, { p: 'order', l: '关联订单', w: 150 },
+      { p: 'pm', l: '项目经理', w: 90 }, { p: 'planStart', l: '计划开始', w: 110 }, { p: 'planEnd', l: '计划完成', w: 110 },
+      { p: 'progress', l: '进度', w: 150, noTip: true, progress: true },
+      { p: 'status', l: '项目状态', w: 100, tag: { 未启动: 'info', 实施中: 'primary', 验收中: 'warning', 已完成: 'success' } },
+      { p: 'risk', l: '风险', w: 90, noTip: true },
+    ];
+    const filters = [
+      { k: 'kw', label: '搜索项目', ph: '项目编号 / 名称 / 客户' },
+      { k: 'status', label: '项目状态', opts: ['未启动', '实施中', '验收中', '已完成'] },
+      { k: 'pm', label: '项目经理', opts: ['孙工', '钱工', '周航', '吴迪'] },
+    ];
+    const onLink = (c, row) => { if (c.p === 'no') go('/delivery/' + row.no); };
+    const finishOne = row => {
+      const nx = (row.milestones || []).find(m => m.status !== '已完成');
+      if (!nx) return ElMessage.info('该项目里程碑已全部完成');
+      nx.status = '已完成';
+      dlTouch(row);
+      dlProg(row);
+      dlNext(row);
+      row.recs.unshift({ time: TODAY, who: '张三', act: '里程碑完成', note: nx.name + '（进度重算为 ' + row.progress + '%）' });
+      dlLog(row.no, '里程碑完成', '里程碑「' + nx.name + '」标记完成，进度由系统重算为 ' + row.progress + '%' + (row.progress >= 100 ? '，项目已完成' : ''));
+      ElMessage.success('已标记里程碑「' + nx.name + '」完成，进度重算为 ' + row.progress + '%');
+    };
+    return { rows, totalText, stats, cols, filters, onLink, finishOne, TODAY };
+  },
+  template: `<div>
+    <list-page :crumbs="['交付管理','交付项目']" title="交付项目" :total-text="totalText" :stats="stats" :filters="filters" :rows="rows" :cols="cols" :action-width="170" note-tag="真实数据 · 点击编号进入详情"
+      @link="onLink">
+      <template #ops>
+        <el-button icon="Download" @click="$msg.info('示例：导出交付项目')">导出</el-button>
+      </template>
+      <template #cell-risk="{row}"><el-tag v-if="row.risk" type="danger" size="small" effect="light">有风险</el-tag><span v-else>-</span></template>
+      <template #actions="{row}">
+        <el-button link type="primary" @click="$go('/delivery/'+row.no)">查看</el-button>
+        <el-button v-if="(row.milestones||[]).some(m => m.status !== '已完成')" link type="primary" @click="finishOne(row)">完成下一里程碑</el-button>
+      </template>
+    </list-page>
+  </div>`,
+};
+registerRoute('/delivery', DeliveryPage, 'delivery');
+
+/* ===== 交付项目详情 /delivery/:no ===== */
+const DeliveryDetailPage = {
+  props: { no: String },
+  setup(props) {
+    const d = computed(() => store.ext.deliveries.find(x => x.no === props.no) || null);
+    const tab = ref('ms');
+    const order = computed(() => d.value ? store.ext.orders.find(o => o.no === d.value.order) || null : null);
+    const ct = computed(() => order.value ? store.ext.contracts.find(c => c.no === order.value.contract) || null : null);
+    const cust = computed(() => d.value ? store.customers.find(c => c.name === d.value.customer) || null : null);
+    const custNo = computed(() => cust.value ? cust.value.no : cno((d.value || {}).customer || ''));
+    const overdue = computed(() => d.value && d.value.status !== '已完成' && d.value.planEnd < TODAY);
+    const touch = () => dlTouch(d.value);
+    touch();
+    const recs = computed(() => [...(d.value ? d.value.recs || [] : [])].sort((a, b) => (a.time < b.time ? 1 : -1)));
+    const finish = m => {
+      if (m.status === '已完成') return ElMessage.info('该里程碑已完成');
+      m.status = '已完成';
+      const d2 = d.value;
+      dlTouch(d2);
+      dlProg(d2);
+      dlNext(d2);
+      d2.recs.unshift({ time: TODAY, who: '张三', act: '里程碑完成', note: m.name + '（进度重算为 ' + d2.progress + '%）' });
+      dlLog(d2.no, '里程碑完成', '里程碑「' + m.name + '」标记完成，进度重算为 ' + d2.progress + '%' + (d2.progress >= 100 ? '，项目状态变更为「已完成」' : ''));
+      ElMessage.success('「' + m.name + '」已完成，项目进度重算为 ' + d2.progress + '%');
+    };
+    const nextMs = computed(() => d.value ? (d.value.milestones || []).find(m => m.status !== '已完成') || null : null);
+    return { d, tab, order, ct, cust, custNo, overdue, recs, finish, nextMs, DL_TAG, DL_STATUS_TAG, fmtY };
+  },
+  template: `<div v-if="d && d.recs">
+    <el-breadcrumb separator="/" class="crumb"><el-breadcrumb-item><a @click="$go('/delivery')">交付管理</a></el-breadcrumb-item><el-breadcrumb-item><a @click="$go('/delivery')">交付项目</a></el-breadcrumb-item><el-breadcrumb-item>{{ d.no }}</el-breadcrumb-item></el-breadcrumb>
+    <div class="page-head"><h1>项目 {{ d.no }}</h1><el-tag :type="({未启动:'info',实施中:'primary',验收中:'warning',已完成:'success'})[d.status]||'info'">{{ d.status }}</el-tag>
+      <span class="total">{{ d.name }} · 项目经理 {{ d.pm }}</span></div>
+    <div class="ops" style="margin-top:-4px">
+      <el-progress style="width:280px" :percentage="d.progress" :stroke-width="12" :status="d.progress===100?'success':''"/>
+      <el-button v-if="nextMs" type="primary" icon="Check" @click="finish(nextMs)">标记里程碑「{{ nextMs.name }}」完成</el-button>
+      <el-button icon="Printer" @click="$msg.info('示例：打印项目周报')">打印周报</el-button>
+    </div>
+    <el-alert v-if="d.risk" type="error" show-icon :closable="false" style="margin-bottom:12px" :title="'风险提示：' + d.risk + '。请与客户确认应对措施并更新计划。'"/>
+    <el-alert v-else-if="overdue" type="error" show-icon :closable="false" style="margin-bottom:12px" :title="'计划完成日期 ' + d.planEnd + ' 已过期，但项目仍在交付中：存在延期风险，请重新排期。'"/>
+    <el-alert v-if="!d.risk && !overdue && d.status !== '已完成'" type="info" show-icon :closable="false" style="margin-bottom:12px" :title="nextMs ? '当前进行中的里程碑：' + nextMs.name + '（计划 ' + nextMs.date + '）' : '里程碑推进正常'"/>
+    <el-card shadow="never" :body-style="{padding:'0'}">
+      <el-tabs v-model="tab" style="padding:0 18px">
+        <el-tab-pane label="里程碑时间线" name="ms"><div style="padding:16px 6px">
+          <el-timeline>
+            <el-timeline-item v-for="(m,i) in d.milestones" :key="i" :timestamp="m.date" placement="top"
+              :type="m.status==='已完成' ? 'success' : (m.status==='进行中' ? 'primary' : 'info')"
+              :hollow="m.status!=='已完成'">
+              <div style="display:flex;align-items:center;gap:10px;padding:2px 0">
+                <b>{{ m.name }}</b>
+                <el-tag size="small" :type="({未开始:'info',进行中:'primary',已完成:'success'})[m.status]">{{ m.status }}</el-tag>
+                <el-button v-if="m.status !== '已完成'" size="small" type="primary" plain @click="finish(m)">标记完成</el-button>
+                <el-icon v-else style="color:var(--ok)"><check/></el-icon>
+              </div>
+            </el-timeline-item>
+          </el-timeline>
+          <el-alert type="info" show-icon :closable="false" title="里程碑每完成一项，项目进度自动按「已完成里程碑数 / 总数」重算，全部完成后项目状态自动变为「已完成」。"/>
+        </div></el-tab-pane>
+        <el-tab-pane :label="'实施记录（' + recs.length + '）'" name="recs"><div style="padding:16px 6px">
+          <el-timeline>
+            <el-timeline-item v-for="(r,i) in recs" :key="i" :timestamp="r.time" placement="top" type="primary">
+              <div class="tl-item-card"><b style="margin-right:8px">{{ r.act }}</b><span class="muted" style="font-size:12px">{{ r.who }}</span>
+                <div style="line-height:1.7;margin-top:2px">{{ r.note }}</div></div>
+            </el-timeline-item>
+          </el-timeline>
+        </div></el-tab-pane>
+        <el-tab-pane label="关联订单与客户" name="src"><div style="padding:16px 6px" class="card card-pad" >
+          <el-descriptions :column="1" border>
+            <el-descriptions-item label="关联订单"><a v-if="order" class="link" @click="$go('/order/'+order.no)">{{ order.no }}</a><span v-else>-</span></el-descriptions-item>
+            <el-descriptions-item label="订单金额" v-if="order"><span class="money">¥{{ fmtY(order.amount) }}</span></el-descriptions-item>
+            <el-descriptions-item label="关联合同"><a v-if="ct" class="link" @click="$go('/contract/'+ct.no)">{{ ct.no + ' · ' + ct.name }}</a><span v-else>-</span></el-descriptions-item>
+            <el-descriptions-item label="客户"><a class="link" @click="$go('/customer/'+custNo)">{{ d.customer }}</a></el-descriptions-item>
+            <el-descriptions-item label="项目经理">{{ d.pm }}</el-descriptions-item>
+            <el-descriptions-item label="计划工期">{{ d.planStart + ' → ' + d.planEnd }}</el-descriptions-item>
+          </el-descriptions>
+        </div></el-tab-pane>
+      </el-tabs>
+    </el-card>
+  </div>`,
+};
+registerRoute('/delivery/:no', DeliveryDetailPage, 'delivery-detail');
+
 /* ===== 线索详情（/lead/:no）===== */
 DOCS_DEFAULT['lead-detail'] = mkDoc('lead-detail', {
   name: '线索详情', module: '线索管理',
@@ -3860,6 +4402,301 @@ const OppsPage = {
 registerRoute('/opps', OppsPage, 'opps-board', () => ({ view: 'board' }));
 registerRoute('/opps/list', OppsPage, 'opps-list', () => ({ view: 'list' }));
 
+/* ===== 第 4 阶段：订单列表 /orders（真实数据）与订单详情 /order/:no ===== */
+DOCS_DEFAULT['orders'] = mkDoc('orders', {
+  name: '销售订单', module: '订单管理',
+  goal: '承接合同签订后的执行环节：以合同为源头创建订单并进行金额上限校验，跟踪订单状态（待确认 → 备货中 → 交付中 → 已完成 / 已取消）、发货与开票信息，保证订单与合同、交付项目联动可追溯。',
+  roles: ['销售：查看本人订单，可从合同新建订单、确认订单', '销售经理：查看团队订单并可流转状态', '交付 / 客服：查看发货与交付信息', '财务：查看开票信息（部分开票 / 已开票）'],
+  enter: ['左侧导航：订单管理 → 订单管理', '合同详情「关联订单」Tab 中新建 / 查看', '客户详情「订单」Tab、商机详情关联订单链接'],
+  layout: ['顶部：面包屑 + 页面标题 + 订单总数', '统计卡：订单总数、待确认、交付中、已完成、已取消（由列表数据实算）', '筛选区：关键词、客户、订单状态、开票状态', '表格：9 列 + 操作列（查看 / 推进 / 取消）', '分页：真实分页 10 / 20 / 50'],
+  fields: [
+    '订单编号｜文本｜只读｜格式：DD-年月-序号，全库唯一',
+    '合同｜文本｜必填：是｜校验：必须为已签署 / 履约中 / 已完成合同',
+    '客户｜文本｜只读｜说明：选合同后自动带出，不可修改',
+    '金额｜货币｜必填：是｜校验：> 0 且 ≤ 该合同剩余可开单额（合同金额 - 未取消订单合计）',
+    '状态｜枚举｜只读｜待确认 / 备货中 / 交付中 / 已完成 / 已取消',
+    '开票状态｜枚举｜只读｜未开票 / 部分开票 / 已开票',
+    '发货状态｜枚举｜只读｜未发货 / 已发货 / 已签收',
+  ],
+  rules: ['订单数据全部来自 store.ext.orders（真实分页），统计卡实时计算', '新建订单必须先选合同：客户自动带出；校验「同合同未取消订单金额合计 + 本单 ≤ 合同金额」，超出时给出明确错误并阻止保存', '取消订单必须填写原因并写操作日志；已取消订单不计入合同金额占用', '状态与操作日志实时写回 store'],
+  flow: ['订单状态流转：待确认 → 确认订单 → 备货中 → 开始交付 → 交付中 → 确认完成 → 已完成', '取消：待确认 / 备货中 / 交付中可取消，必须填写原因，状态变为「已取消」', '已取消为终态，释放合同金额占用'],
+  errors: ['未选合同直接保存：前端拦截提示', '订单金额超过合同剩余额度：明确提示“超出合同金额上限 ¥xx”并阻止保存', '取消未填原因：拦截并提示', '查询无结果：显示空态，可重置筛选'],
+  api: ['订单分页查询、订单新建（含合同额度校验）接口、订单状态流转接口、开票信息查询（示例）'],
+  accept: ['统计卡数字由全部订单数据实算而非写死', '新建订单超合同上限时能给出明确错误且不写入', '状态流转后列表 / 详情 / 日志即时更新，整页无控制台报错'],
+  version: ['2026-11-02 · 张三 · 创建本页需求文档（原型版）'],
+});
+DOCS_DEFAULT['order-detail'] = mkDoc('order-detail', {
+  name: '订单详情', module: '订单管理',
+  goal: '展示单笔订单的明细、交付 / 发货状态、开票信息与关联单据，并作为订单状态流转与取消操作的落点页面，保证每一步状态变化实时写回数据并留痕。',
+  roles: ['负责人销售：推进状态流转、取消订单', '销售经理：可流转与取消', '交付 / 客服：查看交付信息与关联交付项目', '财务：查看开票信息'],
+  enter: ['订单列表点击订单编号或「查看」', '合同详情「关联订单」Tab、客户详情「订单」Tab 链接'],
+  layout: ['头部：面包屑 + 订单编号 + 状态标签 + 状态流转按钮', 'Tab：订单明细 / 交付与发货 / 开票信息 / 关联合同与客户 / 关联交付项目 / 操作日志'],
+  fields: [
+    '订单编号 / 合同 / 客户 / 负责人｜文本｜只读',
+    '订单金额｜货币｜只读｜说明：明细行小计之和',
+    '明细行：产品 / 数量 / 单位 / 单价 / 折扣 / 小计｜只读',
+    '发货状态 / 计划交付日期 / 收货地址｜只读',
+    '开票状态 / 发票抬头 / 开票金额｜只读',
+    '操作日志行：时间 / 操作人 / 操作 / 内容｜只读',
+  ],
+  rules: ['状态流转按钮按当前状态动态显示，操作后状态立即写回 store.ext.orders 并写日志', '取消必须填写原因（弹窗必填）后才执行', '订单明细行金额按 元 精确显示；开票金额按开票状态折算', '关联合同 / 客户 / 交付项目均可点击跳转'],
+  flow: ['待确认 →（确认订单）→ 备货中 →（开始交付）→ 交付中 →（确认完成）→ 已完成', '待确认 / 备货中 / 交付中可「取消订单」：状态 → 已取消，原因必填并入日志', '已取消 / 已完成为终态'],
+  errors: ['订单编号不存在：提示未找到数据并给出返回列表入口', '取消原因未填：前端拦截', '暂无交付项目 / 开票记录：显示空态提示而非报错'],
+  api: ['订单详情查询、状态流转、取消（带原因）接口、交付项目与开票信息联动查询（示例）'],
+  accept: ['头部状态正确并可流转；每步操作后状态、日志即时更新', '六个 Tab 内容与该订单自身数据一致，明细金额与订单金额一致', '无控制台报错'],
+  version: ['2026-11-02 · 张三 · 创建本页需求文档（原型版）'],
+});
+
+/* --- 订单状态流转定义 --- */
+const OD_FLOW = [
+  { from: '待确认', act: '确认订单', to: '备货中', tip: '订单信息确认无误，进入备货' },
+  { from: '备货中', act: '开始交付', to: '交付中', tip: '货物 / 服务准备就绪，开始交付' },
+  { from: '交付中', act: '确认完成', to: '已完成', tip: '客户已签收 / 验收通过' },
+];
+const OD_CANCELABLE = ['待确认', '备货中', '交付中'];
+function odLog(no, act, detail) { store.ext.logs.unshift({ time: TODAY + ' 1' + ((store.ext.logs.length % 7) + 1) + ':' + ((store.ext.logs.length * 13 % 50) + 9), who: '张三', module: '订单', act, detail: detail + '（订单：' + no + '）' }); }
+function odTransit(od, act) {
+  const step = OD_FLOW.find(f => f.from === od.status && f.act === act);
+  if (!step) return false;
+  od.status = step.to;
+  od.shipStatus = od.status === '已完成' ? '已签收' : (od.status === '交付中' ? '已发货' : '未发货');
+  odLog(od.no, act, '状态由「' + step.from + '」变更为「' + step.to + '」');
+  return true;
+}
+/* 合同剩余可开单额度：合同金额 - 关联未取消订单合计 */
+const odCapOf = ct => Math.max(0, (ct.amount || 0) - store.ext.orders.filter(o => o.contract === ct.no && o.status !== '已取消').reduce((s, o) => s + (o.amount || 0), 0));
+
+const OrdersPage = {
+  components: { ListPage },
+  setup() {
+    const totalText = computed(() => '销售订单共 ' + store.ext.orders.length + ' 笔');
+    const stats = computed(() => {
+      const a = store.ext.orders;
+      return [
+        ['订单总数', String(a.length), ''],
+        ['待确认', String(a.filter(o => o.status === '待确认').length), 'warn'],
+        ['交付中', String(a.filter(o => o.status === '交付中').length), 'ok'],
+        ['已完成', String(a.filter(o => o.status === '已完成').length), 'ok'],
+        ['已取消', String(a.filter(o => o.status === '已取消').length), 'danger'],
+      ];
+    });
+    const cols = [
+      { p: 'no', l: '订单编号', w: 150, link: true }, { p: 'customer', l: '客户', w: 200, link: 'cust' }, { p: 'contract', l: '关联合同', w: 160 },
+      { p: 'amount', l: '订单金额', w: 130, money: true }, { p: 'date', l: '订单日期', w: 110 }, { p: 'dlv', l: '交付日期', w: 110 },
+      { p: 'owner', l: '负责人', w: 90 }, { p: 'status', l: '订单状态', w: 100, tag: { 待确认: 'info', 备货中: 'warning', 交付中: 'primary', 已完成: 'success', 已取消: 'danger' } },
+      { p: 'invoiceStatus', l: '开票状态', w: 100, tag: { 未开票: 'info', 部分开票: 'warning', 已开票: 'success' } },
+    ];
+    const filters = computed(() => [
+      { k: 'kw', label: '搜索订单', ph: '订单编号 / 客户 / 合同' }, { k: 'status', label: '订单状态', opts: ['待确认', '备货中', '交付中', '已完成', '已取消'] },
+      { k: 'invoiceStatus', label: '开票状态', opts: ['未开票', '部分开票', '已开票'] },
+    ]);
+    const onLink = (c, row) => (c.p === 'contract' ? go('/contract/' + row.contract) : go('/order/' + row.no));
+    const transit = row => { const step = OD_FLOW.find(f => f.from === row.status); if (!step) return ElMessage.info('当前状态「' + row.status + '」不可推进'); odTransit(row, step.act); ElMessage.success('已' + step.act + '（' + step.tip + '），状态与日志已更新'); };
+    const cancel = row => ElMessageBox.prompt('取消后订单进入「已取消」终态，可释放该合同的金额占用。请填写取消原因（必填）：', '取消订单 ' + row.no, { confirmButtonText: '确认取消', cancelButtonText: '返回', inputPattern: /\S+/, inputErrorMessage: '取消原因不能为空' })
+      .then(({ value }) => { row.status = '已取消'; odLog(row.no, '取消', '取消原因：' + value + '；合同金额占用已释放'); ElMessage.success('订单已取消，原因已记录'); }).catch(() => {});
+    /* ---- 新建订单弹窗 ---- */
+    const fref = ref(null);
+    const dlg = ref(false);
+    const draft = reactive({ contract: '', amount: null, date: TODAY, dlv: '', owner: '张三' });
+    const rule = { contract: [{ required: true, message: '请选择合同', trigger: 'change' }], amount: [{ required: true, message: '请填写订单金额', trigger: 'blur' }] };
+    const ctOpts = computed(() => store.ext.contracts.filter(ct => ['已签署', '履约中', '已完成'].includes(ct.status)));
+    const selCt = computed(() => store.ext.contracts.find(ct => ct.no === draft.contract) || null);
+    const cap = computed(() => selCt.value ? odCapOf(selCt.value) : 0);
+    /* 订单默认明细：优先复用合同报价明细，否则单行合同标的 */
+    const defaultItems = ct => {
+      const q = ct.quote ? store.ext.quotes.find(x => x.no === ct.quote) : null;
+      if (q && q.items && q.items.length) return q.items.map(it => ({ ...it }));
+      return [{ productNo: '', name: '合同标的（' + (ct.type || '产品 / 服务') + '）', qty: 1, unit: '项', price: ct.amount || 0, discount: 100 }];
+    };
+    const save = () => fref.value.validate(ok => {
+      if (!ok) return;
+      const ct = selCt.value;
+      if (!ct) return ElMessage.warning('请先选择合同，客户将自动带出');
+      const amo = draft.amount || 0;
+      if (amo <= 0) return ElMessage.warning('订单金额必须大于 0');
+      if (amo > odCapOf(ct)) return ElMessage.error('保存失败：订单金额 ¥' + fmtY(amo) + ' 超出该合同剩余可开单额度 ¥' + fmtY(odCapOf(ct)) + '（合同金额 ¥' + fmtY(ct.amount) + ' 减去已下订单合计），请调整金额');
+      const base = 'DD-' + TODAY.slice(0, 7).replace('-', '') + '-';
+      const already = new Set(store.ext.orders.map(o => o.no));
+      let seq = 100 + store.ext.orders.filter(o => o.no.startsWith(base)).length;
+      let no; do { no = base + String(seq++).padStart(4, '0'); } while (already.has(no));
+      store.ext.orders.unshift({
+        no, customer: ct.customer, contract: ct.no, opp: ct.opp || '', amount: amo, date: draft.date, dlv: draft.dlv || extAddDays(draft.date, 30),
+        owner: draft.owner, status: '待确认', items: defaultItems(ct), invoiceStatus: '未开票', shipStatus: '未发货',
+        address: ((store.customers.find(c => c.name === ct.customer) || {}).region || '') + '某某产业园',
+      });
+      odLog(no, '新建', '从合同 ' + ct.no + ' 新建订单（客户：' + ct.customer + '，金额：¥' + fmtY(amo) + '，明细 ' + (defaultItems(ct).length) + ' 行）');
+      ctLog(ct.no, '新增订单', '关联合同新增订单 ' + no + '（金额：¥' + fmtY(amo) + '）');
+      dlg.value = false; ElMessage.success('订单已创建，可在详情页推进状态');
+      go('/order/' + no);
+    });
+    return { totalText, stats, cols, filters, store, dlg, fref, draft, rule, ctOpts, selCt, cap, save, onLink, transit, cancel, fmtY };
+  },
+  template: `<div>
+    <list-page :crumbs="['订单管理','销售订单']" title="销售订单" :total-text="totalText" :stats="stats" :filters="filters" :rows="store.ext.orders" :cols="cols" :action-width="200" note-tag="真实数据 · 点击订单编号进入详情"
+      @link="onLink">
+      <template #ops>
+        <el-button type="primary" icon="Plus" @click="dlg=true">新建订单</el-button>
+        <el-button icon="Download" @click="$msg.info('示例：导出订单')">导出</el-button>
+      </template>
+      <template #actions="{row}">
+        <el-button link type="primary" @click="$go('/order/'+row.no)">查看</el-button>
+        <el-button v-if="['待确认','备货中','交付中'].includes(row.status)" link type="primary" @click="transit(row)">{{ ({'待确认':'确认订单','备货中':'开始交付','交付中':'确认完成'})[row.status] }}</el-button>
+        <el-button v-if="['待确认','备货中','交付中'].includes(row.status)" link type="danger" @click="cancel(row)">取消</el-button>
+      </template>
+    </list-page>
+    <el-dialog v-model="dlg" title="新建订单（从合同发起）" width="640px">
+      <el-form ref="fref" :model="draft" :rules="rule" label-width="110px">
+        <el-form-item label="关联合同" prop="contract">
+          <el-select v-model="draft.contract" filterable placeholder="选择已签署 / 履约中 / 已完成的合同" style="width:100%">
+            <el-option v-for="c in ctOpts" :key="c.no" :label="c.no + ' · ' + c.name" :value="c.no"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="客户"><el-input :model-value="selCt ? selCt.customer : ''" disabled placeholder="选合同后自动带出"/></el-form-item>
+        <el-row :gutter="12">
+          <el-col :span="12"><el-form-item label="订单金额" prop="amount"><el-input-number v-model="draft.amount" :min="0" :step="10000" :controls="false" placeholder="元" style="width:100%"/></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="负责人"><el-select v-model="draft.owner" style="width:100%"><el-option v-for="o in OWNERS" :key="o" :value="o"/></el-select></el-form-item></el-col>
+        </el-row>
+        <el-row :gutter="12">
+          <el-col :span="12"><el-form-item label="订单日期"><el-date-picker v-model="draft.date" type="date" value-format="YYYY-MM-DD" style="width:100%"/></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="计划交付日期"><el-date-picker v-model="draft.dlv" type="date" value-format="YYYY-MM-DD" placeholder="默认 30 天后" style="width:100%"/></el-form-item></el-col>
+        </el-row>
+      </el-form>
+      <el-alert v-if="selCt" type="info" show-icon :closable="false" style="margin-bottom:8px"
+        :title="'合同金额 ¥' + fmtY(selCt.amount) + ' · 已下订单合计（未取消）¥' + fmtY(selCt.amount - cap) + ' · 剩余可开单 ¥' + fmtY(cap)"/>
+      <el-alert type="warning" show-icon :closable="false" title="校验规则：同一合同下「未取消订单金额合计 + 本单」不得超过合同金额；超出将无法保存。"/>
+      <template #footer><el-button @click="dlg=false">取消</el-button><el-button type="primary" @click="save">保存为待确认订单</el-button></template>
+    </el-dialog>
+  </div>`,
+};
+registerRoute('/orders', OrdersPage, 'orders');
+
+/* ===== 订单详情 /order/:no ===== */
+const OrderDetailPage = {
+  components: { PageHead },
+  props: { no: String },
+  setup(props) {
+    const od = computed(() => store.ext.orders.find(x => x.no === props.no) || null);
+    const tab = ref('items');
+    const custNo = computed(() => cno((od.value || {}).customer || ''));
+    const ct = computed(() => od.value ? store.ext.contracts.find(c => c.no === od.value.contract) || null : null);
+    const items = computed(() => (od.value ? od.value.items || [] : []).map((it, i) => ({ ...it, seq: i + 1, sub: Math.round((it.price || 0) * (it.qty || 1) * ((it.discount == null ? 100 : it.discount)) / 100) })));
+    const deliveryOf = computed(() => od.value ? store.ext.deliveries.filter(d => d.order === od.value.no) : []);
+    const invoiceAmt = computed(() => {
+      if (!od.value) return 0;
+      if (od.value.invoiceStatus === '已开票') return od.value.amount;
+      if (od.value.invoiceStatus === '部分开票') return od.value.amount / 2;
+      return 0;
+    });
+    const logs = computed(() => {
+      const o = od.value; if (!o) return []; const base = [
+        { time: o.date + ' 09:00', who: o.owner, act: '创建订单', detail: '从合同 ' + o.contract + ' 新建订单（金额：¥' + fmtY(o.amount) + '）' },
+        { time: o.date + ' 10:30', who: '系统', act: '开票状态', detail: '开票状态初始化：' + o.invoiceStatus + '；发货状态：' + o.shipStatus },
+      ];
+      store.ext.logs.filter(x => x.module === '订单' && x.detail.includes(o.no)).forEach(x => base.push({ time: x.time, who: x.who, act: x.act, detail: x.detail }));
+      return base.sort((a, b) => (a.time < b.time ? 1 : -1));
+    });
+    const buttons = computed(() => {
+      const o = od.value; if (!o) return [];
+      const b = [];
+      const step = OD_FLOW.find(f => f.from === o.status);
+      if (step) b.push({ act: step.act, type: 'primary', label: step.act, tip: step.tip });
+      if (OD_CANCELABLE.includes(o.status)) b.push({ act: 'cancel', type: 'danger', plain: true, label: '取消订单' });
+      return b;
+    });
+    const doAct = b => {
+      if (b.act === 'cancel') { cfRf.reason = ''; cfDlg.value = true; return; }
+      if (odTransit(od.value, b.act)) ElMessage.success('已' + b.act + '（' + b.tip + '），状态与操作日志已更新');
+      else ElMessage.info('当前状态不可执行该操作');
+    };
+    const cfDlg = ref(false); const cfRf = reactive({ reason: '' });
+    const doCancel = () => {
+      const v = cfRf.reason.trim();
+      if (!v) return ElMessage.warning('请填写取消原因（必填）');
+      od.value.status = '已取消';
+      odLog(od.value.no, '取消', '取消原因：' + v);
+      cfDlg.value = false;
+      ElMessage.success('订单已取消，原因已写入操作日志');
+    };
+    return { od, tab, custNo, ct, items, deliveryOf, invoiceAmt, logs, buttons, doAct, cfDlg, cfRf, doCancel, fmtY, fmtC, OD_FLOW };
+  },
+  template: `<div v-if="od">
+    <el-breadcrumb separator="/" class="crumb"><el-breadcrumb-item><a @click="$go('/orders')">订单管理</a></el-breadcrumb-item><el-breadcrumb-item><a @click="$go('/orders')">销售订单</a></el-breadcrumb-item><el-breadcrumb-item>{{ od.no }}</el-breadcrumb-item></el-breadcrumb>
+    <div class="page-head"><h1>订单 {{ od.no }}</h1><el-tag :type="({待确认:'info',备货中:'warning',交付中:'primary',已完成:'success',已取消:'danger'})[od.status]||'info'">{{ od.status }}</el-tag><span class="total">订单金额 ¥{{ fmtY(od.amount) }} · 负责人 {{ od.owner }}</span></div>
+    <div class="ops" style="margin-top:-4px">
+      <el-button v-for="b in buttons" :key="b.act" :type="b.type" :plain="!!b.plain" @click="doAct(b)">{{ b.label }}</el-button>
+      <el-button icon="Printer" @click="$msg.info('示例：打印销售订单')">打印</el-button>
+    </div>
+    <el-alert v-if="od.status==='已取消'" type="error" show-icon :closable="false" style="margin-bottom:12px" title="该订单已取消：仅可查看历史数据，取消原因见「操作日志」。"/>
+    <el-alert v-if="!ct" type="warning" show-icon :closable="false" style="margin-bottom:12px" title="该订单关联合同在合同台账中查不到（历史数据），合同相关字段展示为空。"/>
+    <el-card shadow="never" style="margin-bottom:14px" :body-style="{padding:'0'}">
+      <el-tabs v-model="tab">
+        <el-tab-pane label="订单明细" name="items"><div class="card card-pad" style="padding:14px 18px">
+          <el-table :data="items" size="small" border show-summary :summary-method="() => ['','合计 ' + items.length + ' 行','','','','','¥' + fmtY(items.reduce((s,i)=>s+i.sub,0))]">
+            <el-table-column prop="seq" label="行" width="50"/>
+            <el-table-column label="产品 / 服务" min-width="180"><template #default="{row}">{{ row.name || row.productNo || '-' }}</template></el-table-column>
+            <el-table-column label="数量" width="70" align="right"><template #default="{row}">{{ row.qty || 1 }}</template></el-table-column>
+            <el-table-column prop="unit" label="单位" width="80"/>
+            <el-table-column label="单价" width="110" align="right"><template #default="{row}"><span class="money">¥{{ fmtY(row.price) }}</span></template></el-table-column>
+            <el-table-column label="折扣" width="70" align="center"><template #default="{row}">{{ (row.discount==null?100:row.discount) }}%</template></el-table-column>
+            <el-table-column label="小计" width="130" align="right"><template #default="{row}"><span class="money"><b>¥{{ fmtY(row.sub) }}</b></span></template></el-table-column>
+          </el-table>
+          <el-descriptions :column="2" border style="margin-top:12px">
+            <el-descriptions-item label="订单金额"><span class="money">¥{{ fmtY(od.amount) }}</span></el-descriptions-item>
+            <el-descriptions-item label="明细合计"><span class="money">¥{{ fmtY(items.reduce((s,i)=>s+i.sub,0)) }}</span></el-descriptions-item>
+          </el-descriptions>
+        </div></el-tab-pane>
+        <el-tab-pane label="交付与发货" name="delivery"><div class="card card-pad" style="padding:14px 18px">
+          <el-descriptions :column="2" border>
+            <el-descriptions-item label="发货状态"><el-tag size="small" :type="({未发货:'info',已发货:'primary',已签收:'success'})[od.shipStatus]||'info'">{{ od.shipStatus }}</el-tag></el-descriptions-item>
+            <el-descriptions-item label="计划交付日期">{{ od.dlv }}</el-descriptions-item>
+            <el-descriptions-item label="收货地址">{{ od.address || '-' }}</el-descriptions-item>
+            <el-descriptions-item label="订单日期">{{ od.date }}</el-descriptions-item>
+          </el-descriptions>
+          <div class="card-title" style="margin-top:14px">关联交付项目</div>
+          <el-alert v-if="!deliveryOf.length" type="info" show-icon :closable="false" title="该订单暂无交付项目；交付管理可按订单新建项目。"/>
+          <el-table v-else :data="deliveryOf" size="small" border>
+            <el-table-column prop="no" label="项目编号" width="150"><template #default="{row}"><a class="link" @click="$go('/delivery')">{{ row.no }}</a></template></el-table-column>
+            <el-table-column prop="name" label="项目名称" min-width="180"/>
+            <el-table-column prop="pm" label="项目经理" width="100"/>
+            <el-table-column prop="planStart" label="计划开始" width="110"/><el-table-column prop="planEnd" label="计划完成" width="110"/>
+            <el-table-column label="进度" width="150"><template #default="{row}"><el-progress :percentage="row.progress" :stroke-width="8" :status="row.progress===100?'success':''"/></el-table-column>
+            <el-table-column label="状态" width="100"><template #default="{row}"><el-tag size="small" :type="({未开始:'info',实施中:'primary',验收中:'warning',已完成:'success'})[row.status]||'info'">{{ row.status }}</el-tag></template></el-table-column>
+          </el-table>
+        </div></el-tab-pane>
+        <el-tab-pane label="开票信息" name="invoice"><div class="card card-pad" style="padding:14px 18px">
+          <el-descriptions :column="2" border>
+            <el-descriptions-item label="开票状态"><el-tag size="small" :type="({未开票:'info',部分开票:'warning',已开票:'success'})[od.invoiceStatus]||'info'">{{ od.invoiceStatus }}</el-tag></el-descriptions-item>
+            <el-descriptions-item label="发票抬头">{{ od.customer }}</el-descriptions-item>
+            <el-descriptions-item label="开票金额"><span class="money">¥{{ fmtY(invoiceAmt) }}</span></el-descriptions-item>
+            <el-descriptions-item label="未开票金额"><span class="money">¥{{ fmtY(od.amount - invoiceAmt) }}</span></el-descriptions-item>
+            <el-descriptions-item label="开票类型">增值税专用发票（13%）</el-descriptions-item>
+            <el-descriptions-item label="开票记录">由财务在开票登记后自动写入（原型仅展示）</el-descriptions-item>
+          </el-descriptions>
+          <div style="margin-top:12px"><el-button size="small" type="primary" plain @click="$msg.success('已提交开票申请，将由财务复核（示例）')">申请开票</el-button></div>
+        </div></el-tab-pane>
+        <el-tab-pane label="关联合同与客户" name="source"><div class="card card-pad" style="padding:14px 18px">
+          <el-descriptions :column="1" border>
+            <el-descriptions-item label="关联合同"><a v-if="ct" class="link" @click="$go('/contract/'+ct.no)">{{ ct.no + ' · ' + ct.name }}</a><span v-else>-</span></el-descriptions-item>
+            <el-descriptions-item v-if="ct" label="合同金额"><span class="money">¥{{ fmtY(ct.amount) }}</span></el-descriptions-item>
+            <el-descriptions-item v-if="ct" label="合同状态"><el-tag size="small">{{ ct.status }}</el-tag></el-descriptions-item>
+            <el-descriptions-item label="客户"><a class="link" @click="$go('/customer/'+custNo)">{{ od.customer }}</a></el-descriptions-item>
+          </el-descriptions>
+          <div style="margin-top:12px"><el-button size="small" @click="$go('/contract/'+od.contract)">查看合同详情</el-button></div>
+        </div></el-tab-pane>
+        <el-tab-pane label="操作日志" name="logs"><div class="card card-pad" style="padding:14px 18px">
+          <el-table :data="logs" size="small"><el-table-column prop="time" label="时间" width="150"/><el-table-column prop="who" label="操作人" width="100"/><el-table-column prop="act" label="操作" width="130"/><el-table-column prop="detail" label="内容" min-width="280"/></el-table>
+        </div></el-tab-pane>
+      </el-tabs>
+    </el-card>
+    <el-dialog v-model="cfDlg" title="取消订单（原因必填）" width="480px">
+      <el-alert type="warning" show-icon :closable="false" style="margin-bottom:12px" title="取消后订单进入终态「已取消」，并释放该合同的金额占用。"/>
+      <el-input v-model="cfRf.reason" type="textarea" :rows="3" placeholder="请填写取消原因（将写入操作日志）"/>
+      <template #footer><el-button @click="cfDlg=false">返回</el-button><el-button type="danger" @click="doCancel">确认取消</el-button></template>
+    </el-dialog>
+  </div>`,
+};
+registerRoute('/order/:no', OrderDetailPage, 'order-detail');
+
 const PaymentsPage = {
   components: { PageHead },
   setup() {
@@ -4435,6 +5272,319 @@ const QuotesPage = {
   </div>`,
 };
 registerRoute('/quotes', QuotesPage, 'quotes');
+
+/* ===== 第 5 阶段：服务工单 /service（列表 + SLA 超时标红）与工单详情 /ticket/:no（状态流转 + 处理记录） ===== */
+DOCS_DEFAULT['service'] = mkDoc('service', {
+  name: '服务工单', module: '服务管理',
+  goal: '集中受理客户故障报修、服务请求、咨询与投诉：按类型 / 优先级 / 状态 / 处理人筛选，以 SLA 时限驱动处理速度（超时标红预警），客服与技术可新建工单并全程留痕，保障服务质量可考核。',
+  roles: ['交付 / 客服：接单、处理、转派、关闭工单', '销售经理：查看名下客户工单与 SLA 达成情况', '管理员：全量数据与 SLA 规则配置'],
+  enter: ['左侧导航：服务管理 → 服务工单', '客户详情「服务」Tab、交付项目详情关联跳转'],
+  layout: ['顶部：面包屑 + 页面标题 + 工单总数', '统计卡：工单总数、待接单、处理中、SLA 超时、待客户确认（由数据实算）', '筛选区：关键词 / 工单类型 / 优先级 / 状态 / 处理人', '表格：编号、客户、类型、优先级、问题描述、提交时间、处理人、状态、SLA 列（超时标红）', '新建工单弹窗'],
+  fields: [
+    '工单编号｜文本｜只读｜格式：GD-年月-序号',
+    '工单类型｜枚举｜必填：是｜说明：故障报修 / 服务请求 / 咨询 / 投诉',
+    '客户 / 联系人｜选择｜必填：是｜联系人选项随客户联动',
+    '优先级｜枚举｜必填：是｜说明：紧急(2h) / 高(4h) / 中(24h) / 低(48h) 决定 SLA 时限',
+    '问题描述｜长文本｜必填：是',
+    '处理人｜人员｜说明：接单后写入，可转派并留记录',
+    'SLA 截止时间｜时间｜系统按优先级自动计算'],
+  rules: ['列表数据来自 store.ext.tickets，真分页，统计卡由数据实算', 'SLA 超时规则：未关闭且当前时间已过 SLA 截止时间的工单，SLA 列标红', '新建工单默认状态「待接单」，处理人留空', '每次状态流转都要写入处理记录（时间 / 操作人 / 动作 / 说明）'],
+  flow: ['工单状态流转：待接单 →（接单）→ 处理中 →（填处理说明）→ 待客户确认 →（客户确认）→ 已关闭 →（重新打开）→ 处理中'],
+  errors: ['新建未选客户或未填描述：必填校验拦截', 'SLA 超时后工单仍可处理，但页面持续红色预警', '筛选无结果：空态可重置'],
+  api: ['工单分页查询、新建工单（含 SLA 计算）、接单 / 转派 / 处理 / 关闭接口、处理记录查询（示例）'],
+  accept: ['统计卡数字由数据实算', 'SLA 超时工单在列表标红', '新建工单写入 store.ext.tickets 并出现在详情与列表', '无控制台报错'],
+});
+DOCS_DEFAULT['ticket-detail'] = mkDoc('ticket-detail', {
+  name: '工单详情', module: '服务管理',
+  goal: '呈现单个服务工单的完整处理过程：优先级 / 状态 / SLA 剩余或超时预警、客户与联系人信息、问题描述、图片附件与处理记录时间线；支持接单、转派、处理（→待客户确认）、关闭（客户确认）与重新打开，每一步操作都真实改变状态并写入处理记录。',
+  roles: ['交付 / 客服：接单、处理、转派、重新打开', '客户确认（由客服代录入结果）：关闭工单', '销售经理：跟进客户服务满意度与 SLA 达成', '管理员：全量'],
+  enter: ['服务工单列表点击工单编号', '客户详情 / 交付项目详情的工单链接'],
+  layout: ['头部：面包屑 + 工单号 + 优先级 / 状态标签 + SLA 剩余或超时提示 + 操作按钮组', '左列：问题描述卡（含图片附件占位）+ 处理记录时间线', '右列：客户与联系人卡 + 工单信息（类型 / 处理人 / SLA 截止）'],
+  fields: ['工单编号 / 类型 / 状态 / 处理人｜只读（转派会更新处理人）', '优先级｜枚举｜说明：影响 SLA 时限', 'SLA 截止时间｜时间｜系统按优先级自动计算', '处理记录｜时间 / 操作人 / 动作 / 说明｜每次操作追加，只可新增不可删改'],
+  rules: ['「接单」待接单 → 处理中，处理人为空时默认分配值班客服', '「处理」处理中 → 待客户确认，处理说明必填', '「关闭」待客户确认 → 已关闭（客户确认），处理后工单不可再操作', '「重新打开」已关闭 → 处理中，须填写原因并写记录；「转派」需选择新处理人'],
+  flow: ['待接单 → 处理中 → 待客户确认 → 已关闭；已关闭可重新打开回处理中', '所有状态变更与转派都追加处理记录'],
+  errors: ['工单编号不存在：空态并引导返回列表', '未填处理说明直接确认：校验拦截', 'SLA 已超时：头部红色预警且不阻断处理'],
+  api: ['工单详情查询、接单 / 转派 / 处理 / 关闭 / 重新打开接口、处理记录追加（示例）'],
+  accept: ['每个操作后状态、处理人、处理记录与统计卡即时更新', 'SLA 剩余 / 超时显示正确', '无控制台报错'],
+});
+const TK_HANDLERS = ['客服-小陈', '客服-小林', '技术-黄工', '孙工', '钱工', '林晓'];
+const TK_SLA_H = { 紧急: 2, 高: 4, 中: 24, 低: 48 };
+function tkNow() { const n = new Date(); return TODAY + ' ' + String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0'); }
+function tkLog(no, act, detail) { store.ext.logs.unshift({ time: tkNow(), who: '张三', module: '工单', act, detail: detail + '（工单：' + no + '）' }); }
+function tkNextNo() { let mx = 99; store.ext.tickets.forEach(x => { const n = Number(String(x.no).split('-')[2]); if (n > mx) mx = n; }); return 'GD-' + TODAY.slice(0, 7).replace('-', '') + '-' + String(mx + 1).padStart(4, '0'); }
+function tkSla(t) {
+  if (t.status === '已关闭') return { k: 'none', txt: '-' };
+  const dead = new Date(String(t.slaDeadline).replace(' ', 'T'));
+  const now = new Date(String(tkNow()).replace(' ', 'T'));
+  const rem = dead.getTime() - now.getTime();
+  if (rem < 0) {
+    const hs = Math.round(-rem / 1800000) / 2;
+    return { k: 'timeout', txt: '超时 ' + (hs >= 1 ? (hs % 1 ? hs.toFixed(1) : hs) + ' 小时' : Math.round(-rem / 60000) + ' 分钟') };
+  }
+  const h = Math.floor(rem / 3600000), m = Math.ceil(rem % 3600000 / 60000);
+  const txt = (h ? h + ' 小时 ' : '') + (h || m ? m + ' 分' : '不足 1 分钟') + ' 剩余';
+  return { k: h <= 1 ? 'soon' : 'ok', txt };
+}
+
+/* ===== 服务工单列表 /service ===== */
+const ServicePage = {
+  components: { ListPage },
+  setup() {
+    const rows = computed(() => store.ext.tickets);
+    const totalText = computed(() => '服务工单共 ' + rows.value.length + ' 张');
+    const stats = computed(() => {
+      const a = store.ext.tickets;
+      return [
+        ['工单总数', String(a.length), ''],
+        ['待接单', String(a.filter(x => x.status === '待接单').length), 'warn'],
+        ['处理中', String(a.filter(x => x.status === '处理中').length), 'ok'],
+        ['SLA 超时', String(a.filter(x => tkSla(x).k === 'timeout').length), 'danger'],
+        ['待客户确认', String(a.filter(x => x.status === '待客户确认').length), 'warn'],
+      ];
+    });
+    const cols = [
+      { p: 'no', l: '工单编号', w: 140, link: true }, { p: 'customer', l: '客户', w: 190, link: 'cust' },
+      { p: 'type', l: '工单类型', w: 100, tag: { 故障报修: 'danger', 服务请求: 'primary', 咨询: 'info', 投诉: 'warning' } },
+      { p: 'priority', l: '优先级', w: 80, tag: { 紧急: 'danger', 高: 'warning', 中: 'primary', 低: 'info' } },
+      { p: 'desc', l: '问题描述', w: 230 }, { p: 'created', l: '提交时间', w: 140 }, { p: 'contact', l: '联系人', w: 90 },
+      { p: 'handler', l: '处理人', w: 90 }, { p: 'status', l: '状态', w: 110, tag: { 待接单: 'info', 处理中: 'primary', 待客户确认: 'warning', 已关闭: 'success' } },
+      { p: 'sla', l: 'SLA', w: 150, noTip: true },
+    ];
+    const filters = [
+      { k: 'kw', label: '搜索工单', ph: '工单编号 / 客户 / 描述' },
+      { k: 'type', label: '工单类型', opts: ['故障报修', '服务请求', '咨询', '投诉'] },
+      { k: 'priority', label: '优先级', opts: ['紧急', '高', '中', '低'] },
+      { k: 'status', label: '状态', opts: ['待接单', '处理中', '待客户确认', '已关闭'] },
+      { k: 'handler', label: '处理人', opts: TK_HANDLERS },
+    ];
+    const onLink = (c, row) => { if (c.p === 'no') go('/ticket/' + row.no); };
+    const fref = ref(null); const dlg = ref(false);
+    const draft = reactive({ type: '故障报修', customer: '', contact: '', priority: '中', handler: '', desc: '', created: tkNow() });
+    const rule = {
+      customer: [{ required: true, message: '请选择客户', trigger: 'change' }],
+      priority: [{ required: true, message: '请选择优先级', trigger: 'change' }],
+      desc: [{ required: true, message: '请填写问题描述', trigger: 'blur' }],
+    };
+    const slaTip = computed(() => TK_SLA_H[draft.priority] ? 'SLA 时限：' + TK_SLA_H[draft.priority] + ' 小时（截止 ' + (function () { const d = new Date(new Date(String(tkNow()).replace(' ', 'T')).getTime() + TK_SLA_H[draft.priority] * 3600000); return d.toISOString().slice(0, 16).replace('T', ' '); })() + '）' : '');
+    const custOpts = computed(() => store.customers.filter(c => c.status !== '流失'));
+    const ctOpts = computed(() => draft.customer ? (store.ext.contacts || []).filter(c => c.customer === draft.customer).map(c => c.name) : []);
+    const save = () => fref.value.validate(ok => {
+      if (!ok) return;
+      const no = tkNextNo();
+      const created = tkNow();
+      const sla = new Date(new Date(created.replace(' ', 'T')).getTime() + TK_SLA_H[draft.priority] * 3600000).toISOString().slice(0, 16).replace('T', ' ');
+      store.ext.tickets.unshift({ no, type: draft.type, customer: draft.customer, contact: draft.contact, priority: draft.priority, status: draft.handler ? '处理中' : '待接单', handler: draft.handler, desc: draft.desc, created, slaDeadline: sla, records: [{ time: created, who: '张三', act: draft.handler ? '接单' : '提交工单', note: draft.handler ? '新建工单并指派给 ' + draft.handler + '，按 SLA 启动处理' : '新建工单，等待客服接单' }], images: [] });
+      tkLog(no, '新建', '新建' + draft.type + '工单（客户：' + draft.customer + '，优先级：' + draft.priority + '，SLA 截止：' + sla + '）');
+      dlg.value = false;
+      ElMessage.success('工单已创建（编号 ' + no + '，SLA 截止 ' + sla + '）');
+      go('/ticket/' + no);
+    });
+    return { rows, totalText, stats, cols, filters, onLink, dlg, fref, draft, rule, custOpts, ctOpts, save, tkSla, slaTip };
+  },
+  template: `<div>
+    <list-page :crumbs="['服务管理','服务工单']" title="服务工单" :total-text="totalText" :stats="stats" :filters="filters" :rows="rows" :cols="cols" :action-width="140" note-tag="真实数据 · 点击编号进入详情"
+      @link="onLink">
+      <template #ops>
+        <el-button type="primary" icon="Plus" @click="dlg=true">新建工单</el-button>
+        <el-button icon="Download" @click="$msg.info('示例：导出工单')">导出</el-button>
+      </template>
+      <template #cell-sla="{row}">
+        <span v-if="tkSla(row).k==='timeout'" class="danger-text" style="font-weight:600"><el-icon style="vertical-align:-2px"><alarm-clock/></el-icon> {{ tkSla(row).txt }}</span>
+        <span v-else-if="tkSla(row).k==='soon'" style="color:var(--warn)">{{ tkSla(row).txt }}</span>
+        <span v-else style="width:150px" class="mono">{{ tkSla(row).txt }}</span>
+      </template>
+      <template #actions="{row}">
+        <el-button link type="primary" @click="$go('/ticket/'+row.no)">查看</el-button>
+        <el-button v-if="row.status==='待接单'" link type="primary" @click="$msg.info('在工单详情页进行接单操作')">接单</el-button>
+      </template>
+    </list-page>
+    <el-dialog v-model="dlg" title="新建工单" width="620px">
+      <el-form ref="fref" :model="draft" :rules="rule" label-width="100px">
+        <el-row :gutter="12">
+          <el-col :span="12"><el-form-item label="工单类型">
+            <el-select v-model="draft.type" style="width:100%"><el-option v-for="t in ['故障报修','服务请求','咨询','投诉']" :key="t" :value="t"/></el-select>
+          </el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="优先级" prop="priority">
+            <el-select v-model="draft.priority" style="width:100%"><el-option v-for="p in ['紧急','高','中','低']" :key="p" :value="p"/></el-select>
+          </el-form-item></el-col>
+        </el-row>
+        <el-form-item label="客户" prop="customer">
+          <el-select v-model="draft.customer" filterable placeholder="选择客户（联系人选项随客户联动）" style="width:100%" @change="draft.contact=''">
+            <el-option v-for="c in custOpts" :key="c.no" :label="c.name" :value="c.name"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="关联联系人"><el-select v-model="draft.contact" clearable placeholder="可选" style="width:100%"><el-option v-for="c in ctOpts" :key="c" :label="c" :value="c"/></el-select></el-form-item>
+        <el-form-item label="处理人">
+          <el-select v-model="draft.handler" clearable placeholder="留空则进入待接单池" style="width:100%"><el-option v-for="p in ['客服-小陈','客服-小林','技术-黄工','孙工','钱工','林晓']" :key="p" :value="p"/></el-select>
+        </el-form-item>
+        <el-form-item label="问题描述" prop="desc"><el-input v-model="draft.desc" type="textarea" :rows="3" placeholder="简述客户报修 / 诉求，会在工单详情展示"/></el-form-item>
+        <el-alert v-if="slaTip" type="info" show-icon :closable="false" :title="slaTip"/>
+      </el-form>
+      <template #footer><el-button @click="dlg=false">取消</el-button><el-button type="primary" @click="save">创建工单</el-button></template>
+    </el-dialog>
+  </div>`,
+};
+registerRoute('/service', ServicePage, 'service');
+
+/* ===== 工单详情 /ticket/:no ===== */
+const TicketDetailPage = {
+  props: { no: String },
+  setup(props) {
+    const t = computed(() => store.ext.tickets.find(x => x.no === props.no) || null);
+    const sla = computed(() => tkSla(t.value || { status: '已关闭', slaDeadline: TODAY }));
+    const cust = computed(() => t.value ? store.customers.find(c => c.name === t.value.customer) || null : null);
+    const custNo = computed(() => cust.value ? cust.value.no : cno((t.value || {}).customer || ''));
+    const contact = computed(() => t.value && t.value.contact ? (store.ext.contacts || []).find(c => c.customer === t.value.customer && c.name === t.value.contact) || null : null);
+    const records = computed(() => [...(t.value ? t.value.records || [] : [])].sort((a, b) => (a.time > b.time ? 1 : -1)));
+    // 操作：接单 / 转派 / 处理 / 关闭 / 重新打开
+    const doTake = () => {
+      const w = t.value;
+      if (w.status !== '待接单') return ElMessage.info('当前状态不可接单');
+      w.handler = w.handler || '客服-小陈';
+      w.status = '处理中';
+      w.records.push({ time: tkNow(), who: w.handler, act: '接单', note: '已按 SLA 启动处理' });
+      tkLog(w.no, '接单', '已接单（处理人：' + w.handler + '），状态 → 处理中');
+      ElMessage.success('已接单（处理人：' + w.handler + '），状态变更为「处理中」');
+    };
+    const tpDlg = ref(false); const tp = reactive({ who: '' });
+    const canTransfer = computed(() => ['待接单', '处理中', '待客户确认'].includes((t.value || {}).status));
+    const doTransfer = () => {
+      const w = t.value;
+      if (!tp.who) return ElMessage.warning('请选择新的处理人');
+      const old = w.handler || '（空）';
+      w.handler = tp.who;
+      if (w.status === '待接单') w.status = '处理中';
+      w.records.push({ time: tkNow(), who: '张三', act: '转派', note: '处理人由「' + old + '」转派为「' + tp.who + '」' });
+      tkLog(w.no, '转派', '处理人由「' + old + '」转派为「' + tp.who + '」');
+      tpDlg.value = false; tp.who = '';
+      ElMessage.success('已转派给 ' + w.handler + '，处理记录已更新');
+    };
+    const hdDlg = ref(false); const hd = reactive({ note: '' });
+    const doHandle = () => {
+      const v = hd.note.trim();
+      if (!v) return ElMessage.warning('处理说明为必填，请填写本次处理内容');
+      const w = t.value;
+      w.records.push({ time: tkNow(), who: w.handler || '客服', act: '处理', note: v + '；状态 → 待客户确认' });
+      w.status = '待客户确认';
+      tkLog(w.no, '处理', '填写处理说明并提交客户确认（说明：' + v.slice(0, 20) + (v.length > 20 ? '…' : '') + '）');
+      hdDlg.value = false; hd.note = '';
+      ElMessage.success('已提交客户确认，状态变更为「待客户确认」');
+    };
+    const doClose = () => {
+      const w = t.value;
+      if (w.status !== '待客户确认') return ElMessage.info('当前状态不可关闭（需先处理并等待客户确认）');
+      w.status = '已关闭';
+      w.records.push({ time: tkNow(), who: w.contact || '客户方', act: '客户确认', note: '客户确认问题已解决，工单关闭' });
+      tkLog(w.no, '关闭', '客户确认后工单关闭，状态 → 已关闭');
+      ElNotification({ title: '工单已关闭', message: w.no + ' 已由客户确认关闭，处理记录留痕。', type: 'success' });
+    };
+    const openDlg = ref(false); const opRf = reactive({ reason: '' });
+    const doReopen = () => {
+      const v = opRf.reason.trim();
+      if (!v) return ElMessage.warning('请填写重新打开的原因（必填）');
+      const w = t.value;
+      w.status = '处理中';
+      w.records.push({ time: tkNow(), who: w.handler || '客服', act: '重新打开', note: '原因：' + v + '；状态 → 处理中' });
+      tkLog(w.no, '重新打开', '原因：' + v + '；状态 → 处理中');
+      openDlg.value = false; opRf.reason = '';
+      ElMessage.success('工单已重新打开，状态变更为「处理中」');
+    };
+    return { t, sla, cust, custNo, contact, records, doTake, doTransfer, canTransfer, tpDlg, tp, hdDlg, hd, doHandle, doClose, openDlg, opRf, doReopen, tkSla, fmtY };
+  },
+  template: `<div v-if="t">
+    <el-breadcrumb separator="/" class="crumb"><el-breadcrumb-item><a @click="$go('/service')">服务管理</a></el-breadcrumb-item><el-breadcrumb-item><a @click="$go('/service')">服务工单</a></el-breadcrumb-item><el-breadcrumb-item>{{ t.no }}</el-breadcrumb-item></el-breadcrumb>
+    <div class="page-head"><h1>工单 {{ t.no }}</h1>
+      <el-tag :type="({ 故障报修:'danger', 服务请求:'primary', 咨询:'info', 投诉:'warning' })[t.type]">{{ t.type }}</el-tag>
+      <el-tag :type="{紧急:'danger',高:'warning',中:'primary',低:'info'}[t.priority]" effect="dark">优先级：{{ t.priority }}</el-tag>
+      <el-tag :type="({待接单:'info',处理中:'primary',待客户确认:'warning',已关闭:'success'})[t.status]">{{ t.status }}</el-tag>
+      <span class="total">提交 {{ t.created }} · 处理人 {{ t.handler || '待分配' }}</span></div>
+    <el-alert v-if="sla.k==='timeout'" type="error" show-icon :closable="false" style="margin-bottom:12px" :title="'SLA 超时预警：本工单已超出 SLA 时限（' + tkSla(t).txt + '）。请优先处理并联系客户说明情况，超时情况已计入考核统计。'"/>
+    <el-alert v-else-if="t.status === '已关闭'" type="success" show-icon :closable="false" style="margin-bottom:12px" title="工单已关闭：如客户仍有问题可重新打开，处理记录将保留留痕。"/>
+    <div class="ops" style="margin-top:-4px">
+      <el-button v-if="t.status==='待接单'" type="primary" icon="Pointer" @click="doTake">接单</el-button>
+      <el-button v-if="canTransfer" icon="Switch" @click="tpDlg=true">转派</el-button>
+      <el-button v-if="t.status==='处理中'" type="warning" icon="EditPen" @click="hdDlg=true">处理（提交客户确认）</el-button>
+      <el-button v-if="t.status==='待客户确认'" type="success" icon="CircleCheck" @click="doClose">关闭（客户确认）</el-button>
+      <el-button v-if="['已关闭','待客户确认'].includes(t.status)" icon="RefreshLeft" @click="openDlg=true">重新打开</el-button>
+      <el-button icon="Printer" @click="$msg.info('示例：打印工单回执')">打印</el-button>
+    </div>
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:14px;align-items:start">
+      <div>
+        <div class="card card-pad" style="margin-bottom:14px">
+          <div class="sec-title">问题描述</div>
+          <p style="margin:0;line-height:1.8">{{ t.desc }}</p>
+          <template v-if="(t.images||[]).length">
+            <div class="sec-title" style="margin-top:16px">图片附件（{{ t.images.length }}）</div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+              <div v-for="img in t.images" :key="img" style="width:130px;height:96px;border:1px dashed var(--line);border-radius:8px;background:var(--soft);display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--sub);font-size:12px;gap:4px">
+                <el-icon style="font-size:22px"><camera/></el-icon>{{ img.split('/').pop() }}
+              </div>
+            </div>
+            <p class="muted" style="margin:8px 0 0;font-size:12px">原型阶段以占位卡片代替真实图片；正式版本点击可查看大图。</p>
+          </template>
+          <p v-else class="muted" style="margin:12px 0 0;font-size:12px">工单未上传图片附件（客户可在移动端补充）。</p>
+        </div>
+        <div class="card card-pad">
+          <div class="sec-title">处理记录时间线（{{ records.length }}）</div>
+          <el-timeline>
+            <el-timeline-item v-for="(r,i) in records" :key="i" :timestamp="r.time" placement="top"
+              :type="({ 接单:'primary', 处理:'warning', 客户确认:'success', 转派:'', 重新打开:'danger', 提交工单:'info' })[r.act] || 'primary'">
+              <div class="tl-item-card">
+                <b style="margin-right:8px">{{ r.act }}</b><span class="muted" style="font-size:12px">{{ r.who || '系统' }}</span>
+                <div style="line-height:1.7;margin-top:2px">{{ r.note }}</div>
+              </div>
+            </el-timeline-item>
+          </el-timeline>
+        </div>
+      </div>
+      <div>
+        <div class="card card-pad" style="margin-bottom:14px">
+          <div class="sec-title">SLA 与工单信息</div>
+          <el-descriptions :column="1" border>
+            <el-descriptions-item label="SLA 状态">
+              <el-tag v-if="sla.k==='timeout'" type="danger" effect="dark">{{ sla.txt }}（截止 {{ t.slaDeadline }}）</el-tag>
+              <el-tag v-else-if="sla.k==='none'">{{ sla.txt }}</el-tag>
+              <el-tag v-else-if="sla.k==='soon'" type="warning">{{ sla.txt }}</el-tag>
+              <el-tag v-else type="info" effect="plain">{{ sla.txt }}</el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="SLA 截止时间">{{ t.slaDeadline }}</el-descriptions-item>
+            <el-descriptions-item label="工单类型">{{ t.type }}</el-descriptions-item>
+            <el-descriptions-item label="优先级">{{ t.priority }}<span class="muted" style="margin-left:6px;font-size:12px">SLA 时限 {{ ({紧急:2,高:4,中:24,低:48})[t.priority] }} 小时</span></el-descriptions-item>
+            <el-descriptions-item label="当前处理人">{{ t.handler || '待分配' }}</el-descriptions-item>
+            <el-descriptions-item label="提交时间">{{ t.created }}</el-descriptions-item>
+          </el-descriptions>
+        </div>
+        <div class="card card-pad">
+          <div class="sec-title">客户与联系人</div>
+          <el-descriptions :column="1" border>
+            <el-descriptions-item label="客户"><a class="link" @click="$go('/customer/'+custNo)">{{ t.customer }}</a></el-descriptions-item>
+            <el-descriptions-item label="客户等级" v-if="cust">{{ cust.level }}<el-tag v-if="cust.key" size="small" type="danger" effect="plain" style="margin-left:8px">重点</el-tag></el-descriptions-item>
+            <el-descriptions-item label="联系人"><template v-if="contact"><a class="link" @click="$go('/contact/'+contact.no)">{{ t.contact || '未关联' }}</a><span class="muted" style="margin-left:6px;font-size:12px">{{ contact.title || '' }}</span></template><span v-else>{{ t.contact || '未关联' }}</span></el-descriptions-item>
+            <el-descriptions-item label="联系电话" v-if="contact">{{ contact.phone }}</el-descriptions-item>
+            <el-descriptions-item label="责任销售">{{ (cust && cust.owner) || '-' }}</el-descriptions-item>
+          </el-descriptions>
+        </div>
+      </div>
+    </div>
+    <el-dialog v-model="tpDlg" title="转派工单" width="440px">
+      <el-form label-width="90px">
+        <el-form-item label="当前处理人"><el-input :model-value="t.handler || '待分配'" disabled/></el-form-item>
+        <el-form-item label="新处理人" required><el-select v-model="tp.who" placeholder="选择处理人" style="width:100%"><el-option v-for="h in ['客服-小陈','客服-小林','技术-黄工','孙工','钱工','林晓']" :key="h" :value="h"/></el-select></el-form-item>
+      </el-form>
+      <template #footer><el-button @click="tpDlg=false">取消</el-button><el-button type="primary" @click="doTransfer">确认转派</el-button></template>
+    </el-dialog>
+    <el-dialog v-model="hdDlg" title="处理工单（处理说明必填）" width="520px">
+      <el-alert type="info" show-icon :closable="false" style="margin-bottom:12px" title="提交后工单进入「待客户确认」，关闭工单需客户确认。"/>
+      <el-input v-model="hd.note" type="textarea" :rows="4" placeholder="填写本次处理过程与结果，例如：已重置服务端缓存并完成回归验证…"/>
+      <template #footer><el-button @click="hdDlg=false">取消</el-button><el-button type="primary" @click="doHandle">提交处理结果</el-button></template>
+    </el-dialog>
+    <el-dialog v-model="openDlg" title="重新打开工单（原因必填）" width="480px">
+      <el-input v-model="opRf.reason" type="textarea" :rows="3" placeholder="请填写重新打开的原因（将写入处理记录）"/>
+      <template #footer><el-button @click="openDlg=false">取消</el-button><el-button type="danger" @click="doReopen">确认重新打开</el-button></template>
+    </el-dialog>
+  </div>`,
+};
+registerRoute('/ticket/:no', TicketDetailPage, 'ticket-detail');
 
 const WorkbenchPage = {
   components: { PageHead, EChart },
