@@ -550,12 +550,12 @@ const CUSTOMERS_INIT = [
 
 /* ===== 商机与阶段（方案 5.5 / 6.3） ===== */
 const STAGES = [
-  { key: 'contact', name: '初步接触', prob: 10, color: '#6b8fc9', total: 8, amount: 1560000 },
-  { key: 'need', name: '需求确认', prob: 25, color: '#4b78bd', total: 10, amount: 2380000 },
-  { key: 'plan', name: '方案沟通', prob: 45, color: '#2f62b0', total: 8, amount: 1920000 },
-  { key: 'quote', name: '报价谈判', prob: 65, color: '#1f4e9c', total: 6, amount: 1680000 },
-  { key: 'approve', name: '商务审批', prob: 85, color: '#163b7a', total: 4, amount: 960000 },
-  { key: 'close', name: '赢单 / 输单', prob: 100, color: '#0f2a57', total: 5, amount: 830000 },
+  { key: 'contact', name: '初步接触', prob: 10, ratio: 100, color: '#6b8fc9', total: 8, amount: 1560000 },
+  { key: 'need', name: '需求确认', prob: 25, ratio: 80, color: '#4b78bd', total: 10, amount: 2380000 },
+  { key: 'plan', name: '方案沟通', prob: 45, ratio: 60, color: '#2f62b0', total: 8, amount: 1920000 },
+  { key: 'quote', name: '报价谈判', prob: 65, ratio: 40, color: '#1f4e9c', total: 6, amount: 1680000 },
+  { key: 'approve', name: '商务审批', prob: 85, ratio: 25, color: '#163b7a', total: 4, amount: 960000 },
+  { key: 'close', name: '赢单 / 输单', prob: 100, ratio: 15, color: '#0f2a57', total: 5, amount: 830000 },
 ];
 const STAGE_RULES = {
   need: { title: '需求确认', fields: [
@@ -570,21 +570,21 @@ const STAGE_RULES = {
     { k: 'loseReason', label: '输单原因', type: 'select', opts: ['价格偏高', '功能不满足', '竞品中标', '客户预算取消', '项目延期'] }, { k: 'competitor', label: '竞争对手', type: 'input', ph: '适用时填写' } ] },
 };
 const OPPS_INIT = [
-  { no: 'SJ-202611-0031', name: '苏州某某智能装备 MES 项目', customer: '苏州某某智能装备有限公司', amount: 300000, date: '2026-12-20', owner: '张三', stage: 'contact', prob: 10, info: {}, flags: {} },
-  { no: 'SJ-202611-0029', name: '杭州某某连锁门店 CRM', customer: '杭州某某连锁餐饮有限公司', amount: 120000, date: '2027-01-15', owner: '李四', stage: 'contact', prob: 10, info: {}, flags: {} },
-  { no: 'SJ-202611-0027', name: '合肥某某渠道代理系统', customer: '合肥某某贸易有限公司', amount: 80000, date: '2027-01-30', owner: '赵六', stage: 'contact', prob: 10, info: {}, flags: {} },
-  { no: 'SJ-202610-0026', name: '安徽某某连锁会员系统', customer: '安徽某某连锁有限公司', amount: 260000, date: '2026-12-10', owner: '张三', stage: 'need', prob: 25, info: { demand: '会员积分体系、门店收银对接', buyDate: '2026-12-01', budget: '25–30 万元' }, flags: { stalled: 12 } },
-  { no: 'SJ-202610-0024', name: '无锡某某服务工单系统', customer: '无锡某某汽配有限公司', amount: 150000, date: '2026-12-05', owner: '张三', stage: 'need', prob: 25, info: {}, flags: {} },
-  { no: 'SJ-202610-0022', name: '上海某某数据平台二期', customer: '上海某某信息技术有限公司', amount: 360000, date: '2026-11-30', owner: '王五', stage: 'need', prob: 25, info: { demand: 'BI 看板、跨系统数据同步', buyDate: '2026-11-20', budget: '35–40 万元' }, flags: {} },
-  { no: 'SJ-202610-0018', name: '江苏某某集团协议客户平台', customer: '江苏某某集团', amount: 680000, date: '2026-12-18', owner: '李四', stage: 'plan', prob: 45, info: { demand: '集团协议客户统一管理', buyDate: '2026-12-01', budget: '60–70 万元', solution: '集团版 + 门店端移动应用', participants: '陈总监（决策人）' }, flags: {} },
-  { no: 'SJ-202610-0015', name: '杭州某某酒店续约方案', customer: '杭州某某酒店管理有限公司', amount: 180000, date: '2026-11-28', owner: '赵六', stage: 'plan', prob: 45, info: { demand: '年度续约+增购 20 用户', buyDate: '2026-11-20', budget: '18 万元', solution: '续约 + 增购方案', participants: '刘经理（使用人）' }, flags: { stalled: 9 } },
-  { no: 'SJ-202609-0012', name: '南京某某 ERP 升级项目', customer: '南京某某科技有限公司', amount: 340000, date: '2026-11-25', owner: '张三', stage: 'quote', prob: 65, info: { demand: 'ERP 升级、移动端扩展', buyDate: '2026-11-15', budget: '30–35 万元', solution: 'CRM 企业版 + 移动扩展 + 实施', participants: '陈总监（决策人）' }, flags: { hasQuote: true }, quoteNo: 'BJ-202611-0008' },
-  { no: 'SJ-202609-0010', name: '苏州某某汽配渠道平台', customer: '苏州某某汽配有限公司', amount: 420000, date: '2026-11-22', owner: '李四', stage: 'quote', prob: 65, info: { demand: '渠道订货、返利', buyDate: '2026-11-10', budget: '40 万元', solution: '渠道门户+订货', participants: '黄工（技术）' }, flags: {} },
-  { no: 'SJ-202609-0006', name: '合肥某某餐饮连锁续费', customer: '合肥某某餐饮连锁有限公司', amount: 260000, date: '2026-11-18', owner: '赵六', stage: 'approve', prob: 85, info: { demand: '到期续费', buyDate: '2026-11-10', budget: '26 万元', solution: '原方案续费', participants: '周会计（财务）', terms: '年付，95 折', materials: '报价单 V3 + 折扣说明.pdf' }, flags: { hasQuote: true, contractApproved: false }, quoteNo: 'BJ-202610-0019' },
-  { no: 'SJ-202610-0020', name: '无锡某某精密制造设备管理项目', customer: '无锡某某精密制造有限公司', amount: 240000, date: '2026-11-12', owner: '张三', stage: 'approve', prob: 85, info: { demand: '设备台账与维保管理', buyDate: '2026-11-05', budget: '24 万元', solution: '设备管理模块定制', participants: '黄工（技术）', terms: '合同签署付 50%，验收付 50%', materials: '报价单 V3 + 折扣说明.pdf' }, flags: { hasQuote: true, contractApproved: true }, quoteNo: 'BJ-202610-0015' },
-  { no: 'SJ-202608-0004', name: '南京某某 ERP 实施项目', customer: '南京某某科技有限公司', amount: 100000, date: '2026-10-19', owner: '张三', stage: 'close', prob: 100, result: '赢单', info: {}, flags: {} },
-  { no: 'SJ-202608-0002', name: '宁波某某会员运营', customer: '宁波某某商贸有限公司', amount: 220000, date: '2026-10-29', owner: '张三', stage: 'close', prob: 100, result: '赢单', info: {}, flags: {} },
-  { no: 'SJ-202607-0008', name: '常州某某物流调度', customer: '常州某某物流有限公司', amount: 190000, date: '2026-10-15', owner: '王五', stage: 'close', prob: 0, result: '输单', loseReason: '竞品中标', info: {}, flags: {} },
+  { no: 'SJ-202611-0031', name: '苏州某某智能装备 MES 项目', customer: '苏州某某智能装备有限公司', contact: '王经理', source: '线索', type: '新购', need: 'MES 系统与产线数据采集', competitor: '-', amount: 300000, date: '2026-12-20', owner: '张三', stage: 'contact', prob: 10, info: {}, flags: {} },
+  { no: 'SJ-202611-0029', name: '杭州某某连锁门店 CRM', customer: '杭州某某连锁餐饮有限公司', contact: '李店长', source: '广告', type: '新购', need: '连锁门店会员与营销管理', competitor: '竞品 A', amount: 120000, date: '2027-01-15', owner: '李四', stage: 'contact', prob: 10, info: {}, flags: {} },
+  { no: 'SJ-202611-0027', name: '合肥某某渠道代理系统', customer: '合肥某某贸易有限公司', contact: '赵先生', source: '渠道', type: '新购', need: '渠道代理订货与返利', competitor: '-', amount: 80000, date: '2027-01-30', owner: '赵六', stage: 'contact', prob: 10, info: {}, flags: {} },
+  { no: 'SJ-202610-0026', name: '安徽某某连锁会员系统', customer: '安徽某某连锁有限公司', contact: '李店长', source: '官网', type: '增购', need: '会员积分体系、门店收银对接', competitor: '金蝶', amount: 260000, date: '2026-12-10', owner: '张三', stage: 'need', prob: 25, info: { demand: '会员积分体系、门店收银对接', buyDate: '2026-12-01', budget: '25–30 万元' }, flags: { stalled: 12 } },
+  { no: 'SJ-202610-0024', name: '无锡某某服务工单系统', customer: '无锡某某汽配有限公司', contact: '孙工', source: '官网', type: '新购', need: '售后服务工单管理', competitor: '-', amount: 150000, date: '2026-12-05', owner: '张三', stage: 'need', prob: 25, info: {}, flags: {} },
+  { no: 'SJ-202610-0022', name: '上海某某数据平台二期', customer: '上海某某信息技术有限公司', contact: '冯总', source: '线索', type: '增购', need: 'BI 看板、跨系统数据同步', competitor: '帆软', amount: 360000, date: '2026-11-30', owner: '王五', stage: 'need', prob: 25, info: { demand: 'BI 看板、跨系统数据同步', buyDate: '2026-11-20', budget: '35–40 万元' }, flags: {} },
+  { no: 'SJ-202610-0018', name: '江苏某某集团协议客户平台', customer: '江苏某某集团', contact: '周主任', source: '客户转介绍', type: '新购', need: '集团协议客户统一管理', competitor: '-', amount: 680000, date: '2026-12-18', owner: '李四', stage: 'plan', prob: 45, info: { demand: '集团协议客户统一管理', buyDate: '2026-12-01', budget: '60–70 万元', solution: '集团版 + 门店端移动应用', participants: '陈总监（决策人）' }, flags: {} },
+  { no: 'SJ-202610-0015', name: '杭州某某酒店续约方案', customer: '杭州某某酒店管理有限公司', contact: '刘经理', source: '客户转介绍', type: '续费', need: '年度续约与用户增购', competitor: '-', amount: 180000, date: '2026-11-28', owner: '赵六', stage: 'plan', prob: 45, info: { demand: '年度续约+增购 20 用户', buyDate: '2026-11-20', budget: '18 万元', solution: '续约 + 增购方案', participants: '刘经理（使用人）' }, flags: { stalled: 9 } },
+  { no: 'SJ-202609-0012', name: '南京某某 ERP 升级项目', customer: '南京某某科技有限公司', contact: '陈总监', source: '客户转介绍', type: '增购', need: 'ERP 升级、移动端扩展', competitor: '用友', amount: 340000, date: '2026-11-25', owner: '张三', stage: 'quote', prob: 65, info: { demand: 'ERP 升级、移动端扩展', buyDate: '2026-11-15', budget: '30–35 万元', solution: 'CRM 企业版 + 移动扩展 + 实施', participants: '陈总监（决策人）' }, flags: { hasQuote: true }, quoteNo: 'BJ-202611-0008' },
+  { no: 'SJ-202609-0010', name: '苏州某某汽配渠道平台', customer: '苏州某某汽配有限公司', contact: '黄工', source: '渠道', type: '新购', need: '渠道订货、返利', competitor: '金蝶', amount: 420000, date: '2026-11-22', owner: '李四', stage: 'quote', prob: 65, info: { demand: '渠道订货、返利', buyDate: '2026-11-10', budget: '40 万元', solution: '渠道门户+订货', participants: '黄工（技术）' }, flags: {} },
+  { no: 'SJ-202609-0006', name: '合肥某某餐饮连锁续费', customer: '合肥某某餐饮连锁有限公司', contact: '周会计', source: '客户转介绍', type: '续费', need: '到期续费', competitor: '-', amount: 260000, date: '2026-11-18', owner: '赵六', stage: 'approve', prob: 85, info: { demand: '到期续费', buyDate: '2026-11-10', budget: '26 万元', solution: '原方案续费', participants: '周会计（财务）', terms: '年付，95 折', materials: '报价单 V3 + 折扣说明.pdf' }, flags: { hasQuote: true, contractApproved: false }, quoteNo: 'BJ-202610-0019' },
+  { no: 'SJ-202610-0020', name: '无锡某某精密制造设备管理项目', customer: '无锡某某精密制造有限公司', contact: '黄工', source: '客户转介绍', type: '新购', need: '设备台账与维保管理', competitor: '-', amount: 240000, date: '2026-11-12', owner: '张三', stage: 'approve', prob: 85, info: { demand: '设备台账与维保管理', buyDate: '2026-11-05', budget: '24 万元', solution: '设备管理模块定制', participants: '黄工（技术）', terms: '合同签署付 50%，验收付 50%', materials: '报价单 V3 + 折扣说明.pdf' }, flags: { hasQuote: true, contractApproved: true }, quoteNo: 'BJ-202610-0015' },
+  { no: 'SJ-202608-0004', name: '南京某某 ERP 实施项目', customer: '南京某某科技有限公司', contact: '陈总监', source: '客户转介绍', type: '新购', need: 'ERP 实施与上线支持', competitor: '-', winReason: '方案匹配', amount: 100000, date: '2026-10-19', owner: '张三', stage: 'close', prob: 100, result: '赢单', info: {}, flags: {} },
+  { no: 'SJ-202608-0002', name: '宁波某某会员运营', customer: '宁波某某商贸有限公司', contact: '郑总', source: '活动', type: '新购', need: '会员运营体系', competitor: '-', winReason: '价格优势', amount: 220000, date: '2026-10-29', owner: '张三', stage: 'close', prob: 100, result: '赢单', info: {}, flags: {} },
+  { no: 'SJ-202607-0008', name: '常州某某物流调度', customer: '常州某某物流有限公司', contact: '吴经理', source: '客户转介绍', type: '新购', need: '物流调度与司机结算', competitor: '用友', amount: 190000, date: '2026-10-15', owner: '王五', stage: 'close', prob: 0, result: '输单', loseReason: '竞品中标', info: {}, flags: {} },
 ];
 const STAGE_IDX = Object.fromEntries(STAGES.map((s, i) => [s.key, i]));
 
@@ -1497,10 +1497,16 @@ function extraOpps() {
     };
     if (stage === 'plan' || stage === 'quote' || stage === 'approve') info.solution = extPick(r, ['企业版 + 实施服务', '标准版 + 定制模块', '渠道门户 + 订货', 'BI 看板 + 移动端']);
     if (stage === 'approve') { info.terms = extPick(r, ['30/40/30 分期', '5/5', '年付 92 折']); info.materials = '报价单 + 折扣说明.docx'; }
+    const theme = extPick(r, themes);
     out.push({
       no: 'SJ-' + ym + '-' + extPad(50 + mc[ym], 4),
-      name: extShort(target) + ' ' + extPick(r, themes),
+      name: extShort(target) + ' ' + theme,
       customer: target,
+      contact: extPick(r, ['王经理', '李总', '张主任', '刘经理', '陈总监', '周会计']),
+      source: extPick(r, ['线索', '客户转介绍', '官网', '渠道', '活动', '广告']),
+      type: extPick(r, ['新购', '续费', '增购']),
+      need: theme + '相关需求',
+      competitor: extPick(r, ['-', '-', '用友', '金蝶', '竞品 A']),
       amount: extRint(r, 6, 80) * 10000,
       date: extAddDays(TODAY, extRint(r, 18, 75)),
       owner: extOwner(r), stage,
@@ -3002,7 +3008,7 @@ const AnalyticsDetailPage = {
         const cnt = STAGES.map(s => xs.filter(o => o.stage === s.key).length);
         const amt = STAGES.map(s => Math.round(xs.filter(o => o.stage === s.key).reduce((x, o) => x + o.amount, 0)));
         const custs = new Set(xs.map(o => o.customer));
-        const shape = [100, 80, 60, 40, 25, 12];
+        const shape = [100, 80, 60, 40, 25, 15];
         return {
           stats: [['商机总数', String(xs.length), ''], ['预计总金额', wanT(amt.reduce((a, b) => a + b, 0)), 'ok'], ['覆盖客户', String(custs.size), ''], ['报价后阶段占比', (xs.length ? Math.round(cnt[3] * 1000 / Math.max(1, xs.length)) / 10 : 0) + '%', 'warn']],
           opt: {
@@ -3011,7 +3017,7 @@ const AnalyticsDetailPage = {
               label: { show: true, position: 'inside', color: '#fff', fontSize: 12, formatter: q => q.name + '  ' + cnt[q.dataIndex] + ' 个 · ' + wanT(amt[q.dataIndex]) },
               data: STAGES.map((s, i) => ({ name: s.name, value: shape[i], itemStyle: { color: mixHex(pal[0], '#000000', .48 * i / 5) } })) }],
           },
-          note: '注：漏斗宽度为示意（100% → 12%），不代表真实转化率；数据取预计成交日期在筛选区间内的全部商机。',
+          note: '注：漏斗宽度为示意（100% → 15%），不代表真实转化率；数据取预计成交日期在筛选区间内的全部商机。',
           rows: xs.slice().sort((a, b) => b.amount - a.amount),
           cols: [{ p: 'no', l: '商机编号', w: 130, fmt: 'mono' }, { p: 'name', l: '商机名称', w: 200, fmt: 'link', to: 'opp' },
             { p: 'customer', l: '客户', w: 190, fmt: 'custName' }, { p: 'stage', l: '阶段', w: 100, fmt: 'tag', tagMap: STAGES.reduce((m, s) => (m[s.name] = 'primary', m), {}) },
@@ -3660,19 +3666,19 @@ const ContactsPage = {
     const rows = computed(() => store.ext.contacts.map(c => ({ ...c, keyT: c.key ? '是' : '否' })));
     const stats = computed(() => {
       const a = store.ext.contacts;
-      return [['联系人总数', String(a.length), '', '来自 ' + store.customers.length + ' 家客户'], ['关键决策人', String(a.filter(c => c.key).length), 'ok'], ['支持者', String(a.filter(c => c.attitude === '支持者').length), ''], ['反对者', String(a.filter(c => c.attitude === '反对者').length), 'warn']];
+      return [['联系人总数', String(a.length), '', '来自 ' + store.customers.length + ' 家客户'], ['关键联系人', String(a.filter(c => c.key).length), 'ok'], ['支持者', String(a.filter(c => c.attitude === '支持者').length), ''], ['反对者', String(a.filter(c => c.attitude === '反对者').length), 'warn']];
     });
     const custOpts = computed(() => store.customers.map(c => c.name));
     const cols = [
       { p: 'name', l: '联系人姓名', w: 110, link: true }, { p: 'customer', l: '所属客户', w: 200, link: 'cust' }, { p: 'phone', l: '联系电话', w: 125 },
       { p: 'email', l: '电子邮箱', w: 180 }, { p: 'dept', l: '部门', w: 100 }, { p: 'title', l: '职务', w: 110 },
       { p: 'role', l: '联系人角色', w: 105, tag: CONTACT_ROLE_TAG }, { p: 'infl', l: '影响力', w: 80 },
-      { p: 'attitude', l: '对我方态度', w: 100, tag: CONTACT_ATT_TAG }, { p: 'pref', l: '联系偏好', w: 90 }, { p: 'key', l: '关键决策人', w: 100, bool: true },
+      { p: 'attitude', l: '对我方态度', w: 100, tag: CONTACT_ATT_TAG }, { p: 'pref', l: '联系偏好', w: 90 }, { p: 'key', l: '关键联系人', w: 100, bool: true },
     ];
     const filters = computed(() => [
       { k: 'kw', label: '搜索联系人', ph: '姓名 / 电话 / 邮箱 / 客户' }, { k: 'customer', label: '所属客户', opts: custOpts.value },
       { k: 'role', label: '联系人角色', opts: CONTACT_ROLES }, { k: 'infl', label: '影响力', opts: CONTACT_INFLS },
-      { k: 'attitude', label: '对我方态度', opts: CONTACT_ATTS }, { k: 'keyT', label: '关键决策人', opts: ['是', '否'] },
+      { k: 'attitude', label: '对我方态度', opts: CONTACT_ATTS }, { k: 'keyT', label: '关键联系人', opts: ['是', '否'] },
     ]);
     /* ---- 新增 / 编辑 / 删除 ---- */
     const fref = ref(null);
@@ -3702,9 +3708,8 @@ const ContactsPage = {
       logsPush('删除', row.name + '（' + row.customer + '）');
       ElMessage.success('联系人已删除');
     }).catch(() => {});
-    const logRows = ref([]);
-    const logsPush = (act, d) => logRows.value.unshift({ t: TODAY + ' ' + new Date().toTimeString().slice(0, 5), who: '张三', act, d });
-    const logsShow = computed(() => logRows.value.concat(store.ext.logs.filter(x => x.module === '联系人').slice(0, 6).map(x => ({ t: x.time, who: x.who, act: x.act, d: x.detail }))));
+    const logsPush = (act, d) => store.ext.logs.unshift({ time: TODAY + ' ' + new Date().toTimeString().slice(0, 5), who: '张三', module: '联系人', act, detail: d });
+    const logsShow = computed(() => store.ext.logs.filter(x => x.module === '联系人').slice(0, 8).map(x => ({ t: x.time, who: x.who, act: x.act, d: x.detail })));
     return { rows, stats, cols, filters, dlg, f, fref, rule, peerContacts, openAdd, openEdit, save, del, logsShow, CONTACT_ROLES, CONTACT_INFLS, CONTACT_ATTS, OWNERS, store, go, fmtY };
   },
   template: `<div>
@@ -3745,7 +3750,7 @@ const ContactsPage = {
         </el-row>
         <el-row :gutter="12">
           <el-col :span="12"><el-form-item label="生日"><el-date-picker v-model="f.birthday" type="date" value-format="YYYY-MM-DD" style="width:100%"/></el-form-item></el-col>
-          <el-col :span="12"><el-form-item label="关键决策人"><el-switch v-model="f.key" active-text="是" inactive-text="否"/></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="关键联系人"><el-switch v-model="f.key" active-text="是" inactive-text="否"/></el-form-item></el-col>
         </el-row>
         <el-form-item label="备注"><el-input type="textarea" :rows="2" v-model="f.remark"/></el-form-item>
       </el-form>
@@ -3772,16 +3777,17 @@ const ContactDetail = {
     const myQuotes = computed(() => c.value ? store.ext.quotes.filter(q => q.customer === c.value.customer) : []);
     const reportsToName = computed(() => { if (!c.value || !c.value.reportsTo) return ''; const p = store.ext.contacts.find(x => x.no === c.value.reportsTo); return p ? p.name + '（' + p.title + '）' : ''; });
     const peersOfSame = computed(() => c.value ? store.ext.contacts.filter(x => x.customer === c.value.customer && x.no !== c.value.no) : []);
+    const myLogs = computed(() => c.value ? store.ext.logs.filter(x => x.module === '联系人' && (x.detail.includes(c.value.name) || x.detail.includes(c.value.no) || x.detail.includes(c.value.customer))).slice(0, 8).map(x => ({ t: x.time, who: x.who, act: x.act, d: x.detail })) : []);
     /* ---- 便捷小交互：快速改态度（与关系图一致的真实写回） ---- */
     const stTag = a => ({ 支持者: 'success', 中立: 'info', 反对者: 'danger' }[a] || 'info');
-    return { c, custNo, myOpps, myActs, myQuotes, reportsToName, peersOfSame, stTag, go, fmtY, fmtC };
+    return { c, custNo, myOpps, myActs, myQuotes, reportsToName, peersOfSame, myLogs, stTag, go, fmtY, fmtC };
   },
   template: `<div v-if="c">
     <el-breadcrumb separator="/" class="crumb"><el-breadcrumb-item><a @click="$go('/contacts')">联系人管理</a></el-breadcrumb-item><el-breadcrumb-item><a @click="$go('/contacts')">联系人列表</a></el-breadcrumb-item><el-breadcrumb-item>{{ c.name }}</el-breadcrumb-item></el-breadcrumb>
     <div class="card cust-head">
       <div class="cust-logo" style="border-radius:50%">{{ c.name.slice(0,1) }}</div>
       <div>
-        <h2>{{ c.name }}<el-tag :type="c.role==='决策人'?'danger':'info'" size="small">{{ c.role }}</el-tag><el-tag :type="stTag(c.attitude)" size="small" effect="plain">{{ c.attitude }}</el-tag><el-tag v-if="c.key" type="warning" size="small" effect="plain">关键决策人</el-tag><el-tag type="primary" size="small" effect="plain">影响力 · {{ c.infl }}</el-tag></h2>
+        <h2>{{ c.name }}<el-tag :type="c.role==='决策人'?'danger':'info'" size="small">{{ c.role }}</el-tag><el-tag :type="stTag(c.attitude)" size="small" effect="plain">{{ c.attitude }}</el-tag><el-tag v-if="c.key" type="warning" size="small" effect="plain">关键联系人</el-tag><el-tag type="primary" size="small" effect="plain">影响力 · {{ c.infl }}</el-tag></h2>
         <div class="cust-meta"><span>联系人编号：<b>{{ c.no }}</b></span><span>所属客户：<a class="link" @click="$go('/customer/'+custNo)">{{ c.customer }}</a></span><span>负责人：<b>{{ c.owner || '-' }}</b></span></div>
         <div style="margin-top:8px"><el-button size="small" type="primary" plain icon="Connection" @click="$msg.info('请在下方关系图「新增关系」中维护内部关系')">维护关系</el-button><el-button size="small" @click="$msg.info('示例：编辑联系人表单')"><el-icon><edit/></el-icon>编辑</el-button></div>
       </div>
@@ -3792,19 +3798,23 @@ const ContactDetail = {
       <el-descriptions :column="4" border size="default">
         <el-descriptions-item label="姓名">{{ c.name }}</el-descriptions-item><el-descriptions-item label="部门">{{ c.dept || '-' }}</el-descriptions-item><el-descriptions-item label="职务">{{ c.title || '-' }}</el-descriptions-item><el-descriptions-item label="联系人角色">{{ c.role }}</el-descriptions-item>
         <el-descriptions-item label="联系电话">{{ c.phone }}</el-descriptions-item><el-descriptions-item label="电子邮箱">{{ c.email || '-' }}</el-descriptions-item><el-descriptions-item label="联系偏好">{{ c.pref }}</el-descriptions-item><el-descriptions-item label="生日">{{ c.birthday || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="对我方态度"><el-tag :type="stTag(c.attitude)" size="small">{{ c.attitude }}</el-tag></el-descriptions-item><el-descriptions-item label="关键决策人">{{ c.key ? '是' : '否' }}</el-descriptions-item><el-descriptions-item label="汇报对象">{{ reportsToName || '（顶层）' }}</el-descriptions-item><el-descriptions-item label="备注">{{ c.remark || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="对我方态度"><el-tag :type="stTag(c.attitude)" size="small">{{ c.attitude }}</el-tag></el-descriptions-item><el-descriptions-item label="关键联系人">{{ c.key ? '是' : '否' }}</el-descriptions-item><el-descriptions-item label="汇报对象">{{ reportsToName || '（顶层）' }}</el-descriptions-item><el-descriptions-item label="关系备注">{{ c.remark || '-' }}</el-descriptions-item>
       </el-descriptions>
     </div>
     <relation-graph :customer="c.customer" :current="c.no" height="330px"/>
     <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;margin-top:14px">
-      <div class="card card-pad"><div class="card-title">关联商机（所属客户）</div>
+      <div class="card card-pad"><div class="card-title">参与商机（所属客户）</div>
         <el-table v-if="myOpps.length" :data="myOpps" size="small"><el-table-column prop="no" label="商机编号" width="150"><template #default="{row}"><a class="link" @click="$go('/opp/'+row.no)">{{ row.no }}</a></template></el-table-column><el-table-column prop="name" label="商机名称" min-width="160" show-overflow-tooltip/><el-table-column label="预计金额" width="110" align="right"><template #default="{row}"><span class="money">¥{{ fmtY(row.amount) }}</span></template></el-table-column><el-table-column prop="owner" label="负责人" width="80"/></el-table>
         <el-empty v-else description="该客户暂无商机" :image-size="50"/>
       </div>
-      <div class="card card-pad"><div class="card-title">相关跟进记录</div>
+      <div class="card card-pad"><div class="card-title">历史沟通记录</div>
         <el-table v-if="myActs.length" :data="myActs" size="small"><el-table-column prop="time" label="时间" width="150"/><el-table-column prop="type" label="类型" width="70"/><el-table-column prop="content" label="跟进内容" min-width="200" show-overflow-tooltip/><el-table-column prop="owner" label="跟进人" width="80"/></el-table>
         <el-empty v-else description="该联系人暂无跟进记录" :image-size="50"/>
       </div>
+    </div>
+    <div class="card card-pad" style="margin-top:14px"><div class="card-title">操作日志</div>
+      <el-table v-if="myLogs.length" :data="myLogs" size="small" max-height="220"><el-table-column prop="t" label="时间" width="160"/><el-table-column prop="who" label="操作人" width="100"/><el-table-column prop="act" label="操作" width="90"/><el-table-column prop="d" label="详情" min-width="280" show-overflow-tooltip/></el-table>
+      <el-empty v-else description="该联系人暂无维护日志（新增/编辑/态度/关系变更后自动记录）" :image-size="50"/>
     </div>
   </div>
   <div v-else class="card card-pad" style="text-align:center;padding:70px 40px"><el-empty description="未找到该联系人（可能已被删除或编号输错）"><el-button type="primary" @click="$go('/contacts')">返回联系人列表</el-button></el-empty></div>`,
@@ -7282,6 +7292,13 @@ const OppDetailPage = {
     const follows = computed(() => { const o = opp.value; if (!o) return []; return store.ext.activities.filter(a => a.opp === o.no).slice().sort((a, b) => (a.time < b.time ? 1 : -1)); });
     const quotesOf = computed(() => { const o = opp.value; if (!o) return []; return store.ext.quotes.filter(q => q.opp === o.no); });
     const contractsOf = computed(() => { const o = opp.value; if (!o) return []; return store.ext.contracts.filter(x => x.opp === o.no); });
+    const ordersOf = computed(() => { const o = opp.value; if (!o) return []; return store.ext.orders.filter(x => x.opp === o.no); });
+    const filesOf = computed(() => {
+      const out = [];
+      quotesOf.value.forEach(q => out.push({ name: '报价单 ' + q.no + '（' + q.ver + '）.pdf', type: '报价单', ref: q.no, size: '260KB', date: q.date }));
+      contractsOf.value.forEach(t => (t.attachments || []).forEach(a => out.push({ name: a.name, type: '合同附件', ref: t.no, size: a.size, date: a.date })));
+      return out;
+    });
     const logs = computed(() => {
       const o = opp.value; if (!o) return [];
       const arr = store.ext.logs.filter(x => x.detail.includes(o.no) || x.detail.includes(o.name)).slice(0, 5)
@@ -7315,15 +7332,15 @@ const OppDetailPage = {
       o.stage = gate.target; o.history = (o.history || []).concat([{ from, to: gate.target === 'close' ? o.result : STAGES[STAGE_IDX[gate.target]].name, by: '张三', time: TODAY + ' 16:00', remark: gate.remark || '-' }]);
       gate.show = false; ElMessage.success('阶段已变更：' + from + ' → ' + (gate.target === 'close' ? o.result : STAGES[STAGE_IDX[gate.target]].name) + '，变更记录已保留');
     };
-    return { opp, c, tab, stageName, stageTag, INFO_LABEL, infoRows, follows, quotesOf, contractsOf, logs, gate, request, rule, sysOk, confirmMove, go, yuan, fmtC, fmtY, STAGES, STAGE_IDX };
+    return { opp, c, tab, stageName, stageTag, INFO_LABEL, infoRows, follows, quotesOf, contractsOf, ordersOf, filesOf, logs, gate, request, rule, sysOk, confirmMove, go, yuan, fmtC, fmtY, STAGES, STAGE_IDX };
   },
   template: `<div v-if="opp">
     <el-breadcrumb separator="/" class="crumb"><el-breadcrumb-item><a @click="$go('/opps')">商机管理</a></el-breadcrumb-item><el-breadcrumb-item><a @click="$go('/opps/list')">商机列表</a></el-breadcrumb-item><el-breadcrumb-item>{{ opp.no }}</el-breadcrumb-item></el-breadcrumb>
     <div class="card cust-head">
       <div class="cust-logo">{{ opp.name[0] }}</div>
       <div>
-        <h2>{{ opp.name }}<el-tag :type="stageTag(opp)" size="small">{{ opp.stage === 'close' ? opp.result : stageName(opp.stage) }}</el-tag><el-tag type="danger" size="small" effect="plain" v-if="opp.loseReason">{{ opp.loseReason }}</el-tag></h2>
-        <div class="cust-meta"><span>商机编号：<b>{{ opp.no }}</b></span><span>客户：<b><a @click="$go('/customer/'+($cno(opp.customer)))">{{ opp.customer }}</a></b></span><span>负责人：<b>{{ opp.owner }}</b></span><span>预计成交：<b>{{ opp.date }}</b></span></div>
+        <h2>{{ opp.name }}<el-tag :type="stageTag(opp)" size="small">{{ opp.stage === 'close' ? opp.result : stageName(opp.stage) }}</el-tag><el-tag type="danger" size="small" effect="plain" v-if="opp.loseReason">{{ opp.loseReason }}</el-tag><el-tag type="success" size="small" effect="plain" v-if="opp.winReason">{{ opp.winReason }}</el-tag></h2>
+        <div class="cust-meta"><span>商机编号：<b>{{ opp.no }}</b></span><span>客户：<b><a @click="$go('/customer/'+($cno(opp.customer)))">{{ opp.customer }}</a></b></span><span>联系人：<b>{{ opp.contact || '-' }}</b></span><span>负责人：<b>{{ opp.owner }}</b></span><span>预计成交：<b>{{ opp.date }}</b></span></div>
         <div style="margin-top:10px;display:flex;gap:8px">
           <el-button type="primary" size="small" icon="TopRight" :disabled="opp.stage==='close'" @click="request(opp, STAGES[STAGE_IDX[opp.stage]+1].key)">推进到下一阶段</el-button>
           <el-button size="small" type="success" :disabled="opp.stage==='close'" @click="request(opp, 'close'); gate.mode='win'">标记赢单</el-button>
@@ -7338,10 +7355,15 @@ const OppDetailPage = {
         <el-tab-pane label="基本信息" name="base"><div class="tab-body">
           <el-descriptions :column="3" border size="default">
             <el-descriptions-item label="商机名称" :span="2">{{ opp.name }}</el-descriptions-item><el-descriptions-item label="负责人">{{ opp.owner }}</el-descriptions-item>
-            <el-descriptions-item label="关联客户" :span="2"><a @click="$go('/customer/'+($cno(opp.customer)))">{{ opp.customer }}</a></el-descriptions-item><el-descriptions-item label="预计金额">{{ yuan(opp.amount) }}</el-descriptions-item>
-            <el-descriptions-item label="预计成交日期">{{ opp.date }}</el-descriptions-item><el-descriptions-item label="当前阶段">{{ opp.stage === 'close' ? opp.result : stageName(opp.stage) }}</el-descriptions-item><el-descriptions-item label="赢率">{{ opp.prob }}%</el-descriptions-item>
+            <el-descriptions-item label="关联客户" :span="2"><a @click="$go('/customer/'+($cno(opp.customer)))">{{ opp.customer }}</a></el-descriptions-item><el-descriptions-item label="关联联系人">{{ opp.contact || '-' }}</el-descriptions-item>
+            <el-descriptions-item label="商机来源">{{ opp.source || '-' }}</el-descriptions-item><el-descriptions-item label="商机类型">{{ opp.type || '-' }}</el-descriptions-item><el-descriptions-item label="预计金额">{{ yuan(opp.amount) }}</el-descriptions-item>
+            <el-descriptions-item label="预计成交日期">{{ opp.date }}</el-descriptions-item><el-descriptions-item label="当前阶段">{{ opp.stage === 'close' ? opp.result : stageName(opp.stage) }}</el-descriptions-item><el-descriptions-item label="成交概率">{{ opp.prob }}%</el-descriptions-item>
+            <el-descriptions-item label="主要需求" :span="3">{{ opp.need || '-' }}</el-descriptions-item>
             <el-descriptions-item v-if="opp.loseReason" label="输单原因" :span="3">{{ opp.loseReason }}</el-descriptions-item>
+            <el-descriptions-item v-if="opp.winReason" label="赢单原因" :span="3">{{ opp.winReason }}</el-descriptions-item>
           </el-descriptions>
+          <div class="sec-title" style="margin-top:18px">竞争对手分析</div>
+          <el-descriptions :column="2" border size="small"><el-descriptions-item label="竞争对手">{{ opp.competitor || '未填写' }}</el-descriptions-item><el-descriptions-item label="竞争情况">{{ opp.competitor && opp.competitor !== '-' ? '存在竞争，关注报价与方案差异' : '暂无明显竞争对手' }}</el-descriptions-item></el-descriptions>
           <div class="sec-title" style="margin-top:18px">各阶段必填信息</div>
           <el-descriptions v-if="infoRows.length" :column="2" border size="small">
             <el-descriptions-item v-for="r in infoRows" :key="r[0]" :label="r[0]">{{ r[1] }}</el-descriptions-item>
@@ -7376,6 +7398,18 @@ const OppDetailPage = {
             <el-table-column prop="name" label="合同名称" min-width="220"/><el-table-column label="金额" width="140" align="right"><template #default="{row}"><span class="money">¥{{ fmtY(row.amount) }}</span></template></el-table-column>
             <el-table-column prop="signDate" label="签署日期" width="120"/><el-table-column label="状态" width="100"><template #default="{row}"><el-tag size="small" type="primary">{{ row.status }}</el-tag></template></el-table-column></el-table>
           <el-empty v-else description="暂无关联合同（赢单前需合同审批通过或订单已确认）" :image-size="72"/>
+        </div></el-tab-pane>
+        <el-tab-pane label="关联订单" name="orders"><div class="tab-body">
+          <el-table v-if="ordersOf.length" :data="ordersOf" size="small"><el-table-column prop="no" label="订单编号" width="170"><template #default="{row}"><a class="link" @click="$go('/order/'+row.no)">{{ row.no }}</a></template></el-table-column>
+            <el-table-column prop="contract" label="关联合同" width="170"/><el-table-column label="订单金额" width="140" align="right"><template #default="{row}"><span class="money">{{ yuan(row.amount) }}</span></template></el-table-column>
+            <el-table-column prop="date" label="下单日期" width="120"/><el-table-column prop="owner" label="负责人" width="90"/><el-table-column label="状态" width="100"><template #default="{row}"><el-tag size="small" type="primary">{{ row.status }}</el-tag></template></el-table-column></el-table>
+          <el-empty v-else description="暂无关联订单（赢单后可基于合同生成订单与交付任务）" :image-size="72"/>
+        </div></el-tab-pane>
+        <el-tab-pane label="商机附件" name="files"><div class="tab-body">
+          <div class="ops"><el-button size="small" icon="Upload" @click="$msg.info('示例：上传商机附件（按权限控制）')">上传附件</el-button></div>
+          <el-table v-if="filesOf.length" :data="filesOf" size="small"><el-table-column prop="name" label="文件名" min-width="260"><template #default="{row}"><el-icon><document/></el-icon> <a class="link">{{ row.name }}</a></template></el-table-column>
+            <el-table-column prop="type" label="类型" width="110"/><el-table-column prop="ref" label="关联单据" width="170"/><el-table-column prop="size" label="大小" width="90"/><el-table-column prop="date" label="上传日期" width="120"/></el-table>
+          <el-empty v-else description="暂无商机附件（报价单与合同附件会自动归集到这里）" :image-size="72"/>
         </div></el-tab-pane>
         <el-tab-pane label="阶段变更历史" name="history"><div class="tab-body">
           <el-timeline v-if="opp.history && opp.history.length">
@@ -7420,8 +7454,10 @@ const OppsPage = {
   components: { PageHead },
   props: { view: { type: String, default: 'board' } },
   setup(props) {
-    const owner = ref(''); const kw = ref('');
-    const cards = computed(() => store.opps.filter(o => (!owner.value || o.owner === owner.value) && (!kw.value || (o.name + o.customer + o.no).includes(kw.value))));
+    const owner = ref(''); const kw = ref(''); const source = ref(''); const type = ref('');
+    const SOURCES = ['线索', '客户转介绍', '官网', '渠道', '活动', '广告'];
+    const TYPES = ['新购', '续费', '增购'];
+    const cards = computed(() => store.opps.filter(o => (!owner.value || o.owner === owner.value) && (!source.value || o.source === source.value) && (!type.value || o.type === type.value) && (!kw.value || (o.name + o.customer + o.no + (o.contact || '') + (o.need || '')).includes(kw.value))));
     const colCards = key => cards.value.filter(o => o.stage === key);
     const colCount = key => store.opps.filter(o => o.stage === key).length;
     const colAmount = key => store.opps.filter(o => o.stage === key).reduce((s, o) => s + o.amount, 0);
@@ -7463,7 +7499,10 @@ const OppsPage = {
     const stageName = k => (STAGES.find(s => s.key === k) || {}).name;
     const stageTagType = o => o.stage === 'close' ? (o.result === '赢单' ? 'success' : 'danger') : 'primary';
     const listRows = computed(() => cards.value);
-    return { owner, kw, cards, colCards, colCount, colAmount, totalOpen, totalAmt, thisMonthAmount, wonCount, lostCount, stalled, dragNo, overKey, onDrop, gate, nextStage, request, rule, sysOk, confirmMove, stageName, stageTagType, listRows, STAGES, OWNERS, fmtY, yuan, wan, go, view: computed(() => props.view), STAGE_IDX };
+    const page = ref(1); const size = 20;
+    const pagedRows = computed(() => listRows.value.slice((page.value - 1) * size, page.value * size));
+    watch([owner, kw, source, type], () => { page.value = 1; });
+    return { owner, kw, source, type, SOURCES, TYPES, cards, colCards, colCount, colAmount, totalOpen, totalAmt, thisMonthAmount, wonCount, lostCount, stalled, dragNo, overKey, onDrop, gate, nextStage, request, rule, sysOk, confirmMove, stageName, stageTagType, listRows, pagedRows, page, size, STAGES, OWNERS, fmtY, yuan, wan, go, view: computed(() => props.view), STAGE_IDX };
   },
   template: `<div>
     <page-head :crumbs="['商机管理', view==='board' ? '商机看板' : '商机列表']" :title="view==='board' ? '商机看板' : '商机列表'" :total="'跟进中商机共 '+totalOpen+' 个'">
@@ -7477,15 +7516,16 @@ const OppsPage = {
       <div class="stat-card warn"><span class="lb">停滞商机</span><span class="vl">{{ stalled }}</span><span class="ft">超 7 天未推进，已提醒负责人与经理</span></div>
       <div class="stat-card"><span class="lb">已赢单 / 已输单</span><span class="vl">{{ wonCount }} / {{ lostCount }}</span><span class="ft">输单需填原因与竞争对手</span></div>
     </div>
-    <div class="card query" style="padding-bottom:2px"><el-form inline><el-form-item><el-input v-model="kw" placeholder="搜索商机名称 / 客户 / 编号" clearable style="width:260px" prefix-icon="Search"/></el-form-item><el-form-item label="负责人"><el-select v-model="owner" clearable placeholder="全部" style="width:130px"><el-option v-for="o in OWNERS" :key="o" :value="o"/></el-select></el-form-item><el-form-item><el-button type="primary" icon="Search">查询</el-button><el-button @click="owner='';kw=''">重置</el-button></el-form-item>
+    <div class="card query" style="padding-bottom:2px"><el-form inline><el-form-item><el-input v-model="kw" placeholder="搜索商机名称 / 客户 / 编号" clearable style="width:260px" prefix-icon="Search"/></el-form-item><el-form-item label="负责人"><el-select v-model="owner" clearable placeholder="全部" style="width:120px"><el-option v-for="o in OWNERS" :key="o" :value="o"/></el-select></el-form-item><el-form-item label="来源"><el-select v-model="source" clearable placeholder="全部" style="width:120px"><el-option v-for="x in SOURCES" :key="x" :value="x"/></el-select></el-form-item><el-form-item label="类型"><el-select v-model="type" clearable placeholder="全部" style="width:110px"><el-option v-for="x in TYPES" :key="x" :value="x"/></el-select></el-form-item><el-form-item><el-button type="primary" icon="Search">查询</el-button><el-button @click="owner='';kw='';source='';type=''">重置</el-button></el-form-item>
       <el-form-item style="margin-left:auto;margin-right:0"><span class="muted" style="font-size:12px">提示：可拖拽卡片到相邻阶段，或点击卡片上的「推进」；系统将校验阶段必填项，禁止跳阶段、禁止直接赢单。</span></el-form-item></el-form></div>
 
     <div v-if="view==='board'" class="kanban">
       <div class="kcol" :class="{over:overKey===s.key}" v-for="s in STAGES" :key="s.key" @dragover.prevent="overKey=s.key" @dragleave="overKey=''" @drop.prevent="onDrop(s.key)">
-        <div class="kcol-h"><b>{{ s.name }}</b><span class="cnt">{{ colCount(s.key) }}</span><span class="muted" style="margin-left:auto;font-size:12px">{{ s.key==='close' ? '本月' : '概率 '+s.prob+'%' }}</span></div>
+        <div class="kcol-h"><b>{{ s.name }}</b><span class="cnt">{{ colCount(s.key) }}</span><span class="muted" style="margin-left:auto;font-size:12px">{{ s.key==='close' ? '本月' : '阶段示意 '+s.ratio+'%' }}</span></div>
         <div class="kcol-sum">预计金额 {{ wan(colAmount(s.key)) }}</div>
         <div class="kcard" v-for="o in colCards(s.key)" :key="o.no" draggable="true" @dragstart="dragNo=o.no" @click="go('/opp/'+o.no)">
           <div class="nm">{{ o.name }}</div><div class="cu">{{ o.customer }}</div>
+          <div class="muted" style="font-size:12px;margin-top:2px">{{ o.source }} · {{ o.type }} · {{ o.contact }}</div>
           <div class="am">{{ yuan(o.amount) }}</div>
           <div class="tags" v-if="(o.flags && o.flags.stalled) || s.key==='close'">
             <el-tag v-if="o.flags && o.flags.stalled" size="small" type="warning" effect="plain">停滞 {{ o.flags.stalled }} 天</el-tag>
@@ -7496,17 +7536,20 @@ const OppsPage = {
         <div class="kmore" v-if="s.key!=='close' && colCount(s.key) > colCards(s.key).length">… 另有 {{ colCount(s.key) - colCards(s.key).length }} 个（查看全部）</div>
       </div>
     </div>
-    <div v-else class="card table-card"><el-table :data="listRows" style="width:100%">
+    <div v-else class="card table-card"><el-table :data="pagedRows" style="width:100%">
       <el-table-column type="selection" width="46"/>
       <el-table-column prop="no" label="商机编号" min-width="140"><template #default="{row}"><a class="link" @click="go('/opp/'+row.no)">{{ row.no }}</a></template></el-table-column>
-      <el-table-column prop="name" label="商机名称" min-width="230"/>
-      <el-table-column label="关联客户" min-width="220"><template #default="{row}"><a class="link" @click="$go('/customer/'+($cno(row.customer)))">{{ row.customer }}</a></template></el-table-column>
+      <el-table-column prop="name" label="商机名称" min-width="220"/>
+      <el-table-column label="关联客户" min-width="210"><template #default="{row}"><a class="link" @click="$go('/customer/'+($cno(row.customer)))">{{ row.customer }}</a></template></el-table-column>
+      <el-table-column prop="contact" label="关联联系人" min-width="110"/>
+      <el-table-column prop="source" label="商机来源" min-width="100"/>
+      <el-table-column prop="type" label="商机类型" min-width="90"/>
       <el-table-column label="预计金额" min-width="120" align="right"><template #default="{row}"><span class="money">{{ yuan(row.amount) }}</span></template></el-table-column>
       <el-table-column label="当前阶段" min-width="110"><template #default="{row}"><el-tag size="small" :type="stageTagType(row)">{{ row.stage==='close' ? row.result : stageName(row.stage) }}</el-tag></template></el-table-column>
       <el-table-column label="成交概率" min-width="130"><template #default="{row}"><el-progress :percentage="row.prob" :stroke-width="6"/></template></el-table-column>
       <el-table-column prop="date" label="预计成交日期" min-width="120"/><el-table-column prop="owner" label="负责人" min-width="80"/>
       <el-table-column label="操作" width="170" fixed="right"><template #default="{row}"><el-button link type="primary" @click="go('/opp/'+row.no)">查看</el-button><el-button link type="primary" :disabled="row.stage==='close'" @click="request(row, STAGES[STAGE_IDX[row.stage]+1].key)">推进阶段</el-button></template></el-table-column>
-    </el-table><div class="pager"><span class="batch">共 {{ listRows.length }} 条示例商机</span><el-pagination layout="prev, pager, next" :total="listRows.length" :page-size="20" background size="small"/></div></div>
+    </el-table><div class="pager"><span class="batch">共 {{ listRows.length }} 条示例商机</span><el-pagination v-model:current-page="page" layout="prev, pager, next" :total="listRows.length" :page-size="size" background size="small"/></div></div>
 
     <el-dialog v-model="gate.show" :title="'推进阶段校验 · '+(rule ? rule.title : '')" width="620px" :close-on-click-modal="false">
       <template v-if="gate.opp && rule">
@@ -11103,13 +11146,13 @@ const PZ_DOC_PC_CFG = {
 
   contacts: {
     name: '联系人列表', module: '联系人管理',
-    goal: '统一管理全部客户联系人档案：按所属客户、角色、影响力、态度和关键决策人筛选，查看姓名、电话、邮箱、部门、职务与决策链信息，并支持新增、编辑、删除和跳转详情，为销售维护客户组织关系与决策链提供基础数据。',
+    goal: '统一管理全部客户联系人档案：按所属客户、联系人角色、影响力、对我方态度和关键联系人筛选，查看姓名、电话、邮箱、部门、职务与决策链信息，并支持新增、编辑、删除和跳转详情，为销售维护客户组织关系与决策链提供基础数据（规划方案 5.4 联系人管理）。',
     roles: [
-      '菜单：销售、销售经理、管理员均可通过「联系人管理 → 联系人列表」进入本页。',
-      '按钮：销售可新增、编辑、删除本人权限范围内客户联系人；销售经理可维护团队联系人；管理员拥有全量操作。',
-      '数据：销售仅能看到本人负责客户及协同客户下的联系人，经理看到本部门及下级，管理员看到全部。',
-      '字段：联系电话默认脱敏展示，完整号码需在详情页申请查看并记录访问日志；邮箱与生日按字段权限控制。',
-      '数据：删除联系人属于数据维护操作，仅本人或有管理权限的角色可执行，且必须二次确认并写入操作日志。'
+      '菜单：销售、销售经理、管理员均可通过「联系人管理 → 联系人列表」进入本页，市场/客服等角色按授权查看。',
+      '按钮：新增、编辑、删除、导入、导出按按钮权限控制；销售可维护本人权限范围内客户联系人，销售经理可维护团队联系人，管理员拥有全量操作（第三章）。',
+      '数据：销售仅能看到本人负责客户及协同客户下的联系人，经理看到本部门及下级，总监看所辖部门，管理员看到全部；跨部门越权查询被拦截并记录安全日志（第三章、第十二章）。',
+      '字段：联系电话默认脱敏展示，完整号码需在详情页按字段权限查看并记录访问日志；邮箱与生日按字段权限控制（第三章）。',
+      '数据：删除联系人属于数据维护操作，仅本人或有管理权限的角色可执行，且必须二次确认并写入操作日志；重要数据优先作废/归档而不是物理删除（4.3）。'
     ],
     enter: [
       '入口：左侧导航「联系人管理 → 联系人列表」，路由 /contacts。',
@@ -11118,58 +11161,149 @@ const PZ_DOC_PC_CFG = {
     ],
     layout: [
       '顶部：面包屑「联系人管理 / 联系人列表」、联系人总数与来源说明。',
-      '统计卡：联系人总数（标注来自多少家客户）、关键决策人、支持者、反对者四张卡。',
-      '筛选区：关键词、所属客户、联系人角色、影响力、对我方态度、关键决策人六个条件，支持查询与重置。',
-      '操作区与表格：新增联系人、导入、导出按钮；表格含姓名、客户、电话、邮箱、部门、职务、角色、影响力、态度、联系偏好、关键决策人及编辑/详情/删除操作。',
+      '统计卡：联系人总数（标注来自多少家客户）、关键联系人、支持者、反对者四张卡，数字由 store.ext.contacts 实时计算。',
+      '筛选区：关键词、所属客户、联系人角色、影响力、对我方态度、关键联系人六个条件，支持查询与重置。',
+      '操作区与表格：新增联系人、导入、导出按钮；表格含联系人姓名、所属客户、联系电话、电子邮箱、部门、职务、联系人角色、影响力、对我方态度、联系偏好、关键联系人及编辑/详情/删除操作。',
       '详情抽屉与新增编辑弹窗：抽屉快速查看字段，弹窗分两列维护联系人完整档案，底部显示最近操作日志。'
     ],
     fields: [
-      '联系人姓名｜类型：文本｜必填：是｜校验：非空，失焦触发｜说明：联系人主标识，列表与详情标题展示。',
-      '所属客户｜类型：客户选择（可搜索）｜必填：是｜校验：必须选择有效客户，变更触发校验｜说明：决定联系人归属与数据权限。',
-      '联系电话｜类型：文本｜必填：是｜校验：以数字开头且仅允许数字、星号和短横线｜说明：列表默认脱敏，详情可申请查看完整号码。',
-      '电子邮箱｜类型：文本｜必填：否｜校验：符合邮箱格式｜说明：用于邮件触达与通知。',
-      '联系人角色｜类型：枚举（决策人/使用人/采购人/财务/技术）｜必填：是｜校验：五选一｜说明：决策人标签在列表以红色强调。',
-      '影响力｜类型：枚举（高/中/低）｜必填：是｜校验：三选一｜说明：关系图中高影响力节点更大。',
-      '对我方态度｜类型：枚举（支持者/中立/反对者）｜必填：是｜校验：三选一｜说明：关系图按态度着色，支持者绿色、中立蓝色、反对者红色。',
-      '联系偏好｜类型：枚举（电话/微信/邮件）｜必填：否｜校验：三选一｜说明：指导销售选择触达方式。',
-      '汇报对象｜类型：客户内联系人选择｜必填：否｜校验：只能选择同客户其他联系人｜说明：用于生成客户内部决策链与组织关系树。',
-      '关键决策人｜类型：布尔开关｜必填：是｜校验：是/否｜说明：统计卡与关系图决策链的核心依据。',
-      '负责人｜类型：人员选择｜必填：否｜校验：必须为有效销售人员｜说明：联系人协同维护责任人，默认张三。',
-      '备注｜类型：多行文本｜必填：否｜校验：长度不超过 500 字｜说明：记录沟通偏好、禁忌与背景信息。'
+      '联系人姓名｜类型：文本｜必填：是｜校验：非空，失焦触发｜说明：联系人主标识，列表与详情标题展示（5.4 联系人姓名）。',
+      '所属客户｜类型：客户选择（可搜索）｜必填：是｜校验：必须选择有效客户，变更触发校验｜说明：关联客户，决定联系人归属与数据权限（5.4 所属客户）。',
+      '联系电话｜类型：文本（手机或座机）｜必填：是｜校验：以数字开头且仅允许数字、星号和短横线，手机或座机均可｜说明：列表默认脱敏，详情按字段权限查看完整号码（5.4 联系电话）。',
+      '电子邮箱｜类型：文本｜必填：否｜校验：符合邮箱格式｜说明：用于邮件触达与通知（5.4 电子邮箱）。',
+      '部门｜类型：文本｜必填：否｜校验：长度不超过 50 字｜说明：所属部门，关系图与决策链判断依据（5.4 部门）。',
+      '职务｜类型：文本｜必填：否｜校验：长度不超过 50 字｜说明：岗位，列表与关系图节点展示（5.4 职务）。',
+      '联系人角色｜类型：枚举（决策人/使用人/采购人/财务/技术）｜必填：是｜校验：五选一，与规划方案枚举一致｜说明：决策人标签在列表以红色强调，并决定决策链位置（5.4 联系人角色）。',
+      '影响力｜类型：枚举（高/中/低）｜必填：是｜校验：三选一｜说明：关系图中高影响力节点更大（5.4 影响力）。',
+      '联系偏好｜类型：枚举（电话/微信/邮件）｜必填：否｜校验：三选一，后续可扩展更多渠道｜说明：指导销售选择触达方式（5.4 联系偏好）。',
+      '关键联系人｜类型：布尔开关｜必填：是｜校验：是/否｜说明：是否为关键决策联系人，统计卡与关系图决策链的核心依据（5.4 关键联系人）。',
+      '备注｜类型：多行文本｜必填：否｜校验：长度不超过 500 字｜说明：其他信息、沟通禁忌与关系备注（5.4 备注）。',
+      '对我方态度｜类型：枚举（支持者/中立/反对者）｜必填：是｜校验：三选一｜说明：关系图按态度着色，支持者绿色、中立蓝色、反对者红色（5.4 关系图要求）。',
+      '汇报对象｜类型：客户内联系人选择｜必填：否｜校验：只能选择同客户其他联系人｜说明：用于生成客户内部决策链与组织关系树（5.4 关系图要求）。',
+      '负责人｜类型：人员选择｜必填：否｜校验：必须为有效销售人员｜说明：联系人协同维护责任人，默认张三；与客户主负责人配合防止重复联系（第十二章「同一客户多人跟进」）。',
+      '其他任职关系｜类型：动态列表（客户或组织 + 部门 + 职务）｜必填：否｜校验：同一联系人可关联多个客户或组织，但每条任职关系必须记录具体客户/组织、部门与职务｜说明：规划方案 5.4 要求支持一个联系人服务多个客户；原型当前以所属客户为主关联，多任职关系见本节「未实现」说明。'
     ],
     rules: [
-      '列表由通用 ListPage 渲染，筛选为前端即时过滤：关键词在整行字符串中模糊匹配，其余条件精确匹配，点击查询后回到第 1 页，分页为真实切片。',
-      '新增与编辑共用同一表单与校验规则，保存成功后直接写回 store.ext.contacts，并立即反映到列表、所属客户详情联系人和客户关系图。',
+      '列表由通用 ListPage 渲染，筛选为前端即时过滤：关键词在整行字符串中模糊匹配，其余条件精确匹配，点击查询后回到第 1 页，分页为真实切片（4.2）。',
+      '新增与编辑共用同一表单与校验规则，必填项标星，保存前校验格式及必填项，保存成功后直接写回 store.ext.contacts，并立即反映到列表、所属客户详情联系人和客户关系图（4.3）。',
       '新增时自动生成 LX 开头六位联系人编号；编辑时保留原编号、创建信息与汇报关系。',
-      '删除前弹出确认框，说明会同步清理其汇报关系并记录日志；确认后从联系人数组移除，并把其他联系人的汇报对象指向该编号的字段清空。',
-      '每次新增、编辑、删除都会写入最近操作日志，展示操作时间、操作人、操作类型和联系人加客户名称。',
-      '导入与导出当前为示例提示，正式版导入需按手机号和姓名查重并反馈错误行，导出需按字段权限脱敏。'
+      '同一个联系人可关联多个客户或组织，但必须记录具体任职关系；客户内部关系图标注决策链、支持者、反对者和实际使用者（5.4）。',
+      '删除前弹出确认框，说明会同步清理其汇报关系并记录日志；确认后从联系人数组移除，并把其他联系人的汇报对象指向该编号的字段清空；重要业务对象优先作废/归档并保留历史（4.3）。',
+      '每次新增、编辑、删除都会写入操作日志 store.ext.logs（模块：联系人），展示操作时间、操作人、操作类型和联系人加客户名称，联系人详情与系统日志均可查询。',
+      '导入与导出当前为示例提示，正式版导入需按手机号和姓名查重，返回错误行号、字段和原因，不静默丢数据；导出需按字段权限脱敏（第十二章「数据导入失败」、第十四章「导入导出」）。'
     ],
     flow: [
-      '联系人角色状态：决策人、使用人、采购人、财务、技术，角色决定其在决策链中的位置，决策人可拥有多个下属联系人。',
+      '联系人角色：决策人、使用人、采购人、财务、技术；角色决定其在决策链中的位置，决策人可拥有多个下属联系人，实际使用者单独标注（5.4）。',
       '对我方态度流转：中立 → 沟通推进 → 支持者或反对者；态度变化直接影响关系图节点颜色与支持者、反对者统计。',
-      '关键决策人标记：否 → 是；标记后参与统计卡与决策链生成，取消后从关键决策人名单移除。',
-      '组织关系流转：通过汇报对象建立父子关系，顶层联系人无汇报对象，客户详情组织关系树和关系图据此生成。'
+      '关键联系人标记：否 → 是；标记后参与统计卡与决策链生成，取消后从关键联系人名单移除。',
+      '组织关系流转：通过汇报对象建立父子关系，顶层联系人无汇报对象，客户详情组织关系树和关系图据此生成；支持者/反对者/实际使用者按态度与角色标注。',
+      '联系人所属客户变更时保留原任职关系与历史沟通记录，新客户联系人列表和关系图即时刷新。'
     ],
     errors: [
-      '姓名、所属客户、电话或角色未填：表单校验拦截并提示对应字段，弹窗保持打开。',
+      '姓名、所属客户、联系电话或联系人角色未填：表单校验拦截并提示对应字段，弹窗保持打开（4.3）。',
       '电话格式不符合数字、星号、短横线规则或邮箱格式错误：阻止保存并在字段下方提示。',
+      '重复录入联系人（同一客户下姓名/手机号重复）：提示关联已有联系人、合并或确认新建，不静默产生重复档案（第十二章「重复录入客户」同类场景）。',
+      '同一客户多人跟进：以客户主负责人 + 协同负责人约束联系人维护，列表与详情展示负责人，避免重复联系（第十二章「同一客户多人跟进」）。',
       '删除联系人时用户取消：不执行删除，汇报关系与日志均不变化。',
       '联系人已被其他页面删除或编号不存在：详情页显示「未找到该联系人」空态并提供返回列表按钮。',
-      '无权限维护他人客户联系人：编辑和删除按钮应置灰并提示联系管理员，原型通过角色演示。'
+      '无权限维护他人客户联系人：编辑和删除按钮应置灰并提示联系管理员，越权操作后端拦截并记录安全日志（第三章、第十二章「用户越权操作」）。',
+      '导入文件字段缺失或格式错误：返回错误行号、字段和原因，已成功行不受影响，不静默丢数据（第十二章「数据导入失败」）。'
     ],
     api: [
-      '联系人分页查询接口：支持关键词、客户、角色、影响力、态度、关键决策人筛选并返回真实总数。',
+      '联系人分页查询接口：支持关键词、客户、角色、影响力、态度、关键联系人筛选并返回真实总数。',
       '联系人新增、编辑、删除接口：删除时在同一事务中清理汇报关系并写入审计日志。',
-      '联系人详情与关系图查询接口：返回基本信息、所属客户、关联商机、跟进活动和客户内部关系节点边。',
-      '操作日志查询接口：按联系人编号或客户名称反查最近的维护记录。'
+      '联系人详情与关系图查询接口：返回个人信息、所属客户、任职关系、关联商机、历史沟通、关系备注、关系节点边和操作日志。',
+      '操作日志查询接口：按联系人编号或客户名称反查最近的维护记录。',
+      '联系人导入接口：返回成功条数以及失败行的行号、字段与原因（示例）。'
     ],
     accept: [
-      '六个筛选条件均可用，查询与重置后列表、统计卡和分页总数同步变化，单页行数不超过总数。',
-      '新增联系人保存后立即出现在列表和所属客户联系人 Tab，编号自动生成且唯一。',
-      '手机号、邮箱、必填项校验均能拦截非法输入，合法数据可正常保存。',
-      '删除联系人后列表不再显示，原下属联系人的汇报对象被清空，并新增一条操作日志。',
-      '点击姓名、所属客户、详情和编辑按钮均能正确跳转或打开弹窗，页面无控制台报错。'
+      '第十四章「联系人：联系人能关联客户并查看互动历史」：新增联系人可选择所属客户，保存后可在联系人列表与所属客户详情中看到，且互动历史可查询。',
+      '六个筛选条件均可用，查询与重置后列表、统计卡和分页总数同步变化，单页行数不超过总数，无假总数。',
+      '联系人角色仅能选择决策人/使用人/采购人/财务/技术，影响力仅能选择高/中/低，联系偏好仅能选择电话/微信/邮件；关键联系人开关可在列表与详情正确展示。',
+      '手机号/座机格式、邮箱、必填项校验均能拦截非法输入，合法数据可正常保存。',
+      '删除联系人后列表不再显示，原下属联系人的汇报对象被清空，并新增一条可查询的操作日志。',
+      '点击姓名、所属客户、详情和编辑按钮均能正确跳转或打开弹窗，页面无控制台报错。',
+      '第十四章重点场景「从新增线索开始，完整转化为客户、联系人和商机」：线索转化生成的联系人能在本列表按所属客户检索到，并可进入详情查看互动历史。'
+    ]
+  },
+
+  'contact-detail': {
+    name: '联系人详情', module: '联系人管理',
+    goal: '呈现单个联系人的完整档案：个人信息、所属客户与任职关系、参与商机、历史沟通、关系备注和操作日志，并通过客户内部关系图（决策链、支持者、反对者、实际使用者、影响力）支撑销售对组织决策链路的判断与关系维护（规划方案 5.4）。',
+    roles: [
+      '菜单：从联系人列表、客户详情联系人或关系图节点进入本页，销售、销售经理、管理员按数据权限访问。',
+      '按钮：负责人可编辑联系人、修改对我方态度、维护内部关系；销售同事只读；管理员可全量维护与关系数据修正（第三章）。',
+      '数据：销售仅能查看本人负责客户及协同客户下的联系人，经理查看本部门及下级，管理员查看全部；越权访问被拦截并记录安全日志（第三章、第十二章）。',
+      '字段：联系电话、邮箱、生日按字段权限脱敏或隐藏，查看完整号码需申请并记录访问日志（第三章）。'
+    ],
+    enter: [
+      '入口：联系人列表点击联系人姓名进入 /contact/:no。',
+      '关联入口：客户详情「联系人」Tab 的联系人行「查看」；客户内部关系图点击节点跳转。',
+      '返回：面包屑「联系人管理 / 联系人列表 / 联系人姓名」可返回列表；所属客户名称链接进入 /customer/:no。'
+    ],
+    layout: [
+      '头部：姓名 + 联系人角色/对我方态度/关键联系人标签 + 联系人编号、所属客户链接、负责人；操作区含维护关系、编辑。',
+      '基本信息卡：联系人姓名、部门、职务、联系人角色、联系电话、电子邮箱、联系偏好、生日、对我方态度、关键联系人、汇报对象、关系备注。',
+      '客户内部关系图：节点按态度着色、按影响力定大小，边含汇报/影响/支持/反对/合作，并展示决策链、支持者名单、反对者名单与实际使用者。',
+      '关联业务区：参与商机（所属客户商机）与历史沟通记录（跟进活动）。',
+      '操作日志：展示该联系人及所属客户联系人维护记录的时间、操作人、操作类型与详情。'
+    ],
+    fields: [
+      '联系人姓名｜类型：文本｜必填：是｜校验：非空｜说明：详情标题与关系图节点名称（5.4 联系人姓名）。',
+      '所属客户｜类型：客户选择（只读链接）｜必填：是｜校验：必须为有效客户｜说明：关联客户，可点击进入客户详情（5.4 所属客户）。',
+      '联系电话｜类型：文本（手机或座机）｜必填：是｜校验：以数字开头且仅允许数字、星号和短横线｜说明：按字段权限展示，完整号码访问记录日志（5.4 联系电话）。',
+      '电子邮箱｜类型：文本｜必填：否｜校验：符合邮箱格式｜说明：邮件触达与通知（5.4 电子邮箱）。',
+      '部门｜类型：文本｜必填：否｜校验：长度不超过 50 字｜说明：所属部门，组织关系判断依据（5.4 部门）。',
+      '职务｜类型：文本｜必填：否｜校验：长度不超过 50 字｜说明：岗位，决策链与关系图展示（5.4 职务）。',
+      '联系人角色｜类型：枚举（决策人/使用人/采购人/财务/技术）｜必填：是｜校验：五选一｜说明：决定决策链位置，实际使用者单独标注（5.4 联系人角色）。',
+      '影响力｜类型：枚举（高/中/低）｜必填：是｜校验：三选一｜说明：关系图节点大小依据（5.4 影响力）。',
+      '联系偏好｜类型：枚举（电话/微信/邮件）｜必填：否｜校验：三选一｜说明：指导销售选择触达方式（5.4 联系偏好）。',
+      '关键联系人｜类型：布尔开关｜必填：是｜校验：是/否｜说明：是否为关键决策联系人，头部标签与决策链核心依据（5.4 关键联系人）。',
+      '备注｜类型：多行文本｜必填：否｜校验：长度不超过 500 字｜说明：其他信息与关系备注（5.4 备注）。',
+      '对我方态度｜类型：枚举（支持者/中立/反对者）｜必填：是｜校验：三选一｜说明：关系图着色与支持者/反对者名单依据（5.4 关系图要求）。',
+      '汇报对象｜类型：客户内联系人选择｜必填：否｜校验：只能选择同客户其他联系人｜说明：生成决策链与组织关系树（5.4 关系图要求）。',
+      '负责人｜类型：人员选择｜必填：否｜校验：有效销售人员｜说明：联系人维护责任人，与客户主负责人配合防止重复联系（第十二章）。',
+      '其他任职关系｜类型：动态列表（客户或组织 + 部门 + 职务）｜必填：否｜校验：每条任职关系必须记录具体客户/组织、部门与职务｜说明：规划方案 5.4 要求一个联系人可关联多个客户或组织；原型当前仅展示所属客户，多任职关系见本节「未实现」说明。'
+    ],
+    rules: [
+      '关系图数据实时取自该客户全部联系人，修改态度后图与支持者/反对者名单即时刷新（5.4）。',
+      '决策链按「汇报对象」从决策人向下逐级生成；客户无决策人时回退为按汇报关系的顶层联系人（5.4）。',
+      '新增关系（汇报）会写回联系人的汇报对象字段；影响/支持/反对/合作等关系写入扩展关系边并同步呈现（5.4）。',
+      '关联商机展示该联系人所属客户的全部商机，可点击商机编号进入详情；历史沟通按联系人姓名与所属客户过滤，按时间倒序展示（5.4 联系人详情）。',
+      '关系备注保存在联系人备注字段，编辑后详情与关系图说明同步更新；所有新增、编辑、态度与关系变更写入操作日志（4.3）。',
+      '同一联系人可关联多个客户或组织并记录任职关系，主关联客户决定数据权限；跨客户任职关系需保留各自部门与职务（5.4）。'
+    ],
+    flow: [
+      '对我方态度：中立 →（沟通推进）→ 支持者 / 反对者；图与名单即时联动，支持者/反对者统计同步变化（5.4）。',
+      '关系角色：决策人 → 使用人/采购人/财务/技术逐级汇报；关系图标注决策链、支持者、反对者和实际使用者（5.4）。',
+      '关键联系人：否 → 是，标记后进入关键联系人名单并影响决策链展示；取消后移出名单。',
+      '任职关系：主客户任职 → 新增其他客户/组织任职 → 记录部门与职务；查询详情时按客户展示对应任职关系（5.4）。'
+    ],
+    errors: [
+      '联系人不存在或已被删除：显示「未找到该联系人（可能已被删除或编号输错）」空态并提供返回列表按钮。',
+      '无权限查看该联系人：拦截访问并提示无权限，后端记录安全日志（第三章、第十二章「用户越权操作」）。',
+      '所属客户无其他联系人：关系图与决策链显示空态，不报错，可提示从客户详情新增联系人。',
+      '客户无决策人：决策链回退为按汇报关系的顶层联系人，并在关系图提示补充决策人（5.4）。',
+      '修改态度或新增关系时两个联系人相同：拦截并提示不能相同；汇报关系不能跨客户建立（5.4）。',
+      '联系人所需商机/跟进数据缺失：对应卡片显示空态，不影响基本信息与关系图渲染（第十二章半成品数据提示）。',
+      '重复录入联系人：提示关联、合并或确认新建，不静默产生重复档案（第十二章「重复录入客户」同类场景）。'
+    ],
+    api: [
+      '联系人详情查询接口：返回个人信息、所属客户、任职关系、部门、职务、关键联系人标记与负责人。',
+      '客户内部关系图查询接口：返回该客户全部联系人节点、汇报/影响/支持/反对/合作边、决策链与支持者/反对者名单。',
+      '态度更新与关系新增接口：写回联系人态度或汇报对象/扩展关系边，并写入操作日志。',
+      '关联商机与历史沟通查询接口：按联系人姓名与所属客户返回商机、跟进活动（示例）。',
+      '联系人操作日志查询接口：按联系人编号返回时间、操作人、操作类型与详情。'
+    ],
+    accept: [
+      '第十四章「联系人：联系人能关联客户并查看互动历史」：详情页正确显示所属客户，并可查看该联系人的历史沟通记录与参与商机。',
+      '关系图节点按对我方态度区分支持者/中立/反对者颜色，按影响力区分节点大小，并显示决策链、支持者名单、反对者名单。',
+      '点击关系图节点可跳转对应联系人详情；修改态度或新增关系后写回 store 并即时刷新图、名单与统计。',
+      '头部展示关键联系人、联系人角色、影响力标签，联系人角色枚举与规划方案 5.4 一致（决策人/使用人/采购人/财务/技术）。',
+      '操作日志区可查询到该联系人的新增、编辑、态度与关系变更记录，包含操作人和时间（第十四章「操作日志」）。',
+      '联系人编号不存在时显示空态并可返回列表，页面无控制台报错。',
+      '第十四章重点场景「从新增线索开始，完整转化为客户、联系人和商机」：转化生成的联系人详情可关联所属客户、商机与沟通历史。',
+      '第十四章重点场景「不同部门尝试查看彼此的客户数据，验证数据权限」：无权限联系人不可见或被拦截，敏感字段按权限脱敏。'
     ]
   },
 
@@ -11500,8 +11634,8 @@ const PZ_DOC_PC_CFG = {
       '菜单：销售经理可查看团队全部商机并调整阶段，管理员可查看全量数据。',
       '按钮：销售拥有推进阶段和查看详情；经理额外可调整负责人与处理停滞商机；新建商机按钮对销售开放。',
       '数据：销售数据范围为本人的商机，经理为本部门及下级，管理员为全部；看板列统计按全量商机计算。',
-      '字段：预计金额、成交概率、客户名称、负责人、停滞天数可见，成本与毛利等敏感字段不在看板展示。',
-      '数据：商机关闭后归档，不物理删除；输单必须记录原因，阶段变更保留历史。'
+      '字段：预计金额、成交概率、客户名称、负责人、停滞天数、商机来源与类型可见，成本与毛利等敏感字段不在看板展示。',
+      '数据：商机关闭后归档，不物理删除；输单必须记录原因与竞争对手（适用时），阶段变更保留历史。'
     ],
     enter: [
       '入口：左侧导航「商机管理 → 商机看板」，路由 /opps。',
@@ -11511,48 +11645,63 @@ const PZ_DOC_PC_CFG = {
     layout: [
       '顶部：面包屑「商机管理 / 商机看板」、跟进中商机总数、看板/列表视图切换和新建商机按钮。',
       '统计卡：跟进中商机、商机预计金额、本月预计成交、停滞商机、已赢单/已输单五张卡。',
-      '筛选区：关键词按商机名称、客户、编号模糊搜索，负责人下拉精确定位，支持查询与重置。',
-      '看板区：六列分别为初步接触、需求确认、方案沟通、报价谈判、商务审批、赢单/输单，每列显示数量、预计金额合计和商机卡片。',
+      '筛选区：关键词按商机名称、客户、编号、联系人和主要需求模糊搜索，负责人、商机来源、商机类型下拉筛选，支持查询与重置。',
+      '看板区：六列分别为初步接触、需求确认、方案沟通、报价谈判、商务审批、赢单/输单，每列显示数量、阶段示意比例、预计金额合计和商机卡片。',
       '推进弹窗：展示当前阶段到目标阶段、阶段门必填字段、系统检查项、成交结果（赢单/输单）和变更备注。'
     ],
     fields: [
-      '商机编号｜类型：文本｜必填：是｜校验：全局唯一，格式 SJ-年月-序号｜说明：点击卡片或编号进入商机详情。',
-      '商机名称｜类型：文本｜必填：是｜校验：非空｜说明：看板卡片主标题。',
-      '关联客户｜类型：客户选择｜必填：是｜校验：必须关联有效客户｜说明：卡片副标题展示客户名称。',
-      '预计金额｜类型：货币｜必填：是｜校验：大于 0｜说明：卡片和列汇总按金额展示，已结束商机不进入跟进中合计。',
-      '当前阶段｜类型：枚举（contact/need/plan/quote/approve/close）｜必填：是｜校验：必须为阶段枚举｜说明：决定商机所在看板列与成交概率。',
-      '成交概率｜类型：百分比｜必填：是｜校验：随阶段自动映射 10/25/45/65/85/100｜说明：阶段推进后自动更新，不可手工乱填。',
-      '预计成交日期｜类型：日期｜必填：是｜校验：合理业务日期｜说明：用于本月预计成交统计与漏斗周期筛选。',
-      '负责人｜类型：人员｜必填：是｜校验：有效销售人员｜说明：卡片底部展示负责人，支持按负责人筛选。',
-      '客户需求｜类型：多行文本｜必填：进入需求确认时必填｜校验：非空｜说明：阶段门字段，记录客户核心需求。',
-      '采购时间｜类型：日期｜必填：进入需求确认时必填｜校验：非空｜说明：阶段门字段，评估成交周期。',
-      '预算范围｜类型：文本｜必填：进入需求确认时必填｜校验：非空｜说明：如 30 至 40 万元，辅助判断商机质量。',
-      '方案说明/参与联系人｜类型：多行文本/联系人选择｜必填：进入方案沟通时必填｜校验：非空｜说明：记录方案要点和客户参与角色。',
-      '商务条件/审批材料｜类型：多行文本/选择｜必填：进入商务审批时必填｜校验：非空｜说明：付款方式、交付周期、折扣依据和审批附件。',
-      '输单原因｜类型：枚举（价格偏高/功能不满足/竞品中标/客户预算取消/项目延期）｜必填：输单时必填｜校验：五选一｜说明：写回商机并用于赢输分析。',
-      '竞争对手｜类型：文本｜必填：否｜校验：无｜说明：输单时补充竞品信息。'
+      '商机编号｜自动编号｜必填：是｜校验：全局唯一，格式 SJ-年月-序号｜说明：点击卡片或编号进入商机详情。',
+      '商机名称｜文本｜必填：是｜校验：非空，建议包含客户与项目关键词｜说明：看板卡片主标题。',
+      '关联客户｜关联对象｜必填：是｜校验：必须关联有效客户，不允许空值｜说明：卡片副标题展示客户名称，点击可进入客户详情。',
+      '关联联系人｜关联对象｜必填：是｜校验：须为该客户下的联系人，作为主要对接人｜说明：卡片展示主要对接人，详情页「关联联系人」Tab 查看决策链。',
+      '商机来源｜下拉框｜必填：是｜校验：线索/客户转介绍/官网/渠道/活动/广告等配置枚举｜说明：用于来源转化分析。',
+      '商机类型｜下拉框｜必填：是｜校验：新购/续费/增购等配置枚举｜说明：用于新购与存量业务区分。',
+      '预计金额｜金额｜必填：是｜校验：大于 0，单位为元｜说明：卡片和列汇总按金额展示，已结束商机不进入跟进中合计。',
+      '成交概率｜百分比｜必填：是｜校验：0 至 100，按阶段或人工配置｜说明：阶段推进后按阶段默认值更新；阶段示意比例 100%/80%/60%/40%/25%/15% 仅表示阶段顺序，不代表实际销售转化率。',
+      '预计成交日期｜日期｜必填：是｜校验：有效业务日期｜说明：用于本月预计成交统计与漏斗周期筛选。',
+      '当前阶段｜下拉框｜必填：是｜校验：初步接触/需求确认/方案沟通/报价谈判/商务审批/赢单/输单｜说明：决定商机所在看板列；已关闭商机以赢单或输单结果展示。',
+      '竞争对手｜文本/关联｜必填：否｜校验：输单时适用则填写｜说明：记录竞争品牌、竞争态势和应对策略，详情页单独展示竞争对手分析。',
+      '主要需求｜多行文本｜必填：否（进入需求确认阶段必填）｜校验：非空｜说明：记录客户核心需求，阶段门字段，支撑方案与报价。',
+      '负责人｜用户｜必填：是｜校验：在职销售人员｜说明：卡片底部展示负责人，支持按负责人筛选。',
+      '输赢单原因｜下拉框｜必填：输单时必填，赢单可选｜校验：价格偏高/功能不满足/竞品中标/客户预算取消/项目延期等配置枚举｜说明：成功或失败原因写回商机，用于赢输分析与复盘。',
+      '客户需求｜多行文本｜必填：进入需求确认时必填｜校验：非空｜说明：6.3 阶段控制点，需求确认阶段必须填写。',
+      '采购时间｜日期｜必填：进入需求确认时必填｜校验：非空｜说明：6.3 阶段控制点，评估成交周期。',
+      '预算范围｜文本｜必填：进入需求确认时必填｜校验：非空｜说明：如 30 至 40 万元，辅助判断商机质量。',
+      '方案说明｜多行文本｜必填：进入方案沟通时必填｜校验：非空｜说明：记录方案要点和交付范围。',
+      '参与沟通的联系人｜联系人选择｜必填：进入方案沟通时必填｜校验：须为该客户下的联系人｜说明：记录客户参与角色与决策链。',
+      '有效报价单｜关联对象｜必填：进入报价谈判时必填｜校验：必须存在已通过审批且在有效期内的报价单｜说明：报价谈判阶段必须有关联有效报价。',
+      '商务条件｜多行文本｜必填：进入商务审批时必填｜校验：非空｜说明：付款方式、交付周期、服务期限和折扣依据。',
+      '审批材料｜附件选择｜必填：进入商务审批时必填｜校验：非空｜说明：报价单、折扣说明、客户意向函等审批材料。',
+      '成交证明｜关联对象｜必填：赢单时必填｜校验：合同已审批或订单已确认｜说明：企业配置的成交条件，禁止直接标记赢单。'
     ],
     rules: [
       '拖拽或点击推进时先比较当前阶段与目标阶段索引：相同则不处理，目标为关闭后阶段则禁止，目标小于当前则提示不支持直接回退，跨度大于一级则报错并提示下一阶段名称。',
-      '进入需求确认、方案沟通、商务审批分别校验需求、方案、商务条件等必填字段；未填项在弹窗中逐项标红并阻止推进。',
-      '进入报价谈判前系统检查 hasQuote 标志，进入赢单前系统检查 contractApproved 标志；未满足时显示「未满足」原因和「前往处理」跳转。',
-      '赢单和输单必须通过同一关闭阶段门：赢单需合同已审批或订单已确认，输单需选择输单原因，竞争对手为可选补充。',
-      '推进成功后写回阶段、成交概率、阶段信息与变更历史，历史包含变更前后阶段、操作人、时间和备注；关闭时写回赢单或输单结果。',
+      '进入需求确认、方案沟通、商务审批分别校验客户需求、采购时间、预算范围、方案说明、参与联系人、商务条件、审批材料等必填字段；未填项在弹窗中逐项标红并阻止推进。',
+      '进入报价谈判前系统检查是否存在有效报价单，进入赢单前系统检查 contractApproved（合同已审批或订单已确认）；未满足时显示「未满足」原因和「前往处理」跳转。',
+      '赢单和输单必须通过同一关闭阶段门：赢单需满足企业配置的成交条件，输单需选择输单原因，竞争对手在适用时填写。',
+      '每次阶段变更必须保留变更前后阶段、变更人、变更时间和备注；推进成功后写回阶段、成交概率、阶段信息与变更历史。',
+      '禁止将商机直接标记为赢单；禁止跳阶段推进，回退需提交「阶段回退」申请并填写原因。',
+      '超过 7 天未推进的商机标记为停滞并自动提醒负责人与销售经理，支持经理介入（规划方案第十二章「商机长时间停滞」）。',
       '看板列的数量和金额汇总取全部商机而非当前筛选结果，筛选只影响每列展示的卡片；卡片超出时提示另有数量并引导查看全部。',
       '点击卡片进入详情，点击卡片内「推进」按钮阻止冒泡，避免误跳转；拖拽放置后触发同一套阶段门校验。'
     ],
     flow: [
-      '阶段主流程：初步接触 10% → 需求确认 25% → 方案沟通 45% → 报价谈判 65% → 商务审批 85% → 赢单/输单。',
-      '推进规则：只能推进到相邻下一阶段，不支持直接回退或跳阶段；需要回退时必须提交阶段回退申请并填写原因。',
-      '关闭流转：商务审批 → 赢单或输单；赢单概率置 100，输单概率置 0，输单原因写入商机并进入赢输分析。',
-      '阶段门条件：需求确认需客户需求、采购时间、预算范围；方案沟通需方案说明、参与联系人；报价谈判需有效报价；商务审批需商务条件和审批材料。',
-      '停滞与归档：超过 7 天未推进标记停滞并提醒负责人与经理；已关闭商机归档后不能再推进。'
+      '阶段主流程：初步接触 → 需求确认 → 方案沟通 → 报价谈判 → 商务审批 → 赢单/输单；阶段示意比例依次为 100%/80%/60%/40%/25%/15%，仅表示阶段顺序，不代表实际转化率。',
+      '阶段进入/退出条件：初步接触需有明确潜在客户，退出时客户需求初步明确；需求确认需客户表达需求，退出时需求得到确认；方案沟通需有初步方案，退出时客户认可方案方向。',
+      '报价谈判需产品与范围基本明确，退出时报价达成基本一致；商务审批需接近签约，退出时商务条件确认；赢单需满足成交条件，输单需明确不再推进并记录原因和竞争对手（适用时）。',
+      '阶段推进只能进入相邻下一阶段，不支持直接回退或跳阶段；需要回退时必须提交阶段回退申请并填写原因。',
+      '关闭流转：商务审批 → 赢单或输单；赢单概率置 100，输单概率置 0，输赢单原因写入商机并进入赢输分析，已关闭商机归档后不能再推进。',
+      '阶段规则应支持后台配置，阶段、必填项和成交条件不在程序写死；成交概率按阶段或人工配置。'
     ],
     errors: [
       '拖拽跨越多个阶段：阻止变更并明确提示当前阶段和目标阶段，告知下一阶段应为哪一个。',
       '尝试回退阶段：提示暂不支持直接回退，需提交阶段回退申请并填写原因。',
       '已关闭商机再次推进：提示该商机已结束并归档，不能再推进。',
       '阶段门必填项缺失或系统检查未通过：弹窗显示红色错误和未满足原因，禁止确认推进。',
+      '商机长时间停滞：系统按规则自动提醒负责人与经理，支持经理介入；原型以停滞标签和提醒文案演示。',
+      '报价审批被拒绝：保存拒绝原因，修改报价后重新提交；已审批报价修改必须生成新版本，不得覆盖原批准内容。',
+      '合同审批后修改：按合同变更规则重新审批；未审批通过不得作为赢单成交证明。',
+      '用户越权推进或查看他人商机：按钮置灰并提示，正式版后端拦截并记录安全日志。',
       '拖拽到同一阶段或空放置：不做任何数据变更，不产生错误提示和历史记录。',
       '并发修改同一商机：正式版需版本号或锁校验并提示刷新，原型为单用户即时写回。'
     ],
@@ -11560,27 +11709,28 @@ const PZ_DOC_PC_CFG = {
       '商机看板查询接口：按阶段返回商机列表，并返回每列数量与金额汇总。',
       '阶段推进接口：提交目标阶段、阶段门字段和变更备注，服务端再次执行必填与系统条件校验。',
       '阶段门检查接口：返回目标阶段必填字段、系统检查项及是否满足，供前端渲染推进弹窗。',
-      '商机详情接口：返回商机基础信息、阶段信息、历史记录与关联报价合同，用于卡片跳转。'
+      '商机详情接口：返回商机基础信息、阶段信息、历史记录与关联报价合同订单，用于卡片跳转。'
     ],
     accept: [
-      '六列看板按阶段正确分组，列内卡片数量与列头数量一致，预计金额合计可复算。',
-      '拖拽或点击推进只能进入相邻下一阶段，跨阶段、回退和已关闭商机推进均被拦截并给出明确提示。',
-      '阶段门必填项缺失或系统检查未通过时无法确认推进，补全后可成功变更并刷新卡片所在列。',
-      '赢单需合同已审批，输单必须选择原因，关闭后卡片显示赢单或输单标签且概率正确。',
-      '筛选、重置、看板/列表切换、卡片点击和推进按钮均可用，页面无控制台报错。'
+      '对应规划方案第十四章「商机：阶段变化符合配置规则，输赢单记录完整」：六列看板按阶段正确分组，列内卡片数量与列头数量一致，预计金额合计可复算。',
+      '拖拽或点击推进只能进入相邻下一阶段，跨阶段、回退和已关闭商机推进均被拦截并给出明确提示；阶段变更历史包含变更前后阶段、变更人、变更时间和备注。',
+      '需求确认、方案沟通、商务审批的阶段必填项缺失时无法确认推进，补全后可成功变更并刷新卡片所在列；报价谈判无有效报价单时被拦截。',
+      '赢单需合同已审批或订单已确认，禁止直接标记赢单；输单必须选择输单原因，关闭后卡片显示赢单或输单标签且概率分别为 100 或 0。',
+      '商机超过 7 天未推进显示停滞标签并给出提醒文案，筛选、重置、看板/列表切换、卡片点击和推进按钮均可用。',
+      '对应第十四章重点场景「从商机推进到报价、合同审批、签署和订单生成」：阶段推进与关联报价、合同、订单跳转链路可用，页面无控制台报错。'
     ]
   },
 
   'opps-list': {
     name: '商机列表', module: '商机管理',
-    goal: '以表格方式管理全部商机，侧重字段对比、批量选择与阶段推进操作：展示商机编号、名称、客户、预计金额、当前阶段、成交概率、预计成交日期和负责人，支持按名称/客户/编号和负责人筛选，并与看板共享统计口径和阶段门校验，服务销售复盘与经理管理场景。',
+    goal: '以表格方式管理全部商机，侧重字段对比、批量选择与阶段推进操作：展示商机编号、名称、客户、联系人、来源、类型、预计金额、当前阶段、成交概率、预计成交日期和负责人，支持按名称/客户/编号、负责人、来源和类型筛选，并与看板共享统计口径和阶段门校验，服务销售复盘与经理管理场景。',
     roles: [
       '菜单：销售通过「商机管理 → 商机列表」进入，只查看本人商机。',
       '菜单：销售经理可查看团队全部商机，管理员可查看全量商机。',
       '按钮：销售可勾选商机、查看详情和推进阶段；经理可批量调整负责人或处理停滞商机；新建商机按钮对有创建权限的角色开放。',
       '数据：数据范围按角色控制，销售本人、经理本部门及下级、管理员全部；统计卡与看板保持一致。',
-      '字段：金额、阶段、概率、预计成交日期和负责人可见，成本、毛利等敏感字段按权限脱敏。',
-      '数据：商机关闭后归档保留历史，不物理删除；阶段变更和输单原因必须留痕。'
+      '字段：金额、阶段、概率、预计成交日期、来源、类型和负责人可见，成本、毛利等敏感字段按权限脱敏。',
+      '数据：商机关闭后归档保留历史，不物理删除；阶段变更和输赢单原因必须留痕。'
     ],
     enter: [
       '入口：左侧导航「商机管理 → 商机列表」，路由 /opps/list。',
@@ -11590,57 +11740,160 @@ const PZ_DOC_PC_CFG = {
     layout: [
       '顶部：面包屑「商机管理 / 商机列表」、跟进中商机总数、看板/列表视图切换和新建商机按钮。',
       '统计卡：跟进中商机、商机预计金额、本月预计成交、停滞商机、已赢单/已输单五张卡，与看板同源。',
-      '筛选区：关键词输入框按商机名称、客户、编号模糊搜索，负责人下拉精确筛选，支持查询与重置。',
-      '列表区：首列为多选框，其后为商机编号、商机名称、关联客户、预计金额、当前阶段、成交概率进度条、预计成交日期、负责人和操作列。',
-      '底部：显示总条数与分页控件，每页 20 条；操作列提供查看和推进阶段按钮。'
+      '筛选区：关键词输入框按商机名称、客户、编号、联系人和主要需求模糊搜索，负责人、商机来源、商机类型下拉筛选，支持查询与重置。',
+      '列表区：首列为多选框，其后为商机编号、商机名称、关联客户、关联联系人、商机来源、商机类型、预计金额、当前阶段、成交概率进度条、预计成交日期、负责人和操作列。',
+      '底部：显示筛选后的真实总条数与分页控件，每页 20 条；操作列提供查看和推进阶段按钮。'
     ],
     fields: [
-      '商机编号｜类型：文本｜必填：是｜校验：全局唯一，格式 SJ-年月-序号｜说明：点击进入商机详情。',
-      '商机名称｜类型：文本｜必填：是｜校验：非空｜说明：列表主字段，支持关键词模糊搜索。',
-      '关联客户｜类型：客户选择｜必填：是｜校验：必须关联有效客户｜说明：点击客户名称进入客户详情。',
-      '预计金额｜类型：货币｜必填：是｜校验：大于 0｜说明：按元展示，已结束商机不进入跟进中金额合计。',
-      '当前阶段｜类型：枚举（初步接触/需求确认/方案沟通/报价谈判/商务审批/赢单/输单）｜必填：是｜校验：必须为阶段枚举｜说明：已关闭商机显示赢单或输单结果标签。',
-      '成交概率｜类型：百分比｜必填：是｜校验：随阶段自动映射｜说明：以进度条展示，阶段推进后自动更新。',
-      '预计成交日期｜类型：日期｜必填：是｜校验：合理业务日期｜说明：用于本月预计成交与周期分析。',
-      '负责人｜类型：人员｜必填：是｜校验：有效销售人员｜说明：支持按负责人筛选。',
-      '批量选择｜类型：多选｜必填：否｜校验：至少选择一条才能批量操作｜说明：用于批量分配或导出，未选中时相关按钮应禁用。',
-      '推进目标阶段｜类型：系统计算｜必填：是｜校验：只能为当前阶段的相邻下一阶段｜说明：点击推进阶段自动带入，不由用户随意选择。',
-      '变更备注｜类型：文本｜必填：否｜校验：无｜说明：随阶段变更写入历史，记录变更人、时间和前后阶段。'
+      '商机编号｜自动编号｜必填：是｜校验：全局唯一，格式 SJ-年月-序号｜说明：点击进入商机详情。',
+      '商机名称｜文本｜必填：是｜校验：非空｜说明：列表主字段，支持关键词模糊搜索。',
+      '关联客户｜关联对象｜必填：是｜校验：必须关联有效客户｜说明：点击客户名称进入客户详情。',
+      '关联联系人｜关联对象｜必填：是｜校验：须为该客户下的联系人｜说明：列表展示主要对接人，详情查看决策链。',
+      '商机来源｜下拉框｜必填：是｜校验：线索/客户转介绍/官网/渠道/活动/广告等配置枚举｜说明：用于来源筛选和转化分析。',
+      '商机类型｜下拉框｜必填：是｜校验：新购/续费/增购等配置枚举｜说明：用于新购与存量业务区分。',
+      '预计金额｜金额｜必填：是｜校验：大于 0｜说明：按元展示，已结束商机不进入跟进中金额合计。',
+      '当前阶段｜下拉框｜必填：是｜校验：初步接触/需求确认/方案沟通/报价谈判/商务审批/赢单/输单｜说明：已关闭商机显示赢单或输单结果标签。',
+      '成交概率｜百分比｜必填：是｜校验：0 至 100，按阶段或人工配置｜说明：以进度条展示，阶段推进后自动更新；阶段示意比例 100%/80%/60%/40%/25%/15% 仅表示阶段顺序。',
+      '预计成交日期｜日期｜必填：是｜校验：有效业务日期｜说明：用于本月预计成交与周期分析。',
+      '竞争对手｜文本/关联｜必填：否｜校验：输单时适用则填写｜说明：记录竞争品牌与竞争态势。',
+      '主要需求｜多行文本｜必填：否（进入需求确认阶段必填）｜校验：非空｜说明：客户核心需求，支持关键词搜索。',
+      '负责人｜用户｜必填：是｜校验：在职销售人员｜说明：支持按负责人筛选。',
+      '输赢单原因｜下拉框｜必填：输单时必填，赢单可选｜校验：价格偏高/功能不满足/竞品中标/客户预算取消/项目延期等配置枚举｜说明：写回商机并用于赢输分析。',
+      '批量选择｜多选｜必填：否｜校验：至少选择一条才能批量操作｜说明：用于批量分配或导出，未选中时相关按钮应禁用。',
+      '推进目标阶段｜系统计算｜必填：是｜校验：只能为当前阶段的相邻下一阶段｜说明：点击推进阶段自动带入，不由用户随意选择。',
+      '变更备注｜文本｜必填：否｜校验：无｜说明：随阶段变更写入历史，记录变更人、时间和前后阶段。'
     ],
     rules: [
-      '列表与看板共用同一份商机数据、关键词与负责人筛选和五张统计卡，切换视图后数据口径保持一致。',
-      '筛选为前端即时过滤：关键词匹配商机名称、客户和编号，负责人精确匹配；查询后重置到第 1 页。',
-      '点击「推进阶段」与看板推进调用同一阶段门逻辑：校验相邻阶段、必填字段和 hasQuote、contractApproved 等系统检查，未通过不允许变更。',
+      '列表与看板共用同一份商机数据、关键词/负责人/来源/类型筛选和五张统计卡，切换视图后数据口径保持一致。',
+      '筛选为前端即时过滤：关键词匹配商机名称、客户、编号、联系人和主要需求，负责人、来源、类型精确匹配；查询后重置到第 1 页。',
+      '点击「推进阶段」与看板推进调用同一阶段门逻辑：校验相邻阶段、必填字段和有效报价、成交条件等系统检查，未通过不允许变更。',
       '已关闭商机的推进按钮禁用，避免对归档商机重复变更；查看按钮始终可用。',
       '列表首列支持多选，批量操作前需判断选中数量，未选中时提示先勾选；批量操作保留操作日志。',
-      '底部显示筛选后的真实总条数，分页控件按 20 条每页展示；正式版接服务端分页接口，当前原型以前端集合驱动。',
+      '底部显示筛选后的真实总条数，分页按 20 条每页切片；正式版接服务端分页接口，当前原型以前端集合驱动。',
       '金额、阶段、概率等列使用统一格式化与标签颜色，主题切换后颜色变量跟随，不写死颜色。'
     ],
     flow: [
       '列表状态跟随商机阶段：初步接触 → 需求确认 → 方案沟通 → 报价谈判 → 商务审批 → 赢单或输单；列表阶段标签在关闭前显示阶段名，关闭后显示结果。',
-      '阶段推进需通过阶段门：必填字段逐项补全，系统检查未满足时前往报价或合同页面处理后再推进。',
+      '阶段推进需通过阶段门：必填字段逐项补全，系统检查未满足时前往报价或合同页面处理后再推进，禁止跳阶段和直接回退。',
       '赢单条件为合同已审批或订单已确认，输单必须选择输单原因；关闭后商机归档，概率分别置为 100 或 0。',
+      '每次阶段变更保留变更前后阶段、变更人、变更时间和备注；超过 7 天未推进自动提醒负责人与销售经理。',
       '批量选择商机后可执行批量分配或导出，操作结果影响负责人或导出文件，并写入操作日志。'
     ],
     errors: [
       '未选中任何商机执行批量操作：提示先勾选，按钮不应产生实际变更。',
       '尝试推进已关闭商机：推进按钮禁用；若通过其他入口触发则提示商机已结束归档。',
       '阶段门必填项缺失或系统检查未满足：阻止推进，弹窗显示具体缺失项和前往处理链接。',
+      '商机长时间停滞：显示停滞标签并提醒负责人与经理，支持经理介入。',
+      '报价审批被拒绝或已审批报价修改：保存拒绝原因后重新提交，修改必须生成新版本，不得覆盖原批准内容。',
       '筛选无结果：表格显示空态，统计卡仍为真实全量数字，用户可重置筛选。',
-      '并发修改同一商机：正式版需在提交时校验版本并提示刷新，原型为单用户演示。'
+      '用户越权查看或推进他人商机：按钮置灰并提示，正式版后端拦截并记录安全日志；并发修改需校验版本并提示刷新。'
     ],
     api: [
-      '商机分页查询接口：支持关键词、负责人、阶段筛选并返回真实总数，供列表与看板共用。',
+      '商机分页查询接口：支持关键词、负责人、来源、类型、阶段筛选并返回真实总数，供列表与看板共用。',
       '阶段推进接口：提交目标阶段、阶段门字段和备注，服务端重复校验后写回阶段与历史。',
       '批量操作接口：批量分配负责人或导出，校验选中记录的数据权限。',
-      '商机详情与关联单据接口：返回商机详情、关联客户、报价和合同，用于编号与客户跳转。'
+      '商机详情与关联单据接口：返回商机详情、关联客户、报价、合同和订单，用于编号与客户跳转。'
     ],
     accept: [
-      '列表正确展示商机编号、名称、客户、金额、阶段、概率、日期和负责人，点击编号与客户可进入对应详情。',
-      '关键词与负责人筛选可用，查询和重置后列表与统计卡同步变化，总数等于筛选后的真实条数。',
-      '点击推进阶段只能进入相邻下一阶段，跨阶段、回退和已关闭商机均被拦截，阶段门必填项校验生效。',
-      '未选中商机时批量操作被拦截，选中后操作有明确结果提示。',
-      '列表与看板切换数据一致，页面无控制台报错。'
+      '对应规划方案第十四章「商机：阶段变化符合配置规则，输赢单记录完整」：列表正确展示商机编号、名称、客户、联系人、来源、类型、金额、阶段、概率、日期和负责人，点击编号与客户可进入对应详情。',
+      '关键词、负责人、来源、类型筛选可用，查询和重置后列表同步变化，总数等于筛选后的真实条数，翻页后数据不同。',
+      '点击推进阶段只能进入相邻下一阶段，跨阶段、回退和已关闭商机均被拦截，阶段门必填项与有效报价、成交条件校验生效。',
+      '赢单需合同已审批或订单已确认，输单必须选择输单原因，关闭后概率分别为 100 或 0 且历史可查。',
+      '未选中商机时批量操作被拦截，选中后操作有明确结果提示；列表与看板切换数据一致，页面无控制台报错。'
+    ]
+  },
+
+  'opp-detail': {
+    name: '商机详情', module: '商机管理',
+    goal: '全景展示单个商机的基础信息、阶段进度、客户需求与方案、参与联系人与决策链、竞争对手、跟进记录、产品报价、合同订单和商机附件，并提供合规的阶段推进、赢单 / 输单操作，保证每次阶段变更和最终输赢结果可追溯。',
+    roles: [
+      '菜单：销售通过商机看板或商机列表点击商机编号进入，只查看和推进本人负责的商机。',
+      '菜单：销售经理可查看团队全部商机，审核阶段推进与特殊折扣，处理停滞商机；管理员拥有全量权限。',
+      '按钮：负责人可推进阶段、标记赢单或输单、查看关联单据；赢单需满足成交条件，输单必须填写原因；回退需提交阶段回退申请。',
+      '数据：销售数据范围为本人的商机，经理为本部门及下级，管理员为全部；跨部门查看按数据权限拦截。',
+      '字段：金额、成交概率、客户、联系人、竞争对手、输单原因为业务字段；成本、毛利等敏感字段按字段权限隐藏或脱敏。',
+      '数据：商机和阶段历史不可物理删除，关闭后归档；阶段变更、关联报价与合同修改均需留痕。'
+    ],
+    enter: [
+      '入口：商机看板点击商机卡片、商机列表点击商机编号，路由 /opp/:no。',
+      '关联入口：客户详情「商机」Tab 点击商机编号、跟进记录或全局搜索命中商机后可跳转本页。',
+      '跳转：客户名称进入 /customer/:no，报价编号进入 /quote/:no，合同编号进入 /contract/:no，订单编号进入 /order/:no；推进弹窗系统检查未满足时可点击「前往处理」前往报价或合同页面。'
+    ],
+    layout: [
+      '头部：商机名称、阶段 / 输赢结果标签、商机编号、客户链接、关联联系人、负责人、预计成交日期、预计金额、成交概率、阶段进度条，以及推进到下一阶段、标记赢单、标记输单按钮。',
+      'Tab：基本信息、跟进记录、关联联系人、关联报价、关联合同、关联订单、商机附件、阶段变更历史、操作日志。',
+      '基本信息：商机编号、名称、客户、联系人、来源、类型、金额、成交日期、当前阶段、成交概率、主要需求、输赢单原因，以及竞争对手分析、各阶段必填信息和客户需求/方案记录。',
+      '阶段变更历史：每次变更展示变更前后阶段、变更人、变更时间和备注；操作日志展示重要操作的执行人、时间和详情。'
+    ],
+    fields: [
+      '商机编号｜自动编号｜必填：是｜校验：全局唯一，格式 SJ-年月-序号｜说明：详情页头部与基本信息展示，不可编辑。',
+      '商机名称｜文本｜必填：是｜校验：非空，建议包含客户与项目关键词｜说明：如南京某某 ERP 项目。',
+      '关联客户｜关联对象｜必填：是｜校验：必须关联有效客户，不允许空值｜说明：点击客户名称进入客户详情，详情数据使用该客户自己的数据。',
+      '关联联系人｜关联对象｜必填：是｜校验：须为该客户下的联系人，作为主要对接人｜说明：头部展示主要对接人，「关联联系人」Tab 展示客户联系人与决策链。',
+      '商机来源｜下拉框｜必填：是｜校验：线索/客户转介绍/官网/渠道/活动/广告等配置枚举｜说明：用于来源转化分析。',
+      '商机类型｜下拉框｜必填：是｜校验：新购/续费/增购等配置枚举｜说明：区分新购与存量业务。',
+      '预计金额｜金额｜必填：是｜校验：大于 0，单位为元｜说明：详情头部汇总卡展示。',
+      '成交概率｜百分比｜必填：是｜校验：0 至 100，按阶段或人工配置｜说明：阶段推进后按阶段默认值更新；阶段示意比例 100%/80%/60%/40%/25%/15% 仅表示阶段顺序，不代表实际销售转化率。',
+      '预计成交日期｜日期｜必填：是｜校验：有效业务日期｜说明：预计赢单时间，用于本月预计成交和漏斗周期统计。',
+      '当前阶段｜下拉框｜必填：是｜校验：初步接触/需求确认/方案沟通/报价谈判/商务审批/赢单/输单｜说明：阶段进度条高亮当前阶段；关闭后显示赢单或输单结果。',
+      '竞争对手｜文本/关联｜必填：否｜校验：输单时适用则填写｜说明：详情页「竞争对手分析」展示竞争品牌和竞争情况。',
+      '主要需求｜多行文本｜必填：否（进入需求确认阶段必填）｜校验：非空｜说明：客户核心需求，写回商机并用于方案与报价。',
+      '负责人｜用户｜必填：是｜校验：在职销售人员｜说明：主销售负责人，负责推进商机。',
+      '输赢单原因｜下拉框｜必填：输单时必填，赢单可选｜校验：价格偏高/功能不满足/竞品中标/客户预算取消/项目延期等配置枚举｜说明：成功或失败原因写回商机并展示在基本信息。',
+      '客户需求｜多行文本｜必填：进入需求确认时必填｜校验：非空｜说明：6.3 阶段控制点，「各阶段必填信息」展示。',
+      '采购时间｜日期｜必填：进入需求确认时必填｜校验：非空｜说明：评估成交周期。',
+      '预算范围｜文本｜必填：进入需求确认时必填｜校验：非空｜说明：如 30 至 40 万元，辅助判断商机质量。',
+      '方案说明｜多行文本｜必填：进入方案沟通时必填｜校验：非空｜说明：客户需求和方案记录，详情页「各阶段必填信息」展示。',
+      '参与沟通的联系人｜联系人选择｜必填：进入方案沟通时必填｜校验：须为该客户下的联系人｜说明：参与联系人及决策链，「关联联系人」Tab 查看。',
+      '有效报价单｜关联对象｜必填：进入报价谈判时必填｜校验：必须存在已通过审批且在有效期内的报价单｜说明：「关联报价」Tab 展示报价编号、金额、版本、有效期和审批状态。',
+      '商务条件｜多行文本｜必填：进入商务审批时必填｜校验：非空｜说明：付款方式、交付周期、服务期限和折扣依据。',
+      '审批材料｜附件选择｜必填：进入商务审批时必填｜校验：非空｜说明：报价单、折扣说明、客户意向函等审批材料。',
+      '成交证明｜关联对象｜必填：赢单时必填｜校验：合同已审批或订单已确认｜说明：禁止直接标记赢单；关联合同、订单 Tab 可核对。',
+      '阶段变更记录｜系统记录｜必填：是｜校验：每次变更自动生成｜说明：包含变更前后阶段、变更人、变更时间和备注。'
+    ],
+    rules: [
+      '阶段推进只能进入相邻下一阶段，禁止跳阶段；目标阶段等于当前阶段不处理，目标小于当前阶段提示不支持直接回退，已关闭商机不能再推进。',
+      '进入需求确认、方案沟通、商务审批分别校验客户需求、采购时间、预算范围、方案说明、参与联系人、商务条件、审批材料等必填字段；未填项逐项标红并阻止推进。',
+      '进入报价谈判前系统检查是否存在有效报价单；进入赢单前系统检查合同已审批或订单已确认；未满足时显示原因和「前往处理」链接。',
+      '赢单必须满足企业配置的成交条件，禁止直接标记为赢单；输单必须选择输单原因，竞争对手在适用时填写。',
+      '每次阶段变更保留变更前后阶段、变更人、变更时间和备注；推进成功后写回阶段、成交概率、阶段必填信息和阶段变更历史。',
+      '关联联系人、报价、合同、订单、附件和跟进记录均按当前商机与所属客户真实数据展示，不与其他商机混用。',
+      '超过 7 天未推进显示停滞并提醒负责人与销售经理，支持经理介入；阶段规则支持后台配置。',
+      '查看和操作受数据权限与按钮权限控制，越权请求由后端拦截并记录安全日志。'
+    ],
+    flow: [
+      '阶段主流程：初步接触 → 需求确认 → 方案沟通 → 报价谈判 → 商务审批 → 赢单/输单；阶段示意比例依次为 100%/80%/60%/40%/25%/15%，仅表示阶段顺序，不代表实际转化率。',
+      '进入条件：初步接触需有明确潜在客户；需求确认需客户表达需求；方案沟通需有初步方案；报价谈判需产品与范围基本明确；商务审批需接近签约；赢单需满足成交条件；输单需明确不再推进。',
+      '退出条件：初步接触退出时客户需求初步明确；需求确认退出时需求得到确认；方案沟通退出时客户认可方案方向；报价谈判退出时报价达成基本一致；商务审批退出时商务条件确认。',
+      '关闭流转：商务审批 → 赢单或输单；赢单概率置 100，输单概率置 0；输单原因和竞争对手写入商机，赢单原因可选记录，结果进入赢输分析。',
+      '关联流转：赢单前须合同审批通过或订单已确认；赢单后生成订单与交付任务，进入履约流程；输单后记录原因并归档。'
+    ],
+    errors: [
+      '商机不存在：详情显示空态和「返回商机看板」按钮，不报错。',
+      '不满足阶段条件推进：校验弹窗逐项标红缺失必填项或显示系统检查未满足原因，禁止确认推进。',
+      '尝试跳阶段、直接回退或推进已关闭商机：分别提示下一阶段、需提交阶段回退申请、已结束并归档。',
+      '输单未填写输单原因：前端拦截并提示，不允许关闭；竞争对手适用但未填时提示补充。',
+      '商机长时间停滞：系统自动提醒负责人与经理，支持经理介入，原型以停滞标签和提醒文案演示。',
+      '报价审批被拒绝：保存拒绝原因，修改报价后重新提交；已审批报价修改必须生成新版本，不得覆盖原批准内容。',
+      '合同审批后修改：按合同变更规则重新审批；未审批通过不得作为赢单成交证明。',
+      '同一客户多人跟进：以本商机负责人为主负责人，协同人员只读或按权限操作，防止重复联系和撞单。',
+      '用户越权查看或推进：按钮置灰并提示，正式版后端拦截并记录安全日志。',
+      '关联报价、合同或订单不存在：对应 Tab 显示空态和引导文案，不影响基础信息展示。'
+    ],
+    api: [
+      '商机详情查询接口：返回商机基础信息、关联客户、联系人、阶段信息、主要需求和竞争对手。',
+      '阶段推进接口与阶段门检查接口：提交目标阶段、阶段门字段和备注，服务端再次校验必填项、有效报价和成交条件。',
+      '关联数据接口：按商机查询跟进记录、报价、合同、订单和附件，均校验数据权限。',
+      '操作日志接口：查询阶段变更、关联单据修改和重要操作的执行人、时间与详情。',
+      '自动化提醒接口：扫描长时间停滞商机并通知负责人与销售经理（示例）。'
+    ],
+    accept: [
+      '对应规划方案第十四章「商机：阶段变化符合配置规则，输赢单记录完整」：详情头部和基本信息完整展示 5.5 的 14 个字段（商机编号、名称、关联客户、关联联系人、来源、类型、预计金额、成交概率、预计成交日期、当前阶段、竞争对手、主要需求、负责人、输赢单原因）。',
+      '阶段推进只能进入相邻下一阶段，跨阶段、回退和已关闭商机推进均被拦截；需求确认、方案沟通、报价谈判、商务审批、赢单、输单的阶段门校验与规划方案 6.3 一致。',
+      '赢单必须合同已审批或订单已确认，输单必须填写输单原因；关闭后概率分别为 100 或 0，输赢单原因可在基本信息查看。',
+      '阶段变更历史每次包含变更前后阶段、变更人、变更时间和备注；操作日志可查询操作人和时间。',
+      '关联联系人、报价、合同、订单、附件、跟进记录均来自当前商机及其客户，空数据展示空态不报错。',
+      '对应第十四章重点场景「从商机推进到报价、合同审批、签署和订单生成」：从本页可核对报价、合同、订单链路；修改报价或合同后历史版本和操作记录可查，页面无控制台报错。'
     ]
   },
 
