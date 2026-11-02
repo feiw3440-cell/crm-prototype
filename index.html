@@ -482,7 +482,7 @@ const NAV = [
   { key: 'leads', title: '线索管理', icon: 'Aim', children: [
     { path: '/leads', title: '线索列表' }, { path: '/leads/my', title: '我的线索' }, { path: '/leads/pool', title: '线索公海' }, { path: '/leads/records', title: '线索转化记录' } ] },
   { key: 'customers', title: '客户管理', icon: 'OfficeBuilding', children: [
-    { path: '/customers', title: '客户列表' }, { path: '/customers/my', title: '我的客户' }, { path: '/customers/pool', title: '客户公海' }, { path: '/customers/key', title: '重点客户' }, { path: '/customers/merge', title: '客户合并' } ] },
+    { path: '/customers', title: '客户列表' }, { path: '/customers/my', title: '我的客户' }, { path: '/customers/pool', title: '客户公海' }, { path: '/customers/key', title: '重点客户' }, { path: '/customers/category', title: '客户分类' }, { path: '/customers/recycle', title: '客户回收站' }, { path: '/customers/merge', title: '客户合并' } ] },
   { key: 'contacts', title: '联系人管理', icon: 'User', path: '/contacts' },
   { key: 'opps', title: '商机管理', icon: 'TrendCharts', children: [
     { path: '/opps', title: '商机看板' }, { path: '/opps/list', title: '商机列表' } ] },
@@ -4221,12 +4221,16 @@ const CustomerMergePage = {
     });
     const migTotal = computed(() => migRows.value.reduce((s, r) => s + r.n, 0));
     const pickCount = computed(() => MERGE_FIELDS.filter(([k]) => keep[k] === 'sub').length);
+    const mergedBlocked = c => !!c && (c.status === '已合并' || c.archived);
     const canNext = computed(() => {
-      if (step.value === 1) return !!mainC.value && !!subC.value && form.main !== form.merged;
+      if (step.value === 1) return !!mainC.value && !!subC.value && form.main !== form.merged && !mergedBlocked(mainC.value) && !mergedBlocked(subC.value);
       return true;
     });
     const next = () => {
-      if (step.value === 1 && !canNext.value) return ElMessage.warning('请选择主客户与被合并客户（两个客户不能相同）');
+      if (step.value === 1 && !canNext.value) {
+        if (mergedBlocked(mainC.value) || mergedBlocked(subC.value)) return ElMessage.warning('已合并或已归档客户不可再次参与合并');
+        return ElMessage.warning('请选择主客户与被合并客户（两个客户不能相同）');
+      }
       if (step.value < 4) step.value++;
     };
     const prev = () => step.value > 1 && step.value--;
@@ -4236,6 +4240,7 @@ const CustomerMergePage = {
     const doMerge = () => {
       if (!form.reason || !form.reason.trim()) return ElMessage.warning('请填写合并原因（必填）');
       const m = mainC.value, s = subC.value; if (!m || !s) return ElMessage.warning('请选择主客户与被合并客户');
+      if (mergedBlocked(m) || mergedBlocked(s)) return ElMessage.warning('已合并或已归档客户不可再次参与合并');
       MERGE_FIELDS.forEach(([k]) => { if (keep[k] === 'sub') m[k] = s[k]; });     // 冲突字段按选择保留
       // 关联数据真实迁移：改归属到主客户
       const n = s.name;
@@ -4322,10 +4327,22 @@ const CustomersPage = {
   components: { ListPage },
   props: { tab: { type: String, default: 'all' } },
   setup(props) {
-    const TABS = { all: '客户列表', my: '我的客户', pool: '客户公海', key: '重点客户' };
-    const rows = computed(() => store.customers.filter(c => props.tab === 'my' ? c.owner === '张三' : props.tab === 'pool' ? !c.owner : props.tab === 'key' ? c.key : true));
+    const TABS = { all: '客户列表', my: '我的客户', pool: '客户公海', key: '重点客户', category: '客户分类', recycle: '客户回收站' };
+    const cat = ref('');
+    const rows = computed(() => {
+      let list = store.customers;
+      if (props.tab === 'my') list = list.filter(c => c.owner === '张三');
+      else if (props.tab === 'pool') list = list.filter(c => !c.owner);
+      else if (props.tab === 'key') list = list.filter(c => c.key);
+      else if (props.tab === 'recycle') list = list.filter(c => c.status === '流失' || c.status === '已合并' || c.archived);
+      else if (props.tab === 'category') {
+        if (cat.value) list = list.filter(c => c.industry === cat.value);
+        return list.slice().sort((a, b) => String(a.industry || '').localeCompare(String(b.industry || ''), 'zh') || String(a.level || '').localeCompare(String(b.level || ''), 'zh'));
+      }
+      return list;
+    });
     const t = computed(() => TABS[props.tab]);
-    const totalText = computed(() => '客户列表共 ' + store.customers.length + ' 家');
+    const totalText = computed(() => t.value + '共 ' + rows.value.length + ' 家');
     const stats = computed(() => [['客户总数', String(store.customers.length), '', '含公海客户'], ['本月新增', String(store.customers.filter(c => c.created && c.created.startsWith('2026-11')).length), 'ok'], ['重点 / 战略客户', String(store.customers.filter(c => c.key).length), ''], ['超 14 天未跟进', String(store.customers.filter(c => c.owner && daysBetween(c.lastFollow, TODAY) > 14).length), 'warn'], ['流失客户', String(store.customers.filter(c => c.status === '流失').length), 'danger']]);
     const cols = [
       { p: 'no', l: '客户编号', w: 140 }, { p: 'name', l: '客户名称', w: 220, link: true }, { p: 'type', l: '客户类型', w: 100 }, { p: 'industry', l: '行业分类', w: 120 },
@@ -4336,22 +4353,48 @@ const CustomersPage = {
     const target = ref([]); const tf = reactive({ owner: '', reason: '' });
     const quick = reactive({ level: '', status: '' });
     const openTransfer = (rows) => { if (!rows.length) return ElMessage.warning('请先勾选客户'); target.value = rows; Object.assign(tf, { owner: '', reason: '' }); dlg.transfer = true; };
+    const writeOwnerLog = (row, oldOwner, act) => {
+      store.ext.logs.unshift({ time: TODAY + ' 09:00', who: '张三', module: '客户', act, detail: `客户「${row.name}」（${row.no}）负责人 ${oldOwner || '（公海）'} → ${tf.owner}；原因：${tf.reason}` });
+    };
     const doTransfer = () => {
       if (!tf.owner) return ElMessage.warning('请选择新负责人'); if (!tf.reason) return ElMessage.warning('请填写转移原因（将写入负责人变更日志）');
       const keyOnes = target.value.filter(c => c.key);
-      if (keyOnes.length) { dlg.transfer = false; return ElNotification({ title: '已提交审批', message: `其中 ${keyOnes.length} 家重点客户转移需「原负责人直属经理」审批，审批通过后生效；其余 ${target.value.length - keyOnes.length} 家已直接转移。`, type: 'warning', duration: 5000 }) && target.value.filter(c => !c.key).forEach(c => c.owner = tf.owner); }
-      target.value.forEach(c => c.owner = tf.owner); dlg.transfer = false; ElMessage.success(`已转移 ${target.value.length} 家客户，变更日志已保留（原负责人 → ${tf.owner}）`);
+      const direct = target.value.filter(c => !c.key);
+      if (keyOnes.length) {
+        keyOnes.forEach(c => store.ext.logs.unshift({ time: TODAY + ' 09:00', who: '张三', module: '客户', act: '提交客户转移审批', detail: `客户「${c.name}」（${c.no}）申请由 ${c.owner || '（公海）'} 转给 ${tf.owner}；原因：${tf.reason}；需原负责人直属经理审批后生效` }));
+        direct.forEach(c => { const old = c.owner; c.owner = tf.owner; writeOwnerLog(c, old, '负责人变更'); });
+        dlg.transfer = false;
+        return ElNotification({ title: '已提交审批', message: `其中 ${keyOnes.length} 家重点客户转移需「原负责人直属经理」审批，审批通过后生效；其余 ${direct.length} 家已直接转移。`, type: 'warning', duration: 5000 });
+      }
+      target.value.forEach(c => { const old = c.owner; c.owner = tf.owner; writeOwnerLog(c, old, '负责人变更'); });
+      dlg.transfer = false; ElMessage.success(`已转移 ${target.value.length} 家客户，变更日志已保留（原负责人 → ${tf.owner}）`);
     };
-    const claim = row => ElMessageBox.confirm(`确认领取客户「${row.name}」？领取后保护期 30 天。`, '领取客户', { type: 'info' }).then(() => { row.owner = '张三'; ElMessage.success('领取成功'); }).catch(() => {});
+    const claim = row => {
+      let cfg;
+      try { cfg = prRead().custs || {}; } catch (e) { cfg = {}; }
+      const days = cfg.protectDays == null ? 30 : cfg.protectDays;
+      if (cfg.scope && cfg.scope.length && !cfg.scope.includes(row.level)) return ElMessage.warning(`当前公海规则仅允许领取等级：${cfg.scope.join(' / ')}，该客户等级为「${row.level}」`);
+      const mine = store.customers.filter(c => c.owner === '张三');
+      if (cfg.holdLimit != null && mine.length >= cfg.holdLimit) return ElMessage.warning(`已达同时持有上限 ${cfg.holdLimit} 家，请先释放部分客户后再领取`);
+      const todayClaimed = mine.filter(c => c.claimedAt === TODAY).length;
+      if (cfg.dailyLimit != null && todayClaimed >= cfg.dailyLimit) return ElMessage.warning(`已达今日领取上限 ${cfg.dailyLimit} 家，请明日再领取`);
+      ElMessageBox.confirm(`确认领取客户「${row.name}」？领取后保护期 ${days} 天，保护期内不自动释放。`, '领取客户', { type: 'info' }).then(() => {
+        row.owner = '张三'; row.lastFollow = TODAY; row.claimedAt = TODAY; row.protectUntil = extAddDays(TODAY, days);
+        store.ext.logs.unshift({ time: TODAY + ' 09:00', who: '张三', module: '客户', act: '领取客户', detail: `从客户公海领取「${row.name}」（${row.no}），保护期至 ${row.protectUntil}` });
+        ElMessage.success('领取成功');
+      }).catch(() => {});
+    };
     const openDrawerInit = row => { quick.level = row.level; quick.status = row.status; };
     const saveQuick = (row, close) => { row.level = quick.level; row.status = quick.status; ElMessage.success('已保存（快捷编辑）'); close(); };
-    return { rows, t, TABS, stats, cols, dlg, target, tf, quick, openTransfer, doTransfer, claim, openDrawerInit, saveQuick, OWNERS, INDUSTRIES, go, fmtY, tab: computed(() => props.tab), totalText, levelTag: LEVEL_TAG, stTag: CUST_STATUS_TAG };
+    return { rows, t, TABS, cat, stats, cols, dlg, target, tf, quick, openTransfer, doTransfer, claim, openDrawerInit, saveQuick, OWNERS, INDUSTRIES, go, fmtY, tab: computed(() => props.tab), totalText, levelTag: LEVEL_TAG, stTag: CUST_STATUS_TAG };
   },
   template: `<div>
     <list-page :crumbs="['客户管理', t]" :title="t" :total-text="totalText" :stats="stats" :rows="rows" :cols="cols" :action-width="230" drawer-title="客户快速查看 / 快捷编辑"
       :filters="[{k:'kw',label:'搜索客户',ph:'搜索客户（编号 / 名称）'},{k:'type',label:'客户类型',opts:['企业客户','个人客户','渠道客户']},{k:'level',label:'客户等级',opts:['战略客户','重点客户','普通客户','潜在客户']},{k:'owner',label:'负责人',opts:OWNERS},{k:'status',label:'客户状态',opts:['正常','跟进中','暂停合作','流失']}]"
       @link="(c,row) => $go('/customer/'+row.no)">
-      <template #top><el-tabs :model-value="tab" @tab-change="k => $go(k==='all'?'/customers':'/customers/'+k)" style="margin-bottom:6px"><el-tab-pane v-for="(v,k) in TABS" :key="k" :label="v" :name="k"/></el-tabs></template>
+      <template #top><el-tabs :model-value="tab" @tab-change="k => $go(k==='all'?'/customers':'/customers/'+k)" style="margin-bottom:6px"><el-tab-pane v-for="(v,k) in TABS" :key="k" :label="v" :name="k"/></el-tabs>
+        <div v-if="tab==='category'" style="display:flex;align-items:center;gap:10px;padding:0 2px 10px"><span class="muted">按行业分类查看：</span><el-select v-model="cat" clearable placeholder="全部行业" size="small" style="width:180px"><el-option v-for="x in INDUSTRIES" :key="x" :label="x" :value="x"/></el-select><span class="muted" style="font-size:12px">当前共 {{ rows.length }} 家，按行业与客户等级排序</span></div>
+      </template>
       <template #ops="{sel}">
         <el-button type="primary" icon="Plus" @click="$msg.info('示例：新增客户表单（必填项标星，保存前校验格式）')">新增客户</el-button>
         <el-button icon="Upload" @click="$msg.info('示例：导入客户（查重 → 必填校验 → 错误行反馈 → 结果统计）')">导入</el-button>
@@ -4422,7 +4465,7 @@ const CustomerDetail = {
     const doOwner = () => {
       if (!ownerForm.owner || !ownerForm.reason) return ElMessage.warning('请选择新负责人并填写变更原因');
       if (ownerForm.owner === c.value.owner) return ElMessage.warning('新负责人与当前负责人相同');
-      logsExtra.value.unshift({ t: TODAY + ' 07:00', who: '张三', act: '变更负责人', d: `${c.value.owner} → ${ownerForm.owner}；原因：${ownerForm.reason}` });
+      store.ext.logs.unshift({ time: TODAY + ' 07:00', who: '张三', module: '客户', act: c.value.key ? '提交负责人变更审批' : '变更负责人', detail: `客户「${c.value.name}」（${c.value.no}）负责人 ${c.value.owner || '（公海）'} → ${ownerForm.owner}；原因：${ownerForm.reason}` });
       if (c.value.key) { dlg.owner = false; ElNotification({ title: '已提交审批', message: '重点客户变更负责人需直属经理审批，审批通过后生效；变更日志已记录。', type: 'warning' }); return; }
       c.value.owner = ownerForm.owner; dlg.owner = false; ElMessage.success('负责人已变更，变更日志已保留');
     };
@@ -4587,6 +4630,8 @@ const CustomerDetail = {
 registerRoute('/customers', CustomersPage, 'customers', () => ({ tab: 'all' }));
 registerRoute('/customers/my', CustomersPage, 'customers', () => ({ tab: 'my' }));
 registerRoute('/customers/key', CustomersPage, 'customers', () => ({ tab: 'key' }));
+registerRoute('/customers/category', CustomersPage, 'customers', () => ({ tab: 'category' }));
+registerRoute('/customers/recycle', CustomersPage, 'customers', () => ({ tab: 'recycle' }));
 registerRoute('/customers/pool', CustomersPage, 'customer-pool', () => ({ tab: 'pool' }));
 registerRoute('/customer/:no', CustomerDetail, 'customer-detail');
 
@@ -4781,24 +4826,75 @@ registerRoute('/delivery/:no', DeliveryDetailPage, 'delivery-detail');
 /* ===== 线索详情（/lead/:no）===== */
 DOCS_DEFAULT['lead-detail'] = mkDoc('lead-detail', {
   name: '线索详情', module: '线索管理',
-  goal: '集中展示单条线索的全部字段、跟进时间线与操作日志，作为线索转化、分配、退回公海、标记无效等操作的落点页面，保证线索处理过程全程留痕。',
-  roles: ['负责人销售：可转化、记录跟进、退回公海、标记无效', '销售经理：可分配线索给团队成员', '管理员：可查看全部操作日志'],
-  enter: ['线索列表点击线索编号或线索名称', '顶部全局搜索命中线索后跳转', '跟进记录页关联线索的链接'],
-  layout: ['头部：面包屑 + 线索名称 + 状态标签 + 操作按钮（转化 / 分配 / 退回公海 / 标记无效）', '基本信息：字段描述表（编号、公司、联系人、电话、来源、需求、预计金额、负责人、下次跟进、创建时间、重复提示）', '跟进时间线：按时间倒序的跟进卡片', '操作日志：创建 / 分配 / 转化等全部留痕'],
-  fields: [
-    '线索编号｜文本｜只读｜格式：XS-年月-序号，全库唯一',
-    '线索名称｜文本｜必填：是｜说明：默认取公司 + 需求主题',
-    '公司名称｜文本｜必填：是｜校验：与已有线索 / 客户名称查重',
-    '联系人 / 电话｜文本｜必填：是｜校验：手机号格式与查重',
-    '预计金额｜货币｜必填：否｜校验：≥ 0',
-    '重复提示｜文本｜只读｜说明：命中查重规则时展示重复对象与依据',
+  goal: '集中展示单条线索的五个信息区域（基本信息、需求信息、跟进记录、关联信息、操作记录），并提供转化客户、分配、退回公海、标记无效等操作入口，作为线索从跟进到客户转化的落点页面，保证处理过程全程留痕（规划方案 5.2 / 6.1）。',
+  roles: [
+    '菜单 / 数据：负责人销售可转化、记录跟进、退回公海、标记无效本人线索；销售经理可分配团队线索；管理员可查看全部线索与操作日志；非授权人无操作按钮。',
+    '按钮权限：转化客户、分配、退回公海、标记无效按角色显示；已转化 / 无效线索的转化按钮置灰。',
+    '字段权限：手机号码等敏感字段按权限脱敏展示；操作日志对所有有权查看本线索的角色可见。'
   ],
-  rules: ['转化在同一事务中创建客户 / 联系人 / 商机，原始线索保留动态置「已转化」', '分配需选择负责人；退回公海后负责人清空、状态回到「新建」', '标记无效必须填写原因（枚举 + 补充说明），原因写入操作日志', '无效 / 已转化线索不可再转化，按钮置灰'],
-  flow: ['状态流转：新建 → 跟进中 → 已转化 / 无效；跟进中 / 新建可退回公海'],
-  errors: ['线索不存在：显示空态 + 返回列表按钮', '分配未选负责人：前端拦截并提示', '标记无效未填原因：前端拦截并提示'],
-  api: ['线索详情查询、分配 / 领取接口、转化事务接口、跟进时间线查询、操作日志查询（示例）'],
-  accept: ['展示线索自身全部字段与时间线，数据与其他线索隔离', '转化 / 分配 / 退回 / 无效操作后状态与日志即时更新', '无控制台报错'],
-  version: ['2026-11-02 · 张三 · 创建本页需求文档（原型版）'],
+  enter: [
+    '线索列表 / 我的线索 / 公海点击线索编号或名称进入 /lead/:no。',
+    '顶部全局搜索命中线索后跳转；跟进记录页、客户关联信息反查线索的链接。',
+    '转化成功通知中「查看客户」链接可反查本页原始线索。'
+  ],
+  layout: [
+    '头部：面包屑 + 线索名称 + 状态标签 + 来源标签 + 操作按钮（转化客户 / 分配 / 退回公海 / 标记无效）+ 预计金额与下次联系摘要卡。',
+    '基本信息区：线索编号、状态、公司名称、联系人、联系电话、来源渠道、负责人、创建时间、重复提示。',
+    '需求信息区：产品需求（需求类型）、预算（预计金额）、采购时间、需求描述。',
+    '跟进记录区：按时间倒序的跟进时间线（电话 / 微信 / 拜访 / 邮件，含反馈与下一步）。',
+    '关联信息区：来源活动、推荐人、相关附件。',
+    '操作记录区：创建 / 分配 / 修改 / 转化 / 退回 / 无效的全部留痕（操作人 + 时间 + 内容）。'
+  ],
+  fields: [
+    '线索编号｜类型：自动编号｜必填：是｜校验：全局唯一，格式 XS-年月-四位序号｜说明：系统生成，原始线索档案标识。',
+    '线索名称｜类型：文本｜必填：是｜校验：非空｜说明：个人、公司或项目名称。',
+    '公司名称｜类型：文本｜必填：是｜校验：与已有线索 / 客户名称查重｜说明：潜在企业名称，命中查重时头部与重复提示区展示重复对象。',
+    '联系人｜类型：文本｜必填：是｜校验：非空｜说明：联系人姓名。',
+    '手机号码｜类型：手机号｜必填：是｜校验：11 位手机号格式，参与查重｜说明：联系电话，按字段权限脱敏展示。',
+    '来源渠道｜类型：下拉框｜必填：是｜校验：枚举（官网 / 广告 / 转介绍 / 活动 / 渠道）｜说明：来源标签展示在名称旁。',
+    '需求类型｜类型：下拉框｜必填：否｜校验：产品或服务类别字典｜说明：需求信息区「产品需求」来源。',
+    '预计金额｜类型：金额｜必填：否｜校验：大于等于 0｜说明：初步预算，转化时作为商机预计金额默认值。',
+    '采购时间｜类型：日期｜必填：否｜校验：不早于创建时间｜说明：需求信息区展示的计划采购时间（原型示例数据）。',
+    '需求描述｜类型：多行文本｜必填：否｜校验：无｜说明：需求信息区的文字描述。',
+    '下次联系时间｜类型：日期时间｜必填：否｜校验：不早于当前时间｜说明：计划跟进时间，头部摘要卡展示。',
+    '线索状态｜类型：状态｜必填：是｜校验：枚举（新建 / 跟进中 / 已转化 / 无效）｜说明：只能通过业务操作流转，不能直接修改。',
+    '重复提示｜类型：文本｜必填：否｜校验：命中查重规则时生成｜说明：提示重复对象、重复依据，转化前建议关联已有客户。',
+    '来源活动 / 推荐人 / 相关附件｜类型：文本 / 附件｜必填：否｜校验：来源为活动或转介绍时展示｜说明：关联信息区内容，保留线索溯源信息。'
+  ],
+  rules: [
+    '转化客户弹窗按规划方案 6.1 展示：客户处理方式（创建新客户 / 关联现有客户）、客户名称、客户类型、所属行业、联系人姓名及联系方式、是否创建商机（商机名称 / 预计金额 / 预计成交日期）、新客户负责人；保存时同一事务创建客户 / 联系人 /（可选）商机，任一步失败整体回滚。',
+    '转化前先检查客户是否已存在（按手机号、公司名称）：线索命中已有客户时默认「关联现有客户」，避免重复建档；转化后状态置为「已转化」、保留原始线索与全部跟进历史。',
+    '分配必须选择负责人（必选校验），可填备注；分配后写入操作日志。',
+    '退回公海：负责人清空、状态回到「新建」，历史跟进记录保留，弹出确认框防止误操作。',
+    '标记无效必须填写无效原因（枚举：联系方式无效 / 无采购意向 / 已被竞品签约 / 信息不真实 / 重复线索）与补充说明，原因写入操作日志。',
+    '操作留痕：创建、分配、修改、转化、退回、标记无效全部记录操作人与时间，重要操作可在系统日志查询。'
+  ],
+  flow: [
+    '状态流转：新建 → 跟进中（记录跟进）→ 已转化 / 无效；跟进中 / 新建且无异常时可退回公海（回到新建、负责人清空）；已转化为终态不可再转化，转化按钮置灰。',
+    '转化链路（规划方案 6.1）：转化客户 → 重复检测（客户是否已存在）→ 创建或关联客户 → 创建或关联联系人 → 创建商机 → 线索转化完成；转化失败整体回滚并保留原始线索。',
+    '自动化提醒（规划方案 7.3）：到达下次联系时间创建待办并通知负责人；超过指定时长未跟进提醒负责人或按公海规则自动回收。'
+  ],
+  errors: [
+    '线索不存在：显示空态与「返回线索列表」按钮，不报错。',
+    '线索转化失败：客户 / 联系人 / 商机任一步创建失败整体回滚，不生成半成品客户关系，原始线索与跟进历史保留（规划方案十二「线索转化失败」）。',
+    '重复提示：命中查重的线索头部展示警示条，转化弹窗默认关联现有客户，可人工确认合并或关联（规划方案十二「重复录入」）。',
+    '分配未选负责人 / 标记无效未填原因：前端拦截并提示，弹窗保持打开。',
+    '用户越权操作：非负责人 / 非授权角色不展示操作按钮，越权请求后端拦截并记录安全日志（规划方案十二）。'
+  ],
+  api: [
+    '线索详情查询接口：返回线索字段、查重结果、关联信息与操作日志。',
+    '线索转化事务接口：同一事务创建 / 关联客户、联系人、商机，返回结果；失败回滚。',
+    '分配 / 领取 / 退回公海 / 标记无效接口：校验与权限检查，写操作日志。',
+    '跟进时间线查询、待办生成与操作日志接口（示例）。'
+  ],
+  accept: [
+    '对应规划方案第十四章「线索管理：能创建、分配、查重、跟进、转化」：本页可完成分配、跟进查看、转化、标记无效、退回公海全部操作并即时更新状态与日志。',
+    '对应重点验收场景「从新增线索开始，完整转化为客户、联系人和商机」：在详情页发起转化，完成后状态置为已转化、写入转化时间与客户编号，客户 / 商机详情可反查。',
+    '五个信息区域（基本信息 / 需求信息 / 跟进记录 / 关联信息 / 操作记录）与规划方案 5.2 一致，本线索数据与其他线索隔离。',
+    '转化弹窗字段与校验齐全：未选客户处理方式 / 商机信息缺失时拦截；命中已有客户时默认关联现有客户。',
+    '操作后无控制台报错，操作日志按时间倒序追加，操作人与时间完整可查。'
+  ],
+  version: ['2026-11-02 · 张三 · 创建本页需求文档（原型版）', '2026-11-02 · 对齐规划方案 5.2 / 6.1 / 7.3 / 十二 / 十四 · 补需求信息与关联信息区、转化弹窗五要素与验收标准'],
 });
 const LeadDetailPage = {
   components: { PageHead },
@@ -4828,9 +4924,13 @@ const LeadDetailPage = {
       return arr;
     });
     const logs = computed(() => logsExtra.value.concat(logsBase.value));
-    const dlg = reactive({ assign: false, invalid: false });
+    const dlg = reactive({ assign: false, invalid: false, convert: false });
     const af = reactive({ owner: '', reason: '' });
     const iv = reactive({ reason: '', remark: '' });
+    // 需求信息与关联信息（规划方案 5.2 详情页区域）
+    const needTime = computed(() => lead.value && lead.value.status === '跟进中' ? '2026 年 Q4（跟进中确认）' : '—');
+    const relActivity = computed(() => lead.value && lead.value.source === '活动' ? '2026 华东数字化巡展' : '—');
+    const referrer = computed(() => lead.value && lead.value.source === '转介绍' ? '江苏某某集团 · 周主任' : '—');
     const doAssign = () => {
       if (!af.owner) return ElMessage.warning('请选择负责人');
       lead.value.owner = af.owner; addLog('分配线索', '分配给 ' + af.owner + (af.reason ? '；原因：' + af.reason : ''));
@@ -4843,13 +4943,43 @@ const LeadDetailPage = {
       lead.value.status = '无效'; addLog('标记无效', '原因：' + iv.reason + (iv.remark ? '；说明：' + iv.remark : ''));
       dlg.invalid = false; ElMessage.success('已标记为无效，原因已记录');
     };
-    const doConvert = () => ElMessageBox.confirm('确认将线索「' + lead.value.company + '」转化为客户与商机？转化后线索状态置为「已转化」，原始跟进历史保留。', '转化线索', { type: 'info', confirmButtonText: '确认转化', cancelButtonText: '取消' })
-      .then(() => {
-        const l = lead.value; l.status = '已转化'; l.convertedAt = TODAY + ' 16:00';
-        addLog('转化为客户', '在示例（简化流程）中生成客户与商机，线索状态置为已转化');
-        ElMessage.success('线索已转化：客户 / 商机已创建，线索状态已更新为「已转化」');
-      }).catch(() => {});
-    return { lead, stTag, acts, logs, dlg, af, iv, doAssign, doBack, doInvalid, doConvert, go, yuan };
+    // 转化客户弹窗（规划方案 6.1：客户处理方式 / 客户信息 / 联系人 / 商机 / 新客户负责人）
+    const cv = reactive({ mode: 'new', custName: '', custType: '企业客户', industry: '', owner: '张三', linkNo: '', contactName: '', contactPhone: '', createOpp: true, oppName: '', oppAmount: 0, oppDate: '', saving: false });
+    const exCusts = computed(() => store.customers.slice(0, 12));
+    const cvDup = computed(() => lead.value && lead.value.dup && lead.value.dup.customerNo ? lead.value.dup : null);
+    const openConvert = () => {
+      const l = lead.value; if (!l || l.status === '已转化' || l.status === '无效') return;
+      Object.assign(cv, { mode: (l.dup && l.dup.customerNo) ? 'link' : 'new', custName: l.company, custType: '企业客户', industry: '', owner: l.owner || '张三', linkNo: (l.dup && l.dup.customerNo) || '', contactName: l.contact, contactPhone: l.phone, createOpp: true, oppName: l.company.replace(/有限公司|有限责任公司/, '') + ' ' + l.need + ' 项目', oppAmount: l.amount, oppDate: '2026-12-31', saving: false });
+      dlg.convert = true;
+    };
+    const doConvert = () => {
+      if (cv.mode === 'new' && (!cv.custName || !cv.industry)) return ElMessage.warning('请填写客户名称并选择所属行业');
+      if (cv.mode === 'link' && !cv.linkNo) return ElMessage.warning('请选择要关联的现有客户');
+      if (!cv.contactName || !cv.contactPhone) return ElMessage.warning('请填写联系人姓名及联系方式');
+      if (cv.createOpp && (!cv.oppName || !cv.oppAmount || !cv.oppDate)) return ElMessage.warning('请完整填写商机名称、预计金额、预计成交日期');
+      cv.saving = true;
+      setTimeout(() => {
+        const l = lead.value; let custNo = cv.linkNo; const created = [];
+        try {
+          if (cv.mode === 'new') {
+            if (store.customers.some(c => c.name === cv.custName)) throw new Error('客户名称已存在，请选择关联现有客户');
+            store.seq.customer++; custNo = 'KH-202611-' + String(store.seq.customer).padStart(4, '0');
+            store.customers.unshift({ no: custNo, name: cv.custName, type: cv.custType, industry: cv.industry, level: '潜在客户', source: l.source, region: '江苏省南京市', scale: '中型', owner: cv.owner, status: '跟进中', lastFollow: TODAY, lastDeal: '-', total: 0, created: TODAY, phone: cv.contactPhone, key: false });
+            created.push('客户 ' + custNo);
+          } else created.push('关联现有客户 ' + custNo);
+          created.push('联系人 ' + cv.contactName);
+          if (cv.createOpp) { store.opps.unshift({ no: 'SJ-202611-0' + (40 + store.opps.length), name: cv.oppName, customer: cv.mode === 'new' ? cv.custName : (store.customers.find(c => c.no === custNo) || {}).name, amount: cv.oppAmount, date: cv.oppDate, owner: cv.owner, stage: 'contact', prob: 10, info: {}, flags: {} }); created.push('商机「' + cv.oppName + '」'); }
+          l.status = '已转化'; l.convertedAt = TODAY + ' 16:00'; l.convertedTo = custNo;
+          addLog('转化为客户', '同一事务创建：' + created.join('、') + '；原始线索与跟进历史保留');
+          cv.saving = false; dlg.convert = false;
+          ElNotification({ title: '线索转化完成', message: '已在同一事务中创建：' + created.join('、') + '。原始线索与跟进历史已保留。', type: 'success', duration: 5000 });
+        } catch (e) {
+          cv.saving = false;
+          ElMessage.error('线索转化失败：' + e.message + '。已整体回滚，原始线索与跟进历史保留，未生成半成品客户关系');
+        }
+      }, 700);
+    };
+    return { lead, stTag, acts, logs, dlg, af, iv, doAssign, doBack, doInvalid, openConvert, doConvert, cv, cvDup, exCusts, needTime, relActivity, referrer, OWNERS, INDUSTRIES, go, yuan };
   },
   template: `<div v-if="lead">
     <el-breadcrumb separator="/" class="crumb"><el-breadcrumb-item><a @click="$go('/leads')">线索管理</a></el-breadcrumb-item><el-breadcrumb-item><a @click="$go('/leads')">线索列表</a></el-breadcrumb-item><el-breadcrumb-item>{{ lead.no }}</el-breadcrumb-item></el-breadcrumb>
@@ -4859,7 +4989,7 @@ const LeadDetailPage = {
         <h2>{{ lead.name }}<el-tag :type="stTag[lead.status]" size="small">{{ lead.status }}</el-tag><el-tag type="info" size="small" effect="plain">{{ lead.source }}</el-tag></h2>
         <div class="cust-meta"><span>线索编号：<b>{{ lead.no }}</b></span><span>负责人：<b>{{ lead.owner || '（公海 · 待分配）' }}</b></span><span>创建时间：<b>{{ lead.created }}</b></span></div>
         <div style="margin-top:10px;display:flex;gap:8px">
-          <el-button type="primary" size="small" icon="Promotion" :disabled="lead.status==='已转化'||lead.status==='无效'" @click="doConvert">转化客户 / 商机</el-button>
+          <el-button type="primary" size="small" icon="Promotion" :disabled="lead.status==='已转化'||lead.status==='无效'" @click="openConvert">转化客户 / 商机</el-button>
           <el-button size="small" icon="User" @click="af.owner=lead.owner;af.reason='';dlg.assign=true">分配</el-button>
           <el-button size="small" :disabled="!lead.owner" @click="doBack">退回公海</el-button>
           <el-button size="small" type="warning" plain :disabled="lead.status==='已转化'" @click="iv.reason='';iv.remark='';dlg.invalid=true">标记无效</el-button>
@@ -4871,15 +5001,20 @@ const LeadDetailPage = {
     <div class="card card-pad">
       <div style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:20px">
         <div>
-          <div class="sec-title">线索基本信息</div>
+          <div class="sec-title">基本信息</div>
           <el-descriptions :column="2" border size="default">
             <el-descriptions-item label="线索编号">{{ lead.no }}</el-descriptions-item><el-descriptions-item label="线索状态">{{ lead.status }}</el-descriptions-item>
             <el-descriptions-item label="公司名称" :span="2">{{ lead.company }}</el-descriptions-item>
             <el-descriptions-item label="联系人">{{ lead.contact }}</el-descriptions-item><el-descriptions-item label="联系电话">{{ lead.phone }}</el-descriptions-item>
-            <el-descriptions-item label="来源渠道">{{ lead.source }}</el-descriptions-item><el-descriptions-item label="需求类型">{{ lead.need }}</el-descriptions-item>
-            <el-descriptions-item label="预计金额">{{ yuan(lead.amount) }}</el-descriptions-item><el-descriptions-item label="负责人">{{ lead.owner || '（公海 · 待分配）' }}</el-descriptions-item>
-            <el-descriptions-item label="下次跟进">{{ lead.next || '-' }}</el-descriptions-item><el-descriptions-item label="创建时间">{{ lead.created }}</el-descriptions-item>
+            <el-descriptions-item label="来源渠道">{{ lead.source }}</el-descriptions-item><el-descriptions-item label="负责人">{{ lead.owner || '（公海 · 待分配）' }}</el-descriptions-item>
+            <el-descriptions-item label="创建时间" :span="2">{{ lead.created }}</el-descriptions-item>
             <el-descriptions-item label="重复提示" :span="2">{{ lead.dup ? ('与' + lead.dup.type + '「' + lead.dup.ref + '」' + lead.dup.why) : '未命中查重规则' }}</el-descriptions-item>
+          </el-descriptions>
+          <div class="sec-title" style="margin-top:20px">需求信息</div>
+          <el-descriptions :column="2" border size="default">
+            <el-descriptions-item label="产品需求（需求类型）">{{ lead.need }}</el-descriptions-item><el-descriptions-item label="预算（预计金额）">{{ yuan(lead.amount) }}</el-descriptions-item>
+            <el-descriptions-item label="采购时间">{{ needTime }}</el-descriptions-item><el-descriptions-item label="下次跟进时间">{{ lead.next || '-' }}</el-descriptions-item>
+            <el-descriptions-item label="需求描述" :span="2">围绕「{{ lead.need }}」方向的初步商务沟通，预算与采购周期以跟进记录确认为准。</el-descriptions-item>
           </el-descriptions>
           <div class="sec-title" style="margin-top:20px">跟进记录时间线</div>
           <el-timeline style="padding-left:6px">
@@ -4891,7 +5026,13 @@ const LeadDetailPage = {
           </el-timeline>
         </div>
         <div>
-          <div class="sec-title">操作日志</div>
+          <div class="sec-title">关联信息</div>
+          <el-descriptions :column="1" border size="small">
+            <el-descriptions-item label="来源活动">{{ relActivity }}</el-descriptions-item>
+            <el-descriptions-item label="推荐人">{{ referrer }}</el-descriptions-item>
+            <el-descriptions-item label="相关附件"><a class="link" @click="$msg.info('示例：预觘认证文件（按权限展示）')">名片信息.jpg</a> · <a class="link" @click="$msg.info('示例：下载附件（按权限展示）')">需求初稿.xlsx</a></el-descriptions-item>
+          </el-descriptions>
+          <div class="sec-title" style="margin-top:20px">操作日志</div>
           <el-timeline>
             <el-timeline-item v-for="(g,i) in logs" :key="g.time+g.act+i" :timestamp="g.time + ' · ' + g.who" placement="top" :hollow="i!==0">
               <b>{{ g.act }}</b><div class="muted" style="font-size:13px">{{ g.detail }}</div>
@@ -4906,6 +5047,37 @@ const LeadDetailPage = {
       <el-form label-width="90px"><el-form-item label="分配给" required><el-select v-model="af.owner" placeholder="选择销售人员" style="width:100%"><el-option v-for="o in OWNERS" :key="o" :value="o"/></el-select></el-form-item>
       <el-form-item label="备注"><el-input v-model="af.reason" type="textarea" :rows="2"/></el-form-item></el-form>
       <template #footer><el-button @click="dlg.assign=false">取消</el-button><el-button type="primary" @click="doAssign">确认分配</el-button></template>
+    </el-dialog>
+    <el-dialog v-model="dlg.convert" title="转化客户" width="700px" top="6vh" :close-on-click-modal="false">
+      <template v-if="lead">
+        <el-alert v-if="cvDup" type="warning" show-icon :closable="false" style="margin-bottom:14px">
+          <template #title>转化前查重：检测到已存在客户「{{ cvDup.ref }}」（{{ cvDup.why }}）</template>
+          <div style="font-size:12px;margin-top:4px">为避免重复建客户，已默认关联现有客户；仍需新建请确认不是同一组织。</div></el-alert>
+        <el-alert v-else type="success" show-icon :closable="false" style="margin-bottom:14px" title="转化前查重：未发现重复客户（已按手机号、公司名称检查），可创建新客户。" />
+        <el-form label-width="108px" size="default">
+          <div class="sec-title">客户处理方式</div>
+          <el-form-item label="处理方式" required><el-radio-group v-model="cv.mode"><el-radio-button label="new">创建新客户</el-radio-button><el-radio-button label="link">关联现有客户</el-radio-button></el-radio-group></el-form-item>
+          <template v-if="cv.mode==='new'">
+            <el-row :gutter="12"><el-col :span="12"><el-form-item label="客户名称" required><el-input v-model="cv.custName"/></el-form-item></el-col>
+            <el-col :span="12"><el-form-item label="客户类型" required><el-select v-model="cv.custType" style="width:100%"><el-option v-for="x in ['企业客户','个人客户','渠道客户']" :key="x" :value="x"/></el-select></el-form-item></el-col></el-row>
+            <el-row :gutter="12"><el-col :span="12"><el-form-item label="所属行业" required><el-select v-model="cv.industry" placeholder="请选择" style="width:100%"><el-option v-for="x in INDUSTRIES" :key="x" :value="x"/></el-select></el-form-item></el-col>
+            <el-col :span="12"><el-form-item label="新客户负责人" required><el-select v-model="cv.owner" style="width:100%"><el-option v-for="x in OWNERS" :key="x" :value="x"/></el-select></el-form-item></el-col></el-row>
+          </template>
+          <el-form-item v-else label="现有客户" required><el-select v-model="cv.linkNo" filterable placeholder="搜索并选择现有客户" style="width:100%"><el-option v-for="c in exCusts" :key="c.no" :value="c.no" :label="c.no+' · '+c.name"/></el-select></el-form-item>
+          <div class="sec-title">联系人</div>
+          <el-row :gutter="12"><el-col :span="12"><el-form-item label="联系人姓名" required><el-input v-model="cv.contactName"/></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="联系方式" required><el-input v-model="cv.contactPhone"/></el-form-item></el-col></el-row>
+          <div class="sec-title">商机</div>
+          <el-form-item label="创建商机"><el-switch v-model="cv.createOpp" active-text="是" inactive-text="否"/></el-form-item>
+          <template v-if="cv.createOpp">
+            <el-form-item label="商机名称" required><el-input v-model="cv.oppName"/></el-form-item>
+            <el-row :gutter="12"><el-col :span="12"><el-form-item label="预计金额" required><el-input-number v-model="cv.oppAmount" :min="0" :step="10000" :controls="false" style="width:100%"/></el-form-item></el-col>
+            <el-col :span="12"><el-form-item label="预计成交日期" required><el-date-picker v-model="cv.oppDate" type="date" value-format="YYYY-MM-DD" style="width:100%"/></el-form-item></el-col></el-row>
+          </template>
+        </el-form>
+        <div class="muted" style="font-size:12px;padding-left:4px"><el-icon><lock/></el-icon> 保存时客户、联系人、商机在同一事务中创建，任一步失败则整体回滚，原始线索与跟进历史始终保留。</div>
+      </template>
+      <template #footer><el-button @click="dlg.convert=false">取消</el-button><el-button type="primary" :loading="cv.saving" @click="doConvert">确认转化</el-button></template>
     </el-dialog>
     <el-dialog v-model="dlg.invalid" title="标记无效" width="440px">
       <el-form label-width="90px"><el-form-item label="无效原因" required><el-select v-model="iv.reason" placeholder="请选择" style="width:100%"><el-option v-for="x in ['联系方式无效','无采购意向','已被竞品签约','信息不真实','重复线索']" :key="x" :value="x"/></el-select></el-form-item>
@@ -4954,7 +5126,7 @@ const LeadsPage = {
     });
     const openAssign = (row, sel) => { batch.value = row ? [row] : sel; if (!batch.value.length) return ElMessage.warning('请先勾选需要分配的线索'); assignForm.owner = ''; assignForm.reason = ''; dlg.assign = true; };
     const doAssign = () => { if (!assignForm.owner) return ElMessage.warning('请选择负责人');
-      batch.value.forEach(l => { l.owner = assignForm.owner; if (l.status === '新建') l.status = '新建'; }); dlg.assign = false; ElMessage.success(`已将 ${batch.value.length} 条线索分配给 ${assignForm.owner}，操作记录已写入`); };
+      batch.value.forEach(l => { l.owner = assignForm.owner; }); dlg.assign = false; ElMessage.success(`已将 ${batch.value.length} 条线索分配给 ${assignForm.owner}，操作记录已写入`); };
     const claim = row => ElMessageBox.confirm(`确认从公海领取线索「${row.company}」？领取后保护期 7 天，每人领取上限 50 条（当前已领 18 条）。`, '领取线索', { type: 'info' }).then(() => { row.owner = '张三'; row.status = '跟进中'; ElMessage.success('领取成功，已加入「我的线索」'); }).catch(() => {});
     const openFollow = row => { curLead.value = row; Object.assign(followForm, { type: '电话', content: '', feedback: '', next: '' }); dlg.follow = true; };
     const doFollow = () => { if (!followForm.content) return ElMessage.warning('请填写跟进内容');
@@ -4969,6 +5141,7 @@ const LeadsPage = {
       store.leads.unshift({ no: 'XS-202611-' + n, name: addForm.need || '新建线索', company: addForm.company, contact: addForm.contact, phone: addForm.phone.replace(/^(\d{3})\d{4}(\d{4})$/, '$1****$2'), source: addForm.source, need: addForm.need || '-', amount: addForm.amount || 0, status: '新建', owner: '', next: '', created: '2026-11-02 07:00', dup: dupCheck.value.length ? { type: '线索/客户', ref: dupCheck.value[0].ref, why: dupCheck.value[0].why } : undefined });
       dlg.add = false; ElMessage.success('线索已创建并进入待分配线索池'); };
     const openAdd = () => { Object.assign(addForm, { company: '', contact: '', phone: '', source: '官网', need: '', amount: 0 }); dlg.add = true; };
+    const NEED_TYPES = ['CRM 软件', 'ERP 对接', 'MES 系统', '服务工单', 'BI 数据平台', '会员运营', '渠道代理', '实施服务', '培训服务', '定制开发'];
     // ---------- 转化客户（方案 6.1） ----------
     const cv = reactive({ mode: 'new', custName: '', custType: '企业客户', industry: '', owner: '张三', linkNo: '', contactName: '', contactPhone: '', contactTitle: '', createOpp: true, oppName: '', oppAmount: 0, oppDate: '', saving: false });
     const cvDup = computed(() => curLead.value && curLead.value.dup && curLead.value.dup.customerNo ? curLead.value.dup : null);
@@ -4998,7 +5171,7 @@ const LeadsPage = {
     };
     const dupLink = row => ({ type: row.dup.type, text: row.dup.why + '：' + row.dup.ref });
     const hasCust = no => store.customers.some(c => c.no === no);
-    return { hasCust, rows, stats, cols, t, TABS, dlg, curLead, batch, assignForm, followForm, invalidForm, addForm, dupCheck, openAssign, doAssign, claim, openFollow, doFollow, openInvalid, doInvalid, release, cmd, openAdd, submitAdd, cv, cvDup, openConvert, doConvert, dupLink, dupCount, totalText, OWNERS, INDUSTRIES, EXISTING_CUSTOMERS: computed(() => store.customers.slice(0, 12)), go, yuan, tab: computed(() => props.tab) };
+    return { hasCust, rows, stats, cols, t, TABS, dlg, curLead, batch, assignForm, followForm, invalidForm, addForm, dupCheck, openAssign, doAssign, claim, openFollow, doFollow, openInvalid, doInvalid, release, cmd, openAdd, submitAdd, NEED_TYPES, cv, cvDup, openConvert, doConvert, dupLink, dupCount, totalText, OWNERS, INDUSTRIES, EXISTING_CUSTOMERS: computed(() => store.customers.slice(0, 12)), go, yuan, tab: computed(() => props.tab) };
   },
   template: `<div>
     <list-page :crumbs="['线索管理', t]" :title="t" :total-text="totalText" :stats="stats" :rows="rows" :cols="cols" :action-width="260" drawer-title="线索详情（快速查看）"
@@ -5052,7 +5225,7 @@ const LeadsPage = {
         <el-form-item label="联系人" required><el-input v-model="addForm.contact" /></el-form-item>
         <el-form-item label="手机号码" required><el-input v-model="addForm.phone" maxlength="11" placeholder="11 位手机号（参与重复检测）" /></el-form-item>
         <el-form-item label="来源渠道"><el-select v-model="addForm.source"><el-option v-for="s in ['官网','广告','转介绍','活动','渠道']" :key="s" :value="s"/></el-select></el-form-item>
-        <el-form-item label="需求类型"><el-input v-model="addForm.need" /></el-form-item>
+        <el-form-item label="需求类型"><el-select v-model="addForm.need" filterable allow-create default-first-option placeholder="选择或输入产品/服务类别"><el-option v-for="s in NEED_TYPES" :key="s" :value="s"/></el-select></el-form-item>
         <el-form-item label="预计金额"><el-input-number v-model="addForm.amount" :min="0" :step="10000" :controls="false" style="width:200px"/> 元</el-form-item>
       </el-form>
       <template #footer><el-button @click="dlg.add=false">取消</el-button><el-button type="primary" @click="submitAdd">保存</el-button></template>
@@ -7797,6 +7970,8 @@ function prRead() {
   return out;
 }
 const prHasContract = c => (store.ext.contracts || []).some(t => t.customer === c.name && (t.status === '履约中' || t.status === '已签署'));
+const prHasOpenComplaint = c => (store.ext.tickets || []).some(t => t.customer === c.name && t.type === '投诉' && t.status !== '已关闭');
+const prHasSpecial = c => !!(c.specialProtect || c.protected);
 
 const PoolRulesPage = {
   components: { PageHead },
@@ -7810,7 +7985,7 @@ const PoolRulesPage = {
     const stats = computed(() => {
       const poolCust = store.customers.filter(c => !c.owner).length;
       const poolLead = store.leads.filter(l => !l.owner && l.status !== '已转化').length;
-      const protectCust = store.customers.filter(c => c.owner && (c.key || prHasContract(c))).length;
+      const protectCust = store.customers.filter(c => c.owner && (c.key || prHasContract(c) || prHasOpenComplaint(c) || prHasSpecial(c))).length;
       return [['公海客户（无负责人）', String(poolCust), 'warn'], ['公海线索（无负责人）', String(poolLead), 'warn'],
         ['受保护客户', String(protectCust), 'ok'], ['规则变更记录', String(r.logs.length), '']];
     });
@@ -7847,11 +8022,17 @@ const PoolRulesPage = {
             kept.push({ n: c.name, w: '—（已在公海）', why: c.status === '潜在客户' ? '潜在客户尚未分配' : '公海存量' });
             return;
           }
+          if (c.protectUntil && c.protectUntil >= todayStr) {
+            kept.push({ n: c.name, w: c.owner, why: '领取保护期内（至 ' + c.protectUntil + '），不释放' });
+            return;
+          }
           if (c.key && rule.protectKey) {
             kept.push({ n: c.name, w: c.owner, why: '重点客户保护开启' });
             return;
           }
           if (rule.protectContract && prHasContract(c)) return kept.push({ n: c.name, w: c.owner, why: '名下有履约中/已签署合同（保护）' });
+          if (prHasOpenComplaint(c)) return kept.push({ n: c.name, w: c.owner, why: '存在未处理投诉（保护，6.2）' });
+          if (prHasSpecial(c)) return kept.push({ n: c.name, w: c.owner, why: '客户存在特殊保护（保护，6.2）' });
           if (!inScope) {
             kept.push({ n: c.name, w: c.owner, why: '生效范围未覆盖「' + c.level + '」' });
             return;
@@ -10375,6 +10556,343 @@ Object.entries(PZ_DOC_M_CFG).forEach(([k, c]) => { DOCS_DEFAULT[k] = mkDoc(k, c)
 
 /* ===== PC 端需求文档补全（page-zz 保证最后加载，覆盖页面文件中较简略的旧文档） ===== */
 const PZ_DOC_PC_CFG = {
+  'customers': {
+    name: '客户列表', module: '客户管理',
+    goal: '集中管理企业全部客户档案：支持客户列表、我的客户、客户公海、重点客户、客户分类和客户回收站六个视图，提供查重、批量分配/转移、客户合并、导入导出与快捷编辑，作为客户详情与全生命周期经营的统一入口（规划方案 5.3、6.2）。',
+    roles: [
+      '菜单：销售通过「客户管理 → 客户列表 / 我的客户 / 重点客户」进入，只能查看本人负责及协同的客户，客户公海只展示无负责人客户。',
+      '菜单：销售经理可查看本团队客户并分配任务；销售总监可查看所辖部门客户；系统管理员拥有全部数据与客户回收站权限（第三章）。',
+      '按钮：新增、编辑、删除/作废、导入、导出、批量分配、转移、审批按按钮权限控制；客户回收站受权限控制，仅授权角色可见。',
+      '数据：数据权限分为本人、本人及下属、所属部门、指定部门、全部五档，跨部门越权查询被拦截并记录安全日志（第三章、第十二章）。',
+      '字段：联系电话、累计成交金额等敏感字段按字段权限脱敏、隐藏或只读，无权限用户不可见完整号码与金额（第三章）。'
+    ],
+    enter: [
+      '入口：左侧导航「客户管理 → 客户列表 / 我的客户 / 客户公海 / 重点客户 / 客户分类 / 客户回收站」，分别对应 /customers、/customers/my、/customers/pool、/customers/key、/customers/category、/customers/recycle。',
+      '关联入口：工作台客户统计、全局搜索客户候选、线索转化成功提示、商机/报价/合同/订单/回款页面的客户链接均可进入客户详情。',
+      '跳转：点击客户名称进入 /customer/:no；客户公海页签进入领取/分配流程；客户合并页签进入 /customers/merge。'
+    ],
+    layout: [
+      '顶部：面包屑「客户管理 / 当前页签」、页面标题、当前列表客户总数，以及新增客户、导入、导出、批量分配/转移按钮。',
+      '统计卡：客户总数、本月新增、重点/战略客户、超 14 天未跟进、流失客户五张卡，数字由当前 store.customers 实时计算。',
+      '页签与筛选：客户列表/我的客户/客户公海/重点客户/客户分类/客户回收站页签；关键词（编号/名称）、客户类型、客户等级、负责人、客户状态五个筛选条件；客户分类页签另提供行业筛选。',
+      '列表：客户编号、客户名称、客户类型、行业分类、客户等级、客户来源、所属区域、客户规模、客户负责人、客户状态、最近跟进时间、最近成交时间、累计成交金额、创建时间，共 14 列；客户名称带重点标记，公海客户负责人显示「（公海）」。',
+      '行操作与抽屉：查看（右侧抽屉快速查看并快捷编辑等级/状态）、详情、领取（公海）、转移、更多（新建商机、记录跟进、客户合并、作废/归档）。'
+    ],
+    fields: [
+      '客户编号｜类型：自动编号｜必填：是｜校验：全局唯一，格式 KH-年月-序号｜说明：客户唯一标识，公海与个人客户共用同一编号体系。',
+      '客户名称｜类型：文本｜必填：是｜校验：全库查重（名称/手机号），命中重复时提示关联现有客户、合并或创建新组织关系｜说明：企业或个人名称，点击进入详情。',
+      '客户类型｜类型：下拉框（企业客户/个人客户/渠道客户）｜必填：是｜校验：三选一｜说明：决定客户属性与部分字段展示。',
+      '行业分类｜类型：下拉框（制造业/零售/酒店餐饮等）｜必填：是｜校验：来自行业字典｜说明：客户分析报表按行业聚合，客户分类视图按该字段筛选。',
+      '客户等级｜类型：下拉框（战略/重点/普通/潜在）｜必填：是｜校验：四选一，界面显示为战略客户/重点客户/普通客户/潜在客户｜说明：重点客户转移与合并需审批，并受公海自动释放保护。',
+      '客户来源｜类型：下拉框（官网/渠道/转介绍等）｜必填：否｜校验：来自来源字典｜说明：用于来源转化与渠道效果分析。',
+      '所属区域｜类型：级联选择（省/市/区）｜必填：否｜校验：省市区级联格式｜说明：用于区域分配与销售经理查看。',
+      '客户规模｜类型：下拉框（大/中/小等）｜必填：否｜校验：来自规模字典｜说明：辅助判断客户价值与投入优先级。',
+      '客户负责人｜类型：用户（主负责人）｜必填：是（公海客户为空）｜校验：同一客户只有一个主负责人，可设置协同负责人但必须明确主负责人｜说明：公海客户显示「（公海）」，领取后写入当前销售。',
+      '客户状态｜类型：下拉框（正常/暂停合作/流失等）｜必填：是｜校验：命中状态枚举；界面另有「跟进中」表示持续互动中｜说明：由最近跟进与成交行为驱动，可在抽屉快捷编辑。',
+      '最近跟进时间｜类型：日期｜必填：否｜校验：不晚于当前时间，由最后一次有效跟进自动更新｜说明：超过 14 天进入预警统计，超过公海规则周期触发回收提醒。',
+      '最近成交时间｜类型：日期｜必填：否｜校验：不晚于当前时间，由最近成交记录自动更新｜说明：用于判断客户是否长期未成交。',
+      '累计成交金额｜类型：金额｜必填：否｜校验：大于等于 0，由已完成交易金额汇总，按分存储｜说明：列表按元展示，用于客户价值判断与排行榜。',
+      '创建时间｜类型：日期｜必填：是｜校验：系统生成，不可手工修改｜说明：客户建档时间，列表默认倒序依据。',
+      '查重结果｜类型：文本/标签｜必填：否｜校验：新增或导入时自动返回命中客户编号与命中原因｜说明：重复时优先提示关联、合并，不静默新建。',
+      '转移原因｜类型：多行文本｜必填：转移/批量分配时必填｜校验：非空｜说明：写入负责人变更日志，保存原负责人、新负责人、变更时间及原因。'
+    ],
+    rules: [
+      '列表为真分页：先按页签与筛选条件过滤，再按当前页码与每页条数切片，总数取过滤后的真实条数；统计卡数字由 store.customers 实时计算，禁止写死假总数。',
+      '同一客户原则上只有一个主负责人，支持多个协同负责人但必须明确主负责人；公海客户不属于任何销售私有（6.2）。',
+      '客户负责人变更时保存原负责人、新负责人、变更时间及原因；重点客户变更负责人（含转移）必须走原负责人直属经理或指定管理人审批，审批通过前不生效（5.3、6.2、7.2）。',
+      '新增客户与导入客户必须先查重：命中重复时提示关联现有客户、合并或创建新组织关系，避免产生重复档案（第十二章）。',
+      '重点客户转移必须走审批，其余客户可直接转移；转移弹窗强制选择新负责人并填写原因，原因写入变更日志。',
+      '客户不物理删除，优先逻辑删除、作废或归档，并记录操作人和原因；客户回收站仅授权角色可见，回收站数据可追溯，不清理历史关联。',
+      '客户合并时关联商机、合同、跟进记录等必须保留，主档案保留、原编号映射可追溯；重点客户合并需补充审批留痕（5.3、第十二章）。',
+      '自动化提醒：到达下次联系时间创建待办并通知客户负责人；超过规则规定的无效跟进周期进入待回收或公海；长期无成交或跟进异常创建客户流失预警维护任务（7.3）。',
+      '导入失败必须返回错误行号、字段和原因，不静默丢数据；导出按当前筛选条件执行并遵循字段权限（4.3、第十二章）。'
+    ],
+    flow: [
+      '客户状态：正常 → 跟进中 → 暂停合作 → 流失；由最近有效跟进与成交行为驱动，允许按业务需要由有权限人员调整，流失客户保留全部历史数据（5.3）。',
+      '客户等级：潜在 → 普通 → 重点 → 战略；重点与战略客户标记为重点客户，转移、合并和公海自动释放受保护（5.3）。',
+      '客户归属流转：客户创建或线索转化 → 分配客户负责人 → 销售持续跟进 →（超期未有效跟进）发送回收提醒 → 符合回收规则释放至公海 → 其他销售领取或经理分配（6.2）。',
+      '负责人变更流转：选择新负责人并填写原因 → 普通客户立即生效并写日志 → 重点客户生成转移审批 → 审批通过后生效，拒绝则保留原负责人。',
+      '客户合并流转：检测重复 → 选择主客户与被合并客户 → 字段冲突对比 → 关联数据迁移预览 → 确认合并（原客户置为已合并并保留原编号映射）。',
+      '回收保护：已签约、正在履约、有未处理投诉或存在特殊保护的客户不自动释放；重点客户与有履约合同客户默认受保护（5.3、6.2）。'
+    ],
+    errors: [
+      '重复录入客户：新增或导入时命中查重，提示关联现有客户、合并或创建新组织关系，不静默生成重复档案（第十二章）。',
+      '线索转化失败：保留原始线索，不生成不完整客户关系，可在修复后重新转化（第十二章）。',
+      '客户负责人离职：将其未完成客户和待办转交给指定人员，历史记录、合同、订单保持不变（第十二章）。',
+      '同一客户多人跟进：以主负责人为准，协同人员共享信息并留痕，防止重复联系；越权修改被拦截（第十二章）。',
+      '转移未勾选客户：提示「请先勾选客户」，不打开转移弹窗；未选择新负责人或未填写原因分别拦截，弹窗保持打开。',
+      '重点客户转移被拒绝：保留原负责人并通知申请人，不产生半更新状态。',
+      '导入文件字段缺失或格式错误：返回错误行号、字段和原因，合法行可继续导入或整批回滚，不静默丢数据（第十二章）。',
+      '跨部门或越权查看客户：后端拦截并记录安全日志，敏感字段按字段权限脱敏或隐藏（第三章、第十二章）。',
+      '筛选无结果：表格显示空态，统计卡仍展示全量真实数字，用户可重置筛选。'
+    ],
+    api: [
+      '客户分页查询接口：按关键词、类型、等级、负责人、状态过滤，返回当前页数据与过滤后的真实总数，服务端执行数据权限。',
+      '客户新增/编辑接口：新增前执行名称与手机号查重，返回命中客户、命中原因与建议处理方式。',
+      '客户转移/批量分配接口：校验新负责人与原因，重点客户生成客户转移审批单，普通客户直接写回并记录变更日志。',
+      '客户查重、导入、导出接口：导入返回错误行号/字段/原因，导出按筛选条件并执行字段脱敏。',
+      '客户合并接口：事务内完成字段覆盖、关联数据改归属、被合并客户状态变更与日志记录。',
+      '公海领取与自动回收接口：校验领取范围、每日上限、持有上限与保护期，回收任务按公海规则执行并留有执行日志（7.3、8.1）。'
+    ],
+    accept: [
+      '第十四章「客户管理：客户归属、转移、公海回收正确」：列表六个页签可切换，公海客户无负责人，领取后进入我的客户且原历史数据保留。',
+      '第十四章重点场景「销售人员离职，将客户及未完成任务转移给其他人员」：转移后新负责人、原负责人、时间与原因均可在变更日志中查到。',
+      '第十四章重点场景「不同部门尝试查看彼此的客户数据，验证数据权限」：越权访问被拦截并记录安全日志，敏感字段按权限展示。',
+      '第十四章「操作日志：重要操作可以查询到操作人和时间」：新增、编辑、转移、合并、作废均产生可查询日志。',
+      '新增重复客户时能触发查重提示，并可通过合并或关联现有客户消除重复；合并后主客户关联数据完整（第十二章）。',
+      '列表分页总数等于筛选后的真实条数，翻页数据变化，统计卡数字可由列表数据复算；页面无控制台报错。'
+    ]
+  },
+
+  'customer-detail': {
+    name: '客户详情', module: '客户管理',
+    goal: '以 Tab 结构全景呈现单个客户：基本信息、联系人、跟进记录、商机、报价、合同、订单、回款、服务、关系图、附件和操作日志，支持从客户直接创建联系人、商机、报价、合同、订单，并查看客户全生命周期成交、回款与服务情况（规划方案 5.3）。',
+    roles: [
+      '菜单：客户负责人可查看并维护本人客户；协同负责人可查看共享信息；销售同事按数据权限只读；销售经理、销售总监、系统管理员按数据范围查看。',
+      '按钮：记录跟进、新建联系人/商机/报价/合同/订单、编辑、变更负责人、客户合并按按钮权限控制；重点客户变更负责人需直属经理审批。',
+      '数据：客户详情只加载当前客户自己的数据，联系人、跟进、商机、报价、合同、订单、回款、服务按客户名称隔离，不与其他客户混用。',
+      '字段：联系电话默认脱敏，点击「显示」才展示完整号码并记录敏感字段访问日志；累计成交金额、未回款金额按字段权限展示。'
+    ],
+    enter: [
+      '入口：客户列表点击客户名称或「详情」，路由 /customer/:no。',
+      '关联入口：全局搜索客户结果、商机/报价/合同/订单/回款/工单页面的客户名称链接、关系图节点跳转。',
+      '跳转：联系人进入 /contact/:no，商机进入 /opp/:no，报价进入 /quote/:no，合同进入 /contract/:no，订单进入 /order/:no，服务工单进入 /service；客户合并进入 /customers/merge 并自动带入当前客户。'
+    ],
+    layout: [
+      '头部：客户 Logo/首字头像、客户名称、等级/状态/行业标签、客户编号、负责人（带变更入口）、联系电话（脱敏/显示切换），以及记录跟进、新建、编辑、客户合并按钮和关联商机/成交合同/累计成交三张汇总卡。',
+      'Tab：基本信息、联系人、跟进记录、商机、报价、合同、订单、回款、服务、关系图、附件、操作日志，共 12 个页签。',
+      '基本信息：客户基本信息（来源、区域、创建时间、类型、规模、行业、主负责人、协同负责人、状态、最近跟进、最近成交、累计成交）、最近跟进卡片、全生命周期（累计成交/累计已回款/未回款/服务工单）、组织关系树、公海规则提示。',
+      '子列表：联系人表、跟进时间线（可按活动类型筛选）、商机表、报价表、合同表、订单表、回款表（按合同回款计划计算）、服务工单表、关系图、附件表、操作日志表。'
+    ],
+    fields: [
+      '客户编号｜类型：自动编号｜必填：是｜校验：全局唯一，格式 KH-年月-序号｜说明：只读，客户详情主键，合并后原编号映射保留。',
+      '客户名称｜类型：文本｜必填：是｜校验：全库查重，名称不能为空｜说明：企业或个人名称，详情页标题展示。',
+      '客户类型｜类型：下拉框（企业客户/个人客户/渠道客户）｜必填：是｜校验：三选一｜说明：基本信息区展示。',
+      '行业分类｜类型：下拉框（制造业/零售/酒店餐饮等）｜必填：是｜校验：来自行业字典｜说明：用于客户画像与报表聚合。',
+      '客户等级｜类型：下拉框（战略/重点/普通/潜在）｜必填：是｜校验：四选一｜说明：头部标签展示，可快捷编辑，重点客户受公海与转移保护。',
+      '客户来源｜类型：下拉框（官网/渠道/转介绍等）｜必填：否｜校验：来自来源字典｜说明：记录客户获取渠道。',
+      '所属区域｜类型：级联选择（省/市/区）｜必填：否｜校验：省市区级联格式｜说明：基本信息区展示。',
+      '客户规模｜类型：下拉框（大/中/小等）｜必填：否｜校验：来自规模字典｜说明：辅助判断客户价值。',
+      '客户负责人｜类型：用户（主负责人）｜必填：是（公海为空）｜校验：同一客户仅一个主负责人；变更需选择新负责人并填写原因｜说明：头部展示，变更保留原负责人、新负责人、时间、原因日志。',
+      '协同负责人｜类型：用户（多选）｜必填：否｜校验：不能与主负责人重复｜说明：多人跟进时共享客户信息，但必须明确主负责人。',
+      '客户状态｜类型：下拉框（正常/暂停合作/流失等）｜必填：是｜校验：命中状态枚举｜说明：由最近跟进与成交行为驱动，可快捷编辑。',
+      '最近跟进时间｜类型：日期｜必填：否｜校验：由有效跟进自动更新，不晚于当前时间｜说明：头部与基本信息展示最近一次有效跟进。',
+      '最近成交时间｜类型：日期｜必填：否｜校验：由成交记录自动更新｜说明：用于判断客户活跃度与流失预警。',
+      '累计成交金额｜类型：金额｜必填：否｜校验：由该客户已完成合同/交易汇总，按分存储｜说明：头部汇总卡与基本信息展示，按万/元格式化。',
+      '创建时间｜类型：日期｜必填：是｜校验：系统生成｜说明：客户建档时间。',
+      '联系人姓名｜类型：文本｜必填：是｜校验：非空，同一客户下不建议重名｜说明：联系人 Tab 展示并可跳转联系人详情。',
+      '联系人角色｜类型：下拉框（决策人/使用人/采购人/财务/技术）｜必填：是｜校验：命中角色枚举｜说明：用于组织结构与关系图分析。',
+      '联系电话｜类型：文本｜必填：是｜校验：手机号格式，默认脱敏显示｜说明：点击「显示」查看完整号码并记录敏感字段访问日志。',
+      '所属客户｜类型：客户选择｜必填：是｜校验：必须为有效客户｜说明：联系人、商机、报价、合同、订单创建时自动带入当前客户且不可改为其他客户。',
+      '变更原因｜类型：多行文本｜必填：变更负责人时必填｜校验：非空｜说明：写入负责人变更日志，记录原负责人、新负责人、变更时间及原因。'
+    ],
+    rules: [
+      '详情页必须使用该客户自己的数据（联系人、跟进、商机、报价、合同、订单、回款、服务、关系图），不得共用或串用其他客户数据。',
+      '可以从客户详情直接创建联系人、商机、报价、合同、订单，创建后自动关联当前客户并出现在对应 Tab，创建表单必填项缺失时拦截。',
+      '可以查询该客户所有历史跟进记录，按时间倒序展示并支持按电话/微信/拜访/会议/邮件筛选；新增跟进后刷新最近跟进时间并写入时间线与操作日志。',
+      '可以查看客户组织关系（总公司、分公司、门店）及联系人汇报关系树；无联系人时显示空态并提示先新增联系人。',
+      '可以查看客户全生命周期成交金额、回款及服务情况：累计成交取该客户合同金额，已回款/未回款按合同回款计划与实收记录计算，服务工单按状态统计进行中数量。',
+      '可以修改客户负责人，但必须保留负责人变更日志；重点客户变更负责人需直属经理审批，审批通过前不生效（5.3、6.2、7.2）。',
+      '客户合并时关联商机、合同、跟进记录等必须保留，合并后当前客户关联数据仍可在详情页查看（5.3、第十二章）。',
+      '自动化提醒：到达下次联系时间创建待办并通知负责人；长期无成交或跟进异常创建客户流失预警维护任务；合同到期前、回款逾期按规则提醒负责人或财务（7.3）。',
+      '敏感字段访问遵循字段权限，显示完整手机号、查看金额等动作写入操作日志；越权编辑或查看被拦截并记录安全日志（第三章、第十二章）。'
+    ],
+    flow: [
+      '客户状态：正常 → 跟进中 → 暂停合作 → 流失；新增有效跟进或成交后更新最近跟进/最近成交与状态，流失客户保留历史数据。',
+      '客户等级：潜在 → 普通 → 重点 → 战略；重点与战略客户在公海释放、负责人变更和客户合并时触发更高审批。',
+      '跟进流转：记录跟进 → 更新最近跟进时间 → 写入跟进时间线 → 若填写下次跟进时间则生成待办并在到期时提醒（7.3）。',
+      '负责人变更流转：选择新负责人并填写原因 → 普通客户立即生效并写日志 → 重点客户生成直属经理审批 → 通过后生效，拒绝则保留原负责人。',
+      '商机流转：商机赢单后自动更新客户状态与最近成交信息；报价审批拒绝保存拒绝原因，修改后重新提交；合同审批后修改需重新审批（5.5、第十二章）。',
+      '客户合并流转：重复客户检测 → 客户合并 → 被合并客户置为已合并 → 联系人/商机/报价/合同/订单/跟进迁移至主客户，原编号映射保留（5.3、第十二章）。',
+      '公海保护：已签约、履约中、有未处理投诉或特殊保护的客户不自动释放，重点客户默认保护（5.3、6.2）。'
+    ],
+    errors: [
+      '客户不存在：显示空态并引导返回客户列表，不渲染空白页面或报错。',
+      '无编辑权限：表单只读，写操作按钮隐藏或禁用；越权请求被后端拦截并记录安全日志（第三章、第十二章）。',
+      '客户无联系人：组织关系树、关系图显示空态并提示先新增联系人。',
+      '新增跟进未填写内容、新建子对象缺少必填项：分别拦截并提示，弹窗保持打开，不产生半成品数据。',
+      '变更负责人未选择新负责人或未填写原因：拦截并提示；新负责人与当前负责人相同也拦截。',
+      '重点客户变更负责人：不直接改负责人，提示已提交直属经理审批并说明生效条件，避免绕过审批。',
+      '客户关联的商机、合同、回款数据为空：对应 Tab 显示空态，不影响其他 Tab 使用。',
+      '同一合同部分收款：记录多笔收款并动态计算余额；超额收款提示异常并转入待核实或预收款；回款录入错误走冲销或更正并保留记录（第十二章）。',
+      '已审批报价修改：生成新版本，不覆盖原批准内容；合同审批后修改按合同变更规则重新审批（第十二章）。',
+      '商机长时间停滞：按规则自动提醒并支持经理介入；客户投诉升级按等级通知主管与相关负责人（第十二章）。',
+      '工单重复提交：提示相似工单并允许关联已有工单，不重复建单（第十二章）。'
+    ],
+    api: [
+      '客户详情查询接口：返回当前客户基本信息、负责人、协同负责人、统计汇总与公海保护状态。',
+      '客户子数据查询接口：按客户名称/编号返回联系人、跟进记录、商机、报价、合同、订单、回款计划、服务工单、附件和操作日志。',
+      '客户子对象创建接口：创建联系人、商机、报价、合同、订单时校验必填项并绑定当前客户。',
+      '负责人变更接口：校验新负责人与原因，重点客户生成转移审批单，写入负责人变更日志。',
+      '客户组织关系与关系图查询接口：返回联系人汇报关系、影响关系与客户内部关系节点边。',
+      '敏感字段访问日志接口：记录完整手机号、金额等敏感字段的查看人与时间（第三章）。'
+    ],
+    accept: [
+      '第十四章「客户管理：客户归属、转移、公海回收正确」：不同客户详情只展示各自数据，联系人、跟进、商机、合同、回款不串用，客户归属与转移结果正确。',
+      '第十四章重点场景「从新增线索开始，完整转化为客户、联系人和商机」：线索转化生成的客户详情能看到对应联系人与商机。',
+      '第十四章「操作日志：重要操作可以查询到操作人和时间」：新增跟进、变更负责人、新建子对象、合并客户均产生可查询日志。',
+      '可以从详情页成功创建联系人、商机、报价、合同、订单，并在对应 Tab 即时出现；创建失败整体回滚，不产生半成品数据。',
+      '新增跟进后时间线头部插入、最近跟进时间更新；按活动类型筛选后记录数与时间线一致。',
+      '负责人变更必须填写新负责人与原因，普通客户即时生效、重点客户提示审批；变更日志包含原负责人、新负责人、时间与原因。',
+      '显示/隐藏完整手机号可切换，敏感字段访问有提示或日志；客户合并后关联商机、合同、跟进记录仍保留。',
+      '页面 12 个 Tab 均可切换渲染，无空指针、无控制台报错。'
+    ]
+  },
+
+  'customer-merge': {
+    name: '客户合并', module: '客户管理',
+    goal: '把重复客户档案合并为一条主档案：通过「选择客户 → 字段冲突对比 → 关联数据迁移预览 → 确认提交」四步流程，保证联系人、商机、报价、合同、订单、跟进记录真实迁移，保留主档案、关联记录和原始编号映射，并记录合并原因、操作人与审批状态（规划方案 5.3、第十二章）。',
+    roles: [
+      '菜单：销售经理可发起客户合并、选择保留字段并填写合并原因；系统管理员可审批重点客户合并；所有有客户查看权限的角色可查看合并记录。',
+      '按钮：发起合并、确认合并、查看合并记录按按钮权限控制；重点客户合并需「原负责人直属经理」审批，无审批权限时只可提交。',
+      '数据：合并操作只允许在数据权限范围内的客户之间进行，跨部门或越权合并被拦截并记录安全日志。',
+      '字段：客户联系电话、成交金额等敏感字段在冲突对比时按字段权限展示，无权限字段不参与保留选择。'
+    ],
+    enter: [
+      '入口：左侧导航「客户管理 → 客户合并」，路由 /customers/merge。',
+      '关联入口：客户详情页「客户合并」按钮会自动把当前客户带入被合并客户；客户列表重复提示中也可进入合并流程。',
+      '跳转：合并完成后可在合并记录中查看主客户；点击主客户名称进入 /customer/:no，被合并客户原编号保留映射（mergedTo）。'
+    ],
+    layout: [
+      '顶部：面包屑「客户管理 / 客户合并」、页面标题、当前可用客户数，以及合并不可简单撤销的风险提示。',
+      '四步 el-steps：选择客户 → 字段冲突对比 → 关联数据迁移预览 → 确认提交；每步提供上一步/下一步，最后一步为确认合并。',
+      '字段冲突对比：逐字段展示主客户值与被告并客户值，相同字段标记「相同」，冲突字段逐项选择保留主客户值或被告并客户值。',
+      '迁移预览：联系人、商机、报价、合同、订单、跟进记录六类关联数据数量，合计迁移条数与「原编号映射保留」提示。',
+      '确认区与合并记录：合并摘要、合并原因（必填）、重点客户审批提示；下方合并记录表（时间/主客户/被合并客户/迁移数据/原因/操作人/审批状态）。'
+    ],
+    fields: [
+      '主客户｜类型：客户选择｜必填：是｜校验：必须为有效客户，且不能与被合并客户相同｜说明：合并后保留的主档案，编号与关联关系继续使用。',
+      '被合并客户｜类型：客户选择｜必填：是｜校验：必须为有效客户，不能与主客户相同，已合并客户不可再次合并｜说明：合并后状态置为「已合并」，保留原编号映射。',
+      '字段保留｜类型：单选（保留主客户/保留被合并）｜必填：是（冲突字段）｜校验：相同字段自动跳过，每个冲突字段必须明确选择｜说明：决定客户名称、类型、行业、等级、来源、区域、规模、负责人、电话、状态等字段的最终值。',
+      '联系人迁移｜类型：只读数量｜必填：是｜校验：数量取自该客户真实联系人数据｜说明：全部联系人归属改为主客户，历史互动保留。',
+      '商机/报价/合同/订单迁移｜类型：只读数量｜必填：是｜校验：数量取自该客户真实业务数据｜说明：关联数据 customer 归属改为主客户，单据编号与历史记录不变。',
+      '跟进记录迁移｜类型：只读数量｜必填：是｜校验：数量取自该客户真实跟进数据｜说明：跟进时间线全部迁移至主客户，不删除原记录。',
+      '合并原因｜类型：多行文本｜必填：是｜校验：非空，建议说明重复来源或合并依据｜说明：写入合并记录与操作日志，供审计追溯。',
+      '审批状态｜类型：只读枚举（已通过/审批中）｜必填：是｜校验：重点客户合并固定为审批中，普通客户为已通过｜说明：重点客户合并需原负责人直属经理审批留痕。'
+    ],
+    rules: [
+      '重复录入客户时应先检测重复并提示关联、合并或创建新组织关系；客户合并用于消除重复档案，不产生新的重复主档案（第十二章）。',
+      '主客户与被合并客户不能相同；必须填写合并原因；未满足条件时「下一步」或「确认合并」被拦截。',
+      '合并必须保留主档案、关联记录和原始编号：被合并客户状态置为「已合并」并记录 mergedTo/合并时间，原编号可追溯。',
+      '关联商机、报价、合同、订单、跟进记录必须真实迁移到主客户名下，不能删除或丢失；迁移应在事务内完成，失败整体回滚，不产生半迁移数据（5.3、第十二章）。',
+      '重点客户合并需「原负责人直属经理」审批；原型直接迁移数据并提示审批留痕，正式版审批通过前不落库（5.3、7.2）。',
+      '合并操作写入操作日志与合并记录，包含时间、主客户、被合并客户、迁移数据量、原因、操作人和审批状态。',
+      '已被合并的客户不可再次作为主客户或被合并客户参与合并；合并完成后列表显示「已合并」并归入客户回收站可追溯。'
+    ],
+    flow: [
+      '重复客户识别：新增/导入触发查重 → 命中重复 → 提示关联现有客户、合并或创建新组织关系 → 进入客户合并（第十二章）。',
+      '合并流程：选择主客户与被合并客户 → 字段冲突对比并选择保留值 → 迁移预览确认六类关联数据数量 → 填写合并原因并提交 → 数据迁移 + 日志记录 → 合并记录列表更新。',
+      '字段处理：相同字段沿用主客户值；冲突字段按逐项选择保留主客户值或被告并客户值，最终写回主客户档案。',
+      '数据迁移：联系人、商机、报价、合同、订单、跟进记录的客户归属改为主客户；单据编号、历史跟进、合同条款与订单数据保持不变。',
+      '审批流转：普通客户合并提交后立即完成并标记已通过；重点客户合并生成审批流程，审批中状态可查，拒绝时不执行合并并保留原档案。',
+      '合并后状态：被合并客户状态为「已合并」，不再参与客户列表正常经营，但可通过原编号映射查询主客户与历史记录。'
+    ],
+    errors: [
+      '未选择主客户或被合并客户：下一步按钮拦截并提示，不进入字段对比。',
+      '主客户与被合并客户相同：页面即时提示「主客户与被合并客户相同，请重新选择」，确认合并被拦截。',
+      '被合并客户已处于「已合并」状态：禁止再次合并，提示其已并入的主客户编号。',
+      '合并原因未填写：提交拦截并提示，弹窗/步骤保持当前状态。',
+      '重点客户合并未审批：提示生成审批流程，审批通过前不生效；审批拒绝则保留原档案并通知申请人。',
+      '合并事务失败：整体回滚，主客户与被合并客户数据均不改变，返回失败原因并记录错误日志，不产生半迁移数据（第十二章）。',
+      '越权合并他人或跨部门客户：后端拦截并记录安全日志（第三章、第十二章）。'
+    ],
+    api: [
+      '客户查重接口：按名称、手机号返回疑似重复客户及命中原因，供合并入口使用（第十二章）。',
+      '客户合并接口：事务内完成主客户字段覆盖、六类关联数据归属改写、被合并客户状态变更、原编号映射写入与日志记录。',
+      '合并预览接口：按主客户与被合并客户返回各字段冲突情况和六类关联数据迁移数量。',
+      '合并记录查询接口：按时间、主客户、被合并客户、操作人、审批状态分页查询。',
+      '重点客户合并审批接口：生成直属经理审批单，审批通过后落库，拒绝时回滚并通知申请人（7.2）。'
+    ],
+    accept: [
+      '四步流程可完整走通：选择客户、字段冲突对比、迁移预览、填写原因并确认合并，每一步均有必填校验。',
+      '合并后被合并客户显示「已合并」并保留原编号映射；主客户详情页能看到迁移后的联系人、商机、报价、合同、订单和跟进记录（5.3、第十二章）。',
+      '关联数据数量在迁移预览与合并记录中一致，迁移后主客户对应 Tab 条数增加、被合并客户原历史记录不丢失。',
+      '主客户与被合并客户相同、原因未填写时无法提交；重点客户合并出现审批提示且审批状态为「审批中」。',
+      '合并记录包含时间、主客户、被合并客户、迁移数据量、原因、操作人与审批状态，操作日志可查询。',
+      '重复客户经合并后，客户列表不再出现两条有效主档案；页面无控制台报错。'
+    ]
+  },
+
+  'pool-rules': {
+    name: '公海规则', module: '系统管理',
+    goal: '配置线索公海与客户公海的自动化规则：允许领取范围、每位销售领取数量上限、领取后保护期限、无有效跟进自动释放天数、重点客户与履约合同保护、客户转移审批和分配方式，并通过「规则试算」预演释放清单、通过变更记录追溯配置调整（规划方案 5.3、6.2、7.3、8.1）。',
+    roles: [
+      '菜单：系统管理员通过「系统管理 → 公海规则」进入并可修改全部规则；销售经理可查看规则与执行试算（只读）。',
+      '按钮：保存规则、恢复默认、规则试算按按钮权限控制；普通销售不可修改全局规则。',
+      '数据：规则为全局基础配置，对所有销售、经理和管理员同时生效，个人不能绕过规则私自保留或释放客户。',
+      '字段：规则变更记录保存操作人、时间与变更摘要，供审计查询；敏感配置仅管理员可见。'
+    ],
+    enter: [
+      '入口：左侧导航「系统管理 → 公海规则」，路由 /system/pool-rules。',
+      '关联入口：客户公海页面的回收/保护提示、线索公海的释放规则均引用本页配置。',
+      '跳转：规则试算结果中的客户名称可进入客户详情；变更记录在页面下方直接查看。'
+    ],
+    layout: [
+      '顶部：面包屑「系统管理 / 公海规则」、页面标题、说明「线索公海 / 客户公海 · 规则离线持久化」，以及恢复默认按钮。',
+      '统计卡：公海客户（无负责人）、公海线索（无负责人）、受保护客户、规则变更记录四张卡，数字由真实数据与规则计算。',
+      '规则卡：线索公海与客户公海两张表单卡，分别配置自动释放条件、客户保护、领取限制、保护期、退回公海审批、分配方式与生效范围。',
+      '规则试算：按当前规则对真实客户/线索模拟释放，展示释放清单（对象、当前负责人、命中原因）与不释放明细抽样。',
+      '规则变更记录：时间、操作人、变更摘要，保存时自动追加，最多保留 30 条。'
+    ],
+    fields: [
+      '未跟进天数｜类型：整数｜必填：是｜校验：1–365｜说明：超过该天数无有效跟进触发回收提醒与释放判断（客户公海默认 15 天）。',
+      '未成交天数｜类型：整数｜必填：是｜校验：1–365｜说明：超过该天数未成交触发释放判断（客户公海默认 90 天）。',
+      '重点客户保护｜类型：布尔｜必填：是｜校验：默认开启｜说明：战略/重点等级客户不自动释放，对应 5.3「重点客户是否禁止自动释放」。',
+      '履约合同保护｜类型：布尔｜必填：是｜校验：默认开启｜说明：有履约中/已签署合同的客户不自动释放，避免影响正在履约的客户（6.2）。',
+      '每日领取上限｜类型：整数｜必填：是｜校验：1–100｜说明：每位销售每日最多领取的客户/线索数量，对应 5.3「每位销售的领取数量上限」。',
+      '同时持有上限｜类型：整数｜必填：是｜校验：1–500｜说明：每位销售同时持有的客户/线索总数上限。',
+      '保护期天数｜类型：整数｜必填：是｜校验：0–120｜说明：领取后保护期，保护期内不释放且其他销售不可重复领取（客户默认 30 天）。',
+      '退回公海需审批｜类型：布尔/单选｜必填：是｜校验：需要/不需要｜说明：对应 5.3「客户转移是否需要审批」，开启后走客户转移审批。',
+      '分配方式｜类型：枚举（手动/轮流/按区域）｜必填：是｜校验：三选一｜说明：决定公海客户被领取或由经理分配的方式。',
+      '生效范围（等级）｜类型：多选（战略/重点/普通/潜在）｜必填：否｜校验：为空表示全部等级｜说明：客户公海规则只对所选客户等级生效，对应「允许领取的客户范围」。',
+      '生效范围（来源）｜类型：多选（官网/广告/活动/转介绍/渠道）｜必填：否｜校验：为空表示全部来源｜说明：线索公海规则只对所选来源生效。',
+      '变更摘要｜类型：文本｜必填：是｜校验：系统自动生成｜说明：保存规则时自动写入变更记录，包含调整后的关键阈值与分配方式。'
+    ],
+    rules: [
+      '公海规则应支持按企业情况调整：允许领取的客户范围、每位销售领取数量上限、领取后保护期限、多少天无有效跟进自动释放、重点客户是否禁止自动释放、客户转移是否需要审批（5.3 客户公海规则）。',
+      '超过规则规定的未跟进/未成交周期时，系统先发送回收提醒，再判断是否符合回收规则；符合才释放至客户公海，不符合则继续由原负责人跟进（6.2、7.3）。',
+      '重点客户保护与履约合同保护优先生效：开启时有履约中/已签署合同、重点客户、有未处理投诉或特殊保护的客户不进入自动释放清单（5.3、6.2、第十二章）。',
+      '保护期优先于释放条件：领取后保护期内即使超过未跟进天数也不释放；保护期截止按领取日 + 配置天数计算。',
+      '规则保存写入本地存储并追加变更记录，记录操作人、时间与变更摘要；恢复默认需二次确认。',
+      '规则试算只读不写数据：按当前（含未保存）数值对真实客户/线索模拟释放，展示命中条件与不释放原因，便于管理员上线前核对。',
+      '业务参数配置原则：客户类型、等级、行业、区域、回收周期等能通过配置解决的差异应通过配置实现，不通过修改代码解决（8.1）。',
+      '自动化规则应支持启用、停用、阈值设置和执行日志查询；本页提供阈值、保护开关、分配方式与变更记录，回收执行日志由正式版后台任务输出（7.3）。'
+    ],
+    flow: [
+      '配置流程：管理员修改客户公海/线索公海规则 → 保存 → 写入本地存储 → 追加规则变更记录 → 后续回收任务与领取校验按新规则执行。',
+      '客户回收流转：客户持续跟进 → 超过未跟进/未成交阈值 → 发送回收提醒 → 判断保护条件（重点客户、履约合同、投诉、特殊保护、保护期）→ 符合则进入待回收/公海 → 销售领取或经理分配（6.2）。',
+      '领取校验：销售领取时校验生效范围、每日领取上限、同时持有上限与是否已在他人保护期，通过后写入负责人与保护期截止。',
+      '转移审批：开启「退回公海需审批」或重点客户转移时生成客户转移审批，审批通过后完成转移/释放，拒绝则保留原负责人（5.3、7.2）。',
+      '规则试算：选择线索公海或客户公海 → 按当前规则扫描真实数据 → 输出释放清单与不释放原因 → 不修改任何业务数据。',
+      '规则变更：保存即生效并留痕；恢复默认将线索/客户规则和变更记录恢复为初始配置（需二次确认）。'
+    ],
+    errors: [
+      '阈值越界（未跟进/未成交天数小于 1 或大于 365、保护期小于 0 或大于 120）：输入组件限制并提示合法范围，不保存非法值。',
+      '每日领取上限或同时持有上限小于 1：输入组件限制，保存前校验失败时拦截。',
+      '试算无释放对象：释放清单显示空态提示「当前规则下没有会被自动释放的对象」，不伪造数据。',
+      '重点客户保护开启时：试算中重点客户进入不释放明细并注明「重点客户保护开启」，不出现释放记录。',
+      '履约合同保护开启时：有履约中/已签署合同的客户进入不释放明细并注明保护原因（6.2）。',
+      '规则保存失败（本地存储不可用）：提示保存失败并保留当前表单值，不静默丢失配置。',
+      '非管理员访问或修改规则：页面只读或入口隐藏，越权请求被拦截并记录安全日志（第三章、第十二章）。'
+    ],
+    api: [
+      '公海规则读取接口：返回线索公海与客户公海的释放阈值、保护开关、领取限制、保护期、审批与分配方式。',
+      '公海规则保存接口：校验阈值范围，保存后写入规则变更记录（操作人、时间、变更摘要）。',
+      '规则试算接口：接收规则参数，对真实客户/线索返回释放清单、不释放原因与统计数量，不写业务数据。',
+      '公海自动回收定时任务接口：按规则扫描超期客户/线索，先发回收提醒，命中保护条件跳过，输出执行日志（7.3）。',
+      '规则变更记录查询接口：按时间倒序分页返回变更时间、操作人与变更摘要。',
+      '业务字典配置接口：客户类型、等级、行业、区域、线索来源等基础枚举配置（8.1，本期以静态字典演示）。'
+    ],
+    accept: [
+      '第十四章「客户管理：客户归属、转移、公海回收正确」：按本页配置的未跟进/未成交天数试算，释放清单与保护名单与规则一致。',
+      '调整未跟进天数、保护期、重点客户保护、履约合同保护后，规则试算结果立即按新值变化；保存后刷新页面配置仍保留。',
+      '保护期内的客户、重点客户（保护开启时）、有履约中/已签署合同的客户、存在未处理投诉或特殊保护的客户不会出现在释放清单中，并能在不释放明细看到对应原因（6.2、第十二章）。',
+      '保存规则后规则变更记录新增一条，包含时间、操作人与变更摘要；恢复默认需二次确认并生效。',
+      '领取校验覆盖生效范围、每日/持有上限与保护期，超限或保护期内领取被拦截。',
+      '页面无控制台报错，两个公海规则卡、试算结果与变更记录均可正常交互。'
+    ]
+  },
+
   'analytics-detail': {
     name: '报表详情', module: '数据分析',
     goal: '对单张经营报表做下钻分析：在统一页面内切换统计周期与负责人，查看核心指标、主题色图表、统计口径说明和真实明细，实现「先看指标、再追单据」的分析动线，覆盖销售漏斗、目标达成、回款、客户、线索、商机赢输、活动效率与服务工单八张预置报表。',
@@ -10657,76 +11175,170 @@ const PZ_DOC_PC_CFG = {
 
   'customer-pool': {
     name: '客户公海', module: '客户管理',
-    goal: '承接无负责人或被释放的客户资源，让销售在统一池中查找、领取客户，并支持经理分配、重点客户转移审批提示和快捷维护客户等级与状态，保证客户资源有序流动、避免长期沉淀与撞单。',
+    goal: '承接无负责人或符合释放条件的客户资源，让销售在统一池中查找、领取客户，并支持经理分配、重点客户转移审批提示和快捷维护客户等级与状态，保证客户资源有序流动、避免长期沉淀与撞单（规划方案 5.3 客户公海规则、6.2 流程二）。',
     roles: [
-      '菜单：销售通过「客户管理 → 客户公海」进入，查看当前无负责人客户。',
-      '菜单：销售经理可见客户公海与团队客户，管理员可见全部客户并维护公海规则。',
-      '按钮：销售拥有领取、查看、详情和快捷编辑；经理额外拥有批量分配/转移；管理员可作废与合并客户。',
-      '数据：公海池数据为 owner 为空的客户，销售领取后进入本人客户范围，经理可跨团队分配。',
-      '字段：客户联系电话默认脱敏，累计成交金额、客户等级、客户状态按角色字段权限展示。',
-      '数据：重点客户转移必须走审批；客户不物理删除，作废需填写原因并记录操作人。'
+      '菜单：销售通过「客户管理 → 客户公海」进入，查看当前无负责人客户并领取；销售经理可查看团队客户并跨团队分配；系统管理员可见全部客户并维护公海规则。',
+      '按钮：销售拥有领取、查看、详情；经理额外拥有批量分配/转移；管理员可维护公海规则与执行回收。按钮按「新增/编辑/删除/导出/审批/转移」按钮权限控制。',
+      '数据：公海客户不属于任何销售私有；销售数据范围为本人，经理为本人及下属，销售总监为所辖部门，管理员为全部。',
+      '字段：客户联系电话默认脱敏，累计成交金额、客户等级、客户状态按字段权限展示或隐藏。',
+      '数据：重点客户转移必须走「原负责人直属经理或指定管理人」审批（7.2）；客户不物理删除，作废需填写原因并记录操作人。'
     ],
     enter: [
       '入口：左侧导航「客户管理 → 客户公海」，路由 /customers/pool。',
-      '关联入口：客户列表顶部页签「公海」切换到同一页面，页签为「全部/我的/公海/重点」。',
+      '关联入口：客户列表顶部页签「客户公海」切换到同一页面，页签为「客户列表/我的客户/客户公海/重点客户/客户分类/客户回收站」。',
       '跳转：点击客户名称或详情进入 /customer/:no；转移成功后客户从公海消失并出现在新负责人客户列表。'
     ],
     layout: [
-      '顶部：面包屑「客户管理 / 客户公海」、页面标题和客户总数说明，以及全局新增、导入、导出、批量分配按钮。',
-      '统计卡：客户总数、本月新增、重点/战略客户、超 14 天未跟进、流失客户五张卡，标注统计口径。',
-      '页签与筛选：全部/我的/公海/重点页签；关键词、客户类型、客户等级、负责人、客户状态五个筛选条件。',
-      '列表与抽屉：客户编号、名称、类型、行业、等级、来源、区域、规模、负责人、状态、最近跟进、最近成交、累计成交、创建时间；抽屉提供快速查看和等级/状态快捷编辑。',
-      '弹窗：领取确认、客户转移/批量分配（新负责人加强制转移原因）、更多菜单中的客户合并与作废示例。'
+      '顶部：面包屑「客户管理 / 客户公海」、页面标题和当前公海客户总数说明，以及新增、导入、导出、批量分配按钮。',
+      '统计卡：客户总数、本月新增、重点/战略客户、超 14 天未跟进、流失客户五张卡，数字均由当前数据实时计算并标注口径。',
+      '页签与筛选：客户列表/我的客户/客户公海/重点客户/客户分类/客户回收站页签；关键词、客户类型、客户等级、负责人、客户状态五个筛选条件。',
+      '列表与抽屉：客户编号、客户名称、客户类型、行业分类、客户等级、客户来源、所属区域、客户规模、客户负责人、客户状态、最近跟进时间、最近成交时间、累计成交金额、创建时间；抽屉提供快速查看和等级/状态快捷编辑。',
+      '弹窗：领取确认（提示保护期）、客户转移/批量分配（新负责人加强制转移原因）、更多菜单中的客户合并与作废示例。'
     ],
     fields: [
-      '客户编号｜类型：文本｜必填：是｜校验：全局唯一，格式 KH-年月-序号｜说明：客户主键，公海与个人客户保持一致。',
-      '客户名称｜类型：文本｜必填：是｜校验：全库查重，名称不能重复｜说明：点击进入客户详情。',
-      '客户类型｜类型：枚举（企业客户/个人客户/渠道客户）｜必填：是｜校验：三选一｜说明：决定客户属性与部分字段显示。',
-      '行业分类｜类型：枚举｜必填：是｜校验：来自行业字典｜说明：客户分析报表按行业聚合。',
-      '客户等级｜类型：枚举（战略客户/重点客户/普通客户/潜在客户）｜必填：是｜校验：四选一｜说明：战略和重点客户标记为重点，受公海释放与转移审批保护。',
-      '客户来源｜类型：枚举｜必填：否｜校验：来自来源字典｜说明：官网、广告、活动、渠道、转介绍等。',
-      '所属区域｜类型：文本｜必填：否｜校验：省市区格式｜说明：用于区域分配与经理查看。',
-      '客户负责人｜类型：人员｜必填：否｜校验：公海客户必须为空｜说明：为空时列表显示「（公海）」，领取后写入张三。',
-      '客户状态｜类型：枚举（正常/跟进中/暂停合作/流失）｜必填：是｜校验：四选一｜说明：可在抽屉中快捷编辑并即时写回。',
-      '最近跟进/最近成交｜类型：日期｜必填：否｜校验：不晚于今天｜说明：最近跟进超过 14 天纳入预警统计。',
-      '累计成交金额｜类型：货币｜必填：是｜校验：大于等于 0，按分存储｜说明：列表按元展示，用于客户价值判断。',
+      '客户编号｜类型：自动编号｜必填：是｜校验：全局唯一，格式 KH-年月-序号｜说明：客户主键，公海与个人客户保持一致。',
+      '客户名称｜类型：文本｜必填：是｜校验：全库查重（名称/手机号），重复时提示关联、合并或创建新组织关系｜说明：点击进入客户详情。',
+      '客户类型｜类型：下拉框（企业客户/个人客户/渠道客户）｜必填：是｜校验：三选一｜说明：决定客户属性与部分字段显示。',
+      '行业分类｜类型：下拉框（制造业/零售/酒店餐饮等）｜必填：是｜校验：来自行业字典｜说明：客户分析报表按行业聚合。',
+      '客户等级｜类型：下拉框（战略/重点/普通/潜在）｜必填：是｜校验：四选一｜说明：战略和重点客户标记为重点，受公海释放与转移审批保护。',
+      '客户来源｜类型：下拉框（官网/渠道/转介绍等）｜必填：否｜校验：来自来源字典｜说明：用于来源转化分析。',
+      '所属区域｜类型：级联选择（省/市/区）｜必填：否｜校验：省市区级联格式｜说明：用于区域分配与经理查看。',
+      '客户规模｜类型：下拉框（大/中/小等）｜必填：否｜校验：来自规模字典｜说明：辅助判断客户价值与投入。',
+      '客户负责人｜类型：用户（主负责人）｜必填：否｜校验：公海客户必须为空；同一客户仅一个主负责人｜说明：为空时列表显示「（公海）」，领取后写入当前销售。',
+      '客户状态｜类型：下拉框（正常/暂停合作/流失等）｜必填：是｜校验：命中状态枚举｜说明：可在抽屉中快捷编辑并即时写回。',
+      '最近跟进时间｜类型：日期｜必填：否｜校验：不晚于今天，由有效跟进自动更新｜说明：超过 14 天纳入预警统计，超过规则周期进入自动回收。',
+      '最近成交时间｜类型：日期｜必填：否｜校验：不晚于今天，由成交记录更新｜说明：用于判断客户是否长期未成交。',
+      '累计成交金额｜类型：金额｜必填：否｜校验：大于等于 0，按分存储并由已完成交易汇总｜说明：列表按元展示，用于客户价值判断。',
+      '创建时间｜类型：日期｜必填：是｜校验：系统生成，不可手工修改｜说明：客户建档时间。',
+      '放入公海原因｜类型：下拉框（主动放弃/超期未跟进/离职释放/经理分配）｜必填：是｜校验：释放时必须选择｜说明：记录客户进入公海的原因，供追溯。',
+      '保护期截止｜类型：日期｜必填：是｜校验：领取日 + 公海规则配置的保护期天数，默认 30 天｜说明：保护期内不自动释放，其他销售不可重复领取。',
       '转移原因｜类型：多行文本｜必填：转移时必填｜校验：非空｜说明：写入负责人变更日志，记录原负责人、新负责人、时间与原因。'
     ],
     rules: [
-      '公海页签的列表数据严格取 store.customers 中 owner 为空的客户；切换页签或筛选后重新计算，分页为真实切片。',
+      '公海页签的列表数据严格取 store.customers 中 owner 为空的客户；切换页签或筛选后重新计算，分页为真实切片，总数取过滤后的真实条数。',
       '五张统计卡为全量客户口径，包含个人客户与公海客户，因此客户总数不一定等于当前公海列表条数，页面通过口径说明避免误解。',
-      '领取前弹出确认框，明确提示领取后保护期 30 天；确认后把负责人写为张三，客户立即从公海列表消失。',
+      '允许领取的客户范围、每位销售每日领取上限与同时持有上限、领取后保护期限、多少天无有效跟进自动释放、重点客户是否禁止自动释放、客户转移是否需要审批，统一由「系统管理 → 公海规则」配置（5.3、8.1）。',
+      '领取前弹出确认框，明确提示当前配置的保护期天数（默认 30 天）；确认前校验生效范围、每日领取上限与同时持有上限，确认后把负责人写为当前销售、刷新最近跟进时间并写入保护期截止日，客户立即从公海列表消失。',
       '转移或批量分配必须选择新负责人并填写转移原因；包含重点客户时提示需原负责人直属经理审批，审批通过前不生效，普通客户可直接转移。',
       '抽屉快捷编辑客户等级与客户状态后点击保存，直接写回客户对象并提示保存成功，列表行同步刷新。',
       '客户不物理删除；「作废」仅记录原因、操作人和时间并归档，客户合并需保留联系人、商机、合同、跟进等关联数据。',
-      '超期未跟进与自动回收规则由系统管理中的公海规则维护，本页只展示结果；重点客户且存在履约合同时不会被自动释放。'
+      '公海中的客户不属于某一个销售的私有客户；释放和再次领取不能删除原客户的历史跟进、合同和订单数据（6.2）。',
+      '已签约、正在履约、有未处理投诉或存在特殊保护的客户不应自动释放；重点客户且存在履约合同时不会被自动释放（5.3、6.2、第十二章）。',
+      '自动化提醒：临近回收先发送回收提醒，超过规则规定的无效跟进周期进入待回收或公海；到达下次联系时间生成待办并通知负责人（7.3）。'
     ],
     flow: [
-      '公海生命周期：客户正常归属个人 → 主动释放或超期未跟进回收 → 负责人置空进入客户公海 → 销售领取或经理分配 → 重新归属个人。',
+      '公海生命周期：客户创建或线索转化 → 分配负责人 → 持续跟进 →（超期未有效跟进）发送回收提醒 → 符合回收规则则释放至客户公海 → 其他销售领取或经理分配 → 重新归属个人（6.2）。',
+      '释放条件：超过规则规定的未跟进天数或未成交天数，且不命中重点客户保护、履约合同保护、特殊保护、未处理投诉保护；保护期内的客户不释放。',
       '客户状态枚举：正常 → 跟进中 → 暂停合作 → 流失；状态可由抽屉快捷编辑，流失客户仍保留历史数据并计入流失统计。',
-      '客户等级枚举：潜在客户 → 普通客户 → 重点客户 → 战略客户；重点与战略客户标记重点，转移和合并需更高审批。',
-      '保护期规则：领取后进入 30 天保护期，保护期内原负责人可申请取回，其他销售不可重复领取；期满后按跟进情况决定是否再次释放。',
-      '转移审批：普通客户提交后立即生效；重点客户生成客户转移审批，审批通过后新负责人生效，拒绝则保留原负责人。'
+      '客户等级枚举：潜在 → 普通 → 重点 → 战略；重点与战略客户标记重点，转移和合并需更高审批。',
+      '保护期规则：领取后进入规则配置的保护期（默认 30 天），保护期内不自动释放且其他销售不可重复领取；期满后按跟进情况决定是否再次释放。',
+      '转移审批：普通客户提交后立即生效；重点客户生成客户转移审批，审批通过后新负责人生效，拒绝则保留原负责人。',
+      '负责人变更：保存原负责人、新负责人、变更时间及原因；负责人离职时转交未完成客户和待办，历史记录不变（6.2、第十二章）。'
     ],
     errors: [
       '未勾选客户就点击批量分配：提示「请先勾选客户」，不打开转移弹窗。',
       '转移时未选择新负责人或未填写原因：分别拦截并提示，弹窗保持打开。',
       '重点客户转移：不直接改负责人，而是提示已提交审批并说明生效条件，避免越权。',
       '公海无客户或筛选无结果：表格显示空态，统计卡仍展示全量真实数字，用户可重置筛选。',
-      '并发领取同一客户：正式版需服务端加锁并提示「已被他人领取」，原型为单用户即时写回。'
+      '并发领取同一客户：正式版需服务端加锁并提示「已被他人领取」，原型为单用户即时写回。',
+      '重复录入客户：领取或分配前执行查重，命中重复时提示关联、合并或创建新组织关系，不静默生成重复档案（第十二章）。',
+      '负责人离职：其未完成客户与待办转交指定人员，历史跟进、合同、订单不变；越权领取或分配被拦截并记录安全日志（第十二章）。'
     ],
     api: [
-      '客户公海分页查询接口：按客户类型、等级、负责人、状态筛选，只返回 owner 为空的客户。',
-      '领取客户接口：带并发校验与保护期写入，返回领取结果和新负责人。',
+      '客户公海分页查询接口：按客户类型、等级、负责人、状态筛选，只返回 owner 为空的客户，总数取过滤后的真实条数。',
+      '领取客户接口：带并发校验、每日领取上限与持有上限校验、保护期写入，返回领取结果和新负责人。',
       '批量分配/转移接口：校验新负责人与原因，重点客户生成转移审批单。',
+      '公海自动回收定时任务接口：按公海规则扫描超期客户，先发回收提醒，命中保护条件的客户跳过，执行日志可查询（7.3、8.1）。',
       '客户快捷编辑与作废接口：写回等级/状态，作废记录原因、操作人和时间并归档。'
     ],
     accept: [
-      '公海页签只显示无负责人客户，领取后该客户立即从公海消失并出现在我的客户中。',
-      '五个筛选条件、页签切换、查询和重置均可用，分页总数为筛选后的真实条数。',
-      '转移弹窗强制选择新负责人和填写原因，包含重点客户时给出审批提示且不直接改负责人。',
+      '公海页签只显示无负责人客户，领取后该客户立即从公海消失并出现在我的客户中；原跟进、合同、订单历史完整保留（第十四章「客户管理」）。',
+      '六个页签、五个筛选条件、查询和重置均可用，分页总数为筛选后的真实条数。',
+      '转移弹窗强制选择新负责人和填写原因，包含重点客户时给出审批提示且不直接改负责人；普通客户提交后立即生效。',
+      '按公海规则调整保护期、未跟进天数后，领取确认文案与规则试算的释放清单同步变化。',
       '抽屉快捷编辑等级或状态并保存后，列表对应行即时更新。',
       '页面无控制台报错，客户名称、详情、更多菜单和作废示例均可交互。'
+    ]
+  },
+
+  'leads': {
+    name: '线索列表', module: '线索管理',
+    goal: '管理从官网、市场活动、渠道和员工录入进入系统的全部线索：支持检索筛选、重复线索检测、分配 / 领取、记录跟进、标记无效与转化客户，让线索从待分配线索池到个人名下再到客户、联系人和商机的旅程全程可追踪（规划方案 5.2 / 6.1）。',
+    roles: [
+      '菜单：销售通过「线索管理 → 线索列表 / 我的线索」进入，只能操作本人负责的线索。',
+      '菜单：市场人员可新增与导入线索、执行线索分配（规划方案三：市场人员创建线索）；销售经理可查看团队全部线索并分配；管理员可维护来源渠道与查重规则。',
+      '按钮：新增、导入、导出、批量分配、分配、标记无效、退回公海、转化客户、记录跟进按按钮权限控制；无分配权限或非本人线索时对应按钮不展示。',
+      '数据：销售数据范围为本人的线索，经理为本人及下属，市场人员为全部待分配线索，管理员为全量。',
+      '字段：手机号码属敏感字段，按字段权限脱敏展示；公海线索对销售只读（仅可领取）。'
+    ],
+    enter: [
+      '入口：左侧导航「线索管理 → 线索列表」，路由 /leads；页签「我的线索」路由 /leads/my。',
+      '关联入口：顶部全局搜索命中线索编号或公司名称后跳转 /lead/:no；工作台快捷操作「新建线索」落到本页新增弹窗。',
+      '跳转：点击线索编号或名称进入线索详情 /lead/:no；记录页中点击「查看客户」进入 /customer/:no。转化客户成功通知中的链接也可回到本页。'
+    ],
+    layout: [
+      '顶部：面包屑「线索管理 / 线索列表」、页面标题与真实总数说明，以及新增线索、导入、导出、批量分配按钮。',
+      '页签：线索列表 / 我的线索 / 线索公海 / 线索转化记录四个页签，共用同一表格组件。',
+      '统计卡：线索总数、待分配（公海）、跟进中、疑似重复、本月已转化五张，全部由 store.leads 实时计算。',
+      '筛选区：关键词（线索编号 / 公司 / 联系人 / 手机）、来源渠道、线索状态、负责人四个条件；查询后回到第 1 页，支持重置。',
+      '表格列：线索编号、线索名称、公司名称（含疑似重复标签）、联系人、手机号码、来源渠道、需求类型、预计金额、线索状态、负责人、下次联系时间、创建时间；右侧操作列按状态给出领取 / 分配 / 记录跟进 / 转化客户 / 更多。',
+      '抽屉：线索详情快速查看，含基本信息、需求信息、跟进记录与操作记录说明。'
+    ],
+    fields: [
+      '线索编号｜类型：自动编号｜必填：是｜校验：全局唯一，格式 XS-年月-四位序号｜说明：系统生成，点击进入线索详情。',
+      '线索名称｜类型：文本｜必填：是｜校验：非空｜说明：个人、公司或项目名称，新建时默认取需求主题。',
+      '公司名称｜类型：文本｜必填：是｜校验：与已有线索 / 客户名称查重，参与重复线索检测｜说明：潜在企业名称，命中重复时显示「疑似重复」标签。',
+      '联系人｜类型：文本｜必填：是｜校验：非空｜说明：联系人姓名。',
+      '手机号码｜类型：手机号｜必填：是｜校验：11 位手机号格式，参与手机号查重｜说明：联系方式，保存后按字段权限脱敏展示（138****1234）。',
+      '来源渠道｜类型：下拉框｜必填：是｜校验：枚举（官网 / 广告 / 转介绍 / 活动 / 渠道）五选一｜说明：官网、广告、转介绍、活动等；用于来源转化分析。',
+      '需求类型｜类型：下拉框｜必填：否｜校验：产品或服务类别字典，允许录入新值｜说明：产品或服务类别，如 CRM 软件、MES 系统。',
+      '预计金额｜类型：金额｜必填：否｜校验：大于等于 0｜说明：初步预算，转化客户时作为新建商机预计金额的默认值。',
+      '线索状态｜类型：状态｜必填：是｜校验：枚举（新建 / 跟进中 / 已转化 / 无效）四选一｜说明：不能直接改状态，只能通过跟进 / 转化 / 无效 / 退回公海等业务操作流转。',
+      '负责人｜类型：用户｜必填：否｜校验：公海线索必须为空｜说明：当前跟进人；分配、领取后写入，退回公海时清空。',
+      '下次联系时间｜类型：日期时间｜必填：否｜校验：不早于当前时间｜说明：计划跟进时间；记录跟进时填写后自动生成销售待办。',
+      '创建时间｜类型：日期时间｜必填：是｜校验：系统生成，不可修改｜说明：线索录入时间，列表与导入按此排序。',
+      '无效原因｜类型：枚举｜必填：标记无效时必填｜校验：枚举（联系方式无效 / 无采购意向 / 已被竞品签约 / 信息不真实 / 重复线索）｜说明：写入操作日志并保留在线索上。',
+      '疑点：查重结果｜类型：文本提示｜必填：否｜校验：手机号或公司名称命中已有线索 / 客户时生成｜说明：显示重复原因与关联单号；对应数据字段 dup。',
+      '转化时间 / 转化为客户｜类型：日期时间 / 客户编号｜必填：转化时系统写入｜校验：客户编号须存在｜说明：仅「线索转化记录」页签展示。'
+    ],
+    rules: [
+      '新增线索必填公司名称、联系人、手机号码并校验手机号格式；保存前按手机号、公司名称实时查重，命中已有线索 / 客户时显示重复提示但允许人工确认后继续（进入待分配线索池并写入 dup 字段）。',
+      '分配 / 批量分配：必须先勾选或指定线索，选择负责人后写回；未选线索提示「请先勾选需要分配的线索」，未选负责人提示「请选择负责人」。',
+      '记录跟进：活动类型（电话 / 微信 / 拜访 / 邮件）+ 跟进内容必填；填写下次联系时间后自动生成待办，线索状态置为「跟进中」。',
+      '转化客户弹窗按规划方案 6.1：客户处理方式（创建新客户 / 关联现有客户）、客户名称、客户类型、所属行业、联系人姓名及联系方式、是否创建商机及商机名称 / 预计金额 / 预计成交日期、新客户负责人；保存时同一事务创建，任一步失败整体回滚。',
+      '导入 / 导出为示例提示：正式版导入须执行查重与必填校验并返回错误行号、字段和原因；导出按字段权限脱敏手机号。',
+      '列表为真分页：按筛选结果切片，统计卡与「线索共 N 条」为真实数据，统计口径在卡片脚注说明。'
+    ],
+    flow: [
+      '状态枚举：新建 → 跟进中 → 已转化 / 无效；无效为终态，退回公海时负责人清空、状态回到「新建」。',
+      '主线流程（规划方案 6.1）：线索来源（官网 / 市场活动 / 渠道 / 员工录入）→ 创建线索 → 系统重复检测 → 命中则提示关联已有客户或线索、人工确认合并或关联 → 分配负责人 → 销售联系并录入跟进记录 → 判断有效性 → 有效则转化客户（创建或关联客户 → 联系人 → 商机），无效则标记无效或退回公海。',
+      '转化前置校验：转化时先检查客户是否已存在（按手机号、公司名称）；客户已存在时默认「关联现有客户」，不重复建档；转化后原始线索与全部跟进历史保留。',
+      '自动化提醒（规划方案 7.3）：新线索创建后通知市场负责人（线索待分配）；分配后超过指定时长未跟进通知销售人员（线索待跟进）；超过指定时间没有跟进的线索可提醒负责人或由公海规则自动回收（本原型与「系统管理 → 公海规则」联动，回收效果在公海列表体现）。',
+      '权限与状态约束：无效 / 已转化线索不可再转化（转化按钮置灰）；状态变化只能通过业务操作触发，不允许直接改状态绕过校验。'
+    ],
+    errors: [
+      '重复录入线索：手机号或公司名称命中已有线索 / 客户时提示关联、合并或人工确认后创建（规划方案十二「重复录入客户 / 重复线索检测」）。',
+      '新增必填缺失或手机号格式错误：拦截保存并逐项提示，弹窗保持打开。',
+      '线索转化失败：转化中客户 / 联系人 / 商机任一步失败则整体回滚，不生成半成品客户关系，原始线索保留且状态不变，可重新发起转化（规划方案十二「线索转化失败」）。',
+      '数据导入失败：返回错误行号、字段和原因，不静默丢数据；导入模板含字段映射说明（规划方案十二「数据导入失败」）。',
+      '用户越权操作：非本人线索不展示操作按钮；越权请求后端拦截并记录安全日志（规划方案十二、第三章数据权限）。',
+      '公海无数据或筛选无结果：表格显示空态并可重置筛选，统计卡仍为真实数字。'
+    ],
+    api: [
+      '线索分页查询接口：支持关键词、来源渠道、状态、负责人条件，返回本权限范围内数据。',
+      '线索查重接口：按手机号 / 公司名称返回重复线索或客户编号及重复原因。',
+      '线索新增 / 导入接口：含必填与格式校验、查重提示；导入错误返回行号明细。',
+      '分配 / 领取 / 退回公海接口：校验负责人与并发，写入操作日志。',
+      '线索转化事务接口：同一事务创建 / 关联客户、联系人、（可选）商机，返回创建结果；失败整体回滚。',
+      '跟进记录、待办生成与操作日志接口：记录操作人、时间与内容（示例）。'
+    ],
+    accept: [
+      '对应规划方案第十四章「线索管理：能创建、分配、查重、跟进、转化」：从新增线索（必填 + 格式校验 + 查重提示）→ 分配或领取 → 记录跟进 → 转化客户的完整链路在本页均可用。',
+      '对应重点验收场景「从新增线索开始，完整转化为客户、联系人和商机」：转化成功后线索状态置为已转化、写入转化时间与目标客户编号，客户详情与商机列表可反查到新建的数据。',
+      '新增线索时公司名称 / 联系人 / 手机号码缺失或手机号格式非法被拦截并提示；合法数据保存后进入待分配（公海）并立即计入统计卡。',
+      '重复线索在列表带「疑似重复」标签，悬浮可查看重复原因（手机号相同 / 公司名称一致）与关联单号。',
+      '统计卡与分页总数由 store.leads 实时计算：线索总数等于数据条数，公海 / 跟进中 / 已转化计数与列表一致，无写死总数。',
+      '四个筛选条件（关键词 / 来源 / 状态 / 负责人）、页签切换、抽屉与行内按钮可用，页面无控制台报错。'
     ]
   },
 
@@ -10773,12 +11385,13 @@ const PZ_DOC_PC_CFG = {
       '分配与批量分配必须先勾选线索或指定单条线索，选择负责人后一次性写回；未选择负责人时提示并阻止提交。',
       '公司名称或手机号命中已有客户/线索时，列表显示「疑似重复」标签，悬浮展示查重结果，转化前建议关联已有客户。',
       '新增线索必须填写公司名称、联系人和手机号码，手机号需符合格式，保存后进入待分配线索池。',
-      '导入与导出为示例提示；正式版导入需执行查重与必填校验并反馈错误行，导出需按字段权限脱敏。'
+      '自动化提醒（规划方案 7.3）：新线索创建后通知市场负责人（线索待分配）；分配后超过指定时长未跟进自动通知销售人员（线索待跟进）；公海线索按「系统管理 → 公海规则」未跟进周期自动回收，本页展示回收结果。',
+      '导入与导出为示例提示；正式版导入需执行查重与必填校验并反馈错误行号、字段和原因（不静默丢数据），导出需按字段权限脱敏。'
     ],
     flow: [
       '线索生命周期：新建（无负责人）→ 进入公海 → 领取或分配 → 跟进中 → 已转化或无效；已转化线索不再出现在公海。',
       '退回公海：负责人清空、状态重置为新建，历史跟进记录与查重信息保留，供后续领取人参考。',
-      '领取保护：领取后 7 天保护期内优先归属领取人，超过领取上限时禁止继续领取，正式版由服务端校验并发。',
+      '领取保护：领取后 7 天保护期内优先归属领取人，超过领取上限时禁止继续领取，正式版由服务端校验并发；超期未跟进线索按公海规则自动回收回公海。',
       '转化状态：跟进中线索可转化客户，转化成功后状态置为已转化并记录转化时间与目标客户编号。'
     ],
     errors: [
@@ -10786,20 +11399,23 @@ const PZ_DOC_PC_CFG = {
       '分配时未选择负责人：提示「请选择负责人」，不写回数据。',
       '手机号格式错误或必填项缺失：新增线索被拦截并提示具体字段。',
       '领取时线索已被他人领取：正式版需刷新列表并提示「已被他人领取」，原型为单用户即时写回。',
+      '数据导入失败：返回错误行号、字段和原因，不静默丢数据（规划方案十二「数据导入失败」）。',
+      '用户越权操作：无分配 / 领取权限的角色不展示对应按钮，越权请求后端拦截并记录安全日志（规划方案十二）。',
       '公海无数据或筛选无结果：表格显示空态并允许重置筛选，统计卡仍展示全量真实数字。'
     ],
     api: [
       '公海线索分页查询接口：返回负责人为空且未转化的线索，支持来源、状态和关键词筛选。',
       '领取线索接口：带并发校验、保护期与领取上限校验，成功后写入负责人和跟进中状态。',
       '分配与批量分配接口：校验负责人有效性并记录分配日志。',
-      '线索查重接口：按手机号和公司名称返回重复的线索或客户编号。'
+      '线索查重接口：按手机号和公司名称返回重复的线索或客户编号。',
+      '公海自动回收定时任务接口：按未跟进周期扫描并回收，产出执行日志（规划方案 7.3）。'
     ],
     accept: [
-      '公海页签只展示无负责人且未转化的线索，领取后立即从当前列表消失并可在我的线索中找到。',
+      '对应规划方案第十四章「线索管理：能创建、分配、查重、跟进、转化」的分配 / 领取环节：销售可从公海先到先得领取线索，经理可分配，领取后立即从公海消失并出现在我的线索中。',
       '领取确认框包含保护期和领取上限提示，确认后负责人和状态正确写回。',
-      '批量分配未选线索或未选负责人时被拦截，选择后可一次分配多条并提示数量。',
-      '疑似重复线索显示标签，悬浮可查看重复原因和关联单号。',
-      '筛选、分页、查看和分配按钮均可用，页面无控制台报错。'
+      '批量分配未选线索或未选负责人时被拦截，选择后可一次分配多条并提示影响记录数。',
+      '疑似重复线索显示标签，悬浮可查看重复原因和关联单号，避免重复建档。',
+      '筛选、分页、查看和分配按钮均可用，统计卡与总数为真实数据，页面无控制台报错。'
     ]
   },
 
@@ -10855,9 +11471,10 @@ const PZ_DOC_PC_CFG = {
     ],
     errors: [
       '记录页无已转化线索：表格显示「暂无数据」空态，统计卡仍显示真实全量数字，用户可切换其他页签。',
-      '转化目标客户不存在或被合并：不显示「查看客户」按钮，避免跳转到无效详情；线索详情仍可查看。',
+      '线索转化失败：转化事务失败时不产生本页记录，原始线索保留、状态不变，可重新发起转化，杜绝半成品客户关系（规划方案十二「线索转化失败」）。',
+      '转化目标客户不存在或被合并：不显示「查看客户」按钮，避免跳转到无效详情；客户合并后通过编号映射追溯主客户，线索仍保留原始转化编号。',
       '筛选条件组合无结果：列表为空并保留筛选条件，用户可点击重置恢复。',
-      '无权限查看客户详情：跳转后客户详情按权限降级为只读或提示无权限，不泄露敏感字段。'
+      '无权限查看客户详情：跳转后客户详情按权限降级为只读或提示无权限，越权请求后端拦截并记录安全日志（规划方案十二「用户越权操作」）。'
     ],
     api: [
       '已转化线索分页查询接口：按来源、状态、负责人和关键词筛选，仅返回已转化记录。',
@@ -10866,10 +11483,11 @@ const PZ_DOC_PC_CFG = {
       '线索导出接口：按数据权限导出转化记录并对手机号等字段脱敏。'
     ],
     accept: [
+      '对应规划方案第十四章「线索管理：能创建、分配、查重、跟进、转化」的转化环节与重点验收场景「从新增线索开始，完整转化为客户、联系人和商机」：一批线索转化完成后，本页能查到对应记录并跳转到客户详情核对。',
       '记录页只显示状态为已转化的线索，公海、跟进中和无效线索均不出现。',
       '列表包含转化时间和转化为客户两列，转化时间晚于创建时间，客户编号可跳转。',
-      '目标客户存在时显示查看客户按钮并跳转正确；客户不存在时按钮不显示且不报错。',
-      '页面无重新转化、退回公海等破坏历史链路的操作入口。',
+      '目标客户存在时显示查看客户按钮并跳转正确；客户不存在或被合并时按钮不显示且不报错。',
+      '页面无重新转化、退回公海等破坏历史链路的操作入口，原始跟进历史永久可查。',
       '筛选、分页、查看和查看客户均可用，页面无控制台报错。'
     ]
   },
