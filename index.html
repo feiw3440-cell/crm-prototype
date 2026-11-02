@@ -328,8 +328,11 @@ const NAV = [
   { key: 'activities', title: '活动管理', icon: 'Calendar', path: '/activities' },
   { key: 'delivery', title: '交付管理', icon: 'Box', path: '/delivery' },
   { key: 'service', title: '服务管理', icon: 'Headset', path: '/service' },
-  { key: 'analytics', title: '数据分析', icon: 'DataAnalysis', path: '/analytics' },
-  { key: 'system', title: '系统管理', icon: 'Setting', path: '/system' },
+  { key: 'analytics', title: '数据分析', icon: 'DataAnalysis', children: [
+    { path: '/analytics', title: '经营报表' } ] },
+  { key: 'system', title: '系统管理', icon: 'Setting', children: [
+    { path: '/system', title: '用户管理' }, { path: '/system/roles', title: '角色权限' }, { path: '/system/org', title: '组织架构' },
+    { path: '/system/logs', title: '操作日志' }, { path: '/system/pool-rules', title: '公海规则' }, { path: '/approvals/templates', title: '审批模板' } ] },
 ];
 
 /* ===== 消息 / 待办 ===== */
@@ -877,6 +880,97 @@ const DOC_PAGES = {
     errors: ['价格/折扣越界：输入框拦截', '无明细时显示空态'],
     api: ['价格表查询、明细保存接口、价格历史查询（示例）'],
     accept: ['明细可编辑价格与最低折扣并写回', '列表与抽屉数据一致；无控制台报错'],
+  },
+  analytics: {
+    name: '经营报表', module: '数据分析',
+    goal: '为管理与复盘提供经营报表入口：以卡片列出 8 张核心报表，点击进入报表详情查看图表、筛选与明细，帮助老板/经理/财务/客服快速定位经营问题。',
+    roles: ['老板/总经理：查看全部报表（全数据范围）', '销售经理：按权限查看销售/回款/赢单类报表', '财务：回款分析、审批统计', '客服：服务工单分析', '系统管理员：配置报表可见性'],
+    enter: ['左侧导航「数据分析 → 经营报表」', '工作台漏斗/业绩卡片中的「查看报表」链接'],
+    layout: ['顶部：搜索框 + 报表卡片网格（图标/名称/核心指标/数据说明）', '卡片悬停可点击进入 /analytics/:id 详情', '底部：更新时间说明'],
+    fields: ['报表名称｜文本｜只读｜说明：8 张预置报表，不支持自定义（本期）', '核心指标｜文本｜说明：跟随报表维度变化', '统计周期｜枚举：近3月/近6月/本年｜必填：是｜默认近6月'],
+    rules: ['报表数据均由 store 真实数据聚合，不使用写死的假数字', '筛选变更后图表与明细表实时联动并回到第 1 页', '主题切换后图表配色跟随主色变量'],
+    flow: ['进入报表：报表卡片 → 报表详情（筛选 + 图表 + 明细）→ 返回列表'],
+    errors: ['筛选无数据：明细表空态提示、图表显示空轴', '报表 id 不存在：显示空态并引导返回列表'],
+    api: ['报表聚合查询接口（按阶段/月度/来源等维度）、明细分页接口（示例）'],
+    accept: ['8 张报表卡片可点击进入对应详情', '图表数据与明细总数一致且真实来自数据层', '无控制台报错'],
+  },
+  'analytics-detail': {
+    name: '报表详情', module: '数据分析',
+    goal: '呈现单张报表：顶部统计卡、主题主色图表（EChart）、时间/负责人筛选与可分页的业务明细表，支撑「看指标 → 追明细」的分析动线。',
+    roles: ['老板/经理/财务/客服（按菜单权限进入对应报表）', '管理员：可查看全部'],
+    enter: ['经营报表卡片点击', '面包屑「数据分析」可返回报表列表'],
+    layout: ['头部：面包屑 + 报表名称 + 时间/负责人筛选 + 返回按钮', '统计卡行：核心指标', '图表区：主图表（可双图并排）+ 结论说明/口径注释', '明细表：真实分页（10/20/50 每页）'],
+    fields: ['统计周期｜枚举｜必填：是｜说明：切换后图表与明细联动', '负责人｜人员｜可空｜说明：空为全部负责人', '金额｜货币｜说明：以元为单位展示，汇总以万'],
+    rules: ['统计口径在页面注明（如销售额=已审批合同签署金额）', '明细表 total 取筛选后的真实条数', '图表颜色由主题主色派生，不写死颜色'],
+    flow: ['筛选 → 图表/统计卡/明细同步刷新 → 分页查看明细'],
+    errors: ['周期内无数据：空态与 0 不误导（显示空轴）', '非法报表 id：空态 + 返回按钮'],
+    api: ['按报表 id 的维度聚合接口、明细查询接口（示例）'],
+    accept: ['切换报表 id 时页面正确重建', '筛选/图表/明细/分页联动正确', '无控制台报错'],
+  },
+  system: {
+    name: '系统管理', module: '系统管理',
+    goal: '管理员维护组织与权限的统一入口：用户管理、角色权限、组织架构、操作日志四个二级页签，保证「人 - 角色 - 数据范围」的权限模型可配置、可追溯。',
+    roles: ['系统管理员：全部功能', '普通用户：可查看操作日志中本人相关记录（原型不体现）'],
+    enter: ['左侧导航「系统管理 →用户管理 / 角色权限 / 组织架构 / 操作日志」', '公海规则、审批模板由相邻菜单进入'],
+    layout: ['顶部：面包屑 + 页面标题 + 新增按钮', '二级页签：用户管理 / 角色权限 / 组织架构 / 操作日志（点击切换并同步 hash）', '用户列表：搜索+筛选 + 表格 + 分页；角色：左侧角色列表 + 右侧权限配置；组织：部门树 + 新增；日志：筛选 + 分页'],
+    fields: ['账号｜文本｜必填：是｜校验：唯一', '姓名｜文本｜必填：是', '部门｜选择｜必填：是', '角色｜选择｜必填：是｜说明：决定数据范围与菜单/按钮权限', '状态｜枚举：启用/停用｜必填：是'],
+    rules: ['停用用户立即失去登录权限（原型提示）', '角色权限保存写回角色配置：菜单树勾选 + 按钮权限 + 数据范围 + 字段脱敏', '新增部门挂在所选父部门下并出现在树中'],
+    flow: ['用户新增/编辑 → 列表即时更新；用户停用/启用二次确认'],
+    errors: ['账号/姓名为空：校验拦截', '重复账号：提示已存在'],
+    api: ['用户/角色/部门 日志 CRUD 接口（示例）'],
+    accept: ['四个页签可切换且地址同步', '用户列表真分页、增改停用可交互', '无控制台报错'],
+  },
+  'user-detail': {
+    name: '用户详情', module: '系统管理',
+    goal: '全景查看单个用户：账号信息、所属部门、角色及其权限摘要，以及该用户的操作日志，为权限排查与审计提供入口。',
+    roles: ['系统管理员：查看与编辑', '部门负责人：查看本部门成员'],
+    enter: ['用户列表点击姓名', '组织架构树点击部门成员'],
+    layout: ['头部：姓名 + 状态标签 + 返回', '信息卡：账号/部门/角色/联系方式/最近登录', '角色权限摘要：数据范围/菜单/按钮/脱敏', '操作日志（按该用户筛选）'],
+    fields: ['账号｜只读', '最近登录｜只读', '数据范围｜只读｜来自角色配置'],
+    rules: ['详情使用该用户自己的数据', '编辑入口跳回用户管理的编辑弹窗（原型从简）'],
+    flow: ['用户状态：启用 ↔ 停用（用户管理页变更）'],
+    errors: ['用户不存在：空态 + 返回按钮'],
+    api: ['用户详情、角色查询、用户操作日志接口（示例）'],
+    accept: ['每个用户详情展示正确', '返回可用；无报错'],
+  },
+  'pool-rules': {
+    name: '公海规则', module: '系统管理',
+    goal: '配置线索公海与客户公海的自动化规则：自动释放条件、领取限制、保护期、退回审批与分配方式，并用「规则试算」在不落库的情况下预演释放清单。',
+    roles: ['系统管理员：查看与修改规则', '销售经理：查看规则、执行试算（只读）'],
+    enter: ['左侧导航「系统管理 → 公海规则」'],
+    layout: ['两张规则卡：线索公海 / 客户公海（表单化配置）', '「规则试算」结果表：客户/线索、原因、当前负责人', '规则变更记录（时间/操作人/变更摘要）'],
+    fields: ['未跟进天数｜整数｜校验：1–365｜必填：是', '未成交天数｜整数｜校验：1–365', '保护期天数｜整数｜校验：0–90', '每日领取上限 / 持有上限｜整数｜校验：>0', '分配方式｜枚举：手动/轮流/按区域'],
+    rules: ['重点客户与有履约合同客户保护开启时不进入自动试算释放', '试算只读不写数据；保存后写入本地存储并追加变更记录', '保护期 ≥ 领取后保护天数，期间禁止释放（试算遵循该优先级）'],
+    flow: ['修改规则 → 保存（本地存储）→ 追加变更记录；试算随时可执行，与当前未保存数值一致'],
+    errors: ['数值越界：输入组件限制', '试算无释放对象：空态提示'],
+    api: ['公海规则读取/保存、试算预览接口、规则变更记录查询（示例）'],
+    accept: ['试算清单与原因由实际数据计算', '保存与变更记录生效', '无控制台报错'],
+  },
+  'approval-templates': {
+    name: '审批模板', module: '审批管理',
+    goal: '配置各业务审批的流程模板：审批节点（类型与条件）、抄送、超时提醒、驳回规则，支持增删节点与差异化条件（如折扣>10% 走总监、金额>50万走总经理）。',
+    roles: ['系统管理员：查看与修改模板', '业务负责人：查看模板（只读）'],
+    enter: ['左侧导航「系统管理 → 审批模板」', '审批中心顶部「审批模板」按钮'],
+    layout: ['模板列表（名称/用途/节点摘要/状态）', '配置抽屉：节点列表（增删/排序/条件）、抄送人、超时提醒（小时）、驳回规则'],
+    fields: ['节点名称｜文本｜必填：是', '审批人类型｜枚举：直属经理/指定角色/指定人｜必填：是', '启用条件｜文本｜说明：折扣>10% / 金额>50万 等', '超时提醒｜数值（小时）', '驳回规则｜枚举：退回修改/自动驳回/仅提醒'],
+    rules: ['至少保留一个审批节点且不能与发起节点相同', '保存写本地存储并提示，审批中心后续按模板展示（原型展示配置效果）'],
+    flow: ['模板变更即刻对后续新提交的审批生效（已有进行中的单据按提交时模板走完）'],
+    errors: ['未选审批人（指定类型时）：保存拦截', '仅剩一个节点不允许删除'],
+    api: ['模板 CRUD、节点校验、模板版本接口（示例）'],
+    accept: ['模板可编辑并可保存', '节点增删、条件与抄送生效（抽屉内即时预览）', '无控制台报错'],
+  },
+  'approval-stats': {
+    name: '审批统计', module: '审批管理',
+    goal: '分析审批运行效率：待办、平均处理时长、通过率、超时数四张统计卡 + 按类型/月度/审批人图表 + 明细表，定位审批瓶颈。',
+    roles: ['管理员/管理层：全量统计', '审批人：可查看自己相关的统计（原型按筛选）'],
+    enter: ['左侧导航「系统管理 → 审批模板」旁的审批统计', '审批中心顶部「审批统计」按钮'],
+    layout: ['统计卡行：待办 / 平均处理时长 / 通过率 / 超时数', '图表区：按类型数量 + 按月趋势 + 各审批人平均时长', '明细表：真实分页'],
+    fields: ['审批类型｜枚举｜说明：折扣/合同/转移/赢单/核销/合并/冲销/批量分配', '处理时长｜小时｜说明：末节点处理时间 - 提交时间', '超时｜布尔｜校验：处理时长 > 48 小时'],
+    rules: ['统计与明细均从历史审批数据真实聚合', '超时阈值 48 小时，与模板的提醒时长呼应'],
+    flow: ['明细表滚动分页；图表随筛选刷新（原型提供类型筛选）'],
+    errors: ['无数据月份不出现假 0', '筛选无结果空态'],
+    api: ['审批流水查询、统计聚合接口（示例）'],
+    accept: ['统计卡数字与明细一致', '三张图表渲染正确', '无控制台报错'],
   },
 };
 
@@ -1871,9 +1965,7 @@ const NotFoundPage = {
   </div>`,
 };
 
-/* ===== 占位模块路由（activities / delivery / service 已由 page-activities.js / page-delivery.js / page-service.js 替代） ===== */
-[['analytics', 'analytics'], ['system', 'system']]
-  .forEach(([path, docKey]) => registerRoute('/' + path, PlaceholderPage, docKey, () => ({ k: docKey })));
+/* ===== 占位模块路由说明：analytics / system 已由 page-analytics.js / page-system.js 替代，此处不再注册占位路由 ===== */
 
 /* ===== 需求文档说明面板：三种状态（隐藏 / 半隐藏 / 完全展开），内容可增删改，存 localStorage ===== */
 const DOC_STATE_KEY = 'crm_doc_state';
@@ -2505,6 +2597,648 @@ const ActivityDetailPage = {
 };
 registerRoute('/activity/:no', ActivityDetailPage, 'activity-detail');
 
+/* ===== 第 6 阶段：数据分析（报表列表 /analytics + 报表详情 /analytics/:id） ===== */
+const AN_REPORTS = [
+  { id: 'funnel', name: '销售漏斗', icon: 'Filter', metric: '各阶段商机数量与预计金额', text: '按商机当前阶段汇总；金额为预计成交金额（不含税）', who: '销售经理' },
+  { id: 'target', name: '业绩目标达成', icon: 'Aim', metric: '月度合同签署金额 vs 目标与达成率', text: '销售额口径：已签署合同金额（示例目标 60 万/月）', who: '管理层' },
+  { id: 'payment', name: '回款分析', icon: 'Coin', metric: '月度计划回款、已回款与回款率', text: '已回款 = 财务已确认到账金额', who: '财务' },
+  { id: 'customer', name: '客户分析', icon: 'OfficeBuilding', metric: '行业分布、等级结构与新增/公海', text: '按客户档案的行业与等级统计', who: '管理层' },
+  { id: 'lead', name: '线索来源转化', icon: 'Share', metric: '各来源线索量与转化率', text: '转化率 = 已转化线索 / 该来源线索总数', who: '市场/经理' },
+  { id: 'opps', name: '商机赢输单分析', icon: 'Trophy', metric: '赢单/输单数量、金额与输单原因', text: '统计「赢单 / 输单」阶段的历史商机', who: '销售经理' },
+  { id: 'activity', name: '活动效率', icon: 'Calendar', metric: '跟进方式分布与完成率', text: '统计跟进活动按方式 / 状态分布', who: '经理' },
+  { id: 'ticket', name: '服务工单分析', icon: 'Headset', metric: '工单类型、状态与优先级分布', text: '统计服务工单按类型 / 状态 / 优先级', who: '客服' },
+];
+const AN_PERIODS = {
+  m3: ['2026-09', '2026-10', '2026-11'], m6: ['2026-06', '2026-07', '2026-08', '2026-09', '2026-10', '2026-11'],
+  y: ['2026-01', '2026-02', '2026-03', '2026-04', '2026-05', '2026-06', '2026-07', '2026-08', '2026-09', '2026-10', '2026-11'],
+};
+const AN_TARGET_MONTH = 600000; // 示例目标：60 万/月
+const AN_PAL = () => {
+  const p = (theme.value, cssVar('--el-color-primary')) || '#2f9bff';
+  const d2 = (theme.value, cssVar('--el-color-primary-dark-2')) || '#247acc';
+  return [p, mixHex(p, '#000000', .42), mixHex(p, '#ffffff', .34), d2, mixHex(p, '#000000', .6), mixHex(p, '#ffffff', .58)];
+};
+const anBaseAxis = () => ({ axisLine: { lineStyle: { color: cssVar('--line') || '#dfe9f5' } }, axisLabel: { color: cssVar('--sub') || '#67768f', fontSize: 11 }, splitLine: { lineStyle: { color: cssVar('--line') || '#dfe9f5' } } });
+
+/* ---------- 报表列表页 ---------- */
+const AnalyticsPage = {
+  components: { PageHead },
+  setup() {
+    const kw = ref('');
+    const cards = computed(() => AN_REPORTS.filter(r => !kw.value.trim() || r.name.includes(kw.value.trim()) || r.metric.includes(kw.value.trim())));
+    const stats = computed(() => {
+      const c = store.customers.filter(x => x.owner);
+      return [
+        ['可用报表', String(AN_REPORTS.length), 'ok'], ['商机数', String(store.opps.length), ''],
+        ['在护客户', String(c.length), ''], ['服务工单', String(store.ext.tickets.length), 'warn'],
+      ];
+    });
+    return { kw, cards, stats, store, wan, AN_REPORTS };
+  },
+  template: `<div>
+    <page-head :crumbs="['数据分析','经营报表']" title="经营报表" :total="'共 '+AN_REPORTS.length+' 张报表'">
+      <el-button icon="Download" @click="$msg.info('示例：导出全部报表（Excel）')">导出</el-button>
+    </page-head>
+    <div class="stat-row" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-card" v-for="s in stats" :key="s[0]" :class="s[2]"><span class="lb">{{ s[0] }}</span><span class="vl">{{ s[1] }}</span><span class="ft">数据更新：2026-11-02 06:00</span></div>
+    </div>
+    <div class="card query" style="display:flex;align-items:center">
+      <el-input v-model="kw" placeholder="搜索报表名称 / 核心指标" prefix-icon="Search" clearable style="width:280px"/>
+      <span class="muted" style="margin-left:14px;font-size:13px">点击卡片进入报表详情，图表与明细随筛选联动</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px">
+      <div class="card card-pad" v-for="r in cards" :key="r.id" style="cursor:pointer;display:flex;flex-direction:column;gap:6px;min-height:150px" @click="$go('/analytics/'+r.id)">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="width:40px;height:40px;border-radius:10px;background:var(--el-color-primary-light-9);color:var(--el-color-primary);display:flex;align-items:center;justify-content:center"><el-icon :size="20"><component :is="r.icon"/></el-icon></span>
+          <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:15px">{{ r.name }}</div><div class="muted" style="font-size:12px">{{ r.who }}</div></div>
+        </div>
+        <div style="font-size:13px;color:var(--text);line-height:1.5">{{ r.metric }}</div>
+        <div class="muted" style="font-size:12px;flex:1">{{ r.text }}</div>
+        <div style="display:flex;align-items:center"><span class="link" style="font-size:13px">查看报表 ›</span><span class="muted" style="margin-left:auto;font-size:12px">每日 06:00 更新</span></div>
+      </div>
+      <el-empty v-if="!cards.length" description="没有匹配的报表" style="grid-column:1/-1"/>
+    </div>
+  </div>`,
+};
+
+/* ---------- 报表详情页 ---------- */
+const AnalyticsDetailPage = {
+  components: { PageHead, EChart },
+  props: { id: String },
+  setup(props) {
+    const rep = computed(() => AN_REPORTS.find(r => r.id === props.id));
+    const period = ref('m6'), owner = ref('');
+    const months = computed(() => AN_PERIODS[period.value] || []);
+    const page = ref(1), size = ref(10);
+    watch([period, owner], () => { page.value = 1; });
+
+    const data = computed(() => {
+      const M = months.value, inM = y => M.includes((y || '').slice(0, 7)), owf = owner.value, hasO = !!owf;
+      const pal = AN_PAL(), SUB = cssVar('--sub') || '#67768f', axis = anBaseAxis();
+      const wanT = n => '¥' + (n / 10000).toLocaleString('zh-CN', { maximumFractionDigits: 1 }) + ' 万';
+      /* --- 销售漏斗 --- */
+      if (props.id === 'funnel') {
+        const xs = store.opps.filter(o => inM(o.date) && (!hasO || o.owner === owf));
+        const cnt = STAGES.map(s => xs.filter(o => o.stage === s.key).length);
+        const amt = STAGES.map(s => Math.round(xs.filter(o => o.stage === s.key).reduce((x, o) => x + o.amount, 0)));
+        const custs = new Set(xs.map(o => o.customer));
+        const shape = [100, 80, 60, 40, 25, 12];
+        return {
+          stats: [['商机总数', String(xs.length), ''], ['预计总金额', wanT(amt.reduce((a, b) => a + b, 0)), 'ok'], ['覆盖客户', String(custs.size), ''], ['报价后阶段占比', (xs.length ? Math.round(cnt[3] * 1000 / Math.max(1, xs.length)) / 10 : 0) + '%', 'warn']],
+          opt: {
+            tooltip: { trigger: 'item', formatter: q => '<b>' + q.name + '</b><br/>商机数量：' + cnt[q.dataIndex] + ' 个<br/>预计金额：' + wanT(amt[q.dataIndex]) },
+            series: [{ type: 'funnel', left: '6%', right: '6%', top: 8, bottom: 8, min: 0, max: 100, minSize: '18%', sort: 'none', gap: 3,
+              label: { show: true, position: 'inside', color: '#fff', fontSize: 12, formatter: q => q.name + '  ' + cnt[q.dataIndex] + ' 个 · ' + wanT(amt[q.dataIndex]) },
+              data: STAGES.map((s, i) => ({ name: s.name, value: shape[i], itemStyle: { color: mixHex(pal[0], '#000000', .48 * i / 5) } })) }],
+          },
+          note: '注：漏斗宽度为示意（100% → 12%），不代表真实转化率；数据取预计成交日期在筛选区间内的全部商机。',
+          rows: xs.slice().sort((a, b) => b.amount - a.amount),
+          cols: [{ p: 'no', l: '商机编号', w: 130, fmt: 'mono' }, { p: 'name', l: '商机名称', w: 200, fmt: 'link', to: 'opp' },
+            { p: 'customer', l: '客户', w: 190, fmt: 'custName' }, { p: 'stage', l: '阶段', w: 100, fmt: 'tag', tagMap: STAGES.reduce((m, s) => (m[s.name] = 'primary', m), {}) },
+            { p: 'amount', l: '预计金额', w: 110, fmt: 'money' }, { p: 'owner', l: '负责人', w: 90 }, { p: 'date', l: '预计成交', w: 110 }],
+        };
+      }
+      /* --- 业绩目标达成 --- */
+      if (props.id === 'target') {
+        const cs = store.ext.contracts.filter(c => inM(c.signDate) && (!hasO || c.owner === owf) && c.amount > 0);
+        const byM = {}; cs.forEach(c => { byM[c.signDate.slice(0, 7)] = (byM[c.signDate.slice(0, 7)] || 0) + c.amount; });
+        const mAmt = M.map(m => byM[m] || 0), mTgt = M.map(() => AN_TARGET_MONTH);
+        const done = mAmt.reduce((a, b) => a + b, 0), tgt = mTgt.reduce((a, b) => a + b, 0);
+        return {
+          stats: [['区间总目标', wanT(tgt), ''], ['已签合同金额', wanT(done), 'ok'], ['达成率', Math.round(done * 1000 / tgt) / 10 + '%', done >= tgt ? 'ok' : 'warn'], ['达标月份', mAmt.filter((v, i) => v >= mTgt[i]).length + ' / ' + M.length, '']],
+          opt: {
+            tooltip: { trigger: 'axis' }, legend: { data: ['合同签署金额', '目标'], textStyle: { color: SUB }, right: 6, top: 0, itemWidth: 14 },
+            grid: { left: 8, right: 14, top: 30, bottom: 4, containLabel: true },
+            xAxis: { type: 'category', data: M, ...axis }, yAxis: { type: 'value', name: '万元', axisLabel: { color: SUB, fontSize: 11, formatter: v => v / 10000 }, splitLine: axis.splitLine },
+            series: [
+              { name: '合同签署金额', type: 'bar', barWidth: 18, itemStyle: { color: pal[0] }, data: mAmt.map(v => Math.round(v / 10000 * 10) / 10) },
+              { name: '目标', type: 'line', smooth: true, symbol: 'circle', symbolSize: 7, itemStyle: { color: pal[3] }, data: mTgt.map(v => v / 10000) } ],
+          },
+          note: '注：销售额 = 已签署（含履约中/已完成/已签署状态）合同金额；示例目标 60 万/月，可在系统管理中调整（原型为常量）。',
+          rows: M.map((m, i) => ({ m, amt: mAmt[i], target: mTgt[i], rate: mTgt[i] ? Math.round(mAmt[i] * 1000 / mTgt[i]) / 10 : 0, ok: mAmt[i] >= mTgt[i] })),
+          cols: [{ p: 'm', l: '月份', w: 100, fmt: 'tag', tagMap: {} }, { p: 'amt', l: '已签金额', w: 120, fmt: 'money' }, { p: 'target', l: '目标', w: 120, fmt: 'money' },
+            { p: 'rate', l: '达成率', w: 140, fmt: 'rate' }],
+        };
+      }
+      /* --- 回款分析 --- */
+      if (props.id === 'payment') {
+        const payMap = {}; store.pay.contracts.forEach(c => { payMap[c.no] = c; });
+        const stAmt = s => s === '已回款' ? -1 : 0;
+        const recOf = (cno, plan) => {
+          const c = payMap[cno];
+          const fallback = plan.status === '已回款' ? plan.amount : (plan.status === '部分回款' ? Math.round(plan.amount * 0.5) : 0);
+          const p0 = c && (c.plans || []).find(q => q.stage === plan.stage);
+          if (!p0) return fallback;
+          let s = 0;
+          store.pay.records.filter(r => r.contract === cno && r.confirm === '财务已确认').forEach(r => (r.alloc || []).forEach(a => { if (a.plan === p0.id) s += a.amt; }));
+          return s;
+        };
+        const rows0 = []; store.ext.contracts.forEach(c => (c.plans || []).forEach(p => {
+          if (!inM(p.date)) return; const got = recOf(c.no, p);
+          rows0.push({ no: c.no, customer: c.customer, stage: p.stage, date: p.date, amount: p.amount, got,
+            status: p.status ? p.status : (got >= p.amount ? '已回款' : got > 0 ? '部分回款' : '未回款'), plan: p.id || c.no + '#' + p.stage });
+        }));
+        const perM = {}, gotM = {};
+        rows0.forEach(r => { perM[r.date.slice(0, 7)] = (perM[r.date.slice(0, 7)] || 0) + r.amount; gotM[r.date.slice(0, 7)] = (gotM[r.date.slice(0, 7)] || 0) + r.got; });
+        const planSum = rows0.reduce((a, r) => a + r.amount, 0), gotSum = rows0.reduce((a, r) => a + r.got, 0);
+        const overdue = rows0.filter(r => r.date < TODAY && r.got < r.amount).length;
+        return {
+          stats: [['计划回款（区间）', wanT(planSum), ''], ['已回款（已确认）', wanT(gotSum), 'ok'], ['回款率', (planSum ? Math.round(gotSum * 1000 / planSum) / 10 : 0) + '%', gotSum >= planSum ? 'ok' : 'warn'], ['逾期未结份数', String(overdue), 'danger']],
+          opt: {
+            tooltip: { trigger: 'axis' }, legend: { data: ['计划回款', '已回款'], textStyle: { color: SUB }, right: 6, top: 0 },
+            grid: { left: 8, right: 14, top: 30, bottom: 4, containLabel: true },
+            xAxis: { type: 'category', data: M, ...axis }, yAxis: { type: 'value', name: '万元', axisLabel: { color: SUB, fontSize: 11, formatter: v => v / 10000 }, splitLine: axis.splitLine },
+            series: [
+              { name: '计划回款', type: 'bar', barWidth: 18, itemStyle: { color: mixHex(pal[0], '#ffffff', .35) }, data: M.map(m => Math.round((perM[m] || 0) / 10000 * 10) / 10) },
+              { name: '已回款', type: 'line', smooth: true, symbol: 'circle', symbolSize: 7, itemStyle: { color: pal[0] }, areaStyle: { color: mixHex(pal[0], '#ffffff', .75) }, data: M.map(m => Math.round((gotM[m] || 0) / 10000 * 10) / 10) } ],
+          },
+          note: '注：已回款 = 财务已确认到账金额（按核销匹配到计划期次）；根据合同回款计划的状态字段对未登记合同按状态折算。',
+          rows: rows0.sort((a, b) => (a.date < b.date ? 1 : -1)),
+          cols: [{ p: 'no', l: '合同编号', w: 130, fmt: 'link', to: 'contract' }, { p: 'customer', l: '客户', w: 180, fmt: 'custName' }, { p: 'stage', l: '计划期次', w: 100 },
+            { p: 'date', l: '计划日期', w: 105 }, { p: 'amount', l: '计划金额', w: 110, fmt: 'money' }, { p: 'got', l: '已回款', w: 110, fmt: 'money' },
+            { p: 'status', l: '状态', w: 100, fmt: 'tag', tagMap: { 已回款: 'success', 部分回款: 'warning', 未回款: 'info' } }],
+        };
+      }
+      /* --- 客户分析 --- */
+      if (props.id === 'customer') {
+        const xs = store.customers.filter(c => inM(c.created) && (!hasO || c.owner === owf));
+        const byInd = {}, byLvl = {};
+        xs.forEach(c => { byInd[c.industry] = (byInd[c.industry] || 0) + 1; byLvl[c.level] = (byLvl[c.level] || 0) + 1; });
+        const allLvl = ['战略客户', '重点客户', '普通客户', '潜在客户'];
+        const amt = xs.reduce((a, c) => a + (c.total || 0), 0);
+        return {
+          stats: [['筛选客户数', String(xs.length), ''], ['累计成交额', wanT(amt), 'ok'], ['公海（无负责人）', String(xs.filter(c => !c.owner).length), 'warn'], ['战略/重点', String(xs.filter(c => c.level === '战略客户' || c.level === '重点客户').length), '']],
+          opt: {
+            tooltip: { trigger: 'item', formatter: q => '<b>' + q.name + '</b><br/>客户数：' + q.value + ' 家（' + q.percent + '%）' },
+            legend: { bottom: 0, textStyle: { color: SUB }, itemWidth: 12, type: 'scroll' },
+            series: [{ type: 'pie', center: ['50%', '44%'], radius: ['34%', '66%'], label: { color: SUB, fontSize: 11, formatter: '{b} {d}%' }, itemStyle: { borderColor: cssVar('--card') || '#fff', borderWidth: 2 },
+              data: Object.keys(byInd).sort((a, b) => byInd[b] - byInd[a]).map((k, i) => ({ name: k, value: byInd[k], itemStyle: { color: pal[i % pal.length] } })) }],
+          },
+          opt2: {
+            tooltip: { trigger: 'axis' }, grid: { left: 6, right: 10, top: 14, bottom: 0, containLabel: true },
+            xAxis: { type: 'category', data: allLvl, ...axis }, yAxis: { type: 'value', ...axis },
+            series: [{ type: 'bar', barWidth: 26, label: { show: true, position: 'top', color: SUB, fontSize: 11 },
+              itemStyle: { color: q => [pal[3], pal[0], pal[5], pal[2]][q.dataIndex % 4] }, data: allLvl.map(k => byLvl[k] || 0) }],
+          },
+          opt2Title: '客户等级分布',
+          note: '注：行业分布与等级结构按筛选区间内创建的客户档案统计；金额为档案中的累计成交额。',
+          rows: xs.slice().sort((a, b) => (b.total || 0) - (a.total || 0)),
+          cols: [{ p: 'no', l: '客户编号', w: 130, fmt: 'mono' }, { p: 'name', l: '客户名称', w: 200, fmt: 'custName' }, { p: 'industry', l: '行业', w: 130 },
+            { p: 'level', l: '等级', w: 90, fmt: 'tag', tagMap: { 战略客户: 'warning', 重点客户: 'primary', 普通客户: 'info', 潜在客户: 'success' } },
+            { p: 'owner', l: '负责人', w: 90, fmt: 'owner' }, { p: 'total', l: '累计成交', w: 110, fmt: 'money' }, { p: 'created', l: '创建日期', w: 105 }],
+        };
+      }
+      /* --- 线索来源转化 --- */
+      if (props.id === 'lead') {
+        const xs = store.leads.filter(l => inM(l.created) && (!hasO || l.owner === owf));
+        const bySrc = {}; xs.forEach(l => { bySrc[l.source] = bySrc[l.source] || { n: 0, cv: 0 }; bySrc[l.source].n++; if (l.status === '已转化') bySrc[l.source].cv++; });
+        const srcs = Object.keys(bySrc);
+        const cvSum = xs.filter(l => l.status === '已转化').length;
+        return {
+          stats: [['线索总数', String(xs.length), ''], ['已转化', String(cvSum), 'ok'], ['整体转化率', (xs.length ? Math.round(cvSum * 1000 / xs.length) / 10 : 0) + '%', ''], ['未分配（公海）', String(xs.filter(l => !l.owner).length), 'warn']],
+          opt: {
+            tooltip: { trigger: 'axis' }, legend: { data: ['线索数', '转化率'], textStyle: { color: SUB }, right: 6, top: 0 },
+            grid: { left: 8, right: 14, top: 30, bottom: 4, containLabel: true },
+            xAxis: { type: 'category', data: srcs, ...axis },
+            yAxis: [{ type: 'value', name: '线索数', ...axis }, { type: 'value', name: '转化率 %', axisLabel: { color: SUB, fontSize: 11 }, splitLine: { show: false } }],
+            series: [
+              { name: '线索数', type: 'bar', barWidth: 26, itemStyle: { color: pal[0] }, data: srcs.map(s => bySrc[s].n) },
+              { name: '转化率', type: 'line', yAxisIndex: 1, symbol: 'circle', symbolSize: 7, itemStyle: { color: pal[3] }, data: srcs.map(s => bySrc[s].n ? Math.round(bySrc[s].cv * 1000 / bySrc[s].n) / 10 : 0) } ],
+          },
+          note: '注：转化率 = 已转化线索 / 该来源线索总数；来源枚举为 官网 / 广告 / 活动 / 转介绍 / 渠道。',
+          rows: xs.slice().sort((a, b) => (a.created < b.created ? 1 : -1)),
+          cols: [{ p: 'no', l: '线索编号', w: 130, fmt: 'mono' }, { p: 'company', l: '公司', w: 200 }, { p: 'source', l: '来源', w: 90, fmt: 'tag', tagMap: {} },
+            { p: 'status', l: '状态', w: 90, fmt: 'tag', tagMap: { 新建: 'info', 跟进中: 'primary', 已转化: 'success', 无效: 'danger' } },
+            { p: 'amount', l: '预计金额', w: 110, fmt: 'money' }, { p: 'owner', l: '负责人', w: 90, fmt: 'owner' }, { p: 'created', l: '创建时间', w: 140 }],
+        };
+      }
+      /* --- 商机赢输单分析 --- */
+      if (props.id === 'opps') {
+        const xs = store.opps.filter(o => o.stage === 'close' && inM(o.date) && (!hasO || o.owner === owf));
+        const win = xs.filter(o => o.result === '赢单'), lose = xs.filter(o => o.result && o.result !== '赢单');
+        const byReason = {}; lose.forEach(o => { const r = o.loseReason || '未填写'; byReason[r] = (byReason[r] || 0) + 1; });
+        const winAmt = win.reduce((a, o) => a + o.amount, 0), loseAmt = lose.reduce((a, o) => a + o.amount, 0);
+        return {
+          stats: [['赢单数', String(win.length), 'ok'], ['赢单金额', wanT(winAmt), 'ok'], ['赢单率', (xs.length ? Math.round(win.length * 1000 / xs.length) / 10 : 0) + '%', ''], ['输单金额', wanT(loseAmt), 'danger']],
+          opt: {
+            tooltip: { trigger: 'item', formatter: q => '<b>' + q.name + '</b><br/>' + q.value + ' 个（' + q.percent + '%）' },
+            legend: { bottom: 0, textStyle: { color: SUB } },
+            series: [{ type: 'pie', center: ['50%', '44%'], radius: ['36%', '64%'], label: { color: SUB, fontSize: 11, formatter: '{b} {d}%' }, itemStyle: { borderColor: cssVar('--card') || '#fff', borderWidth: 2 },
+              data: [{ name: '赢单', value: win.length, itemStyle: { color: pal[0] } }, { name: '输单', value: lose.length, itemStyle: { color: mixHex(pal[0], '#000000', .45) } }].filter(x => x.value) }],
+          },
+          opt2: {
+            tooltip: { trigger: 'axis' }, grid: { left: 6, right: 10, top: 14, bottom: 0, containLabel: true },
+            xAxis: { type: 'category', data: Object.keys(byReason), axisLabel: { color: SUB, fontSize: 11, rotate: 14 } },
+            yAxis: { type: 'value', ...axis },
+            series: [{ type: 'bar', barWidth: 26, itemStyle: { color: mixHex(pal[0], '#000000', .42) }, label: { show: true, position: 'top', color: SUB, fontSize: 11 }, data: Object.values(byReason) }],
+          },
+          opt2Title: '输单原因分布',
+          note: '注：赢单率 = 赢单 /（赢单 + 输单）；输单原因来自商机关闭时填写的信息。',
+          rows: xs.slice().sort((a, b) => (a.date < b.date ? 1 : -1)),
+          cols: [{ p: 'no', l: '商机编号', w: 130, fmt: 'mono' }, { p: 'name', l: '商机名称', w: 200, fmt: 'link', to: 'opp' },
+            { p: 'customer', l: '客户', w: 180, fmt: 'custName' }, { p: 'result', l: '结果', w: 80, fmt: 'tag', tagMap: { 赢单: 'success', 输单: 'danger' } },
+            { p: 'loseReason', l: '输单原因', w: 100, fmt: 'tag', tagMap: {} }, { p: 'amount', l: '金额', w: 110, fmt: 'money' }, { p: 'owner', l: '负责人', w: 90 }, { p: 'date', l: '关闭日期', w: 105 }],
+        };
+      }
+      /* --- 活动效率 --- */
+      if (props.id === 'activity') {
+        const xs = store.ext.activities.filter(a => inM(a.time) && (!hasO || a.owner === owf));
+        const TYPES = ['电话', '微信', '拜访', '会议', '邮件'];
+        const done = xs.filter(a => a.status === '已完成');
+        const byT = t => TYPES.map(v => xs.filter(a => a.type === v && a.status === t).length);
+        return {
+          stats: [['活动总数', String(xs.length), ''], ['已完成', String(done.length), 'ok'], ['完成率', (xs.length ? Math.round(done.length * 1000 / xs.length) / 10 : 0) + '%', done.length / Math.max(1, xs.length) >= .7 ? 'ok' : 'warn'], ['计划中', String(xs.filter(a => a.status === '计划中').length), '']],
+          opt: {
+            tooltip: { trigger: 'axis' }, legend: { data: ['已完成', '计划中', '已取消'], textStyle: { color: SUB }, right: 6, top: 0 },
+            grid: { left: 8, right: 14, top: 30, bottom: 4, containLabel: true },
+            xAxis: { type: 'category', data: TYPES, ...axis }, yAxis: { type: 'value', ...axis },
+            series: [{ name: '已完成', type: 'bar', stack: 's', barWidth: 24, itemStyle: { color: pal[0] }, data: byT('已完成') },
+              { name: '已取消', type: 'bar', stack: 's', itemStyle: { color: mixHex(pal[0], '#000000', .3) }, data: byT('已取消') },
+              { name: '计划中', type: 'bar', stack: 's', itemStyle: { color: mixHex(pal[0], '#ffffff', .45) }, data: byT('计划中') }],
+          },
+          note: '注：按活动类型统计完成/计划/取消分布；拜访类活动含外勤打卡数据。',
+          rows: xs.slice().sort((a, b) => (a.time < b.time ? 1 : -1)),
+          cols: [{ p: 'time', l: '时间', w: 140 }, { p: 'customer', l: '客户', w: 180, fmt: 'custName' }, { p: 'type', l: '方式', w: 80, fmt: 'tag', tagMap: { 电话: 'primary', 拜访: 'success', 会议: 'warning', 微信: 'info', 邮件: '' } },
+            { p: 'status', l: '状态', w: 80, fmt: 'tag', tagMap: { 已完成: 'success', 计划中: 'warning', 已取消: 'info' } },
+            { p: 'owner', l: '负责人', w: 90 }, { p: 'feedback', l: '反馈', w: 130 }],
+        };
+      }
+      /* --- 服务工单分析 --- */
+      if (props.id === 'ticket') {
+        const ownO = c => { const cu = custByName(String(c)); return !hasO || (cu && cu.owner === owf); };
+        const xs = store.ext.tickets.filter(t => inM(t.created) && ownO(t.customer));
+        const TYPES = ['故障报修', '服务请求', '咨询', '投诉'];
+        const STS = ['待接单', '处理中', '待客户确认', '已关闭'];
+        const urgent = xs.filter(t => t.priority === '紧急' || t.priority === '高');
+        const byT2 = v => TYPES.map(x => xs.filter(t => t.type === x && t.status === v).length);
+        return {
+          stats: [['工单总数', String(xs.length), ''], ['待处理', String(xs.filter(t => t.status === '待接单' || t.status === '处理中').length), 'warn'], ['已关闭', String(xs.filter(t => t.status === '已关闭').length), 'ok'], ['紧急/高优先级', String(urgent.length) + ('（' + Math.round(urgent.length * 1000 / Math.max(1, xs.length)) / 10 + '%）'), 'danger']],
+          opt: {
+            tooltip: { trigger: 'item', formatter: q => '<b>' + q.name + '</b><br/>' + q.value + ' 单（' + q.percent + '%）' },
+            legend: { bottom: 0, textStyle: { color: SUB } },
+            series: [{ type: 'pie', center: ['50%', '44%'], radius: ['36%', '64%'], label: { color: SUB, fontSize: 11, formatter: '{b} {d}%' }, itemStyle: { borderColor: cssVar('--card') || '#fff', borderWidth: 2 },
+              data: TYPES.map((k, i) => ({ name: k, value: xs.filter(t => t.type === k).length, itemStyle: { color: pal[i % pal.length] } })).filter(x => x.value) }],
+          },
+          opt2: {
+            tooltip: { trigger: 'axis' }, legend: { data: ['待接单', '处理中', '待客户确认', '已关闭'], textStyle: { color: SUB }, right: 6, top: 0 },
+            grid: { left: 6, right: 10, top: 30, bottom: 0, containLabel: true },
+            xAxis: { type: 'category', data: TYPES, axisLabel: { color: SUB, fontSize: 11, rotate: 12 } }, yAxis: { type: 'value', ...axis },
+            series: STS.map((s, i) => ({ name: s, type: 'bar', stack: 's', itemStyle: { color: [mixHex(pal[0], '#000000', .5), pal[0], mixHex(pal[0], '#000000', .25), mixHex(pal[0], '#ffffff', .45)][i] }, data: byT2(s) })),
+          },
+          opt2Title: '各类型工单状态分布',
+          note: '注：处理中 + 待接单 + 待客户确认视为待处理；紧急 2h / 高 4h / 中 24h / 低 48h SLA。',
+          rows: xs.slice().sort((a, b) => (a.created < b.created ? 1 : -1)),
+          cols: [{ p: 'no', l: '工单编号', w: 130, fmt: 'mono' }, { p: 'customer', l: '客户', w: 170, fmt: 'custName' }, { p: 'type', l: '类型', w: 90, fmt: 'tag', tagMap: {} },
+            { p: 'priority', l: '优先级', w: 80, fmt: 'tag', tagMap: { 紧急: 'danger', 高: 'warning', 中: 'primary', 低: 'info' } },
+            { p: 'status', l: '状态', w: 100, fmt: 'tag', tagMap: { 待接单: 'warning', 处理中: 'primary', 待客户确认: 'warning', 已关闭: 'success' } },
+            { p: 'handler', l: '处理人', w: 100 }, { p: 'created', l: '提交时间', w: 140 }],
+        };
+      }
+      return { stats: [], opt: {}, rows: [], cols: [], note: '' };
+    });
+
+    const rowsF = computed(() => data.value.rows || []);
+    const paged = computed(() => rowsF.value.slice((page.value - 1) * size.value, page.value * size.value));
+    const tagType = (c, v) => (c.tagMap || {})[v] || 'info';
+    const gotoCust = row => { const no = cno(row.customer); if (no && no !== 'NA') return go('/customer/' + no); ElMessage.info('该客户未建档（线索阶段）'); };
+    const goto = () => {};
+    const cellLink = (row, c) => { if (c.to === 'contract') return go('/contract/' + row.no); if (row.no) return go('/opp/' + row.no); };
+    const fmtMoney = v => typeof v === 'number' ? yuan(Math.round(v)) : (v || '¥0');
+    return { rep, period, owner, months, page, size, data, rowsF, paged, tagType, gotoCust, cellLink, fmtMoney, AN_REPORTS };
+  },
+  template: `<div>
+    <page-head :crumbs="[{t:'数据分析',to:'/analytics'},'报表详情 · ' + (rep ? rep.name : '')]" title="报表详情" :total="rep ? rep.metric : ''">
+      <el-select v-model="period" style="width:130px;margin-right:8px"><el-option label="近 3 个月" value="m3"/><el-option label="近 6 个月" value="m6"/><el-option label="本年（2026）" value="y"/></el-select>
+      <el-select v-model="owner" clearable placeholder="全部负责人" style="width:130px;margin-right:8px"><el-option v-for="o in OWNERS" :key="o" :label="o" :value="o"/></el-select>
+      <el-button icon="Download" @click="$msg.info('示例：导出报表（含明细）')">导出</el-button>
+    </page-head>
+    <div class="stat-row" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-card" v-for="s in data.stats" :key="s[0]" :class="s[2]"><span class="lb">{{ s[0] }}</span><span class="vl">{{ s[1] }}</span><span class="ft">随筛选实时计算</span></div>
+    </div>
+    <div style="display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:14px;margin-bottom:14px">
+      <div class="card card-pad">
+        <div class="card-title">{{ rep ? rep.name : '' }}</div>
+        <e-chart :option="data.opt" height="280px"/>
+      </div>
+      <div class="card card-pad" v-if="data.opt2">
+        <div class="card-title">{{ data.opt2Title || '辅助视图' }}</div>
+        <e-chart :option="data.opt2" height="280px"/>
+      </div>
+      <div class="card card-pad" v-else style="display:flex;flex-direction:column;justify-content:center">
+        <div class="sec-title">报表口径</div>
+        <div class="muted" style="font-size:13px;line-height:1.8">{{ data.note || (rep ? rep.text : '') }}</div>
+        <el-alert type="info" show-icon :closable="false" style="margin-top:10px"
+          title="数据说明" description="本页所有统计与明细均由系统内真实数据（客户 / 商机 / 合同 / 回款 / 工单）聚合而成，随筛选条件变化。"/>
+      </div>
+    </div>
+    <div class="card table-card">
+      <div style="padding:10px 12px 0;display:flex;align-items:center">
+        <span class="sec-title" style="margin:0">明细数据</span>
+        <span class="muted" style="margin-left:10px;font-size:13px">{{ data.note }}</span>
+        <el-button link type="primary" style="margin-left:auto" @click="$go('/analytics')">‹ 返回报表列表</el-button>
+      </div>
+      <el-table :data="paged" style="width:100%" :header-cell-style="{height:'42px'}" empty-text="该筛选条件下暂无明细数据">
+        <el-table-column v-for="c in data.cols" :key="c.p" :prop="c.p" :label="c.l" :min-width="c.w" :show-overflow-tooltip="true">
+          <template #default="{row}">
+            <template v-if="!c.hide">
+              <a v-if="c.fmt==='link'" class="link" @click="cellLink(row,c)">{{ row[c.p] }}</a>
+              <a v-else-if="c.fmt==='custName'" class="link" @click="gotoCust(row)">{{ row[c.p] }}</a>
+              <a v-else-if="c.fmt==='owner'" @click="">{{ row[c.p] || '—（公海）' }}</a>
+              <span v-else-if="c.fmt==='money'" class="money">{{ fmtMoney(row[c.p]) }}</span>
+              <el-tag v-else-if="c.fmt==='rate'" size="small" :type="(row.ok ? 'success' : 'warning')" effect="light">{{ row[c.p] }}%</el-tag>
+              <el-tag v-else-if="c.fmt==='tag'" size="small" effect="light" :type="tagType(c,row[c.p])">{{ row[c.p] || '—' }}</el-tag>
+              <span v-else class="mono">{{ row[c.p] === '-' || row[c.p] === undefined ? '—' : row[c.p] }}</span>
+            </template>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div class="pager"><span class="batch">共 {{ rowsF.length }} 条</span>
+        <el-pagination v-model:current-page="page" v-model:page-size="size" :page-sizes="[10,20,50]" layout="sizes, prev, pager, next, jumper" :total="rowsF.length" background size="small"/></div>
+    </div>
+  </div>`,
+};
+
+registerRoute('/analytics', AnalyticsPage, 'analytics');
+registerRoute('/analytics/:id', AnalyticsDetailPage, 'analytics-detail');
+
+/* ===== 第 6 阶段：审批模板 /approvals/templates + 审批统计 /approvals/stats ===== */
+const AT_KEY = 'crm_appr_templates_v1';
+const AT_NODE_TYPES = ['直属经理', '指定角色', '指定人'];
+const AT_ROLE_OPTS = ['销售经理', '销售总监', '财务负责人', '法务', '售前主管'];
+const AT_PERSON_OPTS = ['张三', '李四', '王五', '赵六', '周总监', '王芳', '陈法务', '李琴', '管理员'];
+const AT_REJECTS = ['退回修改', '自动驳回', '仅提醒'];
+const AT_TEMPLATE_INIT = [
+  { name: '报价折扣审批', desc: '报价单折扣超出销售授权范围时进入审批（对应 DISCOUNT_RULES 权限阶梯）',
+    nodes: [ { name: '销售经理', type: '直属经理', role: '', person: '', cond: '' },
+      { name: '销售总监', type: '指定角色', role: '销售总监', person: '', cond: '折扣 > 10% 时触发（整体折扣率超出销售权限）' },
+      { name: '总经理', type: '指定人', role: '', person: '周总监', cond: '金额 > 50 万元或折扣 > 20% 时加签' } ],
+    cc: ['张三'], timeout: 48, reject: '退回修改', on: true },
+  { name: '合同审批', desc: '合同新建 / 变更 / 终止时进入审批，含法务与财务会签',
+    nodes: [ { name: '业务负责人', type: '直属经理', role: '', person: '', cond: '' },
+      { name: '法务', type: '指定角色', role: '法务', person: '', cond: '合同首次签署时触发' },
+      { name: '财务', type: '指定人', role: '', person: '王芳', cond: '合同金额 > 30 万元时加签' } ],
+    cc: ['李琴'], timeout: 24, reject: '自动驳回', on: true },
+  { name: '客户转移审批', desc: '客户（尤其是重点客户）更换负责人需原负责人直属经理确认',
+    nodes: [ { name: '原负责人直属经理', type: '直属经理', role: '', person: '', cond: '' },
+      { name: '销售总监', type: '指定角色', role: '销售总监', person: '', cond: '重点客户（战略/重点等级）转移时加签' } ],
+    cc: [], timeout: 24, reject: '退回修改', on: true },
+  { name: '商机赢单审批', desc: '商机直接标记赢单/输单需提交依据（合同 / 订单 / 输单原因）',
+    nodes: [ { name: '销售经理', type: '直属经理', role: '', person: '', cond: '' },
+      { name: '管理层', type: '指定人', role: '', person: '李四', cond: '预计金额 > 50 万元时加签总经理' } ],
+    cc: [], timeout: 48, reject: '仅提醒', on: true },
+  { name: '回款核销审批', desc: '回款核销、冲销与超额到账分配的财务复核',
+    nodes: [ { name: '财务负责人', type: '指定角色', role: '财务负责人', person: '', cond: '' },
+      { name: '财务总监', type: '指定人', role: '', person: '王芳', cond: '核销金额 > 10 万元或冲销申请时加签' } ],
+    cc: [], timeout: 12, reject: '自动驳回', on: true },
+  { name: '客户合并审批', desc: '重复客户档案合并（重点客户合并强制审批）',
+    nodes: [ { name: '销售经理', type: '直属经理', role: '', person: '', cond: '' },
+      { name: '数据管理员', type: '指定人', role: '', person: '管理员', cond: '重点客户合并时加签' } ],
+    cc: [], timeout: 24, reject: '退回修改', on: false },
+  { name: '线索批量分配审批', desc: '超出普通销售权限的批量分配与公海领取豁免',
+    nodes: [ { name: '销售经理', type: '直属经理', role: '', person: '', cond: '' },
+      { name: '运营', type: '指定人', role: '', person: '管理员', cond: '单次分配 > 10 条时加签' } ],
+    cc: [], timeout: 24, reject: '自动驳回', on: true },
+  { name: '应收冲销审批', desc: '重复录入 / 误操作的回款冲销（需银行回单核对）',
+    nodes: [ { name: '财务负责人', type: '指定角色', role: '财务负责人', person: '', cond: '' },
+      { name: '总经理', type: '指定人', role: '', person: '周总监', cond: '冲销金额 > 20 万元时加签' } ],
+    cc: [], timeout: 12, reject: '自动驳回', on: true },
+];
+function atRead() {
+  let v = null;
+  try { v = JSON.parse(localStorage.getItem(AT_KEY) || 'null'); } catch (e) { v = null; }
+  return (v && Array.isArray(v.templates) && v.templates.length) ? v.templates : JSON.parse(JSON.stringify(AT_TEMPLATE_INIT));
+}
+
+const ApprovalTemplatesPage = {
+  components: { PageHead },
+  setup() {
+    const tmpls = ref(atRead());
+    const f = reactive({ show: false, idx: -1, name: '', desc: '', nodes: [], cc: [], timeout: 24, reject: '退回修改', on: true });
+    const open = (i) => {
+      const t = tmpls.value[i];
+      Object.assign(f, { show: true, idx: i, name: t.name, desc: t.desc, cc: [...t.cc], timeout: t.timeout, reject: t.reject, on: t.on });
+      f.nodes = t.nodes.map(n => ({ ...n }));
+    };
+    const addNode = () => f.nodes.push({ name: '', type: '指定人', role: '', person: '', cond: '' });
+    const delNode = i => { if (f.nodes.length <= 1) return ElMessage.warning('至少保留一个审批节点'); f.nodes.splice(i, 1); };
+    const nodeDesc = n => (n.type === '直属经理' ? n.name + '（直属经理）' : n.type === '指定角色' ? n.name + '（角色：' + (n.role || '未设置') + '）' : n.name + '（' + (n.person || '未设置') + '）');
+    const save = () => {
+      if (!f.name.trim()) return ElMessage.warning('模板名称不能为空');
+      if (!f.nodes.length) return ElMessage.warning('至少保留一个审批节点');
+      for (let i = 0; i < f.nodes.length; i++) {
+        const n = f.nodes[i];
+        if (!n.name.trim()) return ElMessage.warning('第 ' + (i + 1) + ' 个节点的名称不能为空');
+        if (n.type === '指定角色' && !n.role) return ElMessage.warning('第 ' + (i + 1) + ' 个节点（指定角色）请选择角色');
+        if (n.type === '指定人' && !n.person) return ElMessage.warning('第 ' + (i + 1) + ' 个节点（指定人）请选择审批人');
+      }
+      Object.assign(tmpls.value[f.idx], { name: f.name.trim(), desc: f.desc.trim(), cc: [...f.cc], timeout: f.timeout, reject: f.reject, on: f.on, nodes: JSON.parse(JSON.stringify(f.nodes)) });
+      try { localStorage.setItem(AT_KEY, JSON.stringify({ templates: tmpls.value })); } catch (e) {}
+      store.ext.logs.unshift({ time: TODAY + ' 09:30', who: '管理员', module: '系统', act: '编辑', detail: '保存审批模板「' + f.name + '」（节点 ' + f.nodes.length + ' 个 · 超时提醒 ' + f.timeout + ' 小时 · 驳回规则：' + f.reject + '）', ip: '10.20.0.5' });
+      f.show = false; ElMessage.success('审批模板已保存（写本地存储，后续新提交的审批将按模板路由）');
+    };
+    const toggle = t => { t.on = !t.on; try { localStorage.setItem(AT_KEY, JSON.stringify({ templates: tmpls.value })); } catch (e) {} ElMessage.success(t.name + ' 已' + (t.on ? '启用' : '停用为新提交的审批')); };
+    return { tmpls, f, open, addNode, delNode, save, nodeDesc, toggle, AT_NODE_TYPES, AT_ROLE_OPTS, AT_PERSON_OPTS, AT_REJECTS };
+  },
+  template: `<div>
+    <page-head :crumbs="['审批管理','审批模板']" title="审批模板" :total="'共 '+tmpls.length+' 个业务模板'">
+      <el-button icon="RefreshLeft" @click="$msg.info('示例：恢复模板默认配置')">恢复默认</el-button>
+    </page-head>
+    <div class="card query" style="display:flex;align-items:center">
+      <el-icon style="color:var(--el-color-primary);margin-right:8px"><setting/></el-icon>
+      <span style="font-size:13px">模板定义审批流节点（类型与启用条件）、抄送、超时提醒与驳回规则；修改保存到本地存储后对后续新提交的审批生效。</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px">
+      <div class="card card-pad" v-for="(t,i) in tmpls" :key="t.name">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="width:38px;height:38px;border-radius:10px;background:var(--el-color-primary-light-9);color:var(--el-color-primary);display:flex;align-items:center;justify-content:center"><el-icon><stamp/></el-icon></span>
+          <div style="flex:1;min-width:0"><div style="font-weight:600">{{ t.name }}</div><div class="muted" style="font-size:12px;line-height:1.5">{{ t.desc }}</div></div>
+          <el-switch :model-value="t.on" inline-prompt active-text="启用" inactive-text="停用" @change="toggle(t)"/>
+        </div>
+        <div style="margin:10px 0 4px;display:flex;flex-wrap:wrap;gap:6px">
+          <el-tag v-for="(n,j) in t.nodes" :key="j" size="small" effect="light" type="primary" style="max-width:100%">{{ nodeDesc(n) }}</el-tag>
+        </div>
+        <div class="muted" style="font-size:12px;line-height:1.7;margin-top:6px">
+          启用条件：<span v-for="(n,j) in t.nodes.filter(n => n.cond)" :key="j">{{ j? '；':'' }}{{ n.name }}：{{ n.cond }}</span><span v-if="!t.nodes.some(n => n.cond)">—</span><br/>
+          抄送：{{ t.cc.length ? t.cc.join('、') : '—' }} · 超时提醒：{{ t.timeout }} 小时 · 驳回规则：{{ t.reject }}
+        </div>
+        <div style="border-top:1px solid var(--line);margin-top:10px;padding-top:10px;display:flex">
+          <el-button type="primary" plain icon="Edit" size="small" @click="open(i)">配置审批流</el-button>
+        </div>
+      </div>
+    </div>
+    <el-drawer v-model="f.show" :title="'审批模板配置 · ' + f.name" size="640px" destroy-on-close>
+      <el-form label-width="96px">
+        <el-form-item label="模板名称"><el-input v-model="f.name"/></el-form-item>
+        <el-form-item label="用途说明"><el-input v-model="f.desc" type="textarea" :rows="2"/></el-form-item>
+      </el-form>
+      <div class="sec-title">审批流节点 <span class="muted" style="font-weight:400;font-size:12px">自上而下依次审批；条件不满足时自动跳过该节点</span></div>
+      <div v-for="(n,i) in f.nodes" :key="i" style="border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px;background:var(--soft)">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <span class="muted">节点 {{ i+1 }}</span>
+          <el-input v-model="n.name" placeholder="节点名称" style="width:180px" size="small"/>
+          <el-select v-model="n.type" size="small" style="width:120px">
+            <el-option v-for="x in AT_NODE_TYPES" :key="x" :label="x" :value="x"/>
+          </el-select>
+          <el-button link type="danger" size="small" style="margin-left:auto" @click="delNode(i)">删除节点</el-button>
+        </div>
+        <el-form label-width="82px">
+          <el-form-item v-if="n.type==='指定角色'" label="审批角色"><el-select v-model="n.role" size="small" style="width:240px"><el-option v-for="x in AT_ROLE_OPTS" :key="x" :label="x" :value="x"/></el-select></el-form-item>
+          <el-form-item v-if="n.type==='指定人'" label="审批人"><el-select v-model="n.person" filterable size="small" style="width:240px"><el-option v-for="x in AT_PERSON_OPTS" :key="x" :label="x" :value="x"/></el-select></el-form-item>
+          <el-form-item label="启用条件"><el-input v-model="n.cond" size="small" placeholder="为空则始终启用；如：折扣 &gt; 10% / 金额 &gt; 50 万 / 重点客户转移"/></el-form-item>
+        </el-form>
+      </div>
+      <el-button icon="Plus" size="small" plain type="primary" @click="addNode">新增节点</el-button>
+      <el-form label-width="96px" style="margin-top:14px">
+        <el-form-item label="抄送"><el-select v-model="f.cc" multiple collapse-tags filterable placeholder="可多选" style="max-width:100%"><el-option v-for="x in AT_PERSON_OPTS" :key="x" :label="x" :value="x"/></el-select></el-form-item>
+        <el-form-item label="超时提醒"><el-input-number v-model="f.timeout" :min="1" :max="168" size="small" style="width:140px"/> <span class="muted" style="font-size:12px;margin-left:8px">小时（超过后企业和邮件提醒审批人）</span></el-form-item>
+        <el-form-item label="驳回规则"><el-radio-group v-model="f.reject"><el-radio v-for="x in AT_REJECTS" :key="x" :label="x">{{ x }}</el-radio></el-radio-group>
+          <div class="muted" style="font-size:12px">退回修改：申请人可修改后重新提交；自动驳回：流程终止并通知；仅提醒：不做处理仅提醒申请人。</div>
+        </el-form-item>
+      </el-form>
+      <div style="display:flex;gap:8px;padding-top:12px;border-top:1px solid var(--line)">
+        <el-button type="primary" @click="save">保存模板</el-button>
+        <el-button @click="f.show=false">取消</el-button>
+      </div>
+    </el-drawer>
+  </div>`,
+};
+registerRoute('/approvals/templates', ApprovalTemplatesPage, 'approval-templates');
+
+/* ---------- 审批统计（确定性生成历史审批流水的统计视图） ---------- */
+let AT_STAT_ROWS = null;
+function atStatRows() {
+  if (AT_STAT_ROWS) return AT_STAT_ROWS;
+  const rr = extRng(770211);
+  const names = store.ext.users.filter(u => u.status === '启用').map(u => u.name);
+  const APPR = ['张三', '李四', '周总监', '王芳', '陈法务', '李琴'];
+  const MONTHS = ['2025-12', '2026-01', '2026-02', '2026-03', '2026-04', '2026-05', '2026-06', '2026-07', '2026-08', '2026-09', '2026-10', '2026-11'];
+  const bizT = ['南京某某科技 ERP 升级项目', '苏州某某汽配渠道平台合同', '合肥某某餐饮连锁续费', '江苏某某集团平台建设', '杭州某某酒店年度服务', '宁波某某商贸会员系统升级'];
+  const neg = [];
+  const MC = { 报价折扣审批: 9, 合同审批: 8, 客户转移审批: 4, 商机赢单审批: 3, 回款核销审批: 6, 客户合并审批: 2, 应收冲销审批: 3, 线索批量分配审批: 4 };
+  let apSeq = 1;
+  Object.keys(MC).forEach(t0 => {
+    for (let k = 0; k < MC[t0]; k++) {
+      const m = extPick(rr, MONTHS.slice(-8));
+      const day = extPad(extRint(rr, 1, 28), 2);
+      const hourBase = Math.round(1 + rr() * rr() * 92);
+      const hours = hourBase < 1 ? 1 : hourBase;
+      neg.push({
+        id: 'AP-' + extPad(apSeq++, 4), month: m, date: m + '-' + day,
+        type: t0, title: (t0.split('审批')[0]) + '审批（示例：' + bizT[apSeq % bizT.length] + '）',
+        applicant: extPick(rr, names), approver: extPick(rr, APPR), hours,
+        status: extCh(rr, 0.78) ? '已通过' : '已驳回',
+        ot: hours > 48, seq: k,
+      });
+    }
+  });
+  AT_STAT_ROWS = neg.sort((a, b) => (a.date < b.date ? 1 : -1));
+  return AT_STAT_ROWS;
+}
+
+const AT_OT_H = 48;
+const ApprovalStatsPage = {
+  components: { PageHead, EChart },
+  setup() {
+    const fType = ref(''), fOt = ref('');
+    const AT = atStatRows();
+    const rows = computed(() => AT.filter(r0 => (!fType.value || r0.type === fType.value) && (!fOt.value || (fOt.value === '超时' ? r0.ot : !r0.ot))));
+    const page = ref(1), size = ref(10);
+    const paged = computed(() => rows.value.slice((page.value - 1) * size.value, page.value * size.value));
+    watch(() => [fType.value, fOt.value], () => { page.value = 1; });
+    const todoN = computed(() => store.approvals.filter(a => a.tab === 'todo').length);
+    const avgH = computed(() => {
+      const a = rows.value; if (!a.length) return 0;
+      return Math.round(a.reduce((s, r0) => s + r0.hours, 0) / a.length * 10) / 10;
+    });
+    const passRate = computed(() => {
+      const a = rows.value; if (!a.length) return 0;
+      return Math.round(a.filter(r0 => r0.status === '已通过').length * 1000 / a.length) / 10;
+    });
+    const otN = computed(() => (rows.value.filter(r0 => r0.ot)).length);
+    const pal = AN_PAL();
+    const optType = computed(() => {
+      const a = AT.slice();
+      const by = {}; a.forEach(r0 => { by[r0.type] = (by[r0.type] || 0) + 1; });
+      const ks = Object.keys(by);
+      const SUB = cssVar('--sub') || '#67768f';
+      return {
+        tooltip: { trigger: 'axis' }, grid: { left: 6, right: 10, top: 12, bottom: 0, containLabel: true },
+        xAxis: { type: 'category', data: ks, axisLabel: { color: SUB, fontSize: 11, rotate: 20, interval: 0 } },
+        yAxis: { type: 'value', ...anBaseAxis() },
+        series: [{ type: 'bar', barWidth: 22, itemStyle: { color: (theme.value, cssVar('--el-color-primary')) || '#2f9bff' }, label: { show: true, position: 'top', color: SUB, fontSize: 11 }, data: ks.map(k => by[k]) }],
+      };
+    });
+    const optMonth = computed(() => {
+      const SUB = cssVar('--sub') || '#67768f'; const P = (theme.value, cssVar('--el-color-primary')) || '#2f9bff';
+      // 排除当前月（进行中），展示完整自然月
+      const a = AT.filter(r0 => r0.month !== '2026-11');
+      const ms = [...new Set(a.map(r0 => r0.month).sort())];
+      return {
+        tooltip: { trigger: 'axis' }, legend: { data: ['审批数量', '平均时长(h)'], textStyle: { color: SUB }, right: 6, top: 0 },
+        grid: { left: 6, right: 6, top: 30, bottom: 0, containLabel: true },
+        xAxis: { type: 'category', data: ms, ...anBaseAxis() },
+        yAxis: [{ type: 'value', name: '数量', ...anBaseAxis() }, { type: 'value', name: '小时', axisLabel: { color: SUB, fontSize: 11 }, splitLine: { show: false } }],
+        series: [
+          { name: '审批数量', type: 'bar', barWidth: 18, itemStyle: { color: mixHex(P, '#ffffff', .38) }, data: ms.map(m => a.filter(r0 => r0.month === m).length) },
+          { name: '平均时长(h)', type: 'line', yAxisIndex: 1, smooth: true, symbol: 'circle', symbolSize: 6, itemStyle: { color: P }, data: ms.map(m => { const b = a.filter(r0 => r0.month === m); return b.length ? Math.round(b.reduce((s, r0) => s + r0.hours, 0) / b.length * 10) / 10 : 0; }) } ],
+      };
+    });
+    const optWho = computed(() => {
+      const SUB = cssVar('--sub') || '#67768f'; const P = (theme.value, cssVar('--el-color-primary')) || '#2f9bff';
+      const a = AT; const who = [...new Set(a.map(r0 => r0.approver))];
+      return {
+        tooltip: { trigger: 'axis' }, grid: { left: 6, right: 12, top: 12, bottom: 0, containLabel: true },
+        xAxis: { type: 'category', data: who, axisLabel: { color: SUB, fontSize: 11, rotate: 12 } },
+        yAxis: { type: 'value', name: '平均小时', ...anBaseAxis() },
+        series: [{ type: 'bar', barWidth: 26, itemStyle: { color: q => mixHex(P, '#000000', .1 * (q.dataIndex % 4)) },
+          label: { show: true, position: 'top', color: SUB, fontSize: 11 },
+          data: who.map(w0 => { const b = a.filter(r0 => r0.approver === w0); return Math.round(b.reduce((s, r0) => s + r0.hours, 0) / b.length * 10) / 10; }) }],
+      };
+    });
+    const otTag = r0 => r0.ot ? 'danger' : 'info';
+    const stTag = r0 => r0.status === '已通过' ? 'success' : 'danger';
+    const atTypes = [...new Set(AT.map(r0 => r0.type))];
+    return { fType, fOt, rows, paged, page, size, todoN, avgH, passRate, otN, optType, optMonth, optWho, otTag, stTag, atTypes };
+  },
+  template: `<div>
+    <page-head :crumbs="['审批管理','审批统计']" title="审批统计" :total="'待办 '+todoN+' 项 · 历史 ' + rows.length + ' 条审批流水'">
+      <el-button @click="$go('/approvals')">返回审批中心</el-button>
+    </page-head>
+    <div class="stat-row" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-card warn"><span class="lb">待我审批</span><span class="vl">{{ todoN }}</span><span class="ft">来自审批中心实时数据</span></div>
+      <div class="stat-card"><span class="lb">平均处理时长</span><span class="vl">{{ avgH }} 小时</span><span class="ft">历史审批流水均值</span></div>
+      <div class="stat-card ok"><span class="lb">通过率</span><span class="vl">{{ passRate }}%</span><span class="ft">已通过 / 总数</span></div>
+      <div class="stat-card danger"><span class="lb">超时数</span><span class="vl">{{ otN }}</span><span class="ft">处理时长 &gt; 48 小时</span></div>
+    </div>
+    <div class="card query">
+      <el-form inline>
+        <el-form-item label="审批类型"><el-select v-model="fType" placeholder="全部" clearable style="width:180px"><el-option v-for="x in atTypes" :key="x" :label="x" :value="x"/></el-select></el-form-item>
+        <el-form-item label="时效"><el-select v-model="fOt" placeholder="全部" clearable style="width:130px"><el-option label="仅超时（>48h）" value="超时"/><el-option label="仅未超时" value="未超时"/></el-select></el-form-item>
+      </el-form>
+    </div>
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:14px;margin-bottom:14px">
+      <div class="card card-pad"><div class="card-title">按审批类型 · 数量分布</div><e-chart :option="optType" height="272px"/></div>
+      <div class="card card-pad"><div class="card-title">按月趋势（数量 + 平均处理时长，当前进行中的月份不参与均值）</div><e-chart :option="optMonth" height="252px"/></div>
+    </div>
+    <div class="card card-pad" style="margin-bottom:14px"><div class="card-title">各审批人 · 平均处理时长（小时）</div><e-chart :option="optWho" height="230px"/></div>
+    <div class="card table-card">
+      <div style="padding:10px 12px 0;display:flex;align-items:center"><span class="sec-title" style="margin:0">审批流水明细</span><span class="muted" style="font-size:12px;margin-left:10px">真实分页 · 随筛选联动</span></div>
+      <el-table :data="paged" style="width:100%" :header-cell-style="{height:'42px'}" empty-text="没有符合条件的审批流水">
+        <el-table-column prop="id" label="流水号" min-width="110"/><el-table-column prop="type" label="审批类型" min-width="130"/>
+        <el-table-column prop="title" label="标题示例" min-width="260" show-overflow-tooltip/>
+        <el-table-column prop="applicant" label="申请人" min-width="80"/><el-table-column prop="approver" label="审批人" min-width="80"/>
+        <el-table-column prop="date" label="提交日期" min-width="105"/>
+        <el-table-column prop="hours" label="处理时长(小时)" min-width="120" align="right"><template #default="{row}"><span class="mono">{{ row.hours }}</span></template></el-table-column>
+        <el-table-column prop="status" label="结果" min-width="90"><template #default="{row}"><el-tag size="small" :type="stTag(row)" effect="light">{{ row.status }}</el-tag></template></el-table-column>
+        <el-table-column prop="ot" label="超时" min-width="80"><template #default="{row}"><el-tag size="small" :type="otTag(row)" effect="plain">{{ row.ot ? '超时' : '正常' }}</el-tag></template></el-table-column>
+      </el-table>
+      <div class="pager"><span class="batch">共 {{ rows.length }} 条</span>
+        <el-pagination v-model:current-page="page" v-model:page-size="size" :page-sizes="[10,20,50]" layout="sizes, prev, pager, next, jumper" :total="rows.length" background size="small"/></div>
+    </div>
+  </div>`,
+};
+registerRoute('/approvals/stats', ApprovalStatsPage, 'approval-stats');
+
 const ApprovalsPage = {
   components: { PageHead },
   setup() {
@@ -2542,7 +3276,7 @@ const ApprovalsPage = {
     return { tab, TABS, list, count, cur, sel, dlg, KIND, act, need, needUser, submit, resTag, nodeIcon, fmtC, canAct: computed(() => tab.value === 'todo' && cur.value && cur.value.tab === 'todo') };
   },
   template: `<div>
-    <page-head :crumbs="['工作台', '审批中心']" title="审批中心" :total="'待我审批 '+count('todo')+' 项'"><el-button icon="Setting" @click="$msg.info('示例：审批模板配置（审批类型与节点，支持按金额/折扣/客户等级动态配置）')">审批模板</el-button><el-button icon="DataLine" @click="$msg.info('示例：审批统计（数量、用时、驳回率）')">审批统计</el-button></page-head>
+    <page-head :crumbs="['工作台', '审批中心']" title="审批中心" :total="'待我审批 '+count('todo')+' 项'"><el-button icon="Setting" @click="$go('/approvals/templates')">审批模板</el-button><el-button icon="DataLine" @click="$go('/approvals/stats')">审批统计</el-button></page-head>
     <div class="stat-row" style="grid-template-columns:repeat(5,1fr)">
       <div class="stat-card warn"><span class="lb">待我审批</span><span class="vl">{{ count('todo') }}</span><span class="ft">需及时处理</span></div>
       <div class="stat-card"><span class="lb">我发起的</span><span class="vl">{{ count('mine') }}</span><span class="ft">审批中 / 已完成</span></div>
@@ -4820,6 +5554,208 @@ const PaymentsPage = {
 };
 registerRoute('/payments', PaymentsPage, 'payments');
 
+/* ===== 第 6 阶段：公海规则配置 /system/pool-rules（线索公海 / 客户公海 + 规则试算 + 变更记录） ===== */
+const PR_KEY = 'crm_pool_rules_v1';
+const PR_DEFAULT = {
+  leads: { noFollow: 15, noDeal: 45, protectKey: false, protectContract: false, dailyLimit: 5, holdLimit: 20, protectDays: 15, needAudit: false, alloc: '手动', scope: [] },
+  custs: { noFollow: 15, noDeal: 90, protectKey: true, protectContract: true, dailyLimit: 5, holdLimit: 30, protectDays: 30, needAudit: true, alloc: '手动', scope: [] },
+  logs: [ { time: '2026-10-12 10:20', who: '管理员', desc: '初始化公海规则：客户公海 15 天未跟进 / 90 天未成交自动释放，重点客户与履约合同客户保护。' } ],
+};
+const prDeep = o => JSON.parse(JSON.stringify(o));
+function prRead() {
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(PR_KEY) || 'null'); } catch (e) { saved = null; }
+  if (!saved || typeof saved !== 'object') return prDeep(PR_DEFAULT);
+  const out = prDeep(PR_DEFAULT);
+  ['leads', 'custs'].forEach(k => { if (saved[k]) out[k] = Object.assign(out[k], saved[k]); });
+  if (Array.isArray(saved.logs)) out.logs = saved.logs;
+  return out;
+}
+const prHasContract = c => (store.ext.contracts || []).some(t => t.customer === c.name && (t.status === '履约中' || t.status === '已签署'));
+
+const PoolRulesPage = {
+  components: { PageHead },
+  setup() {
+    const r = reactive(prRead());
+    const active = ref('custs');
+    const trial = reactive({ show: '', rows: [], kept: [], note: '' });
+    const todayStr = TODAY;
+    const diff = (a, b) => daysBetween(a, b);
+
+    const stats = computed(() => {
+      const poolCust = store.customers.filter(c => !c.owner).length;
+      const poolLead = store.leads.filter(l => !l.owner && l.status !== '已转化').length;
+      const protectCust = store.customers.filter(c => c.owner && (c.key || prHasContract(c))).length;
+      return [['公海客户（无负责人）', String(poolCust), 'warn'], ['公海线索（无负责人）', String(poolLead), 'warn'],
+        ['受保护客户', String(protectCust), 'ok'], ['规则变更记录', String(r.logs.length), '']];
+    });
+    const SRC_OPTS = ['官网', '广告', '活动', '转介绍', '渠道'];
+    const LVL_OPTS = ['战略客户', '重点客户', '普通客户', '潜在客户'];
+    const ALLOCS = ['手动', '轮流', '按区域'];
+
+    const save = () => {
+      try { localStorage.setItem(PR_KEY, JSON.stringify({ leads: r.leads, custs: r.custs, logs: r.logs })); } catch (e) {}
+      ElMessage.success('公海规则已保存（本地持久化，刷新后仍生效）');
+    };
+    const saveLogs = () => {
+      const d = active.value === 'custs' ? '客户公海' : '线索公海';
+      r.logs.unshift({ time: todayStr + ' ' + String(new Date().getHours()).padStart(2, '0') + ':' + String(new Date().getMinutes()).padStart(2, '0'), who: '管理员', desc: '调整' + d + '规则：未跟进 ' + (active.value === 'custs' ? r.custs.noFollow : r.leads.noFollow) + ' 天 / 未成交 ' + (active.value === 'custs' ? r.custs.noDeal : r.leads.noDeal) + ' 天，保护期 ' + (active.value === 'custs' ? r.custs.protectDays : r.leads.protectDays) + ' 天，分配方式：' + (active.value === 'custs' ? r.custs.alloc : r.leads.alloc) + '。' });
+      if (r.logs.length > 30) r.logs.length = 30;
+      save(); ElMessage.success('规则已保存，并已写入变更记录');
+    };
+    const reset = () => {
+      ElMessageBox.confirm('恢复本次公海规则的默认配置？', '恢复默认', { type: 'warning', confirmButtonText: '恢复', cancelButtonText: '取消' })
+        .then(() => { Object.assign(r, prDeep(PR_DEFAULT)); save(); ElMessage.success('已恢复默认规则'); }).catch(() => {});
+    };
+
+    const runTrial = which => {
+      active.value = which;
+      const rule = which === 'custs' ? r.custs : r.leads;
+      const rows = [], kept = [];
+      if (which === 'custs') {
+        store.customers.forEach(c => {
+          if (c.status === '流失' || (c.mergedTo !== undefined)) return;
+          const inScope = !rule.scope.length || rule.scope.includes(c.level);
+          const dFollow = diff(c.lastFollow, todayStr);
+          const dDeal = c.lastDeal && c.lastDeal !== '-' ? diff(c.lastDeal, todayStr) : diff(c.created, todayStr);
+          if (!c.owner) {
+            kept.push({ n: c.name, w: '—（已在公海）', why: c.status === '潜在客户' ? '潜在客户尚未分配' : '公海存量' });
+            return;
+          }
+          if (c.key && rule.protectKey) {
+            kept.push({ n: c.name, w: c.owner, why: '重点客户保护开启' });
+            return;
+          }
+          if (rule.protectContract && prHasContract(c)) return kept.push({ n: c.name, w: c.owner, why: '名下有履约中/已签署合同（保护）' });
+          if (!inScope) {
+            kept.push({ n: c.name, w: c.owner, why: '生效范围未覆盖「' + c.level + '」' });
+            return;
+          }
+          const reasons = [];
+          if (dFollow >= rule.noFollow) reasons.push('超 ' + rule.noFollow + ' 天未跟进（最后跟进 ' + (c.lastFollow || '—') + '）');
+          if (dDeal >= rule.noDeal) reasons.push('超 ' + rule.noDeal + ' 天未成交（' + (c.lastDeal !== '-' ? '最近成交 ' + c.lastDeal : '从未成交') + '）');
+          if (reasons.length) rows.push({ n: c.name, w: c.owner, why: reasons.join('；') });
+          else kept.push({ n: c.name, w: c.owner, why: '持续跟进中，不触发释放' });
+        });
+      } else {
+        store.leads.forEach(l => {
+          if (l.status === '已转化' || l.status === '无效') {
+            kept.push({ n: l.no + ' ' + l.company, w: l.owner || '—', why: '状态为「' + l.status + '」，不参与释放' });
+            return;
+          }
+          const base = (l.created || '').slice(0, 10);
+          const d = diff(base, todayStr);
+          const inScope = !rule.scope.length || rule.scope.includes(l.source);
+          if (!l.owner) {
+            kept.push({ n: l.no + ' ' + l.company, w: '—（公海）', why: '待领取' });
+            return;
+          }
+          if (!inScope) return kept.push({ n: l.no + ' ' + l.company, w: l.owner, why: '生效范围未覆盖来源「' + l.source + '」' });
+          if (d >= rule.noFollow) rows.push({ n: l.no + ' ' + l.company, w: l.owner, why: '创建后超 ' + rule.noFollow + ' 天未跟进（' + base + '）' });
+          else kept.push({ n: l.no + ' ' + l.company, w: l.owner, why: d >= 0 ? '跟进窗口内（' + d + ' 天）' : '新增线索' });
+        });
+      }
+      trial.rows = rows; trial.kept = kept; trial.show = which;
+      trial.note = which === 'custs'
+        ? '试算口径：对 store.customers 中全部在档客户按当前规则模拟释放（不写数据）。重点客户保护 / 履约合同保护优先生效。'
+        : '试算口径：对 store.leads 中全部线索按当前规则模拟释放（不写数据）；已转化 / 无效线索不参与。';
+      ElMessage.success('试算完成：将释放 ' + rows.length + ' 条、受保护/不触发 ' + kept.length + ' 条');
+    };
+
+    return { r, active, trial, save, saveLogs, reset, runTrial, stats, SRC_OPTS, LVL_OPTS, ALLOCS, trialPane: computed(() => trial.show === 'custs' ? '客户公海' : '线索公海') };
+  },
+  template: `<div>
+    <page-head :crumbs="['系统管理','公海规则']" title="公海规则配置" :total="'线索公海 / 客户公海 · 规则离线持久化'">
+      <el-button icon="RefreshLeft" @click="reset">恢复默认</el-button>
+    </page-head>
+    <div class="stat-row" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-card" v-for="s in stats" :key="s[0]" :class="s[2]"><span class="lb">{{ s[0] }}</span><span class="vl">{{ s[1] }}</span><span class="ft">试算与限额实时核对</span></div>
+    </div>
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start">
+      <div class="card card-pad" v-for="(pool,key) in {leads:'线索公海',custs:'客户公海'}" :key="key" :style="active===key ? 'border-color:var(--el-color-primary)' : ''">
+        <div class="card-title" style="justify-content:space-between">
+          <span><el-icon style="color:var(--el-color-primary);margin-right:6px"><bucket/></el-icon>{{ pool }}规则</span>
+          <el-tag size="small" effect="plain">生效范围：{{ r[key].scope.length ? (key==='custs' ? r[key].scope.join(' / ') : r[key].scope.join(' / ')) : '全部（不限）' }}</el-tag>
+        </div>
+        <el-form label-width="150px" style="margin-top:4px">
+          <el-form-item label="自动释放条件">
+            <div style="display:flex;flex-direction:column;gap:8px;width:100%">
+              <div style="display:flex;align-items:center;gap:8px">超 <el-input-number v-model="r[key].noFollow" :min="1" :max="365" size="small" style="width:100px"/> 天未跟进</div>
+              <div style="display:flex;align-items:center;gap:8px">超 <el-input-number v-model="r[key].noDeal" :min="1" :max="365" size="small" style="width:100px"/> 天未成交</div>
+            </div>
+          </el-form-item>
+          <el-form-item label="客户保护">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <el-checkbox v-model="r[key].protectKey">重点客户（战略/重点等级）保护，不自动释放</el-checkbox>
+              <el-checkbox v-model="r[key].protectContract">有履约中 / 已签署合同的客户保护</el-checkbox>
+            </div>
+          </el-form-item>
+          <el-form-item label="领取限制">
+            <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+              <span>每人每日上限 <el-input-number v-model="r[key].dailyLimit" :min="1" :max="100" size="small" style="width:92px"/></span>
+              <span>同时持有上限 <el-input-number v-model="r[key].holdLimit" :min="1" :max="500" size="small" style="width:92px"/></span>
+            </div>
+          </el-form-item>
+          <el-form-item label="保护期天数">
+            <span style="display:flex;align-items:center;gap:8px">领取后 <el-input-number v-model="r[key].protectDays" :min="0" :max="120" size="small" style="width:92px"/> 天内不释放（保护期优先于释放条件）</span>
+          </el-form-item>
+          <el-form-item label="退回公海需审批">
+            <el-radio-group v-model="r[key].needAudit"><el-radio :label="true">需要（走「客户转移审批」）</el-radio><el-radio :label="false">不需要</el-radio></el-radio-group>
+          </el-form-item>
+          <el-form-item label="分配方式">
+            <el-radio-group v-model="r[key].alloc"><el-radio v-for="a in ALLOCS" :key="a" :label="a">{{ a }}</el-radio></el-radio-group>
+          </el-form-item>
+          <el-form-item :label="key==='custs' ? '生效范围（等级）' : '生效范围（来源）'">
+            <el-select v-if="key==='custs'" v-model="r[key].scope" multiple collapse-tags placeholder="不限（全部等级）" style="width:100%">
+              <el-option v-for="l in LVL_OPTS" :key="l" :label="l" :value="l"/>
+            </el-select>
+            <el-select v-else v-model="r[key].scope" multiple collapse-tags placeholder="不限（全部来源）" style="width:100%">
+              <el-option v-for="s in SRC_OPTS" :key="s" :label="s" :value="s"/>
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <div style="display:flex;gap:8px;border-top:1px solid var(--line);padding-top:12px">
+          <el-button type="primary" icon="Check" @click="saveLogs()">保存规则</el-button>
+          <el-button icon="MagicStick" @click="runTrial(key)">规则试算</el-button>
+          <span class="muted" style="margin-left:auto;align-self:center;font-size:12px">{{ active===key ? '当前操作目标' : '' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card table-card" v-if="trial.show" style="margin-top:14px">
+      <div style="padding:10px 12px 6px;display:flex;align-items:center;gap:10px">
+        <span class="sec-title" style="margin:0">规则试算 · {{ trialPane }}</span>
+        <el-tag size="small" type="warning" effect="light">释放 {{ trial.rows.length }} 条</el-tag>
+        <el-tag size="small" type="success" effect="light">不释放 / 受保护 {{ trial.kept.length }} 条</el-tag>
+        <el-button link type="primary" style="margin-left:auto" @click="trial.show=''">收起</el-button>
+      </div>
+      <div class="muted" style="padding:0 14px 8px;font-size:12px">{{ trial.note }}</div>
+      <el-table :data="trial.rows" style="width:100%" :header-cell-style="{height:'42px'}" empty-text="当前规则下没有会被自动释放的对象">
+        <el-table-column prop="n" :label="trial.show==='custs' ? '客户名称' : '线索'" min-width="230"/>
+        <el-table-column prop="w" label="当前负责人" min-width="110"/>
+        <el-table-column prop="why" label="释放原因（命中条件）" min-width="320"/>
+      </el-table>
+      <div style="padding:10px 14px;border-top:1px solid var(--line)">
+        <div class="muted" style="font-size:12px;margin-bottom:6px">不释放明细（抽样展示，共 {{ trial.kept.length }} 条）</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;max-height:130px;overflow:auto">
+          <el-tag v-for="(k,i) in trial.kept.slice(0, 40)" :key="i" size="small" type="info" effect="plain" :title="k.why" class="dup-tag">{{ k.n }} · {{ k.w }}</el-tag>
+        </div>
+      </div>
+    </div>
+    <el-empty v-else description="尚未运行规则试算：点击上方「规则试算」按钮，按当前规则对真实数据模拟释放清单" style="margin-top:8px;padding:28px 0 36px"/>
+
+    <div class="card table-card" style="margin-top:14px">
+      <div style="padding:10px 12px 0"><span class="sec-title" style="margin:0">规则变更记录</span><span class="muted" style="font-size:12px;margin-left:10px">每次保存自动追加（保存至本地存储）</span></div>
+      <el-table :data="r.logs" style="width:100%" :header-cell-style="{height:'42px'}" empty-text="暂无变更记录">
+        <el-table-column prop="time" label="变更时间" min-width="160"/>
+        <el-table-column prop="who" label="操作人" min-width="100"/>
+        <el-table-column prop="desc" label="变更摘要" min-width="560" show-overflow-tooltip/>
+      </el-table>
+    </div>
+  </div>`,
+};
+registerRoute('/system/pool-rules', PoolRulesPage, 'pool-rules');
+
 /* ===== 第 3 阶段：产品目录 /products + 产品详情 /product/:no + 价格表 /pricebooks ===== */
 const PRODUCT_CATS = ['软件', '服务', '实施费用', '维护费用', '增值服务', '套餐'];
 const PRODUCT_STS = ['在售', '停售', '停用'];
@@ -5586,6 +6522,420 @@ const TicketDetailPage = {
 };
 registerRoute('/ticket/:no', TicketDetailPage, 'ticket-detail');
 
+/* ===== 第 6 阶段：系统管理（用户管理 / 角色权限 / 组织架构 / 操作日志） + 用户详情页 ===== */
+const SYS_PAGES = { users: '用户管理', roles: '角色权限', org: '组织架构', logs: '操作日志' };
+const SYS_DATA_SCOPE = ['本人', '本部门', '本部门及下级', '全部'];
+const SYS_MASK_OPTS = ['合同-成本价', '报价-毛利率', '回款-全部', '报价-折扣明细', '跟进-内容脱敏', '合同-金额明细', '回款-财务备注'];
+const SYS_BTN_OPTS = ['新增', '编辑', '删除', '导出', '导入', '作废', '记录跟进', '折扣审批', '合同审批', '回款确认', '客户转移', '线索分配', '全部'];
+const SYS_MENU_TREE = NAV.map(n => ({ label: n.title, children: n.children ? n.children.map(c => ({ label: c.title })) : [] }));
+const sysNow = () => TODAY + ' ' + String(new Date().getHours()).padStart(2, '0') + ':' + String(new Date().getMinutes()).padStart(2, '0');
+
+const SystemPage = {
+  components: { PageHead },
+  props: { tab: { type: String, default: 'users' } },
+  setup(props) {
+    /* ---------- 用户管理 ---------- */
+    const uQ = reactive({ kw: '', dept: '', role: '', status: '' });
+    const uPage = ref(1), uSize = ref(10);
+    const uDepts = computed(() => store.ext.depts.map(d => d.name));
+    const uRoles = computed(() => store.ext.roles.map(r => r.name));
+    const uFiltered = computed(() => store.ext.users.filter(u =>
+      (!uQ.kw || [u.name, u.acc, u.email, u.phone].some(v => String(v || '').includes(uQ.kw))) &&
+      (!uQ.dept || u.dept === uQ.dept) && (!uQ.role || u.role === uQ.role) && (!uQ.status || u.status === uQ.status)));
+    const uPaged = computed(() => uFiltered.value.slice((uPage.value - 1) * uSize.value, uPage.value * uSize.value));
+    watch(() => [uQ.kw, uQ.dept, uQ.role, uQ.status], () => { uPage.value = 1; });
+    const uStats = computed(() => {
+      const us = store.ext.users;
+      return [['用户总数', String(us.length), ''], ['启用', String(us.filter(u => u.status === '启用').length), 'ok'],
+        ['已停用', String(us.filter(u => u.status === '停用').length), 'warn'], ['角色数', String(store.ext.roles.length), '']];
+    });
+    const uDlg = reactive({ show: false, edit: '' });
+    const uForm = reactive({ id: '', acc: '', name: '', dept: '', role: '', phone: '', email: '', status: '启用' });
+    const uRules = {
+      acc: [{ required: true, message: '请输入账号', trigger: 'blur' }],
+      name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
+      dept: [{ required: true, message: '请选择部门', trigger: 'change' }],
+      role: [{ required: true, message: '请选择角色', trigger: 'change' }],
+    };
+    const uRef = ref(null);
+    const uOpen = row => {
+      Object.assign(uForm, row || { id: '', acc: '', name: '', dept: '', role: '', phone: '', email: '', status: '启用' }, { id: row ? row.id : '', status: row ? row.status : '启用' });
+      uDlg.edit = row ? row.id : ''; uDlg.show = true;
+    };
+    const uSave = () => uRef.value.validate(ok => {
+      if (!ok) return;
+      const dup = store.ext.users.find(u => u.acc === uForm.acc && u.id !== uForm.id);
+      if (dup) return ElMessage.warning('账号「' + uForm.acc + '」已存在（账号需唯一）');
+      if (uForm.id) {
+        const t = store.ext.users.find(u => u.id === uForm.id);
+        Object.assign(t, { acc: uForm.acc, name: uForm.name, dept: uForm.dept, role: uForm.role, phone: uForm.phone, email: uForm.email, status: uForm.status });
+        store.ext.logs.unshift({ time: sysNow(), who: '管理员', module: '系统', act: '编辑', detail: '编辑用户「' + uForm.name + '」（账号：' + uForm.acc + '）', ip: '10.20.0.5' });
+      } else {
+        let n = 1;
+        store.ext.users.forEach(u => { const k = Number(String(u.id).slice(1)); if (k >= n) n = k + 1; });
+        store.ext.users.push({ id: 'u' + String(n).padStart(2, '0'), acc: uForm.acc, name: uForm.name, dept: uForm.dept, role: uForm.role, phone: uForm.phone, email: uForm.email, status: uForm.status, lastLogin: '—' });
+        store.ext.logs.unshift({ time: sysNow(), who: '管理员', module: '系统', act: '新建', detail: '新增用户「' + uForm.name + '」（账号：' + uForm.acc + '，角色：' + uForm.role + '）', ip: '10.20.0.5' });
+      }
+      uDlg.show = false; ElMessage.success('已保存并写回用户列表');
+    });
+    const uToggle = row => ElMessageBox.confirm(
+      row.status === '启用' ? '停用后「' + row.name + '」将立即失去登录权限，进行中的审批不受影响。' : '启用后该用户恢复登录与数据访问权限。',
+      row.status === '启用' ? '停用确认' : '启用确认', { type: 'warning', confirmButtonText: '确认', cancelButtonText: '取消' }).then(() => {
+      row.status = row.status === '启用' ? '停用' : '启用';
+      store.ext.logs.unshift({ time: sysNow(), who: '管理员', module: '系统', act: row.status === '停用' ? '停用' : '启用', detail: (row.status === '停用' ? '停用' : '启用') + '用户「' + row.name + '」', ip: '10.20.0.5' });
+      ElMessage.success('已' + (row.status === '停用' ? '停用' : '启用') + '：' + row.name);
+    }).catch(() => {});
+    const uDrawer = reactive({ show: false, cur: null });
+    const uShow = row => { uDrawer.cur = row; uDrawer.show = true; };
+    const uLogs = computed(() => uDrawer.cur ? store.ext.logs.filter(l => l.who === uDrawer.cur.name).slice(0, 6) : []);
+
+    /* ---------- 角色权限 ---------- */
+    const roleK = ref('sales');
+    const roleTree = ref(null);
+    const role = computed(() => store.ext.roles.find(r => r.key === roleK.value) || store.ext.roles[0]);
+    const rData = reactive({ desc: '', scope: '', btns: [], masks: [] });
+    const roleMenus = ref([]);
+    const syncChecked = () => {
+      roleMenus.value = [];
+      (role.value.menus || []).forEach(k => {
+        roleMenus.value.push(k);
+        SYS_MENU_TREE.forEach(n => {
+          if (n.children && n.children.some(c => c.label === k)) roleMenus.value.push(n.label);
+        });
+      });
+      if (roleTree.value) roleTree.value.setCheckedKeys([...new Set(roleMenus.value)]);
+    };
+    watch(roleK, () => {
+      rData.desc = role.value.desc; rData.scope = role.value.dataScope;
+      rData.btns = [...role.value.buttons]; rData.masks = [...role.value.fieldMask];
+      nextTick(syncChecked);
+    }, { immediate: true });
+    const roleSave = () => {
+      const ck = [...(roleTree.value ? roleTree.value.getCheckedKeys() : []), ...(roleTree.value ? roleTree.value.getHalfCheckedKeys() : [])];
+      const r = role.value;
+      r.menus = [...new Set(ck)];
+      r.desc = rData.desc; r.dataScope = rData.scope; r.buttons = [...rData.btns]; r.fieldMask = [...rData.masks];
+      store.ext.logs.unshift({ time: sysNow(), who: '管理员', module: '系统', act: '编辑', detail: '保存角色权限「' + r.name + '」（菜单 ' + r.menus.length + ' 项 · 数据范围：' + r.dataScope + '）', ip: '10.20.0.5' });
+      ElMessage.success('角色「' + r.name + '」权限已保存并生效');
+    };
+
+    /* ---------- 组织架构 ---------- */
+    const orgT = computed(() => {
+      const nodes = {};
+      store.ext.depts.forEach(d => { nodes[d.no] = { label: d.name, no: d.no, count: store.ext.users.filter(u => u.dept === d.name).length, children: [] }; });
+      const roots = [];
+      store.ext.depts.forEach(d => { if (d.parent && nodes[d.parent]) nodes[d.parent].children.push(nodes[d.no]); else roots.push(nodes[d.no]); });
+      return roots;
+    });
+    const oDlg = ref(false);
+    const oForm = reactive({ parent: '某某软件有限公司', name: '' });
+    const oSave = () => {
+      const name = (oForm.name || '').trim();
+      if (!name) return ElMessage.warning('请输入部门名称');
+      if (store.ext.depts.some(d => d.name === name)) return ElMessage.warning('部门「' + name + '」已存在');
+      const parent = store.ext.depts.find(d => d.name === oForm.parent);
+      let n = 0;
+      store.ext.depts.forEach(d => { const k = Number(String(d.no).slice(1)); if (k >= n) n = k + 1; });
+      store.ext.depts.push({ no: 'D' + String(n).padStart(2, '0'), name, parent: parent ? parent.no : 'D00' });
+      store.ext.logs.unshift({ time: sysNow(), who: '管理员', module: '系统', act: '新建', detail: '新增部门「' + name + '」（上级：' + oForm.parent + '）', ip: '10.20.0.5' });
+      oDlg.value = false; oForm.name = '';
+      ElMessage.success('部门已创建并出现在组织架构树中');
+    };
+
+    /* ---------- 操作日志 ---------- */
+    const lQ = reactive({ kw: '', who: '', module: '' });
+    const lPage = ref(1), lSize = ref(10);
+    const logAll = computed(() => store.ext.logs.slice().sort((a, b) => (a.time < b.time ? 1 : -1)));
+    const lWho = computed(() => [...new Set(store.ext.logs.map(l => l.who))]);
+    const lMod = computed(() => [...new Set(store.ext.logs.map(l => l.module))]);
+    const lFiltered = computed(() => logAll.value.filter(l =>
+      (!lQ.kw || (l.detail + l.act + l.module).includes(lQ.kw)) && (!lQ.who || l.who === lQ.who) && (!lQ.module || l.module === lQ.module)));
+    const lPaged = computed(() => lFiltered.value.slice((lPage.value - 1) * lSize.value, lPage.value * lSize.value));
+    watch(() => [lQ.kw, lQ.who, lQ.module], () => { lPage.value = 1; });
+    const lStats = computed(() => {
+      const a = store.ext.logs;
+      return [['日志总数（示例周期）', String(a.length), ''], ['今日操作', String(a.filter(l => l.time.startsWith(TODAY)).length), 'ok'],
+        ['系统模块操作', String(a.filter(l => l.module === '系统').length), ''], ['涉及操作人', String(new Set(a.map(l => l.who)).size), 'warn']];
+    });
+    const actTag = act => ({ 新建: 'success', 编辑: 'primary', 登录: 'info', 作废: 'danger', 回收: 'warning' }[act] || 'warning');
+
+    const crumbs = computed(() => ['系统管理', SYS_PAGES[props.tab] || '用户管理']);
+    const tabPath = { users: '/system', roles: '/system/roles', org: '/system/org', logs: '/system/logs' };
+    const onTab = t => { if (tabPath[t]) go(tabPath[t]); };
+    return { crumbs, tabPath, onTab, SYS_MENU_TREE, SYS_BTN_OPTS, SYS_MASK_OPTS, SYS_DATA_SCOPE, store,
+      uQ, uPage, uSize, uDepts, uRoles, uFiltered, uPaged, uStats, uDlg, uForm, uRef, uRules, uOpen, uSave, uToggle, uDrawer, uShow, uLogs, actTag,
+      roleK, roleTree, role, rData, roleSave,
+      orgT, oDlg, oForm, oSave,
+      lQ, lPage, lSize, lWho, lMod, lFiltered, lPaged, lStats };
+  },
+  template: `<div>
+    <page-head :crumbs="crumbs" :title="tab==='users' ? '用户管理' : (tab==='roles' ? '角色权限' : tab==='org' ? '组织架构' : '操作日志')" :total="tab==='users' ? ('用户共 '+uFiltered.length+' 人（真实分页）') : (tab==='logs' ? ('日志共 '+lFiltered.length+' 条') : '')">
+      <el-button v-if="tab==='users'" type="primary" icon="Plus" @click="uOpen(null)">新增用户</el-button>
+      <el-button v-if="tab==='org'" type="primary" icon="Plus" @click="oForm.parent='某某软件有限公司';oDlg=true">新增部门</el-button>
+      <el-button v-if="tab==='logs'" icon="Download" @click="$msg.info('示例：导出操作日志（Excel）')">导出</el-button>
+      <el-button v-if="tab==='roles'" type="primary" icon="Check" @click="roleSave">保存权限</el-button>
+    </page-head>
+    <el-tabs :model-value="tab" @tab-click="t => onTab(t.name)">
+      <el-tab-pane name="users" label="用户管理"/>
+      <el-tab-pane name="roles" label="角色权限"/>
+      <el-tab-pane name="org" label="组织架构"/>
+      <el-tab-pane name="logs" label="操作日志"/>
+    </el-tabs>
+
+    <!-- 用户管理 -->
+    <template v-if="tab==='users'">
+      <div class="stat-row" style="grid-template-columns:repeat(4,1fr)">
+        <div class="stat-card" v-for="s in uStats" :key="s[0]" :class="s[2]"><span class="lb">{{ s[0] }}</span><span class="vl">{{ s[1] }}</span><span class="ft">实时统计</span></div>
+      </div>
+      <div class="card query">
+        <el-form inline>
+          <el-form-item label="搜索"><el-input v-model="uQ.kw" placeholder="姓名 / 账号 / 邮箱" prefix-icon="Search" clearable style="width:220px"/></el-form-item>
+          <el-form-item label="部门"><el-select v-model="uQ.dept" placeholder="全部" clearable style="width:160px"><el-option v-for="d in uDepts" :key="d" :label="d" :value="d"/></el-select></el-form-item>
+          <el-form-item label="角色"><el-select v-model="uQ.role" placeholder="全部" clearable style="width:140px"><el-option v-for="r in uRoles" :key="r" :label="r" :value="r"/></el-select></el-form-item>
+          <el-form-item label="状态"><el-select v-model="uQ.status" placeholder="全部" clearable style="width:110px"><el-option label="启用" value="启用"/><el-option label="停用" value="停用"/></el-select></el-form-item>
+        </el-form>
+      </div>
+      <div class="card table-card">
+        <el-table :data="uPaged" style="width:100%" :header-cell-style="{height:'42px'}" empty-text="没有符合条件的用户">
+          <el-table-column prop="acc" label="账号" min-width="110"/><el-table-column prop="name" label="姓名" min-width="100"/>
+          <el-table-column prop="dept" label="所属部门" min-width="140"/><el-table-column prop="role" label="角色" min-width="110"/>
+          <el-table-column prop="phone" label="联系电话" min-width="120"/>
+          <el-table-column prop="lastLogin" label="最近登录" min-width="150"/>
+          <el-table-column prop="status" label="状态" min-width="90"><template #default="{row}"><el-tag size="small" :type="row.status==='启用'?'success':'info'" effect="light">{{ row.status }}</el-tag></template></el-table-column>
+          <el-table-column label="操作" fixed="right" min-width="190">
+            <template #default="{row}">
+              <el-button link type="primary" @click="uShow(row)">查看</el-button>
+              <el-button link type="primary" @click="uOpen(row)">编辑</el-button>
+              <el-button link :type="row.status==='启用'?'danger':'success'" @click="uToggle(row)">{{ row.status==='启用'?'停用':'启用' }}</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <div class="pager"><span class="batch">共 {{ uFiltered.length }} 条</span>
+          <el-pagination v-model:current-page="uPage" v-model:page-size="uSize" :page-sizes="[10,20,50]" layout="sizes, prev, pager, next, jumper" :total="uFiltered.length" background size="small"/></div>
+      </div>
+      <el-drawer v-model="uDrawer.show" :title="'用户详情 · ' + (uDrawer.cur ? uDrawer.cur.name : '')" size="460px" destroy-on-close>
+        <el-descriptions v-if="uDrawer.cur" :column="1" border>
+          <el-descriptions-item v-for="f in [['id','用户ID'],['acc','账号'],['name','姓名'],['dept','部门'],['role','角色'],['phone','电话'],['email','邮箱'],['status','状态'],['lastLogin','最近登录']]" :key="f[0]" :label="f[1]">{{ uDrawer.cur[f[0]] || '—' }}</el-descriptions-item>
+        </el-descriptions>
+        <div class="sec-title" style="margin-top:16px">操作日志（本人）</div>
+        <div v-if="uLogs.length" style="display:flex;flex-direction:column;gap:6px">
+          <div v-for="(l,i) in uLogs" :key="i" style="padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--soft)">
+            <div style="display:flex;gap:8px;align-items:center"><el-tag size="small" :type="actTag(l.act)" effect="light">{{ l.act }}</el-tag><span class="muted" style="font-size:12px">{{ l.time }}</span></div>
+            <div style="font-size:13px;margin-top:3px">{{ l.detail }}</div>
+          </div>
+        </div>
+        <div v-else class="muted" style="font-size:13px">该用户暂无操作日志</div>
+        <div style="margin-top:16px;display:flex;gap:8px">
+          <el-button type="primary" :disabled="!uDrawer.cur" @click="$go('/system/user/' + uDrawer.cur.id)">进入完整详情页</el-button>
+          <el-button @click="uDrawer.show=false">关闭</el-button>
+        </div>
+      </el-drawer>
+    </template>
+
+    <!-- 角色权限 -->
+    <template v-else-if="tab==='roles'">
+      <div style="display:grid;grid-template-columns:240px minmax(0,1fr);gap:14px;align-items:start">
+        <div class="card">
+          <div v-for="r in store.ext.roles" :key="r.key" @click="roleK=r.key"
+            style="padding:12px 14px;border-bottom:1px solid var(--line);cursor:pointer;display:flex;flex-direction:column;gap:2px"
+            :style="roleK===r.key ? 'background:var(--el-color-primary-light-9);border-left:3px solid var(--el-color-primary)' : 'border-left:3px solid transparent'">
+            <div style="display:flex;align-items:center;gap:8px"><b style="font-size:14px">{{ r.name }}</b></div>
+            <div class="muted" style="font-size:12px;line-height:1.5">{{ r.desc }}</div>
+          </div>
+        </div>
+        <div class="card card-pad" v-if="role">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <h3 style="margin:0;font-size:16px">{{ role.name }}</h3>
+            <el-tag size="small" effect="plain">启用成员 {{ store.ext.users.filter(u => u.role === role.name && u.status === '启用').length }} 人</el-tag>
+            <span class="muted" style="margin-left:auto;font-size:12px">保存后对该角色全部成员立即生效</span>
+          </div>
+          <el-form label-width="110px">
+            <el-form-item label="菜单权限">
+              <el-tree ref="roleTree" :data="SYS_MENU_TREE" show-checkbox node-key="label" default-expand-all
+                :expand-on-click-node="false" :check-strictly="false"
+                style="border:1px solid var(--line);border-radius:8px;padding:8px;min-width:420px"/>
+              <div class="muted" style="font-size:12px;margin-top:4px">勾选父级时自动包含子菜单；保存时合并半勾选父级。</div>
+            </el-form-item>
+            <el-form-item label="数据权限">
+              <el-radio-group v-model="rData.scope"><el-radio-button v-for="s in SYS_DATA_SCOPE" :key="s" :label="s">{{ s }}</el-radio-button></el-radio-group>
+            </el-form-item>
+            <el-form-item label="按钮权限">
+              <el-checkbox-group v-model="rData.btns">
+                <el-checkbox v-for="b in SYS_BTN_OPTS" :key="b" :label="b">{{ b }}</el-checkbox>
+              </el-checkbox-group>
+            </el-form-item>
+            <el-form-item label="字段脱敏">
+              <el-checkbox-group v-model="rData.masks">
+                <el-checkbox v-for="m in SYS_MASK_OPTS" :key="m" :label="m">{{ m }}</el-checkbox>
+              </el-checkbox-group>
+              <div class="muted" style="font-size:12px">示例：勾选「合同-成本价」后，该角色在列表/详情中成本价显示为 ****。</div>
+            </el-form-item>
+            <el-form-item label="角色说明"><el-input v-model="rData.desc" type="textarea" :rows="2" style="max-width:560px"/></el-form-item>
+          </el-form>
+          <div style="display:flex;gap:8px;padding-top:12px;border-top:1px solid var(--line)">
+            <el-button type="primary" icon="Check" @click="roleSave">保存权限</el-button>
+            <el-button @click="$msg.info('示例：恢复默认权限')">恢复默认</el-button>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <!-- 组织架构 -->
+    <template v-else-if="tab==='org'">
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:14px;align-items:start">
+        <div class="card card-pad">
+          <div class="card-title">组织架构树 <span class="muted" style="font-weight:400;font-size:12px">共 {{ store.ext.depts.length }} 个部门 · 点击部门名可展开</span></div>
+          <el-tree :data="orgT" node-key="no" default-expand-all :expand-on-click-node="false" class="org-tree">
+            <template #default="{ data }">
+              <div style="display:flex;align-items:center;gap:8px;flex:1;padding-right:10px">
+                <el-icon style="color:var(--el-color-primary)"><office-building/></el-icon>
+                <span>{{ data.label }}</span>
+                <el-tag size="small" type="info" effect="plain" v-if="data.count">{{ data.count }} 人</el-tag>
+                <span class="link" style="margin-left:auto;font-size:12px" @click.stop="oForm.parent=data.label;oDlg=true">＋ 新建子部门</span>
+              </div>
+            </template>
+          </el-tree>
+        </div>
+        <div class="card card-pad">
+          <div class="card-title">部门概览</div>
+          <el-descriptions :column="1" border size="small">
+            <el-descriptions-item label="部门总数">{{ store.ext.depts.length }}</el-descriptions-item>
+            <el-descriptions-item label="一级部门">{{ orgT.length }}</el-descriptions-item>
+            <el-descriptions-item label="有成员的部门">{{ store.ext.depts.filter(d => store.ext.users.some(u => u.dept === d.name)).length }}</el-descriptions-item>
+            <el-descriptions-item label="未挂载成员的部门">{{ store.ext.depts.filter(d => !store.ext.users.some(u => u.dept === d.name)).length }}</el-descriptions-item>
+          </el-descriptions>
+          <el-alert type="info" show-icon :closable="false" style="margin-top:12px" title="说明" description="新增部门写回部门表并立即出现在树中；可在用户管理里把用户改属新部门。"/>
+        </div>
+      </div>
+    </template>
+
+    <!-- 操作日志 -->
+    <template v-else-if="tab==='logs'">
+      <div class="stat-row" style="grid-template-columns:repeat(4,1fr)">
+        <div class="stat-card" v-for="s in lStats" :key="s[0]" :class="s[2]"><span class="lb">{{ s[0] }}</span><span class="vl">{{ s[1] }}</span><span class="ft">可追溯审计</span></div>
+      </div>
+      <div class="card query">
+        <el-form inline>
+          <el-form-item label="搜索"><el-input v-model="lQ.kw" placeholder="操作内容 / 动作" prefix-icon="Search" clearable style="width:220px"/></el-form-item>
+          <el-form-item label="操作人"><el-select v-model="lQ.who" placeholder="全部" clearable filterable style="width:140px"><el-option v-for="w in lWho" :key="w" :label="w" :value="w"/></el-select></el-form-item>
+          <el-form-item label="模块"><el-select v-model="lQ.module" placeholder="全部" clearable style="width:130px"><el-option v-for="m in lMod" :key="m" :label="m" :value="m"/></el-select></el-form-item>
+        </el-form>
+      </div>
+      <div class="card table-card">
+        <el-table :data="lPaged" style="width:100%" :header-cell-style="{height:'42px'}" empty-text="没有符合条件的操作日志">
+          <el-table-column prop="time" label="操作时间" min-width="165"/><el-table-column prop="who" label="操作人" min-width="90"/>
+          <el-table-column prop="module" label="模块" min-width="80"><template #default="{row}"><el-tag size="small" effect="plain">{{ row.module }}</el-tag></template></el-table-column>
+          <el-table-column prop="act" label="动作" min-width="80"><template #default="{row}"><el-tag size="small" :type="actTag(row.act)" effect="light">{{ row.act }}</el-tag></template></el-table-column>
+          <el-table-column prop="detail" label="操作内容" min-width="320" show-overflow-tooltip/>
+          <el-table-column prop="ip" label="来源 IP" min-width="110"/>
+        </el-table>
+        <div class="pager"><span class="batch">共 {{ lFiltered.length }} 条</span>
+          <el-pagination v-model:current-page="lPage" v-model:page-size="lSize" :page-sizes="[10,20,50]" layout="sizes, prev, pager, next, jumper" :total="lFiltered.length" background size="small"/></div>
+      </div>
+    </template>
+
+    <el-dialog v-model="oDlg" title="新增部门" width="420px">
+      <el-form label-width="90px">
+        <el-form-item label="上级部门" required>
+          <el-select v-model="oForm.parent" filterable style="width:100%">
+            <el-option v-for="d in store.ext.depts" :key="d.no" :label="d.name" :value="d.name"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="部门名称" required><el-input v-model="oForm.name" placeholder="如：华东销售三部" maxlength="20"/></el-form-item>
+      </el-form>
+      <template #footer><el-button @click="oDlg=false">取消</el-button><el-button type="primary" @click="oSave">创建</el-button></template>
+    </el-dialog>
+
+    <el-dialog v-model="uDlg.show" :title="uDlg.edit ? '编辑用户' : '新增用户'" width="560px" destroy-on-close>
+      <el-form ref="uRef" :model="uForm" :rules="uRules" label-width="100px">
+        <el-row :gutter="12">
+          <el-col :span="12"><el-form-item label="账号" prop="acc"><el-input v-model="uForm.acc" placeholder="登录账号（唯一）" :disabled="!!uForm.id"/></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="姓名" prop="name"><el-input v-model="uForm.name"/></el-form-item></el-col>
+        </el-row>
+        <el-row :gutter="12">
+          <el-col :span="12"><el-form-item label="所属部门" prop="dept"><el-select v-model="uForm.dept" filterable style="width:100%"><el-option v-for="d in store.ext.depts" :key="d.no" :label="d.name" :value="d.name"/></el-select></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="角色" prop="role"><el-select v-model="uForm.role" style="width:100%"><el-option v-for="r in store.ext.roles" :key="r.key" :label="r.name" :value="r.name"/></el-select></el-form-item></el-col>
+        </el-row>
+        <el-row :gutter="12">
+          <el-col :span="12"><el-form-item label="联系电话"><el-input v-model="uForm.phone"/></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="邮箱"><el-input v-model="uForm.email"/></el-form-item></el-col>
+        </el-row>
+        <el-form-item label="状态"><el-radio-group v-model="uForm.status"><el-radio label="启用"/><el-radio label="停用"/></el-radio-group></el-form-item>
+      </el-form>
+      <el-alert type="info" show-icon :closable="false" title="保存即写回用户列表与操作日志（角色决定菜单/按钮/数据范围权限）。"/>
+      <template #footer><el-button @click="uDlg.show=false">取消</el-button><el-button type="primary" @click="uSave">保存</el-button></template>
+    </el-dialog>
+  </div>`,
+};
+
+/* ---------- 用户详情页 /system/user/:id ---------- */
+const UserDetailPage = {
+  components: { PageHead },
+  props: { id: String },
+  setup(props) {
+    const user = computed(() => store.ext.users.find(u => u.id === props.id) || null);
+    const role = computed(() => user.value ? store.ext.roles.find(r => r.name === user.value.role) : null);
+    const logs = computed(() => user.value ? store.ext.logs.filter(l => l.who === user.value.name).slice().sort((a, b) => (a.time < b.time ? 1 : -1)).slice(0, 12) : []);
+    const deptName = computed(() => user.value ? user.value.dept : '');
+    return { user, role, logs, deptName, SYS_DATA_SCOPE };
+  },
+  template: `<div>
+    <page-head :crumbs="[{t:'系统管理',to:'/system'}, '用户详情 · ' + (user ? user.name : '')]" title="用户详情" v-if="user">
+      <el-button icon="Back" @click="$go('/system')">返回用户管理</el-button>
+    </page-head>
+    <el-empty v-if="!user" description="用户不存在（可能已被删除）"><el-button type="primary" @click="$go('/system')">返回用户管理</el-button></el-empty>
+    <template v-if="user">
+      <div class="cust-head" style="background:var(--card);border:1px solid var(--line);border-radius:10px">
+        <div class="cust-logo">{{ user.name.slice(0,1) }}</div>
+        <div>
+          <h2>{{ user.name }}<el-tag size="small" :type="user.status==='启用'?'success':'info'" effect="light" style="margin-left:8px">{{ user.status }}</el-tag></h2>
+          <div class="cust-meta"><span>账号：<b>{{ user.acc }}</b></span><span>角色：<b>{{ user.role }}</b></span><span>部门：<b>{{ user.dept }}</b></span><span>最近登录：<b>{{ user.lastLogin }}</b></span></div>
+        </div>
+        <div class="sum-cards">
+          <div class="sum-card"><div class="v">{{ logs.length }}</div><div class="l">相关操作日志</div></div>
+          <div class="sum-card"><div class="v">{{ role ? role.menus.length : 0 }}</div><div class="l">可访问菜单</div></div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px">
+        <div class="card card-pad">
+          <div class="card-title">基本信息</div>
+          <el-descriptions :column="1" border>
+            <el-descriptions-item v-for="f in [['acc','账号'],['name','姓名'],['dept','所属部门'],['role','角色'],['phone','联系电话'],['email','邮箱'],['status','状态'],['lastLogin','最近登录']]" :key="f[0]" :label="f[1]">{{ user[f[0]] || '—' }}</el-descriptions-item>
+          </el-descriptions>
+          <div style="margin-top:14px;display:flex;gap:8px">
+            <el-button type="primary" icon="Edit" @click="$msg.info('示例：编辑用户（在用户管理内完成）')">编辑</el-button>
+            <el-button icon="Key" @click="$msg.info('示例：重置密码（重置后通过邮件通知）')">重置密码</el-button>
+          </div>
+        </div>
+        <div class="card card-pad">
+          <div class="card-title">角色权限摘要（{{ role ? role.name : '—' }}）</div>
+          <el-descriptions :column="1" border v-if="role">
+            <el-descriptions-item label="数据权限">{{ role.dataScope }}</el-descriptions-item>
+            <el-descriptions-item label="角色说明">{{ role.desc }}</el-descriptions-item>
+            <el-descriptions-item label="菜单权限">{{ role.menus.join('、') || '—' }}</el-descriptions-item>
+            <el-descriptions-item label="按钮权限">{{ role.buttons.join('、') || '—' }}</el-descriptions-item>
+            <el-descriptions-item label="字段脱敏">{{ role.fieldMask && role.fieldMask.length ? role.fieldMask.join('、') : '无' }}</el-descriptions-item>
+          </el-descriptions>
+        </div>
+      </div>
+      <div class="card table-card" style="margin-top:14px">
+        <div style="padding:10px 12px 0"><span class="sec-title" style="margin:0">本人的操作日志</span></div>
+        <el-table :data="logs" style="width:100%" :header-cell-style="{height:'42px'}" empty-text="暂无相关日志">
+          <el-table-column prop="time" label="操作时间" min-width="165"/><el-table-column prop="module" label="模块" min-width="80"/>
+          <el-table-column prop="act" label="动作" min-width="80"><template #default="{row}"><el-tag size="small" effect="light">{{ row.act }}</el-tag></template></el-table-column>
+          <el-table-column prop="detail" label="操作内容" min-width="320" show-overflow-tooltip/><el-table-column prop="ip" label="来源 IP" min-width="110"/>
+        </el-table>
+      </div>
+    </template>
+  </div>`,
+};
+
+registerRoute('/system', SystemPage, 'system', () => ({ tab: 'users' }));
+registerRoute('/system/roles', SystemPage, 'system', () => ({ tab: 'roles' }));
+registerRoute('/system/org', SystemPage, 'system', () => ({ tab: 'org' }));
+registerRoute('/system/logs', SystemPage, 'system', () => ({ tab: 'logs' }));
+registerRoute('/system/user/:id', UserDetailPage, 'user-detail');
+
 const WorkbenchPage = {
   components: { PageHead, EChart },
   setup() {
@@ -5705,6 +7055,9 @@ const App = {
       if (p.startsWith('/quote/')) return '/quotes';
       if (p.startsWith('/lead/')) return '/leads/my';
       if (p.startsWith('/opp/')) return '/opps/list';
+      if (p.startsWith('/analytics/')) return '/analytics';
+      if (p.startsWith('/system/user/')) return '/system';
+      if (p.startsWith('/approvals/')) return '/approvals/templates';
       return p;
     });
     const menu = ref(null);
