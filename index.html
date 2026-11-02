@@ -1330,7 +1330,7 @@ const EXT_DELIVERIES_PRES = [
 const EXT_TICKETS_PRES = [
   { no: 'GD-202611-0005', type: '服务请求', customer: EXT_NJ, contact: '周会计', priority: '中', status: '待客户确认', handler: '客服-小陈', desc: '申请新增 5 个用户账号', created: '2026-11-01 15:30', slaDeadline: '2026-11-02 15:30',
     records: [ { time: '2026-11-01 15:32', who: '客服-小陈', act: '创建工单', note: '待客户确认账号信息' } ], images: [] },
-  { no: 'GD-202609-0031', type: '故障报修', customer: EXT_NJ, contact: '黄工', priority: '高', status: '已关闭', handler: '技术-黄工', desc: '月度报表导出出现乱码', created: '2026-09-27 09:40', slaDeadline: '2026-09-27 13:40',
+  { no: 'GD-202609-0031', type: '故障报修', customer: EXT_NJ, contact: '黄工', priority: '高', status: '已关闭', handler: '技术-黄工', desc: '月度报表导出出现乱码', created: '2026-09-27 09:40', slaDeadline: '2026-09-27 13:40', solvedTime: '2026-09-28 10:05', rating: 4,
     records: [
       { time: '2026-09-27 09:45', who: '技术-黄工', act: '接单', note: '初步定位为服务器字体缺失' },
       { time: '2026-09-27 15:10', who: '技术-黄工', act: '修复', note: '服务端安装中文字体并回归验证' },
@@ -1338,7 +1338,7 @@ const EXT_TICKETS_PRES = [
   { no: 'GD-202611-0007', type: '投诉', customer: '江苏某某集团', contact: '周主任', priority: '紧急', status: '处理中', handler: '林晓', desc: '协议客户报表导出失败，影响月结', created: '2026-11-02 08:20', slaDeadline: '2026-11-02 10:20',
     records: [ { time: '2026-11-02 08:25', who: '林晓', act: '接单', note: '紧急工单，先临时导出协助月结' } ], images: [] },
   { no: 'GD-202610-0042', type: '故障报修', customer: '苏州某某汽配有限公司', contact: '', priority: '高', status: '已关闭', handler: '孙工', desc: '移动端无法同步订单数据', created: '2026-10-30 11:05', slaDeadline: '2026-10-30 15:05',
-    records: [ { time: '2026-10-30 11:20', who: '孙工', act: '修复', note: '同步队列积压，清空后恢复正常' }, { time: '2026-10-31 09:00', who: '孙工', act: '客户确认', note: '客户确认已解决，关闭工单' } ], images: [] },
+    records: [ { time: '2026-10-30 11:20', who: '孙工', act: '修复', note: '同步队列积压，清空后恢复正常' }, { time: '2026-10-31 09:00', who: '孙工', act: '客户确认', note: '客户确认已解决，关闭工单' } ], images: [], solvedTime: '2026-10-31 09:00', rating: 5 },
 ];
 
 /* --- 部门树 / 角色（6 个）/ 用户 --- */
@@ -1358,7 +1358,7 @@ const EXT_ROLES = [
   { key: 'sales_manager', name: '销售经理', desc: '管理部门团队，可审折扣、转移客户与分配线索', dataScope: '本部门及下级', menus: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '报价管理', '合同管理', '订单管理', '活动管理', '数据分析'], buttons: ['新增', '编辑', '折扣审批', '线索分配', '客户转移', '导出'], fieldMask: ['合同-成本价', '报价-毛利率'] },
   { key: 'presale', name: '售前', desc: '方案支持与标书编写，协助推进商机', dataScope: '本部门', menus: ['工作台', '客户管理', '联系人管理', '商机管理', '报价管理'], buttons: ['方案上传', '跟进记录'], fieldMask: ['回款-全部', '合同-金额明细'] },
   { key: 'finance', name: '财务', desc: '回款确认、开票与合同/报价的财务复核', dataScope: '全部', menus: ['工作台', '合同管理', '订单管理', '回款管理', '报价管理', '数据分析'], buttons: ['回款确认', '开票', '冲销申请'], fieldMask: ['跟进-内容脱敏'] },
-  { key: 'delivery_service', name: '交付/客服', desc: '实施交付、项目进度与服务工单处理', dataScope: '本部门及下级', menus: ['工作台', '客户管理', '联系人管理', '交付管理', '服务管理', '活动管理'], buttons: ['新建项目', '接单', '转派', '关闭工单'], fieldMask: ['报价-折扣明细', '回款-全部'] },
+  { key: 'delivery_service', name: '交付/客服', desc: '实施交付、项目进度与服务工单处理', dataScope: '本部门及下级', menus: ['工作台', '客户管理', '联系人管理', '交付管理', '服务管理', '活动管理'], buttons: ['新建项目', '受理', '指派处理人', '转派', '关闭工单'], fieldMask: ['报价-折扣明细', '回款-全部'] },
   { key: 'admin', name: '系统管理员', desc: '组织架构、用户与角色权限、流程与字段配置', dataScope: '全部', menus: ['工作台', '线索管理', '客户管理', '商机管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '交付管理', '服务管理', '数据分析', '系统管理'], buttons: ['全部'], fieldMask: [] },
 ];
 const EXT_USERS = [
@@ -1773,7 +1773,7 @@ function buildExt(customers, leads, opps) {
     return {
       no: 'XM-' + ym + '-' + extPad(xmSeq++, 4),
       name: extShort(cu.name || o.customer) + ' ' + extPick(r, ['CRM 实施项目', '平台建设项目', '系统升级项目', '数据迁移与上线', '模块部署项目', '培训交付项目']),
-      customer: o.customer, order: o.no,
+      customer: o.customer, order: o.no, contract: o.contract || '',
       pm: extPick(r, ['孙工', '钱工', '周航', '吴迪']),
       status, progress, planStart, planEnd, milestones,
       risk: extCh(r, 0.75) ? '' : extPick(r, ['客户侧接口联调延迟', '关键用户出差影响培训', '需求范围蔓延', '数据质量差需返工']),
@@ -1782,6 +1782,12 @@ function buildExt(customers, leads, opps) {
   orders.forEach(o => {
     if (o.status === '已取消' || takenOrders.has(o.no)) return;
     deliveries.push(genDelivery(o, extRng(extHash(o.no + '|xm'))));
+  });
+  /* 5.13 项目字段：补关联合同与验收状态（未验收 / 阶段验收中 / 已验收，由里程碑推导） */
+  deliveries.forEach(d => {
+    if (!d.contract) { const o = orders.find(x => x.no === d.order); d.contract = o ? o.contract : ''; }
+    const ms = d.milestones || [], done = ms.filter(m => m.status === '已完成').length;
+    d.ac = ms.length && done === ms.length ? '已验收' : (done ? '阶段验收中' : '未验收');
   });
 
   /* ---------- 7) 服务工单（保留 4 条 + 生成） ---------- */
@@ -1796,7 +1802,7 @@ function buildExt(customers, leads, opps) {
     const ym = extPick(r, ['202606', '202607', '202608', '202609', '202610', '202611']);
     const type = extPick(r, ['故障报修', '故障报修', '服务请求', '咨询', '投诉']);
     const priority = extPick(r, ['紧急', '高', '高', '中', '中', '低']);
-    const status = extPick(r, ['待接单', '处理中', '处理中', '待客户确认', '已关闭', '已关闭']);
+    const status = extPick(r, ['待受理', '待分派', '处理中', '处理中', '待客户确认', '待客户确认', '已解决', '已关闭', '已关闭', '已退回']);
     const cs = contactsByCust[cu.name] || [];
     const created = (ym === '202611' ? extAddDays(TODAY, -extRint(r, 0, 10)) : ym.slice(0, 4) + '-' + ym.slice(4) + '-' + extPad(extRint(r, 1, 28), 2)) + ' ' + extPad(extRint(r, 8, 17), 2) + ':' + extPad(extRint(r, 0, 5) * 10, 2);
     const sla = new Date(new Date(created).getTime() + SLA_H[priority] * 3600000).toISOString().slice(0, 16).replace('T', ' ');
@@ -1808,16 +1814,30 @@ function buildExt(customers, leads, opps) {
     };
     const records = [];
     const who = extPick(r, ['孙工', '钱工', '林晓']);
-    if (status === '待接单') records.push({ time: created, who: '', act: '提交工单', note: '待客服接单' });
+    const beyond = ['待分派', '处理中', '待客户确认', '已解决', '已关闭', '已退回'].includes(status);
+    const handled = ['处理中', '待客户确认', '已解决', '已关闭', '已退回'].includes(status);
+    const confirmed = ['已解决', '已关闭', '已退回'].includes(status);
+    if (status === '待受理') records.push({ time: created, who: '', act: '提交工单', note: '等待客服受理' });
     else {
-      records.push({ time: created, who: who, act: '接单', note: '已按 SLA 启动处理' });
-      if (status === '已关闭' || extCh(r, 0.5)) records.push({ time: extAddDays(created.slice(0, 10), 1) + ' 10:30', who: cs.length ? cs[0].name : '客户', act: '客户确认', note: '问题确认解决' });
+      records.push({ time: created, who: '', act: '提交工单', note: '客户提交服务请求' });
+      records.push({ time: created.slice(0, 10) + ' 09:10', who: '客服-小陈', act: '受理', note: '客服受理，待指派处理人' });
+      if (beyond && status !== '待分派') {
+        records.push({ time: created.slice(0, 10) + ' 09:40', who: who, act: '指派处理人', note: '指派给 ' + who + '，按 SLA 启动处理' });
+        if (handled && status !== '处理中') records.push({ time: extAddDays(created.slice(0, 10), 1) + ' 10:30', who: who, act: '处理', note: '已完成处理，提交客户确认' });
+        if (confirmed) {
+          const st = extAddDays(created.slice(0, 10), 1) + ' 15:00';
+          records.push({ time: st, who: cs.length ? cs[0].name : '客户', act: status === '已退回' ? '退回' : '解决确认', note: status === '已退回' ? '客户反馈问题未彻底解决，退回重新处理' : '客户确认问题已解决' });
+        }
+        if (status === '已关闭') records.push({ time: extAddDays(created.slice(0, 10), 2) + ' 09:30', who: cs.length ? cs[0].name : '客户', act: '客户评价', note: '服务满意度 ' + extRint(r, 3, 5) + '/5，工单关闭' });
+      }
     }
+    const solvedTime = ['已解决', '已关闭'].includes(status) ? extAddDays(created.slice(0, 10), 1) + ' 15:00' : '';
     return {
       no: 'GD-' + ym + '-' + extPad(gdSeq++, 4), type, customer: cu.name,
       contact: cs.length ? extPick(r, cs).name : '',
-      priority, status, handler: who,
-      desc: extPick(r, descPool[type]), created, slaDeadline: sla,
+      priority, status, handler: handled && status !== '已退回' ? who : '',
+      desc: extPick(r, descPool[type]), created, slaDeadline: sla, solvedTime,
+      rating: status === '已关闭' ? extRint(r, 1, 5) : '',
       records, images: extCh(r, 0.25) ? ['img/' + ym + '-' + extPad(gdSeq, 4) + '-1.png'] : [],
     };
   };
@@ -1842,17 +1862,23 @@ function buildExt(customers, leads, opps) {
   const ACT_TPL = {
     电话: ['与{c}电话沟通{p}的报价与实施排期', '电话回访{c}，确认{p}使用情况与下一步计划', '与{c}电话确认回款与发票信息'],
     微信: ['微信发送{p}方案资料给{c}', '微信向{c}确认拜访时间', '微信跟进{c}，催收商务审批进度'],
+    短信: ['短信通知{c}{p}系统维护窗口', '短信向{c}发送服务月报摘要'],
     拜访: ['上门拜访{c}，现场演示{p}', '拜访{c}，沟通{p}实施的详细需求', '与{c}例行拜访，维护客户关系'],
     会议: ['与{c}召开{p}需求评审会', '参加{c}组织的供应商比选会议', '与{c}及我方售前召开方案研讨会'],
     邮件: ['邮件向{c}发送{p}的正式报价单', '邮件跟进{c}，确认合同盖章回寄', '邮件发送{c}月度服务报告'],
+    演示: ['远程演示{p}核心功能给{c}', '向{c}演示{p}移动端操作流程'],
+    培训: ['为{c}开展{p}操作培训', '{p}管理员培训与答疑'],
+    其他: ['整理{c}会议纪要并发送', '协调{p}交付排期事务'],
   };
+  const ACT_RESULT = ['已联系', '已联系', '已联系', '待反馈', '待反馈', '需求明确'];
+  const ACT_PLAN = ['发送方案补充材料并确认细节', '跟进内部审批进度', '确认下一次沟通时间与议程', '整理本次沟通纪要给客户'];
   const FEEDBACK = ['对方表示需内部评估', '已有初步意向', '提出价格异议', '约定下次会议时间', '无明确反馈，持续跟进', '需求基本明确', '同意推进下一步'];
   const genAct = (cu, r, i) => {
     const cs = contactsByCust[cu.name] || [];
     const contact = cs.length ? cs[(i * 2 + 1) % cs.length].name : '';
     const myOpps = oppsByCust[cu.name] || [];
     const opp = myOpps.length && extCh(r, 0.75) ? extPick(r, myOpps).no : '';
-    const type = extPick(r, ['电话', '电话', '微信', '拜访', '拜访', '会议', '邮件']);
+    const type = extPick(r, ['电话', '电话', '微信', '微信', '拜访', '拜访', '拜访', '会议', '邮件', '短信', '演示', '培训', '其他']);
     const status = extPick(r, ['已完成', '已完成', '已完成', '已完成', '计划中', '计划中', '已取消']);
     const planned = status === '计划中';
     const day = planned ? extAddDays(TODAY, extRint(r, 1, 14)) : extAddDays(TODAY, -extRint(r, 1, 45));
@@ -1870,7 +1896,10 @@ function buildExt(customers, leads, opps) {
       no: 'HD-' + extPad(hdSeq++, 6), type, customer: cu.name, contact, opp, owner: cu.owner || '',
       time, content,
       feedback: status === '已完成' ? extPick(r, FEEDBACK) : '',
+      result: status === '已完成' ? extPick(r, ACT_RESULT) : '',
+      plan: status === '已完成' && extCh(r, 0.5) ? extPick(r, ACT_PLAN) : '',
       next: status === '已完成' && extCh(r, 0.7) ? extAddDays(day, extRint(r, 2, 10)) + ' 10:00' : '',
+      files: status === '已完成' && (type === '拜访' || type === '演示' || extCh(r, 0.2)) ? ['img/act-' + ('HD-' + extPad(hdSeq, 6)) + '-1.png'] : [],
       status, checkin,
     };
   };
@@ -2614,7 +2643,8 @@ function acNextNo() {
   store.ext.activities.forEach(x => { const n = Number(String(x.no).split('-')[1]); if (n > mx) mx = n; });
   return 'HD-' + String(mx + 1).padStart(6, '0');
 }
-const AC_TAG = { 电话: 'primary', 微信: 'info', 拜访: 'success', 会议: 'warning', 邮件: 'primary' };
+const AC_TAG = { 电话: 'primary', 微信: 'info', 短信: 'info', 拜访: 'success', 会议: 'warning', 邮件: 'primary', 演示: 'success', 培训: 'warning', 其他: 'info' };
+const AC_RESULT_TAG = { 已联系: 'primary', 待反馈: 'warning', 需求明确: 'success' };
 const AC_STATUS_TAG = { 计划中: 'warning', 已完成: 'success', 已取消: 'info' };
 
 /* ===== 活动列表 /activities ===== */
@@ -2643,14 +2673,15 @@ const ActivitiesPage = {
       ];
     });
     const cols = [
-      { p: 'no', l: '活动编号', w: 130, link: true }, { p: 'type', l: '活动类型', w: 90, tag: { 电话: 'primary', 微信: 'info', 拜访: 'success', 会议: 'warning', 邮件: 'primary' } },
+      { p: 'no', l: '活动编号', w: 130, link: true }, { p: 'type', l: '活动类型', w: 90, tag: AC_TAG },
       { p: 'customer', l: '客户', w: 200, link: 'cust' }, { p: 'contact', l: '联系人', w: 90 }, { p: 'opp', l: '商机', w: 140 },
-      { p: 'time', l: '时间', w: 140 }, { p: 'content', l: '内容', w: 260 }, { p: 'owner', l: '负责人', w: 80 },
-      { p: 'feedback', l: '客户反馈', w: 160 }, { p: 'status', l: '状态', w: 90, tag: { 计划中: 'warning', 已完成: 'success', 已取消: 'info' } },
+      { p: 'time', l: '时间', w: 140 }, { p: 'content', l: '内容', w: 250 }, { p: 'owner', l: '负责人', w: 80 },
+      { p: 'feedback', l: '客户反馈', w: 150 }, { p: 'result', l: '跟进结果', w: 90, tag: AC_RESULT_TAG }, { p: 'next', l: '下次跟进时间', w: 140 },
+      { p: 'status', l: '状态', w: 90, tag: AC_STATUS_TAG },
     ];
     const filters = [
       { k: 'kw', label: '搜索活动', ph: '编号 / 客户 / 内容 / 联系人' },
-      { k: 'type', label: '活动类型', opts: ['电话', '微信', '拜访', '会议', '邮件'] },
+      { k: 'type', label: '活动类型', opts: ['电话', '微信', '短信', '拜访', '会议', '邮件', '演示', '培训', '其他'] },
       { k: 'status', label: '活动状态', opts: ['已完成', '计划中', '已取消'] },
       { k: 'owner', label: '负责人', opts: OWNERS },
     ];
@@ -2692,14 +2723,14 @@ const ActivitiesPage = {
       const no = acNextNo();
       store.ext.activities.unshift({
         no, type: draft.type, customer: draft.customer, contact: draft.contact, opp: draft.opp, owner: draft.owner,
-        time: draft.time, content: draft.content, feedback: '', next: '', status: '计划中', checkin: null,
+        time: draft.time, content: draft.content, feedback: '', result: '', plan: '', next: '', status: '计划中', checkin: null, files: [],
       });
       acLog(no, '新增', '新增' + draft.type + '活动（客户：' + draft.customer + '，时间：' + draft.time + '）');
       dlg.value = false;
       ElMessage.success('活动已创建（编号 ' + no + '，状态：计划中）');
       go('/activity/' + no);
     });
-    return { view, d1, d2, rows, totalText, stats, cols, filters, onLink, month, calCells, monthLabel, mv, dayDlg, dayDate, dayActs, openDay, listByDay, AC_TAG, AC_STATUS_TAG, dlg, fref, draft, rule, custOpts, ctOpts, oppOpts, save, TODAY };
+    return { view, d1, d2, rows, totalText, stats, cols, filters, onLink, month, calCells, monthLabel, mv, dayDlg, dayDate, dayActs, openDay, listByDay, AC_TAG, AC_RESULT_TAG, AC_STATUS_TAG, dlg, fref, draft, rule, custOpts, ctOpts, oppOpts, save, TODAY };
   },
   template: `<div>
     <list-page :crumbs="['活动管理','跟进活动']" title="跟进活动" :total-text="totalText" :stats="stats" :filters="filters" :rows="rows" :cols="cols" :action-width="140" note-tag="真实数据 · 点击编号进入详情"
@@ -2752,7 +2783,7 @@ const ActivitiesPage = {
         <el-row :gutter="12">
           <el-col :span="12"><el-form-item label="活动类型">
             <el-select v-model="draft.type" style="width:100%">
-              <el-option v-for="t in ['电话','微信','拜访','会议','邮件']" :key="t" :value="t"/>
+              <el-option v-for="t in ['电话','微信','短信','拜访','会议','邮件','演示','培训','其他']" :key="t" :value="t"/>
             </el-select>
           </el-form-item></el-col>
           <el-col :span="12"><el-form-item label="负责人">
@@ -2791,9 +2822,9 @@ const ActivitiesPage = {
       <div v-else>
         <div v-for="a in dayActs" :key="a.no" style="display:flex;gap:10px;align-items:center;padding:9px 4px;border-bottom:1px dashed var(--line);cursor:pointer" @click="dayDlg=false;$go('/activity/'+a.no)">
           <b class="mono" style="width:44px">{{ a.time.slice(11,16) }}</b>
-          <el-tag size="small" :type="({电话:'primary',微信:'info',拜访:'success',会议:'warning',邮件:'primary'})[a.type]">{{ a.type }}</el-tag>
+          <el-tag size="small" :type="AC_TAG[a.type]">{{ a.type }}</el-tag>
           <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ a.customer }}<span class="muted" style="font-size:12px;margin-left:8px">{{ a.content }}</span></span>
-          <el-tag size="small" :type="({计划中:'warning',已完成:'success',已取消:'info'})[a.status]">{{ a.status }}</el-tag>
+          <el-tag size="small" :type="AC_STATUS_TAG[a.status]">{{ a.status }}</el-tag>
         </div>
         <div style="margin-top:12px;text-align:right"><el-button type="primary" plain @click="listByDay">在列表中筛选该日</el-button></div>
       </div>
@@ -2811,12 +2842,14 @@ const ActivityDetailPage = {
     const custNo = computed(() => cust.value ? cust.value.no : '');
     const contact = computed(() => a.value && a.value.contact ? store.ext.contacts.find(c => c.customer === a.value.customer && c.name === a.value.contact) || null : null);
     const opp = computed(() => a.value && a.value.opp ? store.opps.find(o => o.no === a.value.opp) || null : null);
-    const doneDlg = ref(false); const doneRf = reactive({ feedback: '', next: '' });
+    const doneDlg = ref(false); const doneRf = reactive({ feedback: '', result: '已联系', plan: '', next: '' });
     const doComplete = () => {
       if (!doneRf.feedback.trim()) return ElMessage.warning('客户反馈为必填，请填写沟通结果');
       const act = a.value;
       act.status = '已完成';
       act.feedback = doneRf.feedback.trim();
+      act.result = doneRf.result;
+      act.plan = doneRf.plan.trim();
       act.next = doneRf.next || '';
       if (act.type === '拜访' && !act.checkin) {
         const cu = cust.value || {};
@@ -2828,13 +2861,14 @@ const ActivityDetailPage = {
     };
     const cancel = () => ElMessageBox.prompt('取消后活动进入「已取消」状态（保留记录）。请填写取消原因（必填）：', '取消活动 ' + (a.value ? a.value.no : ''), { inputPattern: /\S+/, inputErrorMessage: '取消原因不能为空' })
       .then(({ value }) => { a.value.status = '已取消'; acLog(a.value.no, '取消', '取消原因：' + value); ElMessage.success('活动已取消'); }).catch(() => {});
-    return { a, cust, custNo, contact, opp, doneDlg, doneRf, doComplete, cancel, AC_TAG, AC_STATUS_TAG, custByName, store };
+    return { a, cust, custNo, contact, opp, doneDlg, doneRf, doComplete, cancel, AC_TAG, AC_RESULT_TAG, AC_STATUS_TAG, custByName, store };
   },
   template: `<div v-if="a">
     <el-breadcrumb separator="/" class="crumb"><el-breadcrumb-item><a @click="$go('/activities')">活动管理</a></el-breadcrumb-item><el-breadcrumb-item><a @click="$go('/activities')">跟进活动</a></el-breadcrumb-item><el-breadcrumb-item>{{ a.no }}</el-breadcrumb-item></el-breadcrumb>
     <div class="page-head"><h1>活动 {{ a.no }}</h1>
-      <el-tag :type="({电话:'primary',微信:'info',拜访:'success',会议:'warning',邮件:'primary'})[a.type]">{{ a.type }}</el-tag>
-      <el-tag :type="({计划中:'warning',已完成:'success',已取消:'info'})[a.status]">{{ a.status }}</el-tag>
+      <el-tag :type="AC_TAG[a.type]">{{ a.type }}</el-tag>
+      <el-tag :type="AC_STATUS_TAG[a.status]">{{ a.status }}</el-tag>
+      <el-tag v-if="a.result" :type="AC_RESULT_TAG[a.result]" effect="plain">跟进结果：{{ a.result }}</el-tag>
       <span class="total">{{ a.time }} · 负责人 {{ a.owner }}</span></div>
     <div class="ops" style="margin-top:-4px">
       <el-button v-if="a.status === '计划中'" type="primary" icon="Check" @click="doneDlg=true">标记完成</el-button>
@@ -2863,8 +2897,26 @@ const ActivityDetailPage = {
         </div>
         <div class="card card-pad" style="margin-bottom:14px">
           <div class="sec-title">下一步</div>
-          <template v-if="a.next"><el-tag type="warning" effect="light" size="large"><el-icon style="vertical-align:-2px"><bell/></el-icon> 下次跟进时间：{{ a.next }}</el-tag><span class="muted" style="margin-left:8px;font-size:13px">到期后自动进入销售「待办」提醒</span></template>
+          <template v-if="a.plan || a.next">
+            <div v-if="a.plan" style="margin-bottom:6px">
+              <b class="muted" style="font-size:12px">下一步计划：</b>{{ a.plan }}
+            </div>
+            <el-tag v-if="a.next" type="warning" effect="light" size="large"><el-icon style="vertical-align:-2px"><bell/></el-icon> 下次跟进时间：{{ a.next }}</el-tag>
+            <span class="muted" style="margin-left:8px;font-size:13px" v-if="a.next">到期后自动进入销售「待办」提醒</span>
+          </template>
           <span v-else class="muted" style="font-size:13px">暂未设置下一步跟进计划</span>
+        </div>
+        <div class="card card-pad" style="margin-bottom:14px">
+          <div class="sec-title">跟进附件</div>
+          <template v-if="(a.files || []).length">
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+              <div v-for="f in a.files" :key="f" style="width:132px;height:96px;border:1px dashed var(--line);border-radius:8px;background:var(--soft);display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--sub);font-size:12px;gap:4px">
+                <el-icon style="font-size:22px"><paperclip/></el-icon>{{ f.split('/').pop() }}
+              </div>
+            </div>
+            <p class="muted" style="margin:8px 0 0;font-size:12px">附件支持图片 / 文件 / 录音，正式版本按字段权限与角色控制查看（原型以占位卡片代替）。</p>
+          </template>
+          <span v-else class="muted" style="font-size:13px">未上传附件</span>
         </div>
         <div class="card card-pad" v-if="a.type === '拜访'">
           <div class="sec-title">拜访签到信息</div>
@@ -2916,7 +2968,9 @@ const ActivityDetailPage = {
     <el-dialog v-model="doneDlg" title="标记完成（客户反馈必填）" width="520px">
       <el-form label-width="90px">
         <el-form-item label="客户反馈" required><el-input v-model="doneRf.feedback" type="textarea" :rows="3" placeholder="本次沟通的客户态度 / 结论 / 待办（写入活动记录）"/></el-form-item>
-        <el-form-item label="下一步时间"><el-date-picker v-model="doneRf.next" type="datetime" value-format="YYYY-MM-DD HH:mm" placeholder="可选，到期进入销售待办" style="width:100%"/></el-form-item>
+        <el-form-item label="跟进结果"><el-select v-model="doneRf.result" style="width:100%"><el-option v-for="r in ['已联系','待反馈','需求明确']" :key="r" :value="r"/></el-select></el-form-item>
+        <el-form-item label="下一步计划"><el-input v-model="doneRf.plan" type="textarea" :rows="2" placeholder="下一次联系内容，如：发送方案补充材料并确认细节"/></el-form-item>
+        <el-form-item label="下次跟进时间"><el-date-picker v-model="doneRf.next" type="datetime" value-format="YYYY-MM-DD HH:mm" placeholder="可选，到期自动生成待办" style="width:100%"/></el-form-item>
       </el-form>
       <template #footer><el-button @click="doneDlg=false">取消</el-button><el-button type="primary" @click="doComplete">确认完成</el-button></template>
     </el-dialog>
@@ -3195,11 +3249,11 @@ const AnalyticsDetailPage = {
         const ownO = c => { const cu = custByName(String(c)); return !hasO || (cu && cu.owner === owf); };
         const xs = store.ext.tickets.filter(t => inM(t.created) && ownO(t.customer));
         const TYPES = ['故障报修', '服务请求', '咨询', '投诉'];
-        const STS = ['待接单', '处理中', '待客户确认', '已关闭'];
+        const STS = ['待受理', '待分派', '处理中', '待客户确认', '已解决', '已关闭', '已退回'];
         const urgent = xs.filter(t => t.priority === '紧急' || t.priority === '高');
         const byT2 = v => TYPES.map(x => xs.filter(t => t.type === x && t.status === v).length);
         return {
-          stats: [['工单总数', String(xs.length), ''], ['待处理', String(xs.filter(t => t.status === '待接单' || t.status === '处理中').length), 'warn'], ['已关闭', String(xs.filter(t => t.status === '已关闭').length), 'ok'], ['紧急/高优先级', String(urgent.length) + ('（' + Math.round(urgent.length * 1000 / Math.max(1, xs.length)) / 10 + '%）'), 'danger']],
+          stats: [['工单总数', String(xs.length), ''], ['待处理', String(xs.filter(t => ['待受理', '待分派', '处理中', '已退回'].includes(t.status)).length), 'warn'], ['已关闭', String(xs.filter(t => t.status === '已关闭').length), 'ok'], ['紧急/高等级', String(urgent.length) + ('（' + Math.round(urgent.length * 1000 / Math.max(1, xs.length)) / 10 + '%）'), 'danger']],
           opt: {
             tooltip: { trigger: 'item', formatter: q => '<b>' + q.name + '</b><br/>' + q.value + ' 单（' + q.percent + '%）' },
             legend: { bottom: 0, textStyle: { color: SUB } },
@@ -3207,17 +3261,17 @@ const AnalyticsDetailPage = {
               data: TYPES.map((k, i) => ({ name: k, value: xs.filter(t => t.type === k).length, itemStyle: { color: pal[i % pal.length] } })).filter(x => x.value) }],
           },
           opt2: {
-            tooltip: { trigger: 'axis' }, legend: { data: ['待接单', '处理中', '待客户确认', '已关闭'], textStyle: { color: SUB }, right: 6, top: 0 },
+            tooltip: { trigger: 'axis' }, legend: { data: STS, textStyle: { color: SUB }, right: 6, top: 0 },
             grid: { left: 6, right: 10, top: 30, bottom: 0, containLabel: true },
             xAxis: { type: 'category', data: TYPES, axisLabel: { color: SUB, fontSize: 11, rotate: 12 } }, yAxis: { type: 'value', ...axis },
-            series: STS.map((s, i) => ({ name: s, type: 'bar', stack: 's', itemStyle: { color: [mixHex(pal[0], '#000000', .5), pal[0], mixHex(pal[0], '#000000', .25), mixHex(pal[0], '#ffffff', .45)][i] }, data: byT2(s) })),
+            series: STS.map((s, i) => ({ name: s, type: 'bar', stack: 's', itemStyle: { color: [mixHex(pal[0], '#000000', .5), mixHex(pal[0], '#ffffff', .65), pal[0], mixHex(pal[0], '#000000', .25), mixHex(pal[0], '#ffffff', .3), mixHex(pal[0], '#000000', .1), '#cc7a7a'][i] }, data: byT2(s) })),
           },
           opt2Title: '各类型工单状态分布',
-          note: '注：处理中 + 待接单 + 待客户确认视为待处理；紧急 2h / 高 4h / 中 24h / 低 48h SLA。',
+          note: '注：待受理 / 待分派 / 处理中 / 已退回视为待处理；紧急 2h / 高 4h / 中 24h / 低 48h SLA。',
           rows: xs.slice().sort((a, b) => (a.created < b.created ? 1 : -1)),
           cols: [{ p: 'no', l: '工单编号', w: 130, fmt: 'mono' }, { p: 'customer', l: '客户', w: 170, fmt: 'custName' }, { p: 'type', l: '类型', w: 90, fmt: 'tag', tagMap: {} },
-            { p: 'priority', l: '优先级', w: 80, fmt: 'tag', tagMap: { 紧急: 'danger', 高: 'warning', 中: 'primary', 低: 'info' } },
-            { p: 'status', l: '状态', w: 100, fmt: 'tag', tagMap: { 待接单: 'warning', 处理中: 'primary', 待客户确认: 'warning', 已关闭: 'success' } },
+            { p: 'priority', l: '问题等级', w: 90, fmt: 'tag', tagMap: { 紧急: 'danger', 高: 'warning', 中: 'primary', 低: 'info' } },
+            { p: 'status', l: '状态', w: 110, fmt: 'tag', tagMap: { 待受理: 'info', 待分派: 'info', 处理中: 'primary', 待客户确认: 'warning', 已解决: 'success', 已关闭: 'success', 已退回: 'danger' } },
             { p: 'handler', l: '处理人', w: 100 }, { p: 'created', l: '提交时间', w: 140 }],
         };
       }
@@ -4796,6 +4850,7 @@ function dlProg(d) {
   d.progress = ms.length ? Math.round(done * 100 / ms.length) : 0;
   if (done === ms.length && ms.length) d.status = '已完成';
   else if (!d.status || d.status === '未启动') d.status = '实施中';
+  d.ac = ms.length && done === ms.length ? '已验收' : (done ? '阶段验收中' : '未验收');
 }
 function dlTouch(d) { if (!d.recs) d.recs = (d.milestones || []).filter(m => m.status === '已完成').map(m => ({ time: m.date, who: d.pm, act: '里程碑完成', note: m.name + '（里程碑验收通过）' })); }
 function dlNext(d) { const nx = (d.milestones || []).find(m => m.status !== '已完成'); if (nx && nx.status !== '进行中') nx.status = '进行中'; return nx; }
@@ -4819,16 +4874,18 @@ const DeliveryPage = {
       ];
     });
     const cols = [
-      { p: 'no', l: '项目编号', w: 140, link: true }, { p: 'name', l: '项目名称', w: 200 },
-      { p: 'customer', l: '客户', w: 200, link: 'cust' }, { p: 'order', l: '关联订单', w: 150 },
-      { p: 'pm', l: '项目经理', w: 90 }, { p: 'planStart', l: '计划开始', w: 110 }, { p: 'planEnd', l: '计划完成', w: 110 },
-      { p: 'progress', l: '进度', w: 150, noTip: true, progress: true },
-      { p: 'status', l: '项目状态', w: 100, tag: { 未启动: 'info', 实施中: 'primary', 验收中: 'warning', 已完成: 'success' } },
-      { p: 'risk', l: '风险', w: 90, noTip: true },
+      { p: 'no', l: '项目编号', w: 140, link: true }, { p: 'name', l: '项目名称', w: 190 },
+      { p: 'customer', l: '客户', w: 200, link: 'cust' }, { p: 'order', l: '关联订单', w: 150 }, { p: 'contract', l: '关联合同', w: 150 },
+      { p: 'pm', l: '项目经理', w: 90 }, { p: 'planStart', l: '计划开始日期', w: 110 }, { p: 'planEnd', l: '计划完成日期', w: 110 },
+      { p: 'progress', l: '进度', w: 140, noTip: true, progress: true },
+      { p: 'status', l: '项目状态', w: 95, tag: { 未启动: 'info', 实施中: 'primary', 验收中: 'warning', 已完成: 'success' } },
+      { p: 'ac', l: '验收状态', w: 100, tag: { 未验收: 'info', 阶段验收中: 'warning', 已验收: 'success' } },
+      { p: 'risk', l: '风险', w: 85, noTip: true },
     ];
     const filters = [
       { k: 'kw', label: '搜索项目', ph: '项目编号 / 名称 / 客户' },
       { k: 'status', label: '项目状态', opts: ['未启动', '实施中', '验收中', '已完成'] },
+      { k: 'ac', label: '验收状态', opts: ['未验收', '阶段验收中', '已验收'] },
       { k: 'pm', label: '项目经理', opts: ['孙工', '钱工', '周航', '吴迪'] },
     ];
     const onLink = (c, row) => { if (c.p === 'no') go('/delivery/' + row.no); };
@@ -4892,6 +4949,7 @@ const DeliveryDetailPage = {
   template: `<div v-if="d && d.recs">
     <el-breadcrumb separator="/" class="crumb"><el-breadcrumb-item><a @click="$go('/delivery')">交付管理</a></el-breadcrumb-item><el-breadcrumb-item><a @click="$go('/delivery')">交付项目</a></el-breadcrumb-item><el-breadcrumb-item>{{ d.no }}</el-breadcrumb-item></el-breadcrumb>
     <div class="page-head"><h1>项目 {{ d.no }}</h1><el-tag :type="({未启动:'info',实施中:'primary',验收中:'warning',已完成:'success'})[d.status]||'info'">{{ d.status }}</el-tag>
+      <el-tag :type="({未验收:'info',阶段验收中:'warning',已验收:'success'})[d.ac]||'info'" effect="plain">验收状态：{{ d.ac || '未验收' }}</el-tag>
       <span class="total">{{ d.name }} · 项目经理 {{ d.pm }}</span></div>
     <div class="ops" style="margin-top:-4px">
       <el-progress style="width:280px" :percentage="d.progress" :stroke-width="12" :status="d.progress===100?'success':''"/>
@@ -4929,11 +4987,14 @@ const DeliveryDetailPage = {
         <el-tab-pane label="关联订单与客户" name="src"><div style="padding:16px 6px" class="card card-pad" >
           <el-descriptions :column="1" border>
             <el-descriptions-item label="关联订单"><a v-if="order" class="link" @click="$go('/order/'+order.no)">{{ order.no }}</a><span v-else>-</span></el-descriptions-item>
+            <el-descriptions-item label="关联合同"><a v-if="d.contract" class="link" @click="$go('/contract/'+d.contract)">{{ d.contract }}</a><span v-else>{{ ct ? ct.no : '-' }}</span></el-descriptions-item>
             <el-descriptions-item label="订单金额" v-if="order"><span class="money">¥{{ fmtY(order.amount) }}</span></el-descriptions-item>
-            <el-descriptions-item label="关联合同"><a v-if="ct" class="link" @click="$go('/contract/'+ct.no)">{{ ct.no + ' · ' + ct.name }}</a><span v-else>-</span></el-descriptions-item>
             <el-descriptions-item label="客户"><a class="link" @click="$go('/customer/'+custNo)">{{ d.customer }}</a></el-descriptions-item>
             <el-descriptions-item label="项目经理">{{ d.pm }}</el-descriptions-item>
-            <el-descriptions-item label="计划工期">{{ d.planStart + ' → ' + d.planEnd }}</el-descriptions-item>
+            <el-descriptions-item label="计划开始日期">{{ d.planStart }}</el-descriptions-item>
+            <el-descriptions-item label="计划完成日期">{{ d.planEnd }}</el-descriptions-item>
+            <el-descriptions-item label="项目状态">{{ d.status }}</el-descriptions-item>
+            <el-descriptions-item label="验收状态">{{ d.ac || '未验收' }}</el-descriptions-item>
           </el-descriptions>
         </div></el-tab-pane>
       </el-tabs>
@@ -6214,13 +6275,13 @@ registerMScreen('me', MMeScreen, { title: '我的', doc: 'm-me', tab: 'me' });
    { id: 8, title: '工单 GD-202611-0007 已超出 SLA 时限', time: '今天 09:05', type: '逾期提醒', read: false },
    { id: 9, title: '合同审批 HT-202611-0006 待你审批（SP-202611-0040）', time: '今天 08:55', type: '审批提醒', read: false }].forEach(m => store.messages.push(m));
 })();
-/* 保证移动端演示至少有 1 张「待接单」工单（工单状态随构建确定性生成） */
+/* 保证移动端演示至少有 1 张「待受理」工单（工单状态随构建确定性生成） */
 (function msbSeedTickets() {
-  if (store.ext.tickets.some(t => t.status === '待接单')) return;
+  if (store.ext.tickets.some(t => t.status === '待受理')) return;
   const t = store.ext.tickets.find(x => x.status !== '已关闭') || store.ext.tickets[0];
   if (!t) return;
-  t.status = '待接单'; t.handler = '';
-  t.records.push({ time: msaNowTime(), who: '系统', act: '重置演示', note: '移动端演示：该工单被置为待接单供接单流程演示' });
+  t.status = '待受理'; t.handler = '';
+  t.records.push({ time: msaNowTime(), who: '系统', act: '重置演示', note: '移动端演示：该工单被置为待受理供受理流程演示' });
 })();
 
 const MSB_STATUS_TAG = { 新建: 'info', 跟进中: 'warning', 已转化: 'success', 无效: 'danger' };
@@ -6940,11 +7001,11 @@ const MSBPaymentDetailScreen = {
 };
 
 /* ========== 6. 服务工单 ========== */
-const MSB_TICKET_SEGS = [['待接单', '待接单'], ['处理中', '处理中'], ['待客户确认', '待确认'], ['已关闭', '已关闭']];
+const MSB_TICKET_SEGS = [['待受理', '待受理'], ['待分派', '待分派'], ['处理中', '处理中'], ['待客户确认', '待确认'], ['已解决', '已解决'], ['已关闭', '已关闭'], ['已退回', '已退回']];
 const MSBTicketsScreen = {
   components: { MSearch, MTag, MEmpty, MCard },
   setup() {
-    const seg = ref('待接单'); const kw = ref('');
+    const seg = ref('待受理'); const kw = ref('');
     const counts = computed(() => { const m = {}; MSB_TICKET_SEGS.forEach(s => { m[s[0]] = store.ext.tickets.filter(t => t.status === s[0]).length; }); return m; });
     const rows = computed(() => {
       let a = store.ext.tickets.filter(t => t.status === seg.value);
@@ -6981,15 +7042,15 @@ const MSBTicketDetailScreen = {
   setup(props) {
     const t = computed(() => store.ext.tickets.find(x => x.no === props.no) || null);
     const records = computed(() => [...((t.value || {}).records || [])].sort((a, b) => (a.time > b.time ? 1 : -1)));
-    const canAct = computed(() => ['待接单', '处理中'].includes((t.value || {}).status));
+    const canAct = computed(() => ['待受理', '处理中'].includes((t.value || {}).status));
     const take = () => {
       const w = t.value;
-      if (!w || w.status !== '待接单') return;
+      if (!w || w.status !== '待受理') return;
       w.handler = w.handler || '客服-小陈';
       w.status = '处理中';
-      w.records.push({ time: msaNowTime(), who: w.handler, act: '接单', note: '移动端接单，已按 SLA 启动处理' });
-      msaLog('工单', '接单', '移动端接单 ' + w.no + '（处理人：' + w.handler + '）');
-      mToast('已接单，状态变为「处理中」', 'success');
+      w.records.push({ time: msaNowTime(), who: w.handler, act: '受理', note: '移动端受理并指派处理人，已按 SLA 启动处理' });
+      msaLog('工单', '受理', '移动端受理并指派 ' + w.no + '（处理人：' + w.handler + '）');
+      mToast('已受理并指派处理人，状态变为「处理中」', 'success');
     };
     return { t, records, canAct, take, sla: () => t.value ? tkSla(t.value) : { k: 'none', txt: '-' }, mpush, mback, mToast };
   },
@@ -7002,7 +7063,7 @@ const MSBTicketDetailScreen = {
         <div class="m-text">{{ t.desc }}</div>
       </m-card>
       <div class="m-action-row" v-if="canAct">
-        <el-button v-if="t.status==='待接单'" type="primary" style="flex:1" icon="Pointer" @click="take">接单</el-button>
+        <el-button v-if="t.status==='待受理'" type="primary" style="flex:1" icon="Pointer" @click="take">受理</el-button>
         <el-button v-if="t.status==='处理中'" type="primary" style="flex:1" icon="EditPen" @click="mpush('ticket-handle', {no:t.no})">处理并提交确认</el-button>
       </div>
       <m-card title="基本信息">
@@ -7015,7 +7076,7 @@ const MSBTicketDetailScreen = {
       <m-card title="处理记录">
         <m-empty v-if="!records.length" text="暂无处理记录" icon="Tickets"/>
         <div v-for="(r, i) in records" :key="i" class="m-flow-row">
-          <span class="m-flow-dot" :class="r.act==='接单'?'':(r.act==='客户确认'?'done':'cur')"></span>
+          <span class="m-flow-dot" :class="r.act==='受理'?'':(r.act==='客户确认'?'done':'cur')"></span>
           <div style="flex:1"><div><b>{{ r.act }}</b> <span class="muted" style="font-size:12px">{{ r.who || '系统' }}</span></div>
             <div class="muted" style="font-size:12px">{{ r.time }}</div>
             <div class="m-text" style="font-size:12px">{{ r.note }}</div></div>
@@ -7295,29 +7356,29 @@ const MSB_DOC_PAGES = {
   },
   'm-tickets': {
     name: '移动端 · 服务工单列表', module: '移动端',
-    goal: '按状态分段处理服务工单：待接单 / 处理中 / 待确认 / 已关闭，支持搜索与 SLA 提示，进入详情接单或处理。',
-    roles: ['交付 / 客服：接单处理', '销售：跟进客户工单'],
+    goal: '按状态分段处理服务工单：待受理 / 待分派 / 处理中 / 待确认 / 已解决 / 已关闭 / 已退回，支持搜索与 SLA 提示，进入详情受理或处理。',
+    roles: ['交付 / 客服：受理与处理工单', '销售：跟进客户工单'],
     enter: ['我的页「我的工单」', '待办「工单」待办项'],
     layout: ['状态分段栏（带数量徽标）', '搜索框', '工单卡片列表（客户 / 编号 / 类型 / 描述 / SLA / 优先级与状态标签）'],
-    fields: ['工单状态｜枚举｜说明：待接单 / 处理中 / 待客户确认 / 已关闭', '优先级｜枚举｜说明：紧急(2h) 高(4h) 中(24h) 低(48h)', 'SLA｜只读｜超时提示'],
+    fields: ['工单状态｜枚举｜说明：待受理 / 待分派 / 处理中 / 待客户确认 / 已解决 / 已关闭 / 已退回', '优先级｜枚举｜说明：紧急(2h) 高(4h) 中(24h) 低(48h)', 'SLA｜只读｜超时提示'],
     rules: ['分段数量实算', 'SLA 已超时在卡片给出「已超时」文案', '点击进入工单详情'],
-    flow: ['待接单 → 接单 → 处理 → 待客户确认 → 已关闭'],
+    flow: ['待受理 →（受理并指派）→ 处理中 → 处理 → 待客户确认 → 已解决 → 已关闭；异常走已退回'],
     errors: ['无工单分段：空态'],
     api: ['工单列表 / SLA 计算接口（示例）'],
     accept: ['分段数量准确', '点击进入详情正常', '无控制台报错'],
   },
   'm-ticket-detail': {
     name: '移动端 · 工单详情', module: '移动端',
-    goal: '查看工单基本信息与处理记录时间线，并完成接单操作（待接单 → 处理中并写记录），处理在旁边屏幕提交。',
-    roles: ['交付 / 客服：接单', '其他角色：查看'],
+    goal: '查看工单基本信息与处理记录时间线，并完成受理操作（待受理 → 处理中并写记录），处理在旁边屏幕提交。',
+    roles: ['交付 / 客服：受理工单', '其他角色：查看'],
     enter: ['工单列表点击', '待办工单项', '客户详情工单区'],
-    layout: ['问题描述卡（类型 / 优先级 / 状态 / 编号 / 提交时间）', '操作行（接单 / 处理并提交确认）', '基本信息卡（客户 / 联系人 / 处理人 / SLA / 图片）', '处理记录时间线'],
+    layout: ['问题描述卡（类型 / 优先级 / 状态 / 编号 / 提交时间）', '操作行（受理 / 处理并提交确认）', '基本信息卡（客户 / 联系人 / 处理人 / SLA / 图片）', '处理记录时间线'],
     fields: ['工单编号 / 状态 / 处理人｜只读', 'SLA 截止｜只读', '处理记录｜时间 / 操作人 / 动作 / 说明｜每次操作追加'],
-    rules: ['仅待接单状态显示接单，接单后默认处理人客服-小陈并写记录', '仅处理中可进入处理屏提交客户确认', '记录只可新增不可删改'],
-    flow: ['待接单 → 接单（处理中）→ 处理屏 → 待客户确认'],
+    rules: ['仅待受理状态显示受理按钮，受理并指派默认处理人客服-小陈后进入处理中并写记录', '仅处理中可进入处理屏提交客户确认', '记录只可新增不可删改'],
+    flow: ['待受理 → 受理并指派（处理中）→ 处理屏 → 待客户确认'],
     errors: ['工单不存在：空态', '状态不匹配：按钮隐藏'],
-    api: ['工单详情 / 接单接口（示例）'],
-    accept: ['接单后状态与记录即时更新', '无控制台报错'],
+    api: ['工单详情 / 受理接口（示例）'],
+    accept: ['受理后状态与记录即时更新', '无控制台报错'],
   },
   'm-ticket-handle': {
     name: '移动端 · 工单处理提交', module: '移动端',
@@ -8081,15 +8142,17 @@ const PaymentsPage = {
     const tab = ref('plan');
     const kw = ref(''); const fst = ref('');
     const recvOf = (planId) => store.pay.records.reduce((s, r) => s + r.alloc.filter(a => a.plan === planId).reduce((x, a) => x + a.amt, 0), 0);
-    const lastDate = (planId) => { const ds = store.pay.records.filter(r => r.alloc.some(a => a.plan === planId)).map(r => r.date).sort(); return ds.length ? ds[ds.length - 1] : '-'; };
-    const confirmOf = (planId) => { const rs = store.pay.records.filter(r => r.alloc.some(a => a.plan === planId)); if (!rs.length) return '-'; return rs.every(r => r.confirm === '财务已确认') ? '财务已确认' : '待财务复核'; };
+    const recsOfPlan = (planId) => store.pay.records.filter(r => r.alloc.some(a => a.plan === planId));
+    const lastDate = (planId) => { const ds = recsOfPlan(planId).map(r => r.date).sort(); return ds.length ? ds[ds.length - 1] : '-'; };
+    const methodOf = (planId) => { const ms = recsOfPlan(planId).map(r => r.method).filter(Boolean); return ms.length ? Array.from(new Set(ms)).join(' / ') : '-'; };
+    const confirmOf = (planId) => { const rs = recsOfPlan(planId); if (!rs.length) return '-'; return rs.every(r => r.confirm === '财务已确认') ? '财务已确认' : '待财务复核'; };
     const planRows = computed(() => {
       const out = [];
       store.pay.contracts.forEach(ct => ct.plans.forEach((p, i) => {
         const got = recvOf(p.id); const rest = p.amount - got; const due = p.date <= TODAY;
         const overdue = rest > 0 && p.date < TODAY; const days = overdue ? daysBetween(p.date, TODAY) : 0;
         const status = got >= p.amount ? '已核销' : overdue ? (got > 0 ? '部分核销 · 逾期' : '逾期未收') : got > 0 ? '部分核销' : '未到期';
-        out.push({ no: 'HK-' + p.id.replace('P', '').padStart(4, '0'), ct, contract: ct.no, customer: ct.customer, order: ct.order, stage: p.stage, ratio: p.ratio, date: p.date, plan: p.amount, got, rest, due, overdue, days, status, last: lastDate(p.id), confirm: confirmOf(p.id), owner: ct.owner, pid: p.id, seq: i + 1 });
+        out.push({ no: 'HK-' + p.id.replace('P', '').padStart(4, '0'), ct, contract: ct.no, customer: ct.customer, order: ct.order, stage: p.stage, ratio: p.ratio, date: p.date, plan: p.amount, got, rest, due, overdue, days, status, last: lastDate(p.id), method: methodOf(p.id), confirm: confirmOf(p.id), owner: ct.owner, pid: p.id, seq: i + 1 });
       }));
       return out;
     });
@@ -8097,7 +8160,8 @@ const PaymentsPage = {
     const sum = computed(() => { const a = planRows.value; const S = f => a.reduce((s, r) => s + f(r), 0);
       return { due: S(r => r.due ? r.plan : 0), got: S(r => r.got), rest: S(r => r.rest), overdue: S(r => r.overdue ? r.rest : 0), n: a.filter(r => r.overdue).length, all: S(r => r.plan) }; });
     const stTag = s => s === '已核销' ? 'success' : s.includes('逾期') ? 'danger' : s === '部分核销' ? 'warning' : 'info';
-    const recRows = computed(() => store.pay.records.map(r => ({ ...r, customer: store.pay.contracts.find(c => c.no === r.contract).customer })));
+    const recRows = computed(() => store.pay.records.map(r => ({ ...r, customer: (store.pay.contracts.find(c => c.no === r.contract) || {}).customer || '-' })));
+    const recTag = t => t === '退款' ? 'warning' : t === '冲销' ? 'danger' : 'success';
     // ---- 抽屉：合同回款详情 ----
     const drawer = ref(false); const curNo = ref('');
     const curCt = computed(() => store.pay.contracts.find(c => c.no === curNo.value));
@@ -8116,17 +8180,45 @@ const PaymentsPage = {
       plans.forEach(p => { const rest = p.amount - recvOf(p.id); if (rest <= 0 || left <= 0) return; const use = Math.min(rest, left); left -= use; rows.push({ id: p.id, stage: p.stage, rest, use, after: rest - use, date: p.date }); });
       return { rows, excess: left };
     });
+    const nextRecId = prefix => prefix + '-' + TODAY.slice(0, 7).replace('-', '') + '-' + String(store.pay.records.length + 20).padStart(4, '0');
     const doReg = () => {
       if (!rf.amount || rf.amount <= 0) return ElMessage.warning('请输入实际到账金额');
-      const pv = preview.value; const id = 'SK-202611-' + String(store.pay.records.length + 20).padStart(4, '0');
-      store.pay.records.push({ id, contract: rf.contract, date: rf.date, amount: toC(rf.amount), method: rf.method, confirm: '待财务复核', operator: '财务-王芳', alloc: pv.rows.map(r => ({ plan: r.id, amt: r.use })), excess: pv.excess });
+      if (!rf.date) return ElMessage.warning('请选择实际回款日期');
+      const pv = preview.value; const id = nextRecId('SK');
+      store.pay.records.push({ id, type: '收款', contract: rf.contract, date: rf.date, amount: toC(rf.amount), method: rf.method, confirm: '待财务复核', operator: '财务-王芳', alloc: pv.rows.map(r => ({ plan: r.id, amt: r.use })), excess: pv.excess, remark: rf.remark });
       dlg.value = false;
       if (pv.excess > 0) ElNotification({ title: '超额收款提示', message: `本次到账超出应收 ¥${fmtC(pv.excess)}，已转入「待核实 / 预收款」，请财务确认。其余金额已自动核销。`, type: 'warning', duration: 6000 });
       else ElMessage.success('收款已登记，已自动核销对应回款计划，并重新计算未收金额与逾期状态');
     };
-    const reverse = r => ElMessageBox.prompt('回款录入错误须走冲销/更正流程并保留原记录。请填写冲销原因：', '申请冲销 ' + r.id, { inputPattern: /\S+/, inputErrorMessage: '原因必填' }).then(() => ElMessage.success('已提交「应收冲销」审批（财务负责人），原记录保留')).catch(() => {});
-    const confirmRec = r => { r.confirm = '财务已确认'; ElMessage.success('财务复核通过'); };
-    return { tab, kw, fst, rows, sum, stTag, recRows, drawer, curNo, curCt, ctPlans, ctRecs, ctSum, openCt, dlg, rf, openReg, preview, doReg, reverse, confirmRec, fmtC, store, TODAY };
+    const reverse = r => {
+      const org = store.pay.records.find(x => x.id === r.id); if (!org) return;
+      if (org.type === '冲销' || org.type === '退款' || org.voided) return ElMessage.warning('该记录已冲销或为退款/冲销记录，不能重复操作');
+      ElMessageBox.prompt('回款录入错误须走冲销/更正流程并保留原记录。请填写冲销原因：', '申请冲销 ' + org.id, { inputPattern: /\S+/, inputErrorMessage: '原因必填' }).then(({ value }) => {
+        const id = nextRecId('CX');
+        store.pay.records.push({ id, type: '冲销', contract: org.contract, date: TODAY, amount: -org.amount, method: '冲销', confirm: '待财务复核', operator: '财务-王芳', reverseOf: org.id, reason: value, alloc: org.alloc.map(a => ({ plan: a.plan, amt: -a.amt })), excess: -(org.excess || 0) });
+        org.voided = true;
+        ElMessage.success('已提交「应收冲销」审批（财务负责人），冲销记录 ' + id + ' 已生成，原记录保留');
+      }).catch(() => {});
+    };
+    const refundDlg = ref(false); const refundRf = reactive({ recordId: '', amount: 0, date: TODAY, reason: '' }); const refundSrc = ref(null);
+    const refundableOf = r => r.amount - store.pay.records.filter(x => (x.refundOf === r.id || x.reverseOf === r.id)).reduce((s, x) => s - x.amount, 0);
+    const openRefund = r => { refundSrc.value = r; Object.assign(refundRf, { recordId: r.id, amount: Number((refundableOf(r) / 100).toFixed(2)), date: TODAY, reason: '' }); refundDlg.value = true; };
+    const doRefund = () => {
+      const r = refundSrc.value; if (!r) return;
+      const org = store.pay.records.find(x => x.id === r.id); if (!org) return;
+      const cents = toC(refundRf.amount || 0); const max = refundableOf(org);
+      if (cents <= 0) return ElMessage.warning('请输入退款金额');
+      if (cents > max) return ElMessage.warning('退款金额不能超过该笔收款的可退金额 ¥' + fmtC(max));
+      if (!refundRf.reason.trim()) return ElMessage.warning('请填写退款原因');
+      let left = cents; const alloc = [];
+      org.alloc.forEach(a => { if (left <= 0 || a.amt <= 0) return; const take = Math.min(a.amt, left); left -= take; alloc.push({ plan: a.plan, amt: -take }); });
+      const id = nextRecId('TK');
+      store.pay.records.push({ id, type: '退款', contract: org.contract, date: refundRf.date || TODAY, amount: -cents, method: org.method, confirm: '待财务复核', operator: '财务-王芳', refundOf: org.id, reason: refundRf.reason, alloc, excess: -left });
+      refundDlg.value = false;
+      ElMessage.success('退款 ' + id + ' 已登记并提交「应收冲销」审批（财务负责人），已回写核销与未收金额');
+    };
+    const confirmRec = r => { const org = store.pay.records.find(x => x.id === r.id); if (!org) return; org.confirm = '财务已确认'; ElMessage.success('财务复核通过'); };
+    return { tab, kw, fst, rows, sum, stTag, recRows, recTag, drawer, curNo, curCt, ctPlans, ctRecs, ctSum, openCt, dlg, rf, openReg, preview, doReg, reverse, refundDlg, refundRf, refundSrc, refundableOf, openRefund, doRefund, confirmRec, fmtC, store, TODAY };
   },
   template: `<div>
     <page-head :crumbs="['回款管理', '回款计划与收款']" title="回款管理" :total="'回款计划共 '+rows.length+' 笔 · 示例合同 '+store.pay.contracts.length+' 份'">
@@ -8142,24 +8234,27 @@ const PaymentsPage = {
     <div class="card query"><el-form inline><el-form-item><el-input v-model="kw" placeholder="合同编号 / 客户 / 款项阶段" clearable style="width:260px" prefix-icon="Search"/></el-form-item><el-form-item label="状态"><el-select v-model="fst" clearable placeholder="全部" style="width:140px"><el-option v-for="x in ['已核销','部分核销','逾期','未到期']" :key="x" :value="x"/></el-select></el-form-item><el-form-item><el-button type="primary" icon="Search">查询</el-button><el-button @click="kw='';fst=''">重置</el-button></el-form-item></el-form></div>
     <div class="card table-card" v-if="tab==='plan'">
       <el-table :data="rows" style="width:100%" :row-class-name="({row}) => row.overdue ? 'row-overdue' : ''" size="small">
-        <el-table-column label="合同编号 / 回款编号" min-width="150"><template #default="{row}"><a class="link" @click="openCt(row.contract)">{{ row.contract }}</a><div class="muted" style="font-size:12px">{{ row.no }} · {{ row.owner }}</div></template></el-table-column>
+        <el-table-column label="回款编号 / 合同编号" min-width="160"><template #default="{row}"><a class="link" @click="openCt(row.contract)">{{ row.no }}</a><div class="muted" style="font-size:12px">{{ row.contract }}</div></template></el-table-column>
         <el-table-column label="客户名称" min-width="170" show-overflow-tooltip><template #default="{row}"><a class="link" @click="$go('/customer/'+$cno(row.customer))">{{ row.customer }}</a></template></el-table-column>
+        <el-table-column label="订单编号" min-width="140"><template #default="{row}"><span class="muted">{{ row.order || '-' }}</span></template></el-table-column>
         <el-table-column label="款项阶段" min-width="105"><template #default="{row}">{{ row.stage }}<div class="muted" style="font-size:12px">{{ row.ratio }}%</div></template></el-table-column>
-        <el-table-column label="计划回款" min-width="115" align="right"><template #default="{row}"><span class="money">¥{{ fmtC(row.plan) }}</span><div class="muted" style="font-size:12px">{{ row.date }}</div></template></el-table-column>
-        <el-table-column label="实际到账" min-width="115" align="right"><template #default="{row}"><span class="money ok-text">¥{{ fmtC(row.got) }}</span><div class="muted" style="font-size:12px">{{ row.last }}</div></template></el-table-column>
+        <el-table-column label="计划回款日期 / 金额" min-width="130" align="right"><template #default="{row}"><span class="money">¥{{ fmtC(row.plan) }}</span><div class="muted" style="font-size:12px">{{ row.date }}</div></template></el-table-column>
+        <el-table-column label="实际回款日期 / 到账金额" min-width="140" align="right"><template #default="{row}"><span class="money ok-text">¥{{ fmtC(row.got) }}</span><div class="muted" style="font-size:12px">{{ row.last }}</div></template></el-table-column>
         <el-table-column label="未收金额" min-width="105" align="right"><template #default="{row}"><span class="money" :class="{'danger-text':row.overdue}">¥{{ fmtC(row.rest) }}</span></template></el-table-column>
+        <el-table-column label="收款方式" min-width="110"><template #default="{row}"><span class="muted">{{ row.method }}</span></template></el-table-column>
         <el-table-column label="核销进度" min-width="110"><template #default="{row}"><el-progress :percentage="Math.round(row.got*100/row.plan)" :stroke-width="7" :status="row.got>=row.plan?'success':(row.overdue?'exception':'')"/></template></el-table-column>
-        <el-table-column label="状态 / 逾期天数 / 财务确认" min-width="190"><template #default="{row}"><el-tag size="small" :type="stTag(row.status)">{{ row.status }}</el-tag><div class="muted" style="font-size:12px;margin-top:2px"><b v-if="row.overdue" class="danger-text">逾期 {{ row.days }} 天 · </b>{{ row.confirm }}</div></template></el-table-column>
+        <el-table-column label="状态 / 逾期天数 / 财务确认" min-width="180"><template #default="{row}"><el-tag size="small" :type="stTag(row.status)">{{ row.status }}</el-tag><div class="muted" style="font-size:12px;margin-top:2px"><b v-if="row.overdue" class="danger-text">逾期 {{ row.days }} 天 · </b>{{ row.confirm }}</div></template></el-table-column>
+        <el-table-column label="负责人" min-width="90"><template #default="{row}">{{ row.owner }}</template></el-table-column>
         <el-table-column label="操作" width="140" fixed="right"><template #default="{row}"><el-button link type="primary" @click="openCt(row.contract)">详情</el-button><el-button link type="primary" :disabled="row.rest<=0" @click="openReg(row.contract,row.pid)">登记收款</el-button></template></el-table-column>
       </el-table>
       <div class="pager"><span class="batch">逾期行以红色标记；金额均为精确小数（分）计算</span><el-pagination layout="prev, pager, next" :total="rows.length" :page-size="20" background size="small"/></div>
     </div>
     <div class="card table-card" v-else>
-      <el-table :data="recRows" style="width:100%"><el-table-column prop="id" label="收款编号" width="150"/><el-table-column prop="contract" label="合同编号" width="150"/><el-table-column prop="customer" label="客户名称" min-width="200"/><el-table-column prop="date" label="到账日期" width="110"/>
+      <el-table :data="recRows" style="width:100%"><el-table-column prop="id" label="收款编号" width="150"/><el-table-column prop="contract" label="合同编号" width="150"/><el-table-column prop="customer" label="客户名称" min-width="200"/><el-table-column prop="date" label="实际回款日期" width="120"/>
         <el-table-column label="到账金额" width="130" align="right"><template #default="{row}"><span class="money">¥{{ fmtC(row.amount) }}</span></template></el-table-column>
-        <el-table-column label="核销对象" min-width="200"><template #default="{row}"><span v-for="a in row.alloc" :key="a.plan" style="margin-right:8px">{{ a.plan }}：¥{{ fmtC(a.amt) }}</span><el-tag v-if="row.excess>0" size="small" type="warning">超额 ¥{{ fmtC(row.excess) }} 待核实</el-tag></template></el-table-column>
-        <el-table-column prop="method" label="收款方式" width="100"/><el-table-column label="财务确认" width="120"><template #default="{row}"><el-tag size="small" :type="row.confirm==='财务已确认'?'success':'warning'">{{ row.confirm }}</el-tag></template></el-table-column>
-        <el-table-column label="操作" width="170" fixed="right"><template #default="{row}"><el-button link type="primary" v-if="row.confirm!=='财务已确认'" @click="confirmRec(row)">财务复核</el-button><el-button link type="danger" @click="reverse(row)">申请冲销</el-button></template></el-table-column></el-table></div>
+        <el-table-column label="核销对象" min-width="220"><template #default="{row}"><span v-for="a in row.alloc" :key="a.plan" style="margin-right:8px">{{ a.plan }}：¥{{ fmtC(a.amt) }}</span><el-tag v-if="row.excess>0" size="small" type="warning">超额 ¥{{ fmtC(row.excess) }} 待核实</el-tag><div v-if="row.reverseOf" class="muted" style="font-size:12px">冲销原单：{{ row.reverseOf }}</div><div v-if="row.refundOf" class="muted" style="font-size:12px">退款原单：{{ row.refundOf }}</div></template></el-table-column>
+        <el-table-column prop="method" label="收款方式" width="100"/><el-table-column label="类型" width="90"><template #default="{row}"><el-tag size="small" :type="recTag(row.type)">{{ row.type || '收款' }}</el-tag></template></el-table-column><el-table-column label="财务确认" width="120"><template #default="{row}"><el-tag size="small" :type="row.confirm==='财务已确认'?'success':'warning'">{{ row.confirm }}</el-tag></template></el-table-column>
+        <el-table-column label="操作" width="220" fixed="right"><template #default="{row}"><el-button link type="primary" v-if="row.confirm!=='财务已确认'" @click="confirmRec(row)">财务复核</el-button><el-button link type="primary" v-if="row.type!=='冲销' && row.type!=='退款' && row.amount>0 && !row.voided" @click="openRefund(row)">退款</el-button><el-button link type="danger" v-if="row.type!=='冲销' && row.type!=='退款' && !row.voided" @click="reverse(row)">申请冲销</el-button></template></el-table-column></el-table></div>
 
     <el-drawer v-model="drawer" size="640px" :title="'回款详情 · '+curNo">
       <div v-if="curCt">
@@ -8177,7 +8272,7 @@ const PaymentsPage = {
           <el-table-column label="未收" width="100" align="right"><template #default="{row}"><span :class="{'danger-text':row.overdue}">¥{{ fmtC(row.rest) }}</span></template></el-table-column>
           <el-table-column label="状态" min-width="110"><template #default="{row}"><el-tag size="small" :type="stTag(row.status)">{{ row.status }}</el-tag><div v-if="row.overdue" class="danger-text" style="font-size:12px">逾期 {{ row.days }} 天</div></template></el-table-column></el-table>
         <div class="sec-title" style="margin-top:18px">到账记录<el-button size="small" type="primary" style="margin-left:auto" @click="openReg(curNo)">登记收款</el-button></div>
-        <el-table :data="ctRecs" size="small" border><el-table-column prop="id" label="收款编号" width="140"/><el-table-column prop="date" label="到账日期" width="100"/><el-table-column label="金额" width="110" align="right"><template #default="{row}">¥{{ fmtC(row.amount) }}</template></el-table-column><el-table-column label="核销" min-width="100"><template #default="{row}"><span v-for="a in row.alloc" :key="a.plan">{{ a.plan }} </span></template></el-table-column><el-table-column label="确认" width="100"><template #default="{row}"><el-tag size="small" :type="row.confirm==='财务已确认'?'success':'warning'">{{ row.confirm }}</el-tag></template></el-table-column></el-table>
+        <el-table :data="ctRecs" size="small" border><el-table-column prop="id" label="收款编号" width="140"/><el-table-column prop="date" label="实际回款日期" width="120"/><el-table-column label="类型" width="80"><template #default="{row}"><el-tag size="small" :type="recTag(row.type)">{{ row.type || '收款' }}</el-tag></template></el-table-column><el-table-column label="金额" width="110" align="right"><template #default="{row}"><span :class="{'danger-text':row.amount<0}">¥{{ fmtC(row.amount) }}</span></template></el-table-column><el-table-column label="核销" min-width="100"><template #default="{row}"><span v-for="a in row.alloc" :key="a.plan" style="margin-right:6px">{{ a.plan }}：¥{{ fmtC(a.amt) }}</span></template></el-table-column><el-table-column label="确认" width="100"><template #default="{row}"><el-tag size="small" :type="row.confirm==='财务已确认'?'success':'warning'">{{ row.confirm }}</el-tag></template></el-table-column></el-table>
         <div class="sec-title" style="margin-top:18px">相关凭证</div><div><el-tag style="margin-right:8px"><el-icon><picture/></el-icon> 银行回单-1019.png</el-tag><el-tag><el-icon><picture/></el-icon> 银行回单-1030.png</el-tag></div>
       </div>
     </el-drawer>
@@ -8190,9 +8285,21 @@ const PaymentsPage = {
         <el-form-item label="备注 / 凭证"><el-input v-model="rf.remark" placeholder="银行回单号等；凭证可上传"/></el-form-item>
       </el-form>
       <div class="sec-title">核销预览</div>
+      <el-alert type="info" show-icon :closable="false" style="margin-bottom:8px" title="一次收款可自动核销多个回款计划：优先核销选定计划，其余按计划回款日期先后分配；不足一期的部分收款按部分核销处理。"/>
       <el-table :data="preview.rows" size="small" border empty-text="请输入到账金额以预览核销结果"><el-table-column prop="stage" label="计划" width="100"/><el-table-column label="核销前未收" align="right"><template #default="{row}">¥{{ fmtC(row.rest) }}</template></el-table-column><el-table-column label="本次核销" align="right"><template #default="{row}"><b class="ok-text">¥{{ fmtC(row.use) }}</b></template></el-table-column><el-table-column label="核销后未收" align="right"><template #default="{row}">¥{{ fmtC(row.after) }}</template></el-table-column><el-table-column label="结果" width="100"><template #default="{row}"><el-tag size="small" :type="row.after===0?'success':'warning'">{{ row.after===0 ? '全额核销' : '部分核销' }}</el-tag></template></el-table-column></el-table>
       <el-alert v-if="preview.excess>0" type="warning" show-icon :closable="false" style="margin-top:10px" :title="'超额收款：超出应收 ¥'+fmtC(preview.excess)+'，将转入「待核实 / 预收款」，不会自动核销。'"/>
       <template #footer><el-button @click="dlg=false">取消</el-button><el-button type="primary" @click="doReg">确认登记</el-button></template>
+    </el-dialog>
+
+    <el-dialog v-model="refundDlg" title="登记退款（应收冲销审批）" width="520px">
+      <el-alert type="warning" show-icon :closable="false" style="margin-bottom:12px" :title="'退款须走「应收冲销」审批（财务负责人）。当前可退金额 ¥'+fmtC(refundSrc ? refundableOf(refundSrc) : 0)+'，原收款记录保留不删除。'"/>
+      <el-form label-width="96px">
+        <el-form-item label="原收款编号"><el-input :model-value="refundRf.recordId" disabled/></el-form-item>
+        <el-form-item label="退款金额" required><el-input-number v-model="refundRf.amount" :min="0" :precision="2" :step="1000" :controls="false" style="width:100%"/></el-form-item>
+        <el-form-item label="退款日期" required><el-date-picker v-model="refundRf.date" type="date" value-format="YYYY-MM-DD" style="width:100%"/></el-form-item>
+        <el-form-item label="退款原因" required><el-input v-model="refundRf.reason" type="textarea" :rows="3" placeholder="如客户退回部分款项、重复收款退回，原因必填"/></el-form-item>
+      </el-form>
+      <template #footer><el-button @click="refundDlg=false">取消</el-button><el-button type="primary" @click="doRefund">提交退款</el-button></template>
     </el-dialog>
   </div>`,
 };
@@ -8926,46 +9033,51 @@ const QuotesPage = {
 registerRoute('/quotes', QuotesPage, 'quotes');
 
 /* ===== 第 5 阶段：服务工单 /service（列表 + SLA 超时标红）与工单详情 /ticket/:no（状态流转 + 处理记录） ===== */
+/* 状态枚举与流程按规划方案 5.12：待受理 → 待分派 → 处理中 → 待客户确认 → 已解决 → 已关闭；客户退回 → 已退回 */
 DOCS_DEFAULT['service'] = mkDoc('service', {
   name: '服务工单', module: '服务管理',
-  goal: '集中受理客户故障报修、服务请求、咨询与投诉：按类型 / 优先级 / 状态 / 处理人筛选，以 SLA 时限驱动处理速度（超时标红预警），客服与技术可新建工单并全程留痕，保障服务质量可考核。',
-  roles: ['交付 / 客服：接单、处理、转派、关闭工单', '销售经理：查看名下客户工单与 SLA 达成情况', '管理员：全量数据与 SLA 规则配置'],
+  goal: '集中受理客户故障报修、服务请求、咨询与投诉：按类型 / 问题等级 / 状态 / 处理人筛选，以 SLA 时限驱动处理速度（超时标红预警），客服与技术可新建工单并全程留痕，保障服务质量可考核。',
+  roles: ['交付 / 客服：受理、指派、处理、评价、关闭工单', '销售经理：查看名下客户工单与 SLA 达成情况', '管理员：全量数据与 SLA 规则配置'],
   enter: ['左侧导航：服务管理 → 服务工单', '客户详情「服务」Tab、交付项目详情关联跳转'],
-  layout: ['顶部：面包屑 + 页面标题 + 工单总数', '统计卡：工单总数、待接单、处理中、SLA 超时、待客户确认（由数据实算）', '筛选区：关键词 / 工单类型 / 优先级 / 状态 / 处理人', '表格：编号、客户、类型、优先级、问题描述、提交时间、处理人、状态、SLA 列（超时标红）', '新建工单弹窗'],
+  layout: ['顶部：面包屑 + 页面标题 + 工单总数', '统计卡：工单总数、待受理、处理中、SLA 超时、待客户确认（由数据实算）', '筛选区：关键词 / 工单类型 / 问题等级 / 状态 / 处理人', '表格：编号、客户、类型、问题等级、问题描述、提交时间、处理人、状态、解决时间、满意度、SLA 列（超时标红）', '新建工单弹窗'],
   fields: [
     '工单编号｜文本｜只读｜格式：GD-年月-序号',
     '工单类型｜枚举｜必填：是｜说明：故障报修 / 服务请求 / 咨询 / 投诉',
     '客户 / 联系人｜选择｜必填：是｜联系人选项随客户联动',
-    '优先级｜枚举｜必填：是｜说明：紧急(2h) / 高(4h) / 中(24h) / 低(48h) 决定 SLA 时限',
+    '问题等级｜枚举｜必填：是｜校验：必须为字典项｜说明：紧急(2h) / 高(4h) / 中(24h) / 低(48h) 决定 SLA 时限',
     '问题描述｜长文本｜必填：是',
-    '处理人｜人员｜说明：接单后写入，可转派并留记录',
-    'SLA 截止时间｜时间｜系统按优先级自动计算'],
-  rules: ['列表数据来自 store.ext.tickets，真分页，统计卡由数据实算', 'SLA 超时规则：未关闭且当前时间已过 SLA 截止时间的工单，SLA 列标红', '新建工单默认状态「待接单」，处理人留空', '每次状态流转都要写入处理记录（时间 / 操作人 / 动作 / 说明）'],
-  flow: ['工单状态流转：待接单 →（接单）→ 处理中 →（填处理说明）→ 待客户确认 →（客户确认）→ 已关闭 →（重新打开）→ 处理中'],
-  errors: ['新建未选客户或未填描述：必填校验拦截', 'SLA 超时后工单仍可处理，但页面持续红色预警', '筛选无结果：空态可重置'],
-  api: ['工单分页查询、新建工单（含 SLA 计算）、接单 / 转派 / 处理 / 关闭接口、处理记录查询（示例）'],
-  accept: ['统计卡数字由数据实算', 'SLA 超时工单在列表标红', '新建工单写入 store.ext.tickets 并出现在详情与列表', '无控制台报错'],
+    '处理人｜人员｜说明：指派后写入，可转派并留记录',
+    'SLA 截止时间｜时间｜系统按问题等级自动计算',
+    '解决时间｜时间｜只读｜说明：客户解决确认时记录',
+    '满意度｜整数｜只读｜说明：1-5 星，客户评价后记录',
+    '当前状态｜枚举｜说明：待受理 / 待分派 / 处理中 / 待客户确认 / 已解决 / 已关闭 / 已退回'],
+  rules: ['列表数据来自 store.ext.tickets，真分页，统计卡由数据实算', 'SLA 超时规则：未关闭 / 未解决且当前时间已过 SLA 截止时间的工单，SLA 列标红', '新建工单默认状态「待受理」，处理人留空，由客服先受理再指派，不允许新建时直接指派绕过受理环节', '每次状态流转都要写入处理记录（时间 / 操作人 / 动作 / 说明）', '「关闭（客户评价）」必须选择满意度（1-5 星），不评价不得关闭'],
+  flow: ['工单流程：客户提交 → 客服受理 → 指派处理人 → 问题处理 → 解决确认 → 客户评价 → 工单关闭', '状态流转：待受理 →（受理）→ 待分派 →（指派处理人）→ 处理中 →（填处理说明）→ 待客户确认 →（解决确认，记解决时间）→ 已解决 →（客户评价记满意度）→ 已关闭', '客户反馈未彻底解决：待客户确认 / 已解决 / 已关闭 →（重新打开）→ 已退回，原因必填；已退回只能处理后再提交确认', '处理中可转派他人并写转派记录'],
+  errors: ['新建未选客户或未填描述：必填校验拦截', 'SLA 超时后工单仍可处理，但页面持续红色预警', '工单重复提交：正式版需提示相似工单并允许关联已有工单（原型未实现识别）', '投诉级别升级：正式版按问题等级通知主管与相关负责人（原型未实现自动升级）', '筛选无结果：空态可重置'],
+  api: ['工单分页查询、新建工单（含 SLA 计算）、受理 / 指派 / 转派 / 处理 / 解决确认 / 评价关闭接口、处理记录与相似工单查询（示例）'],
+  accept: ['统计卡数字由数据实算', 'SLA 超时工单在列表标红', '新建工单写入 store.ext.tickets 并出现在详情与列表', '完整走过一条「提交 → 受理 → 指派 → 处理 → 解决确认 → 评价关闭」链路后，状态、解决时间、满意度与处理记录串联合理', '无控制台报错'],
 });
 DOCS_DEFAULT['ticket-detail'] = mkDoc('ticket-detail', {
   name: '工单详情', module: '服务管理',
-  goal: '呈现单个服务工单的完整处理过程：优先级 / 状态 / SLA 剩余或超时预警、客户与联系人信息、问题描述、图片附件与处理记录时间线；支持接单、转派、处理（→待客户确认）、关闭（客户确认）与重新打开，每一步操作都真实改变状态并写入处理记录。',
-  roles: ['交付 / 客服：接单、处理、转派、重新打开', '客户确认（由客服代录入结果）：关闭工单', '销售经理：跟进客户服务满意度与 SLA 达成', '管理员：全量'],
+  goal: '呈现单个服务工单的完整处理过程：问题等级 / 状态 / SLA 剩余或超时预警、客户与联系人信息、问题描述、图片附件与处理记录时间线；支持受理、指派处理人、转派、处理（→待客户确认）、解决确认（记解决时间）、客户评价并关闭（记满意度）与退回，每一步操作都真实改变状态并写入处理记录。',
+  roles: ['交付 / 客服：受理、指派、处理、转派、退回', '客户确认与评价（由客服代录入结果）：解决确认与评价关闭', '销售经理：跟进客户服务满意度与 SLA 达成', '管理员：全量'],
   enter: ['服务工单列表点击工单编号', '客户详情 / 交付项目详情的工单链接'],
-  layout: ['头部：面包屑 + 工单号 + 优先级 / 状态标签 + SLA 剩余或超时提示 + 操作按钮组', '左列：问题描述卡（含图片附件占位）+ 处理记录时间线', '右列：客户与联系人卡 + 工单信息（类型 / 处理人 / SLA 截止）'],
-  fields: ['工单编号 / 类型 / 状态 / 处理人｜只读（转派会更新处理人）', '优先级｜枚举｜说明：影响 SLA 时限', 'SLA 截止时间｜时间｜系统按优先级自动计算', '处理记录｜时间 / 操作人 / 动作 / 说明｜每次操作追加，只可新增不可删改'],
-  rules: ['「接单」待接单 → 处理中，处理人为空时默认分配值班客服', '「处理」处理中 → 待客户确认，处理说明必填', '「关闭」待客户确认 → 已关闭（客户确认），处理后工单不可再操作', '「重新打开」已关闭 → 处理中，须填写原因并写记录；「转派」需选择新处理人'],
-  flow: ['待接单 → 处理中 → 待客户确认 → 已关闭；已关闭可重新打开回处理中', '所有状态变更与转派都追加处理记录'],
-  errors: ['工单编号不存在：空态并引导返回列表', '未填处理说明直接确认：校验拦截', 'SLA 已超时：头部红色预警且不阻断处理'],
-  api: ['工单详情查询、接单 / 转派 / 处理 / 关闭 / 重新打开接口、处理记录追加（示例）'],
-  accept: ['每个操作后状态、处理人、处理记录与统计卡即时更新', 'SLA 剩余 / 超时显示正确', '无控制台报错'],
+  layout: ['头部：面包屑 + 工单号 + 类型 / 问题等级 / 状态标签 + SLA 剩余或超时提示 + 操作按钮组', '左列：问题描述卡（含图片附件占位与解决方案摘要）+ 处理记录时间线', '右列：SLA 与工单信息卡（类型 / 问题等级 / 处理人 / SLA 截止 / 解决时间 / 满意度）+ 客户与联系人卡'],
+  fields: ['工单编号 / 类型 / 状态 / 处理人｜只读（指派与转派会更新处理人）', '问题等级｜枚举｜说明：紧急(2h) / 高(4h) / 中(24h) / 低(48h)，影响 SLA 时限', 'SLA 截止时间｜时间｜系统按问题等级自动计算', '解决时间｜时间｜只读｜说明：客户解决确认时写入', '满意度｜整数｜只读｜说明：1-5 星，客户评价后写入', '处理记录｜时间 / 操作人 / 动作 / 说明｜每次操作追加，只可新增不可删改'],
+  rules: ['「受理」仅对待受理可用：待受理 → 待分派，写受理记录', '「指派处理人」仅对待分派可用：选择处理人（必选）→ 处理中，写指派记录', '「处理」处理中 / 已退回 → 待客户确认，处理说明必填', '「解决确认」仅对待客户确认可用：→ 已解决并写入解决时间', '「（客户）评价并关闭」仅对已解决可用：满意度（1-5 星）必选，选后 → 已关闭', '「重新打开（退回）」对已关闭 / 已解决 / 待客户确认可用：→ 已退回，原因必填并写记录；「转派」需选择新处理人并写转派记录'],
+  flow: ['待受理 → 待分派 → 处理中 → 待客户确认 → 已解决 → 已关闭；待客户确认 / 已解决也可被客户退回 → 已退回，处理后重新进入待客户确认', '所有状态变更、指派与转派都追加处理记录'],
+  errors: ['工单编号不存在：空态并引导返回列表', '未填处理说明直接确认：校验拦截', '未选满意度直接关闭：校验拦截', '重新打开 / 退回未填原因：校验拦截', 'SLA 已超时：头部红色预警且不阻断处理'],
+  api: ['工单详情查询、受理 / 指派 / 转派 / 处理 / 解决确认 / 评价关闭 / 退回接口、处理记录追加（示例）'],
+  accept: ['每个操作后状态、处理人、解决时间、满意度、处理记录与统计卡即时更新', 'SLA 剩余 / 超时显示正确，已解决 / 已关闭不再计 SLA', '无控制台报错'],
 });
 const TK_HANDLERS = ['客服-小陈', '客服-小林', '技术-黄工', '孙工', '钱工', '林晓'];
 const TK_SLA_H = { 紧急: 2, 高: 4, 中: 24, 低: 48 };
+const TK_ST_TAG = { 待受理: 'info', 待分派: 'info', 处理中: 'primary', 待客户确认: 'warning', 已解决: 'success', 已关闭: 'success', 已退回: 'danger' };
 function tkNow() { const n = new Date(); return TODAY + ' ' + String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0'); }
 function tkLog(no, act, detail) { store.ext.logs.unshift({ time: tkNow(), who: '张三', module: '工单', act, detail: detail + '（工单：' + no + '）' }); }
 function tkNextNo() { let mx = 99; store.ext.tickets.forEach(x => { const n = Number(String(x.no).split('-')[2]); if (n > mx) mx = n; }); return 'GD-' + TODAY.slice(0, 7).replace('-', '') + '-' + String(mx + 1).padStart(4, '0'); }
 function tkSla(t) {
-  if (t.status === '已关闭') return { k: 'none', txt: '-' };
+  if (['已关闭', '已解决'].includes(t.status)) return { k: 'none', txt: '-' };
   const dead = new Date(String(t.slaDeadline).replace(' ', 'T'));
   const now = new Date(String(tkNow()).replace(' ', 'T'));
   const rem = dead.getTime() - now.getTime();
@@ -8988,7 +9100,7 @@ const ServicePage = {
       const a = store.ext.tickets;
       return [
         ['工单总数', String(a.length), ''],
-        ['待接单', String(a.filter(x => x.status === '待接单').length), 'warn'],
+        ['待受理', String(a.filter(x => ['待受理', '待分派'].includes(x.status)).length), 'warn'],
         ['处理中', String(a.filter(x => x.status === '处理中').length), 'ok'],
         ['SLA 超时', String(a.filter(x => tkSla(x).k === 'timeout').length), 'danger'],
         ['待客户确认', String(a.filter(x => x.status === '待客户确认').length), 'warn'],
@@ -8997,24 +9109,25 @@ const ServicePage = {
     const cols = [
       { p: 'no', l: '工单编号', w: 140, link: true }, { p: 'customer', l: '客户', w: 190, link: 'cust' },
       { p: 'type', l: '工单类型', w: 100, tag: { 故障报修: 'danger', 服务请求: 'primary', 咨询: 'info', 投诉: 'warning' } },
-      { p: 'priority', l: '优先级', w: 80, tag: { 紧急: 'danger', 高: 'warning', 中: 'primary', 低: 'info' } },
-      { p: 'desc', l: '问题描述', w: 230 }, { p: 'created', l: '提交时间', w: 140 }, { p: 'contact', l: '联系人', w: 90 },
-      { p: 'handler', l: '处理人', w: 90 }, { p: 'status', l: '状态', w: 110, tag: { 待接单: 'info', 处理中: 'primary', 待客户确认: 'warning', 已关闭: 'success' } },
+      { p: 'priority', l: '问题等级', w: 90, tag: { 紧急: 'danger', 高: 'warning', 中: 'primary', 低: 'info' } },
+      { p: 'desc', l: '问题描述', w: 210 }, { p: 'created', l: '提交时间', w: 140 }, { p: 'contact', l: '联系人', w: 90 },
+      { p: 'handler', l: '处理人', w: 90 }, { p: 'status', l: '当前状态', w: 110, tag: TK_ST_TAG },
+      { p: 'solvedTime', l: '解决时间', w: 140 }, { p: 'rating', l: '满意度', w: 90, noTip: true },
       { p: 'sla', l: 'SLA', w: 150, noTip: true },
     ];
     const filters = [
       { k: 'kw', label: '搜索工单', ph: '工单编号 / 客户 / 描述' },
       { k: 'type', label: '工单类型', opts: ['故障报修', '服务请求', '咨询', '投诉'] },
-      { k: 'priority', label: '优先级', opts: ['紧急', '高', '中', '低'] },
-      { k: 'status', label: '状态', opts: ['待接单', '处理中', '待客户确认', '已关闭'] },
+      { k: 'priority', label: '问题等级', opts: ['紧急', '高', '中', '低'] },
+      { k: 'status', label: '状态', opts: ['待受理', '待分派', '处理中', '待客户确认', '已解决', '已关闭', '已退回'] },
       { k: 'handler', label: '处理人', opts: TK_HANDLERS },
     ];
     const onLink = (c, row) => { if (c.p === 'no') go('/ticket/' + row.no); };
     const fref = ref(null); const dlg = ref(false);
-    const draft = reactive({ type: '故障报修', customer: '', contact: '', priority: '中', handler: '', desc: '', created: tkNow() });
+    const draft = reactive({ type: '故障报修', customer: '', contact: '', priority: '中', desc: '' });
     const rule = {
       customer: [{ required: true, message: '请选择客户', trigger: 'change' }],
-      priority: [{ required: true, message: '请选择优先级', trigger: 'change' }],
+      priority: [{ required: true, message: '请选择问题等级', trigger: 'change' }],
       desc: [{ required: true, message: '请填写问题描述', trigger: 'blur' }],
     };
     const slaTip = computed(() => TK_SLA_H[draft.priority] ? 'SLA 时限：' + TK_SLA_H[draft.priority] + ' 小时（截止 ' + (function () { const d = new Date(new Date(String(tkNow()).replace(' ', 'T')).getTime() + TK_SLA_H[draft.priority] * 3600000); return d.toISOString().slice(0, 16).replace('T', ' '); })() + '）' : '');
@@ -9025,13 +9138,13 @@ const ServicePage = {
       const no = tkNextNo();
       const created = tkNow();
       const sla = new Date(new Date(created.replace(' ', 'T')).getTime() + TK_SLA_H[draft.priority] * 3600000).toISOString().slice(0, 16).replace('T', ' ');
-      store.ext.tickets.unshift({ no, type: draft.type, customer: draft.customer, contact: draft.contact, priority: draft.priority, status: draft.handler ? '处理中' : '待接单', handler: draft.handler, desc: draft.desc, created, slaDeadline: sla, records: [{ time: created, who: '张三', act: draft.handler ? '接单' : '提交工单', note: draft.handler ? '新建工单并指派给 ' + draft.handler + '，按 SLA 启动处理' : '新建工单，等待客服接单' }], images: [] });
-      tkLog(no, '新建', '新建' + draft.type + '工单（客户：' + draft.customer + '，优先级：' + draft.priority + '，SLA 截止：' + sla + '）');
+      store.ext.tickets.unshift({ no, type: draft.type, customer: draft.customer, contact: draft.contact, priority: draft.priority, status: '待受理', handler: '', desc: draft.desc, created, slaDeadline: sla, solvedTime: '', rating: '', records: [{ time: created, who: '张三', act: '提交工单', note: '新建工单，等待客服受理' }], images: [] });
+      tkLog(no, '新建', '新建' + draft.type + '工单（客户：' + draft.customer + '，问题等级：' + draft.priority + '，SLA 截止：' + sla + '）');
       dlg.value = false;
-      ElMessage.success('工单已创建（编号 ' + no + '，SLA 截止 ' + sla + '）');
+      ElMessage.success('工单已创建（编号 ' + no + '，状态：待受理，SLA 截止 ' + sla + '）');
       go('/ticket/' + no);
     });
-    return { rows, totalText, stats, cols, filters, onLink, dlg, fref, draft, rule, custOpts, ctOpts, save, tkSla, slaTip };
+    return { rows, totalText, stats, cols, filters, onLink, dlg, fref, draft, rule, custOpts, ctOpts, save, tkSla, slaTip, TK_ST_TAG };
   },
   template: `<div>
     <list-page :crumbs="['服务管理','服务工单']" title="服务工单" :total-text="totalText" :stats="stats" :filters="filters" :rows="rows" :cols="cols" :action-width="140" note-tag="真实数据 · 点击编号进入详情"
@@ -9045,9 +9158,12 @@ const ServicePage = {
         <span v-else-if="tkSla(row).k==='soon'" style="color:var(--warn)">{{ tkSla(row).txt }}</span>
         <span v-else style="width:150px" class="mono">{{ tkSla(row).txt }}</span>
       </template>
+      <template #cell-rating="{row}">
+        <span v-if="row.rating" style="color:#e6a23c">{{ '★'.repeat(row.rating) }}</span><span v-else class="muted">未评价</span>
+      </template>
       <template #actions="{row}">
         <el-button link type="primary" @click="$go('/ticket/'+row.no)">查看</el-button>
-        <el-button v-if="row.status==='待接单'" link type="primary" @click="$msg.info('在工单详情页进行接单操作')">接单</el-button>
+        <el-button v-if="['待受理','待分派'].includes(row.status)" link type="primary" @click="$msg.info('在工单详情页进行受理 / 指派操作')">受理</el-button>
       </template>
     </list-page>
     <el-dialog v-model="dlg" title="新建工单" width="620px">
@@ -9056,7 +9172,7 @@ const ServicePage = {
           <el-col :span="12"><el-form-item label="工单类型">
             <el-select v-model="draft.type" style="width:100%"><el-option v-for="t in ['故障报修','服务请求','咨询','投诉']" :key="t" :value="t"/></el-select>
           </el-form-item></el-col>
-          <el-col :span="12"><el-form-item label="优先级" prop="priority">
+          <el-col :span="12"><el-form-item label="问题等级" prop="priority">
             <el-select v-model="draft.priority" style="width:100%"><el-option v-for="p in ['紧急','高','中','低']" :key="p" :value="p"/></el-select>
           </el-form-item></el-col>
         </el-row>
@@ -9066,11 +9182,8 @@ const ServicePage = {
           </el-select>
         </el-form-item>
         <el-form-item label="关联联系人"><el-select v-model="draft.contact" clearable placeholder="可选" style="width:100%"><el-option v-for="c in ctOpts" :key="c" :label="c" :value="c"/></el-select></el-form-item>
-        <el-form-item label="处理人">
-          <el-select v-model="draft.handler" clearable placeholder="留空则进入待接单池" style="width:100%"><el-option v-for="p in ['客服-小陈','客服-小林','技术-黄工','孙工','钱工','林晓']" :key="p" :value="p"/></el-select>
-        </el-form-item>
         <el-form-item label="问题描述" prop="desc"><el-input v-model="draft.desc" type="textarea" :rows="3" placeholder="简述客户报修 / 诉求，会在工单详情展示"/></el-form-item>
-        <el-alert v-if="slaTip" type="info" show-icon :closable="false" :title="slaTip"/>
+        <el-alert v-if="slaTip" type="info" show-icon :closable="false" :title="slaTip + '；工单创建后为「待受理」，由客服受理并指派处理人后开始处理。'"/>
       </el-form>
       <template #footer><el-button @click="dlg=false">取消</el-button><el-button type="primary" @click="save">创建工单</el-button></template>
     </el-dialog>
@@ -9088,24 +9201,37 @@ const TicketDetailPage = {
     const custNo = computed(() => cust.value ? cust.value.no : cno((t.value || {}).customer || ''));
     const contact = computed(() => t.value && t.value.contact ? (store.ext.contacts || []).find(c => c.customer === t.value.customer && c.name === t.value.contact) || null : null);
     const records = computed(() => [...(t.value ? t.value.records || [] : [])].sort((a, b) => (a.time > b.time ? 1 : -1)));
-    // 操作：接单 / 转派 / 处理 / 关闭 / 重新打开
+    const solution = computed(() => {
+      const hs = records.value.filter(r => r.act === '处理');
+      return hs.length ? hs[hs.length - 1].note : '';
+    });
+    // 操作：受理 / 指派处理人 / 转派 / 处理 / 解决确认 / 评价关闭 / 退回
     const doTake = () => {
       const w = t.value;
-      if (w.status !== '待接单') return ElMessage.info('当前状态不可接单');
-      w.handler = w.handler || '客服-小陈';
+      if (w.status !== '待受理') return ElMessage.info('当前状态不可受理');
+      w.status = '待分派';
+      w.records.push({ time: tkNow(), who: '客服-小陈', act: '受理', note: '客服已受理，待指派处理人' });
+      tkLog(w.no, '受理', '客服受理，状态 → 待分派');
+      ElMessage.success('工单已受理，状态变更为「待分派」，请指派处理人');
+    };
+    const apDlg = ref(false); const ap = reactive({ who: '客服-小陈' });
+    const doAssign = () => {
+      const w = t.value;
+      if (!ap.who) return ElMessage.warning('请选择处理人');
+      w.handler = ap.who;
       w.status = '处理中';
-      w.records.push({ time: tkNow(), who: w.handler, act: '接单', note: '已按 SLA 启动处理' });
-      tkLog(w.no, '接单', '已接单（处理人：' + w.handler + '），状态 → 处理中');
-      ElMessage.success('已接单（处理人：' + w.handler + '），状态变更为「处理中」');
+      w.records.push({ time: tkNow(), who: '张三', act: '指派处理人', note: '处理人指派为「' + ap.who + '」，按 SLA 启动处理' });
+      tkLog(w.no, '指派处理人', '指派处理人「' + ap.who + '」，状态 → 处理中');
+      apDlg.value = false; ap.who = '';
+      ElMessage.success('已指派给 ' + w.handler + '，状态变更为「处理中」');
     };
     const tpDlg = ref(false); const tp = reactive({ who: '' });
-    const canTransfer = computed(() => ['待接单', '处理中', '待客户确认'].includes((t.value || {}).status));
+    const canTransfer = computed(() => ['待分派', '处理中', '待客户确认', '已退回'].includes((t.value || {}).status));
     const doTransfer = () => {
       const w = t.value;
       if (!tp.who) return ElMessage.warning('请选择新的处理人');
       const old = w.handler || '（空）';
       w.handler = tp.who;
-      if (w.status === '待接单') w.status = '处理中';
       w.records.push({ time: tkNow(), who: '张三', act: '转派', note: '处理人由「' + old + '」转派为「' + tp.who + '」' });
       tkLog(w.no, '转派', '处理人由「' + old + '」转派为「' + tp.who + '」');
       tpDlg.value = false; tp.who = '';
@@ -9116,48 +9242,65 @@ const TicketDetailPage = {
       const v = hd.note.trim();
       if (!v) return ElMessage.warning('处理说明为必填，请填写本次处理内容');
       const w = t.value;
-      w.records.push({ time: tkNow(), who: w.handler || '客服', act: '处理', note: v + '；状态 → 待客户确认' });
+      const fromRet = w.status === '已退回';
+      w.records.push({ time: tkNow(), who: w.handler || '客服', act: '处理', note: (fromRet ? '退回后重新处理：' : '') + v + '；状态 → 待客户确认' });
       w.status = '待客户确认';
       tkLog(w.no, '处理', '填写处理说明并提交客户确认（说明：' + v.slice(0, 20) + (v.length > 20 ? '…' : '') + '）');
       hdDlg.value = false; hd.note = '';
       ElMessage.success('已提交客户确认，状态变更为「待客户确认」');
     };
-    const doClose = () => {
+    const doConfirm = () => {
       const w = t.value;
-      if (w.status !== '待客户确认') return ElMessage.info('当前状态不可关闭（需先处理并等待客户确认）');
+      if (w.status !== '待客户确认') return ElMessage.info('当前状态不可解决确认（需先处理并等待客户确认）');
+      w.status = '已解决';
+      w.solvedTime = tkNow();
+      w.records.push({ time: tkNow(), who: w.contact || '客户方', act: '解决确认', note: '客户确认问题已解决（解决时间：' + w.solvedTime + '），等待客户评价' });
+      tkLog(w.no, '解决确认', '客户确认问题已解决，状态 → 已解决；解决时间：' + w.solvedTime);
+      ElNotification({ title: '问题已解决', message: w.no + ' 客户确认解决（解决时间 ' + w.solvedTime + '），请进行客户评价后关闭。', type: 'success' });
+    };
+    const rateDlg = ref(false); const rate = reactive({ stars: 5, note: '' });
+    const doRate = () => {
+      const w = t.value;
+      if (!rate.stars || rate.stars < 1) return ElMessage.warning('请选择满意度（1-5 星）后才可关闭工单');
+      w.rating = rate.stars;
       w.status = '已关闭';
-      w.records.push({ time: tkNow(), who: w.contact || '客户方', act: '客户确认', note: '客户确认问题已解决，工单关闭' });
-      tkLog(w.no, '关闭', '客户确认后工单关闭，状态 → 已关闭');
-      ElNotification({ title: '工单已关闭', message: w.no + ' 已由客户确认关闭，处理记录留痕。', type: 'success' });
+      w.records.push({ time: tkNow(), who: w.contact || '客户方', act: '客户评价', note: '满意度 ' + rate.stars + '/5' + (rate.note.trim() ? '（' + rate.note.trim() + '）' : '') + '，工单关闭' });
+      tkLog(w.no, '客户评价关闭', '满意度 ' + rate.stars + '/5，状态 → 已关闭');
+      rateDlg.value = false; rate.note = '';
+      ElNotification({ title: '工单已关闭', message: w.no + ' 客户评价完成（满意度 ' + rate.stars + '/5），处理记录留痕。', type: 'success' });
     };
     const openDlg = ref(false); const opRf = reactive({ reason: '' });
+    const canReopen = computed(() => ['已关闭', '已解决', '待客户确认'].includes((t.value || {}).status));
     const doReopen = () => {
       const v = opRf.reason.trim();
-      if (!v) return ElMessage.warning('请填写重新打开的原因（必填）');
+      if (!v) return ElMessage.warning('请填写退回原因（必填）');
       const w = t.value;
-      w.status = '处理中';
-      w.records.push({ time: tkNow(), who: w.handler || '客服', act: '重新打开', note: '原因：' + v + '；状态 → 处理中' });
-      tkLog(w.no, '重新打开', '原因：' + v + '；状态 → 处理中');
+      w.status = '已退回';
+      w.records.push({ time: tkNow(), who: w.contact || '客户方', act: '退回', note: '原因：' + v + '；工单退回（已退回），需重新处理' });
+      tkLog(w.no, '退回', '原因：' + v + '；状态 → 已退回');
       openDlg.value = false; opRf.reason = '';
-      ElMessage.success('工单已重新打开，状态变更为「处理中」');
+      ElMessage.success('工单已退回（状态：已退回），可重新处理后再提交客户确认');
     };
-    return { t, sla, cust, custNo, contact, records, doTake, doTransfer, canTransfer, tpDlg, tp, hdDlg, hd, doHandle, doClose, openDlg, opRf, doReopen, tkSla, fmtY };
+    return { t, sla, cust, custNo, contact, records, solution, doTake, apDlg, ap, doAssign, doTransfer, canTransfer, tpDlg, tp, hdDlg, hd, doHandle, doConfirm, rateDlg, rate, doRate, openDlg, opRf, doReopen, canReopen, tkSla, TK_ST_TAG, fmtY };
   },
   template: `<div v-if="t">
     <el-breadcrumb separator="/" class="crumb"><el-breadcrumb-item><a @click="$go('/service')">服务管理</a></el-breadcrumb-item><el-breadcrumb-item><a @click="$go('/service')">服务工单</a></el-breadcrumb-item><el-breadcrumb-item>{{ t.no }}</el-breadcrumb-item></el-breadcrumb>
     <div class="page-head"><h1>工单 {{ t.no }}</h1>
       <el-tag :type="({ 故障报修:'danger', 服务请求:'primary', 咨询:'info', 投诉:'warning' })[t.type]">{{ t.type }}</el-tag>
-      <el-tag :type="{紧急:'danger',高:'warning',中:'primary',低:'info'}[t.priority]" effect="dark">优先级：{{ t.priority }}</el-tag>
-      <el-tag :type="({待接单:'info',处理中:'primary',待客户确认:'warning',已关闭:'success'})[t.status]">{{ t.status }}</el-tag>
+      <el-tag :type="{紧急:'danger',高:'warning',中:'primary',低:'info'}[t.priority]" effect="dark">问题等级：{{ t.priority }}</el-tag>
+      <el-tag :type="TK_ST_TAG[t.status]">{{ t.status }}</el-tag>
       <span class="total">提交 {{ t.created }} · 处理人 {{ t.handler || '待分配' }}</span></div>
     <el-alert v-if="sla.k==='timeout'" type="error" show-icon :closable="false" style="margin-bottom:12px" :title="'SLA 超时预警：本工单已超出 SLA 时限（' + tkSla(t).txt + '）。请优先处理并联系客户说明情况，超时情况已计入考核统计。'"/>
-    <el-alert v-else-if="t.status === '已关闭'" type="success" show-icon :closable="false" style="margin-bottom:12px" title="工单已关闭：如客户仍有问题可重新打开，处理记录将保留留痕。"/>
+    <el-alert v-else-if="t.status === '已关闭'" type="success" show-icon :closable="false" style="margin-bottom:12px" :title="'工单已关闭：客户满意度 ' + (t.rating ? t.rating + '/5' : '未评价') + '。如客户仍有问题可退回重开，处理记录将保留留痕。'"/>
+    <el-alert v-else-if="t.status === '已退回'" type="warning" show-icon :closable="false" style="margin-bottom:12px" title="工单已退回：客户反馈问题未彻底解决，请重新处理后提交客户确认。"/>
     <div class="ops" style="margin-top:-4px">
-      <el-button v-if="t.status==='待接单'" type="primary" icon="Pointer" @click="doTake">接单</el-button>
+      <el-button v-if="t.status==='待受理'" type="primary" icon="Pointer" @click="doTake">受理</el-button>
+      <el-button v-if="t.status==='待分派'" type="primary" icon="UserFilled" @click="apDlg=true">指派处理人</el-button>
       <el-button v-if="canTransfer" icon="Switch" @click="tpDlg=true">转派</el-button>
-      <el-button v-if="t.status==='处理中'" type="warning" icon="EditPen" @click="hdDlg=true">处理（提交客户确认）</el-button>
-      <el-button v-if="t.status==='待客户确认'" type="success" icon="CircleCheck" @click="doClose">关闭（客户确认）</el-button>
-      <el-button v-if="['已关闭','待客户确认'].includes(t.status)" icon="RefreshLeft" @click="openDlg=true">重新打开</el-button>
+      <el-button v-if="['处理中','已退回'].includes(t.status)" type="warning" icon="EditPen" @click="hdDlg=true">处理（提交客户确认）</el-button>
+      <el-button v-if="t.status==='待客户确认'" type="success" icon="CircleCheck" @click="doConfirm">解决确认（客户确认）</el-button>
+      <el-button v-if="t.status==='已解决'" type="success" icon="Star" @click="rate.stars = 5; rateDlg=true">客户评价并关闭</el-button>
+      <el-button v-if="canReopen" icon="RefreshLeft" @click="openDlg=true">退回 / 重新打开</el-button>
       <el-button icon="Printer" @click="$msg.info('示例：打印工单回执')">打印</el-button>
     </div>
     <div style="display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:14px;align-items:start">
@@ -9175,12 +9318,16 @@ const TicketDetailPage = {
             <p class="muted" style="margin:8px 0 0;font-size:12px">原型阶段以占位卡片代替真实图片；正式版本点击可查看大图。</p>
           </template>
           <p v-else class="muted" style="margin:12px 0 0;font-size:12px">工单未上传图片附件（客户可在移动端补充）。</p>
+          <template v-if="solution">
+            <div class="sec-title" style="margin-top:16px">解决方案（最近一次处理）</div>
+            <p style="margin:0;line-height:1.8">{{ solution }}</p>
+          </template>
         </div>
         <div class="card card-pad">
           <div class="sec-title">处理记录时间线（{{ records.length }}）</div>
           <el-timeline>
             <el-timeline-item v-for="(r,i) in records" :key="i" :timestamp="r.time" placement="top"
-              :type="({ 接单:'primary', 处理:'warning', 客户确认:'success', 转派:'', 重新打开:'danger', 提交工单:'info' })[r.act] || 'primary'">
+              :type="({ 受理:'primary', 指派处理人:'primary', 处理:'warning', 解决确认:'success', 客户评价:'success', 转派:'', 退回:'danger', 重新打开:'danger', 提交工单:'info' })[r.act] || 'primary'">
               <div class="tl-item-card">
                 <b style="margin-right:8px">{{ r.act }}</b><span class="muted" style="font-size:12px">{{ r.who || '系统' }}</span>
                 <div style="line-height:1.7;margin-top:2px">{{ r.note }}</div>
@@ -9201,9 +9348,13 @@ const TicketDetailPage = {
             </el-descriptions-item>
             <el-descriptions-item label="SLA 截止时间">{{ t.slaDeadline }}</el-descriptions-item>
             <el-descriptions-item label="工单类型">{{ t.type }}</el-descriptions-item>
-            <el-descriptions-item label="优先级">{{ t.priority }}<span class="muted" style="margin-left:6px;font-size:12px">SLA 时限 {{ ({紧急:2,高:4,中:24,低:48})[t.priority] }} 小时</span></el-descriptions-item>
+            <el-descriptions-item label="问题等级">{{ t.priority }}<span class="muted" style="margin-left:6px;font-size:12px">SLA 时限 {{ ({紧急:2,高:4,中:24,低:48})[t.priority] }} 小时</span></el-descriptions-item>
             <el-descriptions-item label="当前处理人">{{ t.handler || '待分配' }}</el-descriptions-item>
             <el-descriptions-item label="提交时间">{{ t.created }}</el-descriptions-item>
+            <el-descriptions-item label="解决时间">{{ t.solvedTime || '-' }}</el-descriptions-item>
+            <el-descriptions-item label="满意度">
+              <span v-if="t.rating" style="color:#e6a23c">{{ '★'.repeat(t.rating) }}</span><span v-else class="muted">未评价</span>
+            </el-descriptions-item>
           </el-descriptions>
         </div>
         <div class="card card-pad">
@@ -9218,6 +9369,12 @@ const TicketDetailPage = {
         </div>
       </div>
     </div>
+    <el-dialog v-model="apDlg" title="指派处理人（待分派 → 处理中）" width="440px">
+      <el-form label-width="90px">
+        <el-form-item label="处理人" required><el-select v-model="ap.who" placeholder="选择处理人" style="width:100%"><el-option v-for="h in ['客服-小陈','客服-小林','技术-黄工','孙工','钱工','林晓']" :key="h" :value="h"/></el-select></el-form-item>
+      </el-form>
+      <template #footer><el-button @click="apDlg=false">取消</el-button><el-button type="primary" @click="doAssign">确认指派</el-button></template>
+    </el-dialog>
     <el-dialog v-model="tpDlg" title="转派工单" width="440px">
       <el-form label-width="90px">
         <el-form-item label="当前处理人"><el-input :model-value="t.handler || '待分配'" disabled/></el-form-item>
@@ -9226,13 +9383,23 @@ const TicketDetailPage = {
       <template #footer><el-button @click="tpDlg=false">取消</el-button><el-button type="primary" @click="doTransfer">确认转派</el-button></template>
     </el-dialog>
     <el-dialog v-model="hdDlg" title="处理工单（处理说明必填）" width="520px">
-      <el-alert type="info" show-icon :closable="false" style="margin-bottom:12px" title="提交后工单进入「待客户确认」，关闭工单需客户确认。"/>
-      <el-input v-model="hd.note" type="textarea" :rows="4" placeholder="填写本次处理过程与结果，例如：已重置服务端缓存并完成回归验证…"/>
+      <el-alert type="info" show-icon :closable="false" style="margin-bottom:12px" title="提交后工单进入「待客户确认」，客户解决确认后记录解决时间，再评价关闭。"/>
+      <el-input v-model="hd.note" type="textarea" :rows="4" placeholder="填写本次处理过程与解决方案，例如：已重置服务端缓存并完成回归验证…"/>
       <template #footer><el-button @click="hdDlg=false">取消</el-button><el-button type="primary" @click="doHandle">提交处理结果</el-button></template>
     </el-dialog>
-    <el-dialog v-model="openDlg" title="重新打开工单（原因必填）" width="480px">
-      <el-input v-model="opRf.reason" type="textarea" :rows="3" placeholder="请填写重新打开的原因（将写入处理记录）"/>
-      <template #footer><el-button @click="openDlg=false">取消</el-button><el-button type="danger" @click="doReopen">确认重新打开</el-button></template>
+    <el-dialog v-model="rateDlg" title="客户评价并关闭（满意度必选）" width="480px">
+      <el-form label-width="90px">
+        <el-form-item label="满意度" required>
+          <el-rate v-model="rate.stars" :max="5" show-score score-template="{value} / 5"/>
+        </el-form-item>
+        <el-form-item label="评价备注"><el-input v-model="rate.note" type="textarea" :rows="2" placeholder="客户反馈意见（可选，写入处理记录）"/></el-form-item>
+      </el-form>
+      <template #footer><el-button @click="rateDlg=false">取消</el-button><el-button type="primary" @click="doRate">确认评价并关闭</el-button></template>
+    </el-dialog>
+    <el-dialog v-model="openDlg" title="退回 / 重新打开工单（原因必填）" width="480px">
+      <el-alert type="info" show-icon :closable="false" style="margin-bottom:12px" title="客户反馈问题未彻底解决时退回重开，工单进入「已退回」，重新处理后提交客户确认。"/>
+      <el-input v-model="opRf.reason" type="textarea" :rows="3" placeholder="请填写退回原因（将写入处理记录）"/>
+      <template #footer><el-button @click="openDlg=false">取消</el-button><el-button type="danger" @click="doReopen">确认退回</el-button></template>
     </el-dialog>
   </div>`,
 };
@@ -10606,13 +10773,13 @@ const PZ_DOC_M_CFG = {
 
   'm-tickets': {
     name: '移动端 · 服务工单', module: '移动端',
-    goal: '移动端服务工单处理第一屏：按「待接单 / 处理中 / 待确认 / 已关闭」四段实时分段，携 SLA 剩余 / 超时提示（紧急 2h · 高 4h · 中 24h · 低 48h）与优先级标签，帮助客服 / 交付人员在外优先接最急工单，与 PC 端服务工单管理（/service）同源。',
+    goal: '移动端服务工单处理第一屏：按「待受理 / 待分派 / 处理中 / 待确认 / 已解决 / 已关闭 / 已退回」七段实时分段，携 SLA 剩余 / 超时提示（紧急 2h · 高 4h · 中 24h · 低 48h）与优先级标签，帮助客服 / 交付人员在外优先接最急工单，与 PC 端服务工单管理（/service）同源。',
     roles: [
       '菜单：底部导航「待办」域屏幕（tab=todo）——从我的页「我的工单」入口 mgo 进入、移动待办屏工单项直达详情；正式版按交付 / 客服角色与服务组配置可见范围。',
-      '按钮：拥有四段状态 seg 切换（带数量徽标）、搜索框输入与清空、工单卡点击；本屏不放置接单 / 处理按钮（动作下沉到工单详情与处理提交屏操作）。',
-      '数据：列表覆盖 store.ext.tickets 全部四状态工单（原型演示全量）；正式版按处理组 / 服务区域 / 数据权限过滤；与 PC 端工单列表同一份数据。',
+      '按钮：拥有四段状态 seg 切换（带数量徽标）、搜索框输入与清空、工单卡点击；本屏不放置受理 / 处理按钮（动作下沉到工单详情与处理提交屏操作）。',
+      '数据：列表覆盖 store.ext.tickets 全部状态工单（原型演示全量）；正式版按处理组 / 服务区域 / 数据权限过滤；与 PC 端工单列表同一份数据。',
       '字段：工单号 / 客户 / 类型 / 描述 / SLA 截止 / 优先级 / 状态全部在卡片上可见；SLA 超时标红「已超时」。',
-      '数据：紧急工单 SLA 只有 2 小时，列表按提交时间倒序把最新工单置顶以减少超时风险；每张工单有确定性生成的状态（构建时重置 1 张待接单供演示）。'
+      '数据：紧急工单 SLA 只有 2 小时，列表按提交时间倒序把最新工单置顶以减少超时风险；每张工单有确定性生成的状态（构建时重置 1 张待受理供演示）。'
     ],
     enter: [
       '入口：我的页「我的工单」（mgo 清栈切换，底部导航返回）。',
@@ -10620,30 +10787,30 @@ const PZ_DOC_M_CFG = {
       '返回栈：点击工单 mpush 工单详情 → 详情处理再 mpush 处理提交屏 → 逐级 mback 后本屏分段与搜索保留。'
     ],
     layout: [
-      '状态分段横栏：待接单 / 处理中 / 待确认（待客户确认）/ 已关闭四段，右上角数量徽标为真实计数（0 不显示），默认选中「待接单」。',
+      '状态分段横栏：待受理 / 待分派 / 处理中 / 待确认（待客户确认）/ 已解决 / 已关闭 / 已退回七段，右上角数量徽标为真实计数（0 不显示），默认选中「待受理」。',
       '搜索框：占位「搜索工单：编号 / 客户 / 描述」，关键字与当前状态段叠加过滤。',
-      '工单卡：客户名 + 第二行「编号 · 类型 · 描述」+ 小字「SLA 截止 2026-11-02 10:20」，超时工单追加红色「（已超时）」；右侧竖排优先级标签（紧急红 / 高橙 / 中低灰）+ 状态标签（处理中灰 / 待确认橙 / 已关闭绿）。',
+      '工单卡：客户名 + 第二行「编号 · 类型 · 描述」+ 小字「SLA 截止 2026-11-02 10:20」，超时工单追加红色「（已超时）」；右侧竖排优先级标签（紧急红 / 高橙 / 中低灰）+ 状态标签（受理 / 分派灰 / 处理中蓝 / 待确认橙 / 已解决 / 已关闭绿 / 已退回红）。',
       '空态：当前分段无工单时显示「该状态下暂无工单」 Headset 图标。',
       '底部导航不动，seg 切换不产生栈层级，仅内容区刷新。'
     ],
     fields: [
       '工单编号 no｜类型：文本｜必填：是｜校验：GD-年月-序号全局唯一｜说明：搜索匹配与详情跳转参数。',
-      '工单状态｜类型：枚举（待接单 / 处理中 / 待客户确认 / 已关闭）｜必填：是｜校验：四段过滤主键｜说明：决定详情可用动作；「已关闭」停算 SLA。',
+      '工单状态｜类型：枚举（待受理 / 待分派 / 处理中 / 待客户确认 / 已解决 / 已关闭 / 已退回）｜必填：是｜校验：四段过滤主键｜说明：决定详情可用动作；「已关闭」停算 SLA。',
       '优先级｜类型：枚举（紧急 / 高 / 中 / 低）｜必填：是｜校验：对应 SLA 时效 2 / 4 / 24 / 48 小时｜说明：决定标签颜色与 SLA 计算时长。',
       'SLA 截止 slaDeadline｜类型：日期时间｜必填：是｜校验：提交时间 + 对应优先级 SLA 时长｜说明：超时 / 快到（剩余 ≤1 小时）在详情区分红 / 橙展示。',
       '工单描述 desc｜类型：文本｜必填：是｜校验：非空｜说明：客户问题一句话，参与搜索匹配。',
       '客户 / 工单类型｜类型：文本 / 枚举（故障报修 / 服务请求 / 咨询 / 投诉）｜必填：是｜校验：非空｜说明：卡片主标题与分类（投诉类多为紧急高优先）。',
-      '处理人 handler｜类型：人员｜必填：否｜校验：待接单为空、接单后写入｜说明：列表不在卡上显示，详情卡展示「待分配」或处理人。'
+      '处理人 handler｜类型：人员｜必填：否｜校验：待受理为空、受理并指派后写入｜说明：列表不在卡上显示，详情卡展示「待分配」或处理人。'
     ],
     rules: [
       '列表 = 当前状态段 + 关键字过滤后的工单，按提交时间倒序（最新置顶）；关键字同时匹配 编号 / 客户 / 描述 / 类型四个维度。',
-      'SLA 计算与 PC 端 tkSla 同一套规则：已关闭工单不参与倒计时（显示「-」）；超出时限标红并提示已超时，剩余 ≤1 小时警示。',
-      '四段徽标数 = 各状态真实数量；任一端（PC 接单 / 转派 / 关闭，移动端接单 / 提交确认）状态变化后计数即时变化。',
-      '点击卡片 mpush 工单详情（带工单编号）；避免在本屏直接做接单等写操作。',
+      'SLA 计算与 PC 端 tkSla 同一套规则：已关闭 / 已解决工单不参与倒计时（显示「-」）；超出时限标红并提示已超时，剩余 ≤1 小时警示。',
+      '七段徽标数 = 各状态真实数量；任一端（PC 受理 / 指派 / 转派 / 关闭，移动端受理 / 提交确认）状态变化后计数即时变化。',
+      '点击卡片 mpush 工单详情（带工单编号）；避免在本屏直接做受理等写操作。',
       '弱网与离线：优先展示缓存工单并提示可能非最新；SLA 倒计时基于本机时钟不受网络影响；恢复网络后静默刷新。'
     ],
     flow: [
-      '工单状态流转：待接单 →（详情接单）→ 处理中 →（处理提交屏）→ 待客户确认 →（PC 端客户确认）→ 已关闭；立项即有 SLA 时效承诺。',
+      '工单状态流转：待受理 →（详情受理并指派）→ 处理中 →（处理提交屏）→ 待客户确认 →（PC 端解决确认·评价）→ 已解决 → 已关闭；客户退回 → 已退回；立项即有 SLA 时效承诺。',
       'SLA 时效流：紧急 2 / 高 4 / 中 24 / 低 48 小时为从提交到解决（关闭前）的承诺窗口，超时计入服务考核统计并推送逾期提醒。',
       '分段流：切换状态段 → 列表与徽标联动，再次回到原段状态不变；搜索词跨段保留。',
       '与 PC 同源流：PC 端受理 / 转派 / 关闭 / 重开工单，移动端四段与徽标即时一致；同一工单详情两端字段一致。'
@@ -10651,17 +10818,17 @@ const PZ_DOC_M_CFG = {
     errors: [
       '分段无工单 / 搜索无匹配：空态「该状态下暂无工单」；可切回其他段或清空关键字恢复。',
       'SLA 超时工单：卡片「已超时」红色提示，仍可正常进入详情接单处理（超时不阻断服务）。',
-      '待办直达的工单已被关闭或转派：详情如实展示最新状态，接单按钮不再出现。',
+      '待办直达的工单已被关闭或退回：详情如实展示最新状态，受理按钮不再出现。',
       '弱网降级：缓存提示；无缓存显示空态与重试入口。'
     ],
     api: [
       '工单按状态查询接口：状态 + 关键字参数返回列表与过滤后总数（原型直接过滤 store.ext.tickets）。',
-      '工单状态分布计数接口：四段徽标统计（counts 计算同期待报）。',
+      '工单状态分布计数接口：七段徽标统计（counts 计算同期待报）。',
       'SLA 计算接口：按 提交时间 / 优先级 / 状态 输出剩余或超时时长（原型 tkSla 前端计算）。',
-      '接单 / 处理提交接口：详情与处理屏调用，并写操作日志与状态机器推进（原型同步写 store）。'
+      '受理 / 处理提交接口：详情与处理屏调用，并写操作日志与状态机器推进（原型同步写 store）。'
     ],
     accept: [
-      '四段徽标与 store.ext.tickets 各状态真实计数一致；在详情接单后「待接单 -1 / 处理中 +1」立即可见。',
+      '七段徽标与 store.ext.tickets 各状态真实计数一致；在详情受理并指派后「待受理 -1 / 处理中 +1」立即可见。',
       '搜索跨 编号 / 客户 / 描述 / 类型 生效并与分段叠加。',
       '超时工单有「（已超时）」红色标识；优先级 / 状态标签颜色映射正确。',
       '点击进入对应工单详情，返回后原分段与搜索保留；无控制台报错。'
@@ -10670,13 +10837,13 @@ const PZ_DOC_M_CFG = {
 
   'm-ticket-detail': {
     name: '移动端 · 工单详情', module: '移动端',
-    goal: '单张工单的移动端现场处置台：问题描述（类型 / 优先级 / 状态 / 编号 / 提交时间 / 描述）、接单一键完成（状态 → 处理中并写记录）、处理中工单一键跳处理提交屏（照片 + 说明），基本信息与处理记录时间线完整可回溯，是「接单 → 处理 → 待客户确认」的中间枢纽。',
+    goal: '单张工单的移动端现场处置台：问题描述（类型 / 优先级 / 状态 / 编号 / 提交时间 / 描述）、受理一键完成（受理并指派，状态 → 处理中并写记录）、处理中工单一键跳处理提交屏（照片 + 说明），基本信息与处理记录时间线完整可回溯，是「受理 → 处理 → 待客户确认」的中间枢纽。',
     roles: [
       '菜单：从工单列表点击工单卡、移动待办「工单」项直达进入；正式版按交付 / 客服角色与工单归属控制可见与可操作（负责人权限之大）。',
-      '按钮：拥有「接单」按钮（仅待接单显示，注 Pointer 图标）与「处理并提交确认」按钮（仅处理中显示）；「待客户确认 / 已关闭」状态无任何操作行，只读浏览。',
+      '按钮：拥有「受理」按钮（仅待受理显示，注 Pointer 图标）与「处理并提交确认」按钮（仅处理中显示）；「待客户确认 / 已关闭」状态无任何操作行，只读浏览。',
       '数据：详情按 props.no 精确命中工单自身对象；处理记录、现场图片均为该工单自有数据，不与其他工单串用。',
       '字段：基本信息全员可见（客户 / 联系人 / 处理人 / SLA 截止）；现场图片按「N 张（在处理提交时上传）」计数展示，具体图片在处理提交屏预览。',
-      '数据：接单默认处理人 =「客服-小陈」（原型简化），正式版按轮派 / 技能组规则指定也允许领单。'
+      '数据：受理并指派默认处理人 =「客服-小陈」（原型简化，受理与指派合并一步），正式版按轮派 / 技能组规则指定也允许领单。'
     ],
     enter: [
       '入口：工单列表点击工单卡（mpush 带 no）。',
@@ -10685,49 +10852,49 @@ const PZ_DOC_M_CFG = {
     ],
     layout: [
       '头部描述卡：类型（如「故障报修」）加粗标题 + 优先级标签（紧急红 / 高橙 / 中低灰）+ 状态标签（处理中灰 / 待确认橙 / 已关闭绿）+ 副行「编号 · 提交于 2026-11-02 08:20」+ 描述正文。',
-      '操作行：待接单显示「接单」主色按钮；处理中显示「处理并提交确认」主色按钮（EditPen 图标）；其余状态整行不渲染。',
+      '操作行：待受理显示「受理」主色按钮（受理并指派 → 处理中）；处理中显示「处理并提交确认」主色按钮（EditPen 图标）；其余状态整行不渲染。',
       '「基本信息」卡：客户 / 联系人（空「-」）/ 处理人（空「待分配」）/ SLA 截止 逐行 m-cell；工单已有现场图片时显示「现场图片：N 张（在处理提交时上传）」。',
-      '「处理记录」时间线：每条 动作（接单 / 处理 / 客户确认 / 转派）+ 操作人 + 时间 + 说明，时间升序排列；接单为普通点、「客户确认」为绿色完成点、其他处理动作为流程点。',
+      '「处理记录」时间线：每条 动作（受理 / 指派处理人 / 处理 / 解决确认 / 客户评价 / 退回 / 转派）+ 操作人 + 时间 + 说明，时间升序排列；受理为普通点、「客户确认」为绿色完成点、其他处理动作为流程点。',
       '空态：工单编号不存在显示「工单不存在」；无处理记录显示「暂无处理记录」。'
     ],
     fields: [
       '工单编号 no｜类型：文本｜必填：是｜校验：GD-年月-序号唯一｜说明：头部副行展示，操作日志要点引用。',
       '工单类型｜类型：枚举（故障报修 / 服务请求 / 咨询 / 投诉）｜必填：是｜校验：非空｜说明：头部主标题与分类统计口径。',
       '优先级｜类型：枚举（紧急 / 高 / 中 / 低）｜必填：是｜校验：对应 2/4/24/48 小时 SLA｜说明：决定处理时效承诺与标签颜色。',
-      '工单状态｜类型：枚举（待接单 / 处理中 / 待客户确认 / 已关闭）｜必填：是｜校验：实时读工单对象｜说明：决定接单 / 处理按钮的显隐。',
-      '处理人 handler｜类型：人员｜必填：否｜校验：待接单为空显示「待分配」；接单后默认「客服-小陈」｜说明：处理记录的 who 来源。',
+      '工单状态｜类型：枚举（待受理 / 待分派 / 处理中 / 待客户确认 / 已解决 / 已关闭 / 已退回）｜必填：是｜校验：实时读工单对象｜说明：决定受理 / 处理按钮的显隐。',
+      '处理人 handler｜类型：人员｜必填：否｜校验：待受理 / 待分派为空显示「待分配」；受理并指派后默认「客服-小陈」｜说明：处理记录的 who 来源。',
       'SLA 截止 slaDeadline｜类型：日期时间｜必填：是｜校验：提交时间 + SLA 时长｜说明：本屏展示截止时间点，倒计时超时判断与 PC 端 tkSla 同源。',
       '提交时间 created｜类型：日期时间｜必填：是｜校验：非空｜说明：SLA 起算点。',
       '处理记录 records｜类型：数组（time / who / act / note）｜必填：否｜校验：只可追加不可删改｜说明：时间线渲染源与审计依据。',
       '现场图片 images｜类型：文件名数组（≤3）｜必填：否｜校验：处理提交时写入并截断至 3｜说明：详情按数量提示，正式版可点击预览。'
     ],
     rules: [
-      '接单规则：仅待接单状态显示接单按钮——点击后处理人置为默认客服-小陈（若已有处理人则保留）、状态 → 处理中、追加记录「接单 · 移动端接单，已按 SLA 启动处理」并写操作日志。',
+      '受理规则：仅待受理状态显示受理按钮——点击后受理并指派处理人为默认客服-小陈（若已有处理人则保留）、状态 → 处理中、追加记录「受理 · 移动端受理并指派处理人，已按 SLA 启动处理」并写操作日志。',
       '处理跳转规则：仅处理中显示「处理并提交确认」，点击 mpush 处理提交屏（带 no）；待客户确认 / 已关闭不展示动作行。',
-      '记录规则：处理记录按时间升序只读渲染，PC 端接单 / 转派 / 客户确认 / 重开记录即时同屏出现（同一数据）。',
-      '时间线配色：接单为普通点、客户确认绿色完成点、处理 / 转派等中间动作为流程点，进度一目了然。',
+      '记录规则：处理记录按时间升序只读渲染，PC 端受理 / 指派 / 转派 / 解决确认 / 客户评价 / 退回记录即时同屏出现（同一数据）。',
+      '时间线配色：受理为普通点、客户评价 / 解决确认绿色完成点、处理 / 转派等中间动作为流程点，进度一目了然。',
       '弱网与离线：详情以缓存展示并提示可能非最新；SLA 剩余时间基于本机时钟；恢复网络静默刷新。'
     ],
     flow: [
-      '状态流转：待接单 →（接单）→ 处理中 →（处理提交屏）→ 待客户确认 →（客户确认，PC 端）→ 已关闭；本屏覆盖前三态的动作枢纽。',
-      '接单动作流：点击接单 → 轻提示「已接单，状态变为处理中」→ 状态标签 / 基本信息处理人 / 处理记录 / 列表徽标即时联动，无需退出重进。',
+      '状态流转：待受理 →（受理并指派）→ 处理中 →（处理提交屏）→ 待客户确认 →（PC 端解决确认 / 客户评价）→ 已解决 / 已关闭；客户退回 → 已退回；本屏覆盖前段与处理态的动作枢纽。',
+      '受理动作流：点击受理 → 轻提示「已受理并指派处理人，状态变为处理中」→ 状态标签 / 基本信息处理人 / 处理记录 / 列表徽标即时联动，无需退出重进。',
       '处理闭环流：处理中 → 处理提交屏（说明 + 照片）→ 提交成功自动 mback 回本屏出现新「处理」记录并显示待客户确认。',
       '只读流：待客户确认 / 已关闭工单动作行消失，时间线完整可回溯，供交付复盘。',
     ],
     errors: [
       '工单不存在（编号错误或被删除）：空态「工单不存在」并可返回列表。',
-      '状态与按钮不匹配（并发场景，如已被 PC 端接单）：接单按钮随状态消失，不产生重复接单记录。',
+      '状态与按钮不匹配（并发场景，如已被 PC 端受理）：受理按钮随状态消失，不产生重复受理记录。',
       '联系人 / 处理人缺失：分别显示「-」「待分配」占位，不报错。',
       '弱网：缓存提示；无缓存空态与重试入口。'
     ],
     api: [
       '工单详情接口：按编号返回基础字段 / 处理记录 / 图片数量（原型同步读 store.ext.tickets）。',
-      '接单接口：写状态 / 处理人 / 追加记录 / 操作日志（原型前端直写）。',
+      '受理并指派接口：写状态 / 处理人 / 追加记录 / 操作日志（原型前端直写）。',
       '处理记录查询接口：时间升序全量输出。',
       'SLA 计算接口：剩余 / 超时时长输出（原型 tkSla 计算）。',
     ],
     accept: [
-      '接单后状态 / 处理人 / 处理记录 / 工单列表分段徽标即时一致变化，操作日志含「移动端接单」。',
+      '受理后状态 / 处理人 / 处理记录 / 工单列表分段徽标即时一致变化，操作日志含「移动端受理」。',
       '「处理并提交确认」仅在处理中出现；提交后返回本屏可见「待客户确认」状态与新处理记录。',
       '时间线顺序与渲染点样式正确，记录不可编辑；不同工单详情数据互不串用。',
       '编号不存在走空态；无控制台报错。'
@@ -11233,7 +11400,7 @@ const PZ_DOC_PC_CFG = {
       '商机/合同/客户编号｜类型：文本｜必填：是｜校验：单据必须存在｜说明：以链接方式提供详情下钻，编号列使用等宽字体。',
       '金额｜类型：货币｜必填：是｜校验：原值除以 100 分转元后格式化｜说明：预计金额、已签金额、计划回款、已回款、累计成交额等均按分精确汇总。',
       '比率｜类型：百分比｜必填：是｜校验：分母为 0 时返回 0，不出现 NaN｜说明：达成率、回款率、转化率、赢单率、完成率等保留一位小数。',
-      '状态/结果｜类型：枚举标签｜必填：否｜校验：必须命中各业务状态枚举｜说明：回款计划为已回款/部分回款/未回款，商机为赢单/输单，工单为待接单/处理中/待客户确认/已关闭。'
+      '状态/结果｜类型：枚举标签｜必填：否｜校验：必须命中各业务状态枚举｜说明：回款计划为已回款/部分回款/未回款，商机为赢单/输单，工单为待受理/待分派/处理中/待客户确认/已解决/已关闭/已退回。'
     ],
     rules: [
       '页面数据全部通过 computed 从 store 的客户、商机、合同、回款、线索、活动和工单实时聚合，不使用写死的统计数字。',
@@ -11248,7 +11415,7 @@ const PZ_DOC_PC_CFG = {
       '回款计划状态：未回款 → 部分回款 → 已回款；已回款指财务已确认到账并按核销结果匹配到该计划期次，计划日期早于今天且未结清计为逾期。',
       '商机漏斗阶段顺序固定为初步接触 → 需求确认 → 方案沟通 → 报价谈判 → 商务审批 → 赢单/输单，漏斗宽度为示意值而非真实转化率。',
       '商机赢输分析只统计阶段为 close 且预计成交日期落在所选周期的商机，结果为赢单或输单；输单原因缺失时归入「未填写」。',
-      '活动状态为已完成/计划中/已取消；服务工单状态为待接单/处理中/待客户确认/已关闭，处理中加待接单加待客户确认视为待处理。'
+      '活动状态为已完成/计划中/已取消；服务工单状态为待受理/待分派/处理中/待客户确认/已解决/已关闭/已退回，待受理加待分派加处理中加已退回视为待处理。'
     ],
     errors: [
       '非法或缺失报表 id：报表对象为空，统计卡、图表和明细均无数据，用户可通过顶部面包屑返回报表列表。',
@@ -13499,6 +13666,530 @@ const PZ_DOC_S7_CFG = {
 };
 
 Object.entries(PZ_DOC_S7_CFG).forEach(([k, c]) => { DOCS_DEFAULT[k] = mkDoc(k, c); });
+
+/* ===== S8 回款管理专项对齐：覆盖 payments 需求文档 =====
+   依据规划方案 5.10 回款管理（行 667-703）、6.5（行 945-975）、7.2/7.3（行 1027-1051）、
+   第三章（行 71-94）、4.2/4.3（行 162-188）、第十二章（行 1334-1356）、第十四章（行 1426-1459）。 */
+const PZ_DOC_S8_CFG = {
+  payments: {
+    name: '回款计划与收款', module: '回款管理',
+    goal: '区分「计划回款」与「实际收款」，按规划方案 5.10 管理合同回款计划、到账登记和自动核销：登记实际到账后自动核销对应计划并重算未收金额与逾期状态；支持分批收款、一次收款对应多个计划、部分收款、退款、收款冲销和财务复核，帮助财务与销售负责人掌握应收账款。',
+    roles: [
+      '菜单：销售、销售经理、财务、管理员通过左侧导航「回款管理」进入本页，路由 /payments；合同详情、订单详情与客户详情的回款视图可跳入（第三章菜单权限）。',
+      '按钮：财务人员拥有「登记收款」「退款」「申请冲销」「财务复核」；销售可查看本人合同回款并登记收款，但财务复核与冲销审批由财务负责人处理；原型以按钮文案与可用性演示按钮权限。',
+      '数据：销售只能查看本人负责合同的回款计划与到账，销售经理查看团队合同逾期与回款率，财务可查看合同、订单、回款及应收数据；数据范围按第三章「本人 / 本人及下属 / 所属部门 / 全部」控制。',
+      '字段：合同金额、计划金额、到账金额、逾期金额与核销明细对授权角色可见；审批历史与凭证附件中的敏感字段按财务字段权限脱敏或隐藏。',
+      '数据：回款记录不做物理删除；录入错误走冲销或更正流程，保留原记录、操作人（财务-王芳）与操作时间（4.3、第十二章）。'
+    ],
+    enter: [
+      '入口：左侧导航「回款管理 → 回款计划与收款」，路由 /payments。',
+      '关联入口：合同详情「回款计划」Tab、订单详情回款视图、客户详情「回款」Tab 可跳入；从合同或订单付款计划生成的应收在本页按月跟踪。',
+      '跳转：计划表点击回款编号/合同编号打开回款详情抽屉；点击客户名称进入 /customer/:no；收款记录页签可登记收款、退款与申请冲销。'
+    ],
+    layout: [
+      '顶部：面包屑「回款管理 / 回款计划与收款」、页面标题与总数说明（回款计划共 N 笔 · 示例合同 X 份），右侧为「登记收款」「导出」按钮。',
+      '统计卡：累计应收（已到期）、累计已收、未收金额（含未到期）、逾期金额、回款率五张卡；口径由计划明细实时计算，回款率 = 已收 / 已到期应收，分母为 0 时显示 0%。',
+      '页签与筛选：回款计划（计划 vs 实际）/ 收款记录两个页签；关键词匹配合同编号、回款编号、客户、款项阶段；状态下拉为已核销/部分核销/逾期/未到期，支持查询与重置。',
+      '回款计划表按 5.10 展示：回款编号、合同编号、客户名称、订单编号、款项阶段与比例、计划回款日期/金额、实际回款日期/到账金额、未收金额、收款方式、核销进度、状态/逾期天数/财务确认、负责人；逾期行整行标红。',
+      '收款记录表：收款编号（SK/CX/TK-年月-四位）、合同编号、客户、实际回款日期、到账金额、核销对象（各期分配金额与超额待核实标签）、收款方式、类型（收款/退款/冲销）、财务确认与操作（财务复核/退款/申请冲销）。',
+      '抽屉：回款详情展示合同金额、累计应收、累计已收、未收金额、其中逾期、回款完成度六卡，以及回款计划明细、到账记录（含退款/冲销负向记录）和相关凭证。',
+      '登记收款弹窗：合同、实际到账金额、实际回款日期、收款方式、核销计划（自动或优先某期）、备注/凭证；下方核销预览逐期显示核销前未收、本次核销、核销后未收与结果，超额时告警。',
+      '退款弹窗：原收款编号只读、退款金额（≤ 可退金额）、退款日期、退款原因必填；提交后生成负向退款记录并写入「应收冲销」审批。'
+    ],
+    fields: [
+      '回款编号｜类型：文本｜必填：是｜校验：系统按 HK-四位生成，与合同编号组合唯一｜说明：5.10 回款列表字段，标识每期回款计划，用于核销匹配与逾期追踪。',
+      '客户名称｜类型：关联对象（客户）｜必填：是｜校验：必须关联已存在客户｜说明：5.10 回款列表字段，点击进入客户详情，是催收与对账对象。',
+      '合同编号｜类型：关联对象（合同）｜必填：是｜校验：必须为有效合同，回款计划由合同付款条件生成｜说明：5.10 回款列表字段，点击打开回款详情抽屉，也是核销归属主体。',
+      '订单编号｜类型：关联对象（订单）｜必填：是｜校验：订单须属于同一客户与合同｜说明：5.10 回款列表字段，支撑 6.5「合同 → 订单 → 回款计划」链路核对。',
+      '计划回款日期｜类型：日期｜必填：是｜校验：由合同付款条件生成；日期 ≤ 今日计入已到期，早于今日且未收 > 0 计为逾期｜说明：5.10 回款列表字段，是逾期天数计算基准。',
+      '计划回款金额｜类型：货币｜必填：是｜校验：大于 0，按分存储；各期比例合计 100%、各期金额合计等于合同金额｜说明：5.10 回款列表字段；示例合同 100,000 元按 30/40/30 生成 30,000/40,000/30,000。',
+      '实际回款日期｜类型：日期｜必填：是（已收款时）｜校验：登记收款时不得为空；计划行取该期最近一次到账日期｜说明：5.10 回款列表字段；退款与冲销记录也记录发生日期。',
+      '实际到账金额｜类型：货币｜必填：是（已收款时）｜校验：大于 0；等于该计划下所有收款核销分配之和，退款/冲销以负数回写｜说明：5.10 回款列表字段；核销进度 = 实际到账 / 计划回款金额。',
+      '收款方式｜类型：枚举（银行转账/电汇/支票/微信/支付宝）｜必填：是（登记收款时）｜校验：必须为字典项；退款沿用原收款方式｜说明：5.10 回款列表字段；多条到账时展示去重后的方式列表，无到账显示「-」。',
+      '财务确认状态｜类型：枚举（待财务复核/财务已确认）｜必填：是｜校验：由该期收款记录确认状态推导，全部确认才显示「财务已确认」｜说明：5.10 回款列表字段；财务复核通过后置为「财务已确认」。',
+      '逾期天数｜类型：整数｜必填：是｜校验：计划回款日期 < 今日且未收金额 > 0 时 = 今日 − 计划回款日期，否则为 0｜说明：5.10 回款列表字段；逾期行整行标红，补收清零后停止累计。',
+      '负责人｜类型：人员｜必填：是｜校验：取自合同商务负责人，须为在职用户｜说明：5.10 回款列表字段；决定数据权限与逾期提醒对象。',
+      '款项阶段 / 分期比例｜类型：文本 / 百分比｜必填：是｜校验：阶段非空、各期比例合计 100%｜说明：由合同付款条件生成，如合同签署 30%、项目上线 40%、项目验收 30%。',
+      '未收金额｜类型：货币｜必填：是｜校验：计划回款金额 − 实际到账金额；用于统计时小于 0 的部分不计入未收｜说明：5.10 回款详情「未收金额」，也是逾期金额汇总口径。',
+      '收款编号｜类型：文本｜必填：是｜校验：系统按 SK/CX/TK-年月-四位生成且唯一｜说明：收款记录主键；SK 为收款、CX 为冲销、TK 为退款，记录不可物理删除。',
+      '超额金额（待核实 / 预收款）｜类型：货币｜必填：否｜校验：实际到账 − 可核销应收，大于 0 时产生｜说明：第十二章「超额收款」场景，转入待核实或预收款，不自动核销并告警。',
+      '退款金额 / 冲销金额｜类型：货币（负向记录）｜必填：退款、冲销时是｜校验：退款金额 > 0 且 ≤ 原收款可退金额；冲销必须填写原因｜说明：以负向收款记录回写核销，原记录保留，可追溯修改历史。',
+      '相关凭证｜类型：附件｜必填：否｜校验：支持银行回单等凭证上传｜说明：5.10 回款详情「相关凭证」；原型以示例标签展示，正式版按权限查看与下载。'
+    ],
+    rules: [
+      '页面分为「计划」与「实际收款」两层：回款计划由合同付款条件生成，实际到账按收款记录的 alloc 分配逐期汇总；未收 = 计划回款金额 − 实际到账。',
+      '登记收款时实际到账金额必填且必须大于 0，实际回款日期必填；未填或非法时提示并保持弹窗打开，不生成收款记录。',
+      '核销预览实时计算：可指定优先期次，其余按计划回款日期先后自动分配；一次到账可核销多个计划，不足一期的部分收款按「部分核销」处理，已结清期次跳过。',
+      '超额到账不自动核销：超出应收的金额在预览与保存后提示「超额收款」，转入「待核实 / 预收款」，并在收款记录打超额标签，等待财务核实或后续计划再核销。',
+      '收款记录保存后初始财务确认状态为「待财务复核」，操作人记录财务人员；财务复核通过后置为「财务已确认」，统计卡口径注明含待复核到账。',
+      '退款必须先选择原收款记录，退款金额不得大于可退金额且原因必填；提交后生成 TK 负向记录并按原核销计划冲减实际到账，同时进入 7.2「应收冲销」审批（财务负责人）。',
+      '回款录入错误走冲销：必须填写冲销原因，生成 CX 负向记录并保留原收款记录（原记录标记已冲销、不物理删除），冲销后重算计划未收、逾期与统计卡。',
+      '逾期与提醒：计划回款日期早于今日且未收 > 0 时计算逾期天数并整行标红；按 7.3 回款逾期提醒规则，超过计划回款日期提醒财务与销售负责人，页面统计卡展示逾期笔数与提醒口径。',
+      '统计口径：累计应收只统计计划回款日期 ≤ 今日的计划；累计已收包含待财务复核到账与负向退款/冲销；逾期金额为逾期计划未收合计；回款率 = 累计已收 / 已到期应收，分母为 0 时按 0% 展示。',
+      '导出按钮为示例提示；正式版导出回款计划与收款记录需按第三章数据权限过滤，金额保持分位精度，并写入操作日志。'
+    ],
+    flow: [
+      '计划核销状态：未到期 → 部分核销 → 已核销；到账金额 ≥ 计划金额时置「已核销」，部分到账置「部分核销」，退款/冲销后按剩余到账回退状态。',
+      '逾期状态：计划回款日期 < 今日且未收 > 0 → 逾期未收（尚未到账）或「部分核销 · 逾期」（已有部分到账）；补收至未收为 0 后转为已核销，逾期天数停止累计。',
+      '收款确认流转：登记收款（待财务复核）→ 财务复核通过（财务已确认）；两种状态均计入累计已收，统计卡与文档同时标注该口径。',
+      '收款与计划关系：一个合同多个回款计划，一个计划多条实际收款；一次收款可对应多个计划（alloc 多条），支持分批收款与部分收款，金额以分为单位精确计算。',
+      '退款流转：已收款记录 → 填退款金额/日期/原因 → 生成负向退款记录（待财务复核）→ 按 7.2 提交应收冲销审批（财务负责人）→ 通过后确认并回写核销。',
+      '冲销流转：错误收款记录 → 填写冲销原因 → 生成负向冲销记录（待财务复核）→ 应收冲销审批（财务负责人）→ 原记录保留并标记已冲销，核销与未收重新计算。',
+      '超额流转：到账金额 > 全部未收 → 可核销部分自动核销 → 超出部分转「待核实 / 预收款」→ 财务核实后确认预收款或后续计划生成时再核销。',
+      '审批触发：退款与收款冲销均按 7.2「应收冲销：回款冲销、退款 → 财务负责人」触发审批，审批通过前原收款记录保持有效，审批过程与操作人写入操作日志。'
+    ],
+    errors: [
+      '同一合同部分收款：允许登记多笔收款并动态计算余额，每笔收款独立记录到账日期、方式与核销明细，计划状态随累计到账更新（第十二章「同一合同部分收款」）。',
+      '超额收款：不视为正常核销，提示异常并转入待核实或预收款处理，页面以告警和超额标签提示，避免虚增已收（第十二章「超额收款」）。',
+      '回款录入错误：不允许删除或直接改金额，必须走冲销或更正流程并保留原记录、冲销原因和操作人（第十二章「回款录入错误」）。',
+      '退款边界：退款金额为空、≤ 0 或超过可退金额时拦截并提示，退款原因未填时拦截；已冲销记录不可再次退款或冲销。',
+      '到账金额为空或 ≤ 0：确认登记被拦截并提示「请输入实际到账金额」，弹窗不关闭，不产生收款记录。',
+      '目标合同被作废或不存在：抽屉与登记弹窗不渲染合同数据，筛选无结果时表格显示空态，可重置过滤条件。',
+      '越权操作：非财务角色尝试复核、退款或冲销时，正式版由后端拦截并记录安全日志，前端按按钮权限隐藏（第十二章「用户越权操作」、第三章）。',
+      '金额计算必须分位准确：核销预览与确认后计划行一致，统计卡数字可由计划明细复算；修改回款关键数据须保留历史版本与操作记录（第十四章重点验收场景）。'
+    ],
+    api: [
+      '回款计划分页查询接口：返回合同分期计划、订单编号、已收、未收、逾期天数、收款方式与核销状态，支持按合同、客户、阶段、状态与日期筛选。',
+      '登记收款与自动核销接口（POST /api/payments）：接收合同、实际到账金额、回款日期、收款方式、优先期次与凭证，事务内完成多计划核销、超额入预收款与统计回写。',
+      '收款记录查询与财务复核接口：按确认状态查询并复核，记录核销明细 alloc、操作人、操作时间，支持反查原收款与退款/冲销关联。',
+      '退款与应收冲销审批接口：提交冲销金额、原因与关联收款编号，按 7.2 流转至财务负责人审批，通过后生成负向记录并回滚核销，保留原记录与操作日志。',
+      '回款逾期提醒接口：按 7.3 对超过计划回款日期的计划通知财务与销售负责人，记录提醒时间与接收人。'
+    ],
+    accept: [
+      '对应第十四章「回款：分批收款、部分核销和逾期计算正确」：合同 100,000 元按 30/40/30 生成 30,000/40,000/30,000 三期；先收 30,000 全核销首期，再收 25,000 核销第二期后未收 15,000，计划状态分别为已核销与部分核销/逾期，数字可复算。',
+      '一次收款可同时核销多个计划：登记 70,000 元时按优先期次和计划日期顺序分配到多个计划，核销预览的本次核销合计等于到账金额（不超过应收），确认后计划行与统计卡一致。',
+      '部分收款与逾期口径正确：计划回款日期 < 今日且未收 > 0 时逾期天数 = 今日 − 计划日期；补收至未收为 0 后状态转为已核销且逾期天数归零；计划日期 = 今日不计逾期。',
+      '超额收款处理正确：到账超过全部未收时，超额部分不自动核销，预览与保存后均提示转入待核实/预收款，收款记录显示超额标签，已收统计不包含超额部分。',
+      '退款与冲销可追溯：退款金额超过可退金额被拦截；退款/冲销提交后生成 TK/CX 负向记录并重算未收，原收款记录保留且标记已冲销，冲销原因与操作人可查询。',
+      '财务复核状态正确：登记收款初始为待财务复核，复核后为财务已确认；计划行财务确认状态由各期收款确认状态推导，统计卡口径与页面注释一致。',
+      '对应第十四章重点场景「从合同付款计划生成应收，登记多笔收款并核销」与「修改回款等关键数据，检查历史版本和操作记录」：从合同详情可追到本页计划与到账记录，所有修改留痕，页面无控制台报错。',
+      '对应第三章数据权限：销售仅见本人合同回款，销售经理可见团队，财务可见全部；越权访问在正式版由后端拦截并记录安全日志。'
+    ]
+  }
+};
+
+Object.entries(PZ_DOC_S8_CFG).forEach(([k, c]) => { DOCS_DEFAULT[k] = mkDoc(k, c); });
+
+/* ===== S9 行 5.11 / 5.12 / 5.13 / 6.6 / 十二 / 十四 / 通用规则专项对齐：覆盖活动、服务工单、交付需求文档 =====
+   依据规划方案 5.11 活动与跟进管理（行 704-729）、5.12 服务工单管理（行 730-759）、5.13 交付管理（行 760-782）、
+   6.6 流程六 售后服务与客户复购（行 976-1000）、第三章 权限体系（行 71-94）、4.2/4.3 通用规则（行 162-188）、
+   第十二章 核心业务异常与边界场景（行 1334-1356）、第十四章 系统验收标准（行 1426-1459）。 */
+const PZ_DOC_S9_CFG = {
+  /* ---------- 5.11 活动与跟进管理 ---------- */
+  activities: {
+    name: '跟进活动', module: '活动管理',
+    goal: '按 5.11「统一管理销售与客户的所有互动行为」沉淀客户全生命周期的每一次跟进活动：支持电话 / 微信 / 短信 / 拜访 / 会议 / 邮件 / 演示 / 培训 / 其他九类活动，按类型、客户、负责人、状态与时间区间检索并提供日历视图；销售可在此新增活动与跟进计划，完成后沉淀客户反馈、跟进结果、下一步计划与下次跟进时间，并在客户详情、商机详情统一汇总为完整客户时间线。',
+    roles: [
+      '菜单：销售、销售经理、管理员经左侧导航「活动管理」进入本页（路由 /activities）；客服 / 交付可读写与客户相关的服务类活动（第三章菜单权限）。',
+      '按钮：销售可「新增活动 / 拜访计划」并跟踪本人活动；销售经理可查看团队全部活动；「导出」按钮遵循字段权限；删除不开放，取消活动以逻辑作废保留记录（4.3）。',
+      '数据：销售默认看本人负责客户的活动，销售经理看所属部门及下级，管理员看全部（第三章数据权限「本人 / 本人及下属 / 所属部门 / 全部」）。',
+      '字段：客户联系方式、跟进内容等敏感信息按角色字段权限脱敏；附件正式版按权限控制查看与下载（5.11 附件「按权限控制」）。'
+    ],
+    enter: [
+      '入口：左侧导航「活动管理 → 跟进活动」，路由 /activities。',
+      '关联入口：客户详情「跟进」Tab 的新增跟进 / 活动链接、商机详情关联跟进活动链接、移动端跟进记录屏同源数据。',
+      '跳转：点击活动编号进入 /activity/:no 详情；客户名称进入 /customer/:no；商机进入 /opp/:no；日历点日期查看当日活动并可一键筛回列表。'
+    ],
+    layout: [
+      '顶部：面包屑 + 页面标题 + 视图切换（列表 / 日历）+ 新增活动按钮（页面名称、数据总数以「跟进活动共 N 条」实算）。',
+      '统计卡：活动总数、已完成、计划中、本月活动、已取消，全部由 store.ext.activities 数据实算。',
+      '列表视图：时间区间（起 / 止）选择行 + 筛选区（关键词 / 活动类型 / 活动状态 / 负责人）+ 表格（活动编号、活动类型、客户、联系人、商机、时间、内容、负责人、客户反馈、跟进结果、下次跟进时间、状态）+ 真分页。',
+      '日历视图：月历网格按日显示活动数与当日活动摘要，点日期弹当日活动列表，可一键回列表按当日过滤。',
+      '新增活动弹窗：活动类型（九类枚举）、负责人、关联客户（联系人 / 商机选项随客户联动）、活动时间、跟进内容；保存即写库并跳详情。'
+    ],
+    fields: [
+      '跟进编号｜类型：文本｜必填：是｜校验：系统生成 HD-6 位序号，全库唯一｜说明：5.11 跟进记录「跟进编号 / 系统编号」，点击进入活动详情。',
+      '关联客户｜类型：关联对象（客户）｜必填：是｜校验：必须关联有效客户，流失客户不可选｜说明：5.11「关联客户 / 客户档案」，为客户时间线的归属主体，点击进入客户详情。',
+      '关联联系人｜类型：关联对象（联系人）｜必填：否｜校验：选项随关联客户联动，必须属于同一客户｜说明：5.11「关联联系人 / 对接人」。',
+      '关联商机｜类型：关联对象（商机）｜必填：否｜校验：选项随客户联动，商机须属于同一客户｜说明：5.11「关联商机 / 相关商机」，点击进入商机详情。',
+      '活动类型｜类型：枚举（电话 / 微信 / 短信 / 拜访 / 会议 / 邮件 / 演示 / 培训 / 其他）｜必填：是｜校验：必须命中九类枚举｜说明：5.11 活动类型全集，决定日历角标颜色与拜访签到要求。',
+      '跟进时间｜类型：日期时间｜必填：是｜校验：非空；计划中活动时间不能早于当前时间｜说明：5.11「跟进时间 / 实际发生时间」，日历聚合与区间筛选依据。',
+      '跟进内容｜类型：长文本｜必填：是｜校验：非空｜说明：5.11「跟进内容 / 本次沟通事项」。',
+      '客户反馈｜类型：长文本｜必填：否（计划中）/ 是（标记完成时）｜校验：标记完成必填，否则拦截｜说明：5.11「客户反馈 / 客户态度及意见」，为复盘依据。',
+      '跟进结果｜类型：枚举（已联系 / 待反馈 / 需求明确）｜必填：否｜校验：标记完成时选择，默认已联系｜说明：5.11「跟进结果：已联系、待反馈、需求明确等」。',
+      '下一步计划｜类型：长文本｜必填：否｜校验：非空即可｜说明：5.11「下一步计划 / 下一次联系内容」，完成后可填写。',
+      '下次跟进时间｜类型：日期时间｜必填：否｜校验：完成后可设置，时间格式 YYYY-MM-DD HH:mm｜说明：5.11「下次跟进时间 / 自动生成待办」，到期进入销售待办提醒。',
+      '附件｜类型：文件（图片 / 文件 / 录音）｜必填：否｜校验：大小与类型前端限制，正式版按权限控制查看｜说明：5.11「附件 / 图片、文件、录音等（按权限控制）」，原型以占位卡片展示。',
+      '状态｜类型：枚举（计划中 / 已完成 / 已取消）｜必填：是｜校验：状态仅由操作流转产生，不可手改（4.3）｜说明：列表状态标签与统计卡口径。',
+      '负责人｜类型：人员｜必填：是｜校验：默认当前登录人，可指定｜说明：数据权限过滤主键；负责人离职时活动随客户转交（第十二章）。'
+    ],
+    rules: [
+      '列表数据来自 store.ext.activities，真分页按 page/size 切片，total 取过滤后真实条数，统计卡与总数文案由数据实算（4.2 列表统一元素）。',
+      '时间区间为前端过滤，区间起止颠倒时自动交换；其余筛选条件变化后回到第 1 页。',
+      '点击活动编号进入 /activity/:no；客户、商机、联系人名称可点击进入对应详情（4.3 关联对象）。',
+      '新增活动默认状态「计划中」；在详情页标记完成后必须沉淀客户反馈，可补录跟进结果 / 下一步计划 / 下次跟进时间。',
+      '附件查看遵循字段权限；客户合并时活动记录挂到主档案并保留原始编号（第十二章）。'
+    ],
+    flow: [
+      '活动状态流转：计划中 →（标记完成，客户反馈必填）→ 已完成；计划中 →（取消活动，原因必填）→ 已取消（逻辑作废保留记录，4.3）。',
+      '跟进结果流转：完成后记录「已联系 / 待反馈 / 需求明确」，待反馈活动提示销售继续跟进。',
+      '待办自动化：已完成的「下次跟进时间」到期后自动生成销售待办提醒（5.11 下次跟进时间 / 自动生成待办）。',
+      '时间线汇总：客户详情「跟进」Tab 与商机详情按时间倒序汇总该客户 / 商机全部活动，形成完整客户时间线（5.11 建议）。',
+      '负责人变更：客户负责人离职转交后，未完成活动与待办随客户转移，历史活动记录不变（第十二章「客户负责人离职」）。'
+    ],
+    errors: [
+      '新增未选客户 / 未填内容 / 未选时间：必填校验拦截并提示，不产生脏数据。',
+      '同一客户多人跟进：设主负责人与协同人员，防止重复联系；新建活动时明确负责人口径（第十二章「同一客户多人跟进」）。',
+      '客户负责人离职：活动与待办随客户转交给新负责人，历史跟进记录不变（第十二章「客户负责人离职」）。',
+      '附件越权查看：未授权角色不展示 / 不可下载附件，正式版由后端拦截并记录安全日志（第十二章「用户越权操作」、5.11）。',
+      '时间区间起止颠倒：自动交换；筛选无结果显示空态，可一键重置。',
+      '数据导入失败（批量导入活动正式版）：返回错误行号、字段和原因，不静默丢数据（第十二章「数据导入失败」）。'
+    ],
+    api: [
+      '活动分页查询接口：按类型 / 状态 / 负责人 / 时间区间 / 关键字过滤并分页。',
+      '活动新增与标记完成接口：写客户反馈 / 跟进结果 / 下一步计划，状态机校验流转合法性。',
+      '下次跟进时间待办生成接口：到期生成销售待办并提醒（示例）。',
+      '日历聚合接口：按日期聚合当日活动数量与明细（示例）。'
+    ],
+    accept: [
+      '对应第十四章通用「报表：统计口径统一，数据与明细可以核对」「操作日志：重要操作可以查询到操作人和时间」：新增 / 标记完成 / 取消均写操作日志（操作人 + 时间），统计卡数字可用明细复算。',
+      '列表 / 日历切换可用：日历角标数与当日筛选结果一致；筛选与分页真实生效，活动类型九类均可筛出对应记录。',
+      '新增活动写入 store.ext.activities 且出现在列表首位，详情页 /activity/:no 数据与列表一致。',
+      '标记完成后状态、客户反馈、跟进结果即时更新且记录不可绕过（4.3 状态变化不允许绕过流程）。',
+      '客户详情 / 商机详情时间线含本页新 Activity，无控制台报错。'
+    ]
+  },
+  'activity-detail': {
+    name: '活动详情', module: '活动管理',
+    goal: '呈现单条跟进活动的完整上下文：关联客户 / 联系人 / 商机、跟进内容、客户反馈、跟进结果、下一步计划、下次跟进时间与附件；拜访类活动展示签到信息（地址 / 时间 / 坐标 / 现场照片占位），并作为「标记完成」「取消活动」等状态操作的落点页面。',
+    roles: [
+      '菜单：由 /activities 列表、日历、客户详情与商机详情时间线跳入（第三章菜单权限）。',
+      '按钮：负责人销售可「标记完成 / 取消活动」；销售经理（本部门及下级）可代填反馈；其他角色只读（4.3 按钮权限）。',
+      '数据：仅数据权限范围内活动可见；越权直访编号由正式版后端拦截并记录安全日志（第十二章「用户越权操作」）。',
+      '字段：附件按权限控制查看（5.11）；客户联系方式等敏感字段按角色脱敏（第三章字段权限）。'
+    ],
+    enter: [
+      '入口：活动列表点击活动编号、日历视图点日期后点击活动。',
+      '关联入口：客户详情 / 商机详情跟进时间线关联跳转。',
+      '返回：面包屑回 /activities。'
+    ],
+    layout: [
+      '头部：面包屑 + 活动编号 + 活动类型 / 状态 / 跟进结果标签 + 操作按钮（标记完成 / 取消活动 / 打印）。',
+      '左列：基本信息（跟随时间 / 活动类型 / 负责人 / 跟进编号）→ 跟进内容卡 → 客户反馈卡 → 下一步（下一步计划 + 下次跟进时间）→ 跟进附件卡（图片 / 文件 / 录音占位）→ 拜访签到信息卡（地址 / 时间 / 坐标 / 照片占位）。',
+      '右列：关联客户 / 联系人 / 商机卡（可点击跳转）+ 状态提示告警。'
+    ],
+    fields: [
+      '跟进编号｜类型：文本｜必填：是｜校验：全库唯一｜说明：标题与操作日志主键。',
+      '活动类型｜类型：枚举｜必填：是｜校验：九类枚举之一｜说明：拜访类完成时需签到记录。',
+      '跟进时间｜类型：日期时间｜必填：是｜校验：非空｜说明：实际发生时间。',
+      '跟进内容｜类型：长文本｜必填：是｜校验：非空｜说明：本次沟通事项，完成后不可改（历史留痕）。',
+      '客户反馈｜类型：长文本｜必填：否（计划中）/ 是（标记完成时）｜校验：标记完成必填｜说明：客户态度及意见。',
+      '跟进结果｜类型：枚举（已联系 / 待反馈 / 需求明确）｜必填：否｜校验：标记完成时可选，默认已联系｜说明：头部以标签展示。',
+      '下一步计划｜类型：长文本｜必填：否｜校验：完成后可填写｜说明：下一次联系内容。',
+      '下次跟进时间｜类型：日期时间｜必填：否｜校验：完成后可设置｜说明：到期自动生成销售待办。',
+      '附件｜类型：文件（图片 / 文件 / 录音）｜必填：否｜校验：按权限控制查看｜说明：占位卡片展示，正式版支持上传与预览。',
+      '签到信息｜类型：结构（地址 / 时间 / 经纬度 / 照片）｜必填：否｜校验：仅拜访类｜说明：完成时若无记录则按客户区域生成占位签到。'
+    ],
+    rules: [
+      '「标记完成」仅对状态为计划中的活动可用；完成后必须填写客户反馈，可补选跟进结果 / 下一步计划 / 下次跟进时间。',
+      '拜访类完成时若无签到记录则自动按客户所在地区生成签到占位数据。',
+      '取消活动原因必填；作废以逻辑取消保留记录与操作人（4.3）。',
+      '所有状态变化写入操作日志（store.ext.logs），含操作人（张三）与时间（第十四章操作日志验收）。'
+    ],
+    flow: [
+      '计划中 →（标记完成：客户反馈必填，记录跟进结果 / 下一步计划 / 下次跟进时间）→ 已完成。',
+      '计划中 →（取消：原因必填）→ 已取消（记录保留）。',
+      '下次跟进时间到期 → 自动生成销售待办提醒（5.11）。'
+    ],
+    errors: [
+      '活动编号不存在：空态并引导返回列表。',
+      '标记完成未填写客户反馈：弹窗校验拦截。',
+      '取消未填原因：校验拦截。',
+      '关联商机或联系人被作废：对应链接置灰提示，不产生断链。',
+      '负责人离职转交后：历史记录对原负责人保持只读且不变（第十二章「客户负责人离职」）。',
+      '附件越权查看：正式版后端拦截并记录安全日志（第三章、第十二章「用户越权操作」）。'
+    ],
+    api: [
+      '活动详情查询接口（按编号）。',
+      '标记完成接口：带客户反馈 / 跟进结果 / 下一步计划 / 下次跟进时间，服务端校验状态合法（示例）。',
+      '取消接口：写取消原因与操作日志（示例）。',
+      '签到信息查询接口（拜访类，示例）。'
+    ],
+    accept: [
+      '各卡片数据与该活动自身数据一致，不与其他活动串用（AGENTS 数据隔离约定）。',
+      '标记完成后状态、客户反馈、跟进结果、日志即时更新；完成后不可再标记或取消。',
+      '附件卡与签到卡按活动类型正确显示；无控制台报错。'
+    ]
+  },
+
+  /* ---------- 5.12 服务工单管理 + 6.6 售后流程 ---------- */
+  service: {
+    name: '服务工单', module: '服务管理',
+    goal: '按 5.12 管理售后支持、客户投诉、故障报修和服务请求：以「客户提交 → 客服受理 → 指派处理人 → 问题处理 → 解决确认 → 客户评价 → 工单关闭」七步流程驱动，SLA 服务时限超时标红预警，全链路留痕（受理 / 指派 / 转派 / 处理 / 解决确认 / 评价），形成客户服务档案并支撑复购经营（6.6）。',
+    roles: [
+      '菜单：客服 / 交付经左侧导航「服务管理 → 服务工单」进入（路由 /service）；销售经理可查看名下客户工单；管理员全量（第三章菜单权限）。',
+      '按钮：客服拥有「新建工单 / 导出」与详情页「受理 / 指派处理人 / 转派 / 处理 / 解决确认 / 客户评价并关闭 / 退回」；客户确认与评价由客服代录入；新建不可直接指派绕过受理（4.3 状态变化不得绕过流程）。',
+      '数据：客服按授权客户与处理组查看工单，销售经理看本人客户工单，管理员看全部（第三章数据权限）。',
+      '字段：客户联系方式、电话等敏感字段按角色脱敏；附件图片按权限查看（第三章字段权限、5.12）。'
+    ],
+    enter: [
+      '入口：左侧导航「服务管理 → 服务工单」，路由 /service。',
+      '关联入口：客户详情「服务」Tab、移动端服务工单屏、交付项目详情关联跳转。',
+      '跳转：点击工单编号进入 /ticket/:no；客户名称进入 /customer/:no。'
+    ],
+    layout: [
+      '顶部：面包屑 + 页面标题 + 「服务工单共 N 张」真实总数（4.2 页面顶部：名称 / 面包屑 / 总数）。',
+      '统计卡：工单总数、待受理（含待分派）、处理中、SLA 超时、待客户确认，全部由数据实算（4.2 统计卡片）。',
+      '筛选区：关键词 / 工单类型 / 问题等级 / 状态（七态）/ 处理人（4.2 查询区域）。',
+      '表格：工单编号、客户、工单类型、问题等级、问题描述、提交时间、联系人、处理人、当前状态、解决时间、满意度、SLA（超时标红与剩余时间）（5.12 列表字段 + 4.2 数据表格）。',
+      '操作区域：新建工单 / 导出；行操作：查看 / 受理（待受理与待分派）（4.2 操作区域与行操作）。',
+      '新建工单弹窗：工单类型、问题等级、客户（联系人联动）、问题描述与 SLA 提示；保存后状态「待受理」。'
+    ],
+    fields: [
+      '工单编号｜类型：文本｜必填：是｜校验：系统生成 GD-年月-序号，全库唯一｜说明：5.12「工单编号」，点击进入工单详情。',
+      '客户名称｜类型：关联对象（客户）｜必填：是｜校验：必须关联有效客户，流失客户不可建单｜说明：5.12「客户名称」，点击进入客户详情。',
+      '关联联系人｜类型：关联对象（联系人）｜必填：否｜校验：选项随客户联动｜说明：5.12 页面要素「客户和联系人信息」，评价记录以联系人名义落档。',
+      '工单类型｜类型：枚举（故障报修 / 服务请求 / 咨询 / 投诉）｜必填：是｜校验：必须命中枚举｜说明：5.12「工单类型」，决定统计口径与 SLA 预警策略。',
+      '问题等级｜类型：枚举（紧急 / 高 / 中 / 低）｜必填：是｜校验：必须命中枚举｜说明：5.12「问题等级」+ 页面要素「问题分类及优先级」，紧急 2h / 高 4h / 中 24h / 低 48h 决定 SLA 时限。',
+      '问题描述｜类型：长文本｜必填：是｜校验：非空｜说明：5.12「问题描述」+ 页面要素「问题描述、图片、附件」，图片在详情展示。',
+      '提交时间｜类型：日期时间｜必填：是｜校验：系统写入｜说明：5.12「提交时间」，SLA 起算点。',
+      '处理人｜类型：人员｜必填：否（待受理 / 待分派为空）｜校验：指派后写入，可转派并留记录｜说明：5.12「处理人」+ 页面要素「处理人和协同人员」。',
+      '当前状态｜类型：枚举（待受理 / 待分派 / 处理中 / 待客户确认 / 已解决 / 已关闭 / 已退回）｜必填：是｜校验：状态仅由流程操作产生，不可手改（4.3）｜说明：5.12 工单状态全集与标签。',
+      '解决时间｜类型：日期时间｜必填：否｜校验：客户解决确认时系统写入｜说明：5.12「解决时间」，SLA 达成考核依据。',
+      '满意度｜类型：枚举（1-5 星）｜必填：否（已解决前）/ 是（关闭时）｜校验：未选满意度不得关闭工单｜说明：5.12「满意度」+ 页面要素「客户确认及评价」。',
+      'SLA 服务时限｜类型：系统计算｜必填：是｜校验：提交时间 + 问题等级时长｜说明：5.12 页面要素「SLA 服务时限」，超时红色预警。',
+      '处理记录｜类型：数组（时间 / 操作人 / 动作 / 说明）｜必填：是（每次操作追加）｜校验：只可新增不可删改｜说明：5.12 页面要素「工单处理记录」「工单转派和升级记录」。',
+      '解决方案｜类型：长文本｜必填：否｜校验：处理说明必填后生成｜说明：5.12 页面要素「解决方案」，取最近一次处理记录摘要。'
+    ],
+    rules: [
+      '列表数据来自 store.ext.tickets，真分页，total 取过滤后真实条数，统计卡与总数由数据实算（4.2）。',
+      'SLA 超时规则：未解决 / 未关闭且当前时间已过 SLA 截止时间的工单，SLA 列标红并持续预警（5.12 超时提醒）。',
+      '新建工单默认「待受理」，处理人留空；不允许新建时直接指派绕过受理环节（4.3 状态变化规则）。',
+      '每次状态流转、指派、转派都要写入处理记录（时间 / 操作人 / 动作 / 说明），且只可追加（5.12 处理记录、4.3）。',
+      '「客户评价并关闭」必须选择满意度 1-5 星，不评价不得关闭；满意度存档为后续客户经营与复购的依据（6.6 满意度汇总）。',
+      '重复问题识别：同类工单多次出现时提醒客户负责人并支持知识库沉淀——正式版要求，原型在文档列出口径（5.12）。'
+    ],
+    flow: [
+      '5.12 流程：客户提交 → 客服受理 → 指派处理人 → 问题处理 → 解决确认 → 客户评价 → 工单关闭；不满足退回条件时执行下一环节，不得跳步（4.3）。',
+      '状态流转：待受理 →（受理）→ 待分派 →（指派处理人）→ 处理中 →（处理，说明必填）→ 待客户确认 →（解决确认，记解决时间）→ 已解决 →（评价，满意度必选）→ 已关闭。',
+      '退回流：客户反馈未彻底解决时，待客户确认 / 已解决 / 已关闭 →（退回，原因必填）→ 已退回 →（处理）→ 待客户确认，形成升级 / 转交闭环（5.12 已退回状态、6.6「升级或转交」）。',
+      '升级流：问题等级为投诉或多次同类问题时通知主管与客户负责人（6.6 复购管理要求、5.12 工单升级——正式版推送，原型状态与等级支撑）。',
+      'SLA 与关闭后经营：工单关闭后汇总客户服务档案，支撑客户经营与复购机会识别（6.6「汇总客户服务档案」）。'
+    ],
+    errors: [
+      '工单重复提交：检测提示相似工单并允许关联已有工单——正式版要求，本页在文档列出口径，原型未实现相似识别（第十二章「工单重复提交」）。',
+      '客户投诉升级：根据问题等级通知主管和相关负责人（第十二章「客户投诉升级」）——原型页面等级与状态支撑，自动通知未实现。',
+      'SLA 超时：红色预警不阻断处理，超时计入考核统计（5.12 超时提醒）。',
+      '新建未选客户 / 未填描述 / 未选问题等级：必填校验拦截。',
+      '越权操作：非授权角色创建 / 受理 / 转派，正式版由后端拦截并记录安全日志（第十二章「用户越权操作」、第三章）。',
+      '筛选无结果：空态可重置（4.3）。'
+    ],
+    api: [
+      '工单分页查询接口：按照类型 / 问题等级 / 状态 / 处理人 / 时间区间过滤（4.2 查询区域）。',
+      '新建工单接口（含问题等级 → SLA 自动计算）。',
+      '受理 / 指派处理人 / 转派 / 处理 / 解决确认 / 客户评价关闭 / 退回接口：按 5.12 状态机校验流转合法性。',
+      '处理记录与解决时间 / 满意度查询接口（支撑十四「售后」验收）。',
+      '相似工单识别与知识库沉淀接口（正式版，示例）。'
+    ],
+    accept: [
+      '对应第十四章「售后：工单分配、处理、升级、关闭完整」：从待受理一条工单完整走「受理 → 指派 → 处理 → 解决确认 → 评价关闭」，每步状态与统计卡即时更新。',
+      '对应第十四章重点场景「客户提出投诉，系统分配工单、处理、升级及关闭」：投诉类工单可被受理指派、退回再处理、最终评价关闭，全程处理记录留痕（含操作人与时间）。',
+      'SLA 超时工单在列表标红且详情有红色预警，已解决 / 已关闭不再计 SLA。',
+      '解决时间仅在「解决确认」后写入且不再变化；满意度仅在「客户评价并关闭」后写入，1-5 星。',
+      '新建工单写入 store.ext.tickets 且在列表与详情即时可见；无控制台报错。'
+    ]
+  },
+  'ticket-detail': {
+    name: '工单详情', module: '服务管理',
+    goal: '按 5.12 / 6.6 呈现单个服务工单的完整受理-处理-确认-评价链条：问题等级 / 状态 / SLA 剩余或超时预警、客户与联系人信息、问题描述与图片附件、解决方案与处理记录时间线；支持受理、指派处理人、转派、处理、解决确认（记解决时间）、客户评价并关闭（记满意度）与退回，每一步真实改变状态并留痕。',
+    roles: [
+      '菜单：服务工单列表点击编号进入（/ticket/:no），客户详情 / 交付详情可跳入。',
+      '按钮：客服拥有「受理 / 指派处理人 / 转派 / 处理 / 解决确认 / 客户评价并关闭 / 退回」；待客户确认与已解决前的客户确认由客服代录入（4.3 按钮权限）。',
+      '数据：详情读取该工单自身对象，处理记录 / 图片不与其他工单串用。',
+      '字段：客户联系电话等敏感字段按角色脱敏（第三章字段权限）。'
+    ],
+    enter: [
+      '入口：服务工单列表点击工单编号。',
+      '关联入口：客户详情「服务」Tab、移动端工单详情同源。',
+      '返回：面包屑回 /service。'
+    ],
+    layout: [
+      '头部：面包屑 + 工单号 + 工单类型 / 问题等级 / 当前状态标签 + SLA 剩余或超时提示 + 操作按钮组（按状态动态显示）。',
+      '左列：问题描述卡（含图片附件占位与「解决方案」摘要）+ 处理记录时间线（时间 / 操作人 / 动作 / 说明，含受理、指派处理人、转派、处理、解决确认、客户评价、退回）。',
+      '右列：SLA 与工单信息卡（SLA 状态 / 截止 / 工单类型 / 问题等级 / 处理人 / 提交时间 / 解决时间 / 满意度）+ 客户与联系人卡。'
+    ],
+    fields: [
+      '工单编号｜类型：文本｜只读｜校验：全库唯一｜说明：详情主键。',
+      '问题等级｜类型：枚举（紧急 / 高 / 中 / 低）｜必填：是｜校验：命中枚举｜说明：决定 SLA 时限 2/4/24/48 小时（5.12 问题等级）。',
+      '当前状态｜类型：枚举（待受理 / 待分派 / 处理中 / 待客户确认 / 已解决 / 已关闭 / 已退回）｜必填：是｜校验：只可由操作流转｜说明：决定各操作按钮显隐（5.12 状态全集）。',
+      '处理人｜类型：人员｜必填：否｜校验：指派 / 转派后写入｜说明：转派更新处理人并留记录（5.12 转派记录）。',
+      'SLA 截止时间｜类型：日期时间｜必填：是｜校验：提交时间 + 问题等级时长｜说明：超时红色预警。',
+      '解决时间｜类型：日期时间｜必填：否｜校验：客户解决确认时写入，不再变化｜说明：5.12「解决时间」。',
+      '满意度｜类型：枚举（1-5 星）｜必填：否（关闭前）/ 是（关闭时）｜校验：未选不得关闭｜说明：5.12「满意度」。',
+      '处理记录｜类型：数组（时间 / 操作人 / 动作 / 说明）｜必填：是（每次操作）｜校验：只可追加不可删改｜说明：5.12 页面要素「工单处理记录」。',
+      '解决方案｜类型：长文本｜必填：否｜校验：取最近一次处理记录｜说明：5.12 页面要素「解决方案」。'
+    ],
+    rules: [
+      '「受理」仅对待受理可用：待受理 → 待分派，写受理记录（5.12 流程第 2 步）。',
+      '「指派处理人」仅对待分派可用：必须选择处理人 → 处理中，写指派记录（5.12 流程第 3 步）。',
+      '「处理」对处理中 / 已退回可用：处理说明必填 → 待客户确认；已退回工单重新处理后进入待客户确认。',
+      '「解决确认」仅对待客户确认可用：客户确认问题已解决 → 已解决并写入解决时间（5.12 流程第 5 步）。',
+      '「客户评价并关闭」仅对已解决可用：满意度 1-5 星必选 → 已关闭并写评价记录（5.12 流程第 6-7 步）。',
+      '「退回 / 重新打开」对已关闭 / 已解决 / 待客户确认可用：退回原因必填 → 已退回（5.12 状态、6.6 升级或转交）；「转派」需选择新处理人并写转派记录。'
+    ],
+    flow: [
+      '待受理 → 待分派 → 处理中 → 待客户确认 → 已解决 → 已关闭；已退回为退回态，处理后重新进入待客户确认。',
+      '所有状态变更、指派与转派都追加处理记录，时间线可回溯（第十四章操作日志验收）。',
+      'SLA：已解决 / 已关闭不再倒计时；其余状态按截止时间实时显示剩余或超时。'
+    ],
+    errors: [
+      '工单编号不存在：空态并引导返回列表。',
+      '未填处理说明直接确认：校验拦截；未选满意度直接关闭：校验拦截；退回未填原因：校验拦截。',
+      '工单重复提交 / 相似工单关联：正式版在列表或详情提示（第十二章「工单重复提交」，原型未实现识别）。',
+      '投诉升级通知：根据问题等级通知主管与负责人（第十二章「客户投诉升级」，自动通知未实现）。',
+      'SLA 已超时：头部红色预警且不阻断处理。',
+      '越权操作工单：正式版后端拦截并记录安全日志（第十二章「用户越权操作」）。'
+    ],
+    api: [
+      '工单详情查询接口（按编号，含处理记录与图片数量）。',
+      '受理 / 指派处理人 / 转派 / 处理 / 解决确认 / 客户评价关闭 / 退回接口（状态机校验，示例）。',
+      '处理记录追加接口（只增不改）。',
+      'SLA 计算接口：剩余 / 超时时长。'
+    ],
+    accept: [
+      '对应第十四章「售后：工单分配、处理、升级、关闭完整」：详情页按状态机逐步流转，每步状态、处理人、处理记录、解决时间、满意度即时更新。',
+      'SLA 剩余 / 超时显示正确，已解决 / 已关闭显示「-」。',
+      '完整走过「受理 → 指派 → 处理 → 解决确认 → 评价关闭」后，状态 / 解决时间 / 满意度 / 处理记录与列表、统计卡一致。',
+      '无控制台报错。'
+    ]
+  },
+
+  /* ---------- 5.13 交付管理 ---------- */
+  delivery: {
+    name: '交付项目', module: '交付管理',
+    goal: '按 5.13 把成交后的交付纳入 CRM 业务闭环：以「合同生效 → 创建交付项目 → 分配项目经理 → 制定计划 → 任务实施 → 阶段验收 → 最终验收 → 项目归档」流程跟踪实施进度，通过里程碑驱动进度自算与验收状态，及时发现延期与风险项目，保证交付过程可追溯（第十四章「交付：任务、里程碑和验收记录完整」）。',
+    roles: [
+      '菜单：交付 / 实施人员经左侧导航「交付管理 → 交付项目」进入（路由 /delivery）；实施人员可查看已分配客户的合同、订单及交付任务（第三章角色与菜单权限）。',
+      '按钮：项目经理与交付 / 客服角色可「完成下一里程碑」并逐个标记里程碑；销售经理查看团队客户项目进度与风险；管理员全量维护（4.3 按钮权限）。',
+      '数据：实施人员按分配查看交付项目与客户；销售经理（本部门及下级）；管理员全部（第三章数据权限）。',
+      '字段：合同 / 订单金额等财务信息按角色脱敏（第三章字段权限）。'
+    ],
+    enter: [
+      '入口：左侧导航「交付管理 → 交付项目」，路由 /delivery。',
+      '关联入口：订单详情「交付 / 交付征服」Tab、合同详情、客户详情「交付」Tab 链接（5.13 合同生效后派生）。',
+      '跳转：点击项目编号进入 /delivery/:no；客户 / 订单 / 合同编号可点击进入详情（4.3 关联对象）。'
+    ],
+    layout: [
+      '顶部：面包屑 + 页面标题 + 「交付项目共 N 个」真实总数。',
+      '统计卡：项目总数、实施中、延期预警、风险项目、已完成，全部由数据实算（4.2 统计卡片）。',
+      '筛选区：关键词 / 项目状态 / 验收状态 / 项目经理（4.2 查询区域）。',
+      '表格：项目编号、项目名称、客户、关联订单、关联合同、项目经理、计划开始日期、计划完成日期、进度、项目状态、验收状态、风险 + 行操作（查看 / 完成下一里程碑）（5.13 项目字段 + 4.2 数据表格）。',
+      '分页：真实分页（≥25 条样例数据、20/50/100 每页）。'
+    ],
+    fields: [
+      '项目编号｜类型：文本｜必填：是｜校验：系统生成 XM-年月-序号，全库唯一｜说明：5.13「项目编号」，点击进入项目详情。',
+      '客户名称｜类型：关联对象（客户）｜必填：是｜校验：与订单客户一致｜说明：5.13「客户名称」，点击进入客户详情。',
+      '合同｜类型：关联对象（合同）｜必填：是｜校验：须为生效 / 履约中合同的关联合同｜说明：5.13「合同」，交付项目来源于合同生效（交付流程第 1 步）。',
+      '订单｜类型：关联对象（订单）｜必填：是｜校验：与关联合同同链路｜说明：5.13「订单」，支撑合同-订单-交付链路核对（第十四章订单 / 交付验收）。',
+      '项目名称｜类型：文本｜必填：是｜校验：非空｜说明：5.13「项目名称」。',
+      '项目经理｜类型：人员｜必填：是｜校验：交付流程第 3 步分配｜说明：5.13「项目经理」，延期 / 风险提醒接收人。',
+      '计划开始日期｜类型：日期｜必填：是｜校验：开始 ≤ 完成｜说明：5.13「计划开始日期」。',
+      '计划完成日期｜类型：日期｜必填：是｜校验：完成 ≥ 开始；早于今日且未完成触发延期预警｜说明：5.13「计划完成日期」，第十二章「项目延期」触发预警并记录延期原因。',
+      '项目状态｜类型：枚举（未启动 / 实施中 / 验收中 / 已完成）｜必填：是｜校验：由里程碑推动流转，不可手改｜说明：5.13「项目状态」，对应交付流程「制定计划 → 任务实施 → 阶段验收」。',
+      '验收状态｜类型：枚举（未验收 / 阶段验收中 / 已验收）｜必填：是｜校验：由里程碑完成情况推导｜说明：对应交付流程「阶段验收 → 最终验收 → 项目归档」；全部里程碑完成 = 已验收。',
+      '项目进度｜类型：百分比｜必填：是｜校验：完成里程碑数 / 总里程碑数，系统重算，不可手改｜说明：里程碑驱动，保证进度真实可信。',
+      '风险提示｜类型：长文本｜必填：否｜校验：非空即视为风险项目标红｜说明：5.13 页面要素「风险和问题」。'
+    ],
+    rules: [
+      '列表数据来自 store.ext.deliveries，真分页，total 由过滤后真实条数计算，统计卡实算（4.2）。',
+      '进度由里程碑完成情况自动重算，完成后不可回退；里程碑全部完成后项目状态自动「已完成」且验收状态「已验收」。',
+      '延期预警规则：项目状态非「已完成」且计划完成日期早于今日的，统计卡与列表 / 详情红色预警（第十二章「项目延期」）。',
+      '关联合同可点击进入合同详情，交付项目由订单派生并回填关联合同（5.13 项目字段）。',
+      '里程碑标记完成后写实施记录与操作日志（操作人 + 时间，第十四章操作日志验收）。'
+    ],
+    flow: [
+      '交付流程（5.13）：合同生效 → 创建交付项目 → 分配项目经理 → 制定计划 → 任务实施 → 阶段验收 → 最终验收 → 项目归档。',
+      '项目状态流转：未启动 → 实施中 → 验收中 → 已完成（里程碑驱动，状态不可手改，4.3）。',
+      '验收状态流转：未验收 → 阶段验收中（部分里程碑完成）→ 已验收（全部里程碑完成 = 最终验收，最终验收后进入归档）。',
+      '延期流：计划完成日期过期且未完成 → 红色预警 + 通知项目经理（正式版定时任务推送，原型实时计算）；恢复期限前须重新排期。'
+    ],
+    errors: [
+      '项目延期：触发预警并记录延期原因（第十二章「项目延期」）——预警已实现，延期原因登记栏原型未提供单独字段。',
+      '里程碑并发修改：提示刷新，避免覆盖他人操作。',
+      '项目不存在：空态并引导返回列表。',
+      '关联合同已终止或作废：项目仍可查看但显示提示，不再推进新验收（4.3、第十二章合同终止）。',
+      '越权操作（非交付角色标记里程碑等）：正式版后端拦截并记录安全日志（第十二章「用户越权操作」）。',
+      '筛选无结果：空态可重置。'
+    ],
+    api: [
+      '交付项目分页查询接口（按项目状态 / 验收状态 / 项目经理 / 客户 / 关键词）。',
+      '里程碑完成状态更新接口（含进度与验收状态重算）。',
+      '项目延期预警接口（按计划完成日期计算，正式版定时推送）。',
+      '由合同 / 订单创建交付项目接口（交付流程第 1-2 步，原型由订单派生数据演示）。'
+    ],
+    accept: [
+      '对应第十四章「交付：任务、里程碑和验收记录完整」：里程碑完成历史、进度百分比与验收状态可一致复算，进度 = 已完成里程碑 / 总数。',
+      '对应第十四章重点场景「从合同生成交付项目，完成任务和客户验收」：项目可从订单 / 合同链路下钻，逐个完成里程碑直至全部完成 → 已完成 + 已验收。',
+      '延期预警数字与「状态非已完成且计划完成日期 < 今日」的项目数一致。',
+      '每次里程碑变化写入操作日志与实施记录（操作人 + 时间）。',
+      '无控制台报错。'
+    ]
+  },
+  'delivery-detail': {
+    name: '交付项目详情', module: '交付管理',
+    goal: '按 5.13 呈现单个交付项目的实施全貌：项目基本信息（客户 / 合同 / 订单 / 项目经理 / 计划起止）、项目与验收状态、里程碑时间线与实施记录；项目经理逐一标记里程碑完成，进度与验收状态自动重算并留痕，风险与延期以红色预警提示（对应 5.13 页面要素：项目基本信息、里程碑、风险和问题、验收）。',
+    roles: [
+      '菜单：交付列表点击项目编号进入（/delivery/:no）；订单 / 合同 / 客户详情关联跳入。',
+      '按钮：项目经理与交付 / 客服可「标记里程碑完成 / 打印周报」；销售经理与实施人员只读查看进度与风险（第三章角色权限）。',
+      '数据：详情读取项目自身对象； milestones / 实施记录为该项目自有数据，不与其他项目串用。',
+      '字段：订单金额等按角色脱敏（第三章字段权限）。'
+    ],
+    enter: [
+      '入口：交付项目列表点击项目编号。',
+      '关联入口：订单详情「交付」Tab、客户详情「交付」Tab、合同详情',
+      '返回：面包屑回 /delivery。'
+    ],
+    layout: [
+      '头部：面包屑 + 项目编号 + 项目状态标签 + 验收状态标签 + 进度条 + 操作按钮（标记里程碑完成 / 打印周报）。',
+      '预警行：风险提示红色告警（无风险隐藏）；延期告警（计划完成日期过期，第十二章「项目延期」）；正常进行中的里程碑提示。',
+      '页签「里程碑时间线」：逐项里程碑（名称 / 计划日期 / 未开始 / 进行中 / 已完成）与「标记完成」操作；页签「实施记录」：时间 / 操作人 / 事项追加流；页签「关联订单与客户」：关联订单、关联合同、订单金额、客户、项目经理、计划开始 / 完成日期、项目状态、验收状态。',
+      '对应 5.13 页面要素：实施计划 / 任务列表 / 项目成员 / 客户沟通记录 / 交付文档 / 验收材料 / 交付总结为正式版扩展，原型以里程碑与实施记录两个页签承载核心信息。'
+    ],
+    fields: [
+      '项目编号 / 项目名称 / 客户名称｜类型：文本｜必填：是｜校验：非空｜说明：5.13 项目字段，头部与描述展示。',
+      '合同 / 订单｜类型：关联对象｜必填：是｜校验：可点击跳转｜说明：5.13「合同 / 订单」，交付链路核对。',
+      '项目经理｜类型：人员｜必填：是｜校验：指定｜说明：里程碑完成写入实施记录的人。',
+      '计划开始日期 / 计划完成日期｜类型：日期｜必填：是｜校验：开始 ≤ 完成｜说明：5.13 项目字段，延期判断依据。',
+      '项目状态｜类型：枚举（未启动 / 实施中 / 验收中 / 已完成）｜必填：是｜校验：里程碑驱动流转｜说明：头部标签。',
+      '验收状态｜类型：枚举（未验收 / 阶段验收中 / 已验收）｜必填：是｜校验：按里程碑推导｜说明：头部标签，全部里程碑完成 → 已验收。',
+      '里程碑｜类型：结构（名称 / 日期 / 状态）｜必填：是｜校验：仅未开始 / 进行中可标记，完成后锁定不可回退｜说明：5.13 页面要素「里程碑」。',
+      '项目进度｜类型：百分比｜必填：是｜校验：完成里程碑数 / 总数，自动重算｜说明：头部进度条。',
+      '实施记录｜类型：数组（时间 / 记录人 / 事项）｜必填：是（每次操作追加）｜校验：只增不改｜说明：5.13 页面要素「客户沟通记录 / 交付总结」的原型载体。',
+      '风险提示｜类型：长文本｜必填：否｜校验：非空即预警｜说明：5.13 页面要素「风险和问题」。'
+    ],
+    rules: [
+      '仅「未开始 / 进行中」里程碑可标记完成，完成后状态锁定。',
+      '每次标记完成立即重算进度与验收状态，并追加实施记录与操作日志（操作人 + 时间）。',
+      '里程碑全部完成后项目状态自动「已完成」、验收状态自动「已验收」。',
+      '风险提示与延期告警相互独立：风险为文本，延期为日期比较，二者都可红警。'
+    ],
+    flow: [
+      '里程碑：未开始 / 进行中 →（标记完成）→ 已完成（锁定）。',
+      '项目：未启动 → 实施中 → 验收中 → 已完成（5.13 交付流程「任务实施 → 阶段验收 → 最终验收」）。',
+      '验收状态：未验收 → 阶段验收中 → 已验收 →（最终验收后进入项目归档，正式版归档操作，原型状态页签承载）。'
+    ],
+    errors: [
+      '项目编号不存在：空态并引导返回。',
+      '重复标记完成：提示该里程碑已完成，锁定不可回退。',
+      '关联合同已终止：仍可查看但显示提示，不再推进新验收。',
+      '里程碑并发修改：提示刷新。',
+      '越权标记里程碑：正式版后端拦截并记录安全日志（第十二章「用户越权操作」）。'
+    ],
+    api: [
+      '项目详情查询接口（按编号，含里程碑与实施记录）。',
+      '里程碑状态更新接口（进度与验收状态重算、实施记录追加，示例）。',
+      '风险与延期预警查询接口（示例）。'
+    ],
+    accept: [
+      '对应第十四章「交付：任务、里程碑和验收记录完整」：标记里程碑完成后，进度条、验收状态、实施记录、操作日志即时一致更新并可复算。',
+      '里程碑、客户、订单、合同链接正确，且里程碑全部完成后项目状态与验收状态自动归位（已完成 + 已验收）。',
+      '风险 / 延期红色预警正确显示，无风险且未逾期时隐藏。',
+      '无控制台报错。'
+    ]
+  }
+};
+
+Object.entries(PZ_DOC_S9_CFG).forEach(([k, c]) => { DOCS_DEFAULT[k] = mkDoc(k, c); });
 
 const App = {
   components: { DocPanel },
