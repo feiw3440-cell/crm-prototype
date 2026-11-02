@@ -550,12 +550,13 @@ const CUSTOMERS_INIT = [
 
 /* ===== 商机与阶段（方案 5.5 / 6.3） ===== */
 const STAGES = [
-  { key: 'contact', name: '初步接触', prob: 10, ratio: 100, color: '#6b8fc9', total: 8, amount: 1560000 },
-  { key: 'need', name: '需求确认', prob: 25, ratio: 80, color: '#4b78bd', total: 10, amount: 2380000 },
-  { key: 'plan', name: '方案沟通', prob: 45, ratio: 60, color: '#2f62b0', total: 8, amount: 1920000 },
-  { key: 'quote', name: '报价谈判', prob: 65, ratio: 40, color: '#1f4e9c', total: 6, amount: 1680000 },
-  { key: 'approve', name: '商务审批', prob: 85, ratio: 25, color: '#163b7a', total: 4, amount: 960000 },
-  { key: 'close', name: '赢单 / 输单', prob: 100, ratio: 15, color: '#0f2a57', total: 5, amount: 830000 },
+  /* prob = 默认赢率（原型假设，待业务确认）；funnelWidth = 漏斗图展示宽度，不代表转化率或赢率 */
+  { key: 'contact', name: '初步接触', prob: 10, funnelWidth: 100, color: '#6b8fc9', total: 8, amount: 1560000 },
+  { key: 'need', name: '需求确认', prob: 25, funnelWidth: 80, color: '#4b78bd', total: 10, amount: 2380000 },
+  { key: 'plan', name: '方案沟通', prob: 45, funnelWidth: 60, color: '#2f62b0', total: 8, amount: 1920000 },
+  { key: 'quote', name: '报价谈判', prob: 65, funnelWidth: 40, color: '#1f4e9c', total: 6, amount: 1680000 },
+  { key: 'approve', name: '商务审批', prob: 85, funnelWidth: 25, color: '#163b7a', total: 4, amount: 960000 },
+  { key: 'close', name: '赢单 / 输单', prob: 100, funnelWidth: 15, color: '#0f2a57', total: 5, amount: 830000 },
 ];
 const STAGE_RULES = {
   need: { title: '需求确认', fields: [
@@ -932,10 +933,10 @@ const DOC_PAGES = {
   'opps-board': {
     name: '商机看板', module: '商机管理',
     goal: '以销售阶段看板可视化商机推进：拖拽变更阶段、直观观察分布与金额重心，及时发现停滞商机。',
-    roles: ['销售：操作本人负责商机，拖拽或点击推进相邻阶段', '销售经理：查看全部团队商机，调整归属并介入停滞商机', '管理员：配置阶段概率与阶段门规则'],
+    roles: ['销售：操作本人负责商机，拖拽或点击推进相邻阶段', '销售经理：查看全部团队商机，调整归属并介入停滞商机', '管理员：配置阶段默认赢率与阶段门规则（默认赢率为原型假设，待业务确认，与漏斗展示宽度无关）'],
     enter: ['左侧导航「商机管理 → 商机看板」，路由 /opps', '客户详情商机 Tab 的「去看板」链接；商机列表右上角切换到看板视图'],
     layout: ['顶部：面包屑 + 商机看板标题 + 跟进中商机总数 + 看板/列表视图切换 + 新建商机', '统计卡：跟进中商机、商机预计金额、本月预计成交、停滞商机、已赢单/已输单', '筛选区：关键词、负责人、来源、类型；重置按钮', '六列看板：初步接触 / 需求确认 / 方案沟通 / 报价谈判 / 商务审批 / 赢单·输单，列头显示数量与阶段金额，卡片显示商机名、客户、来源/类型/联系人、金额、停滞标签、预计成交日期与负责人', '阶段推进弹窗：展示当前阶段→目标阶段、阶段门必填项与系统检查项、变更备注，不满足时禁止推进'],
-    fields: ['商机编号｜类型：自动编号｜必填：是｜校验：SJ-年月-序号全局唯一｜说明：点击卡片进入商机详情。', '商机名称｜类型：文本｜必填：是｜校验：非空｜说明：看板卡片主标题。', '关联客户｜类型：客户档案｜必填：是｜校验：必须为有效客户｜说明：客户名称可点击进入客户详情。', '预计金额｜类型：货币｜必填：是｜校验：大于 0｜说明：看板列金额与统计卡按该字段汇总。', '当前阶段｜类型：枚举（初步接触/需求确认/方案沟通/报价谈判/商务审批/赢单·输单）｜必填：是｜校验：按流程相邻推进，不可跳跃｜说明：拖拽或「推进」触发阶段门。', '成交概率｜类型：百分比｜必填：是｜校验：随阶段自动映射｜说明：列表视图与商机详情展示。', '预计成交日期｜类型：日期｜必填：是｜校验：不早于当前日期｜说明：本月预计成交统计依据。', '负责人｜类型：人员｜必填：是｜校验：数据权限内销售｜说明：离职时商机随客户转交（第十二章）。', '停滞标签｜类型：系统标签｜必填：否｜校验：超期未推进自动标记｜说明：停滞商机提醒负责人与经理（7.3 商机停滞提醒）。'],
+    fields: ['商机编号｜类型：自动编号｜必填：是｜校验：SJ-年月-序号全局唯一｜说明：点击卡片进入商机详情。', '商机名称｜类型：文本｜必填：是｜校验：非空｜说明：看板卡片主标题。', '关联客户｜类型：客户档案｜必填：是｜校验：必须为有效客户｜说明：客户名称可点击进入客户详情。', '预计金额｜类型：货币｜必填：是｜校验：大于 0｜说明：看板列金额与统计卡按该字段汇总。', '当前阶段｜类型：枚举（初步接触/需求确认/方案沟通/报价谈判/商务审批/赢单·输单）｜必填：是｜校验：按流程相邻推进，不可跳跃｜说明：拖拽或「推进」触发阶段门。', '赢率｜类型：百分比｜必填：是｜校验：随阶段自动映射（默认赢率 10/25/45/65/85，关闭后赢单 100/输单 0；默认赢率为原型假设，待业务确认）｜说明：列表视图与商机详情展示。', '预计成交日期｜类型：日期｜必填：是｜校验：不早于当前日期｜说明：本月预计成交统计依据。', '负责人｜类型：人员｜必填：是｜校验：数据权限内销售｜说明：离职时商机随客户转交（第十二章）。', '停滞标签｜类型：系统标签｜必填：否｜校验：超期未推进自动标记｜说明：停滞商机提醒负责人与经理（7.3 商机停滞提醒）。'],
     rules: ['阶段只能按流程推进到相邻阶段，禁止跳阶段与直接赢单；回退需提交「阶段回退」申请并填写原因（4.3）。', '进入目标阶段前必须通过阶段门检查：补全必填项并满足系统检查项，任一不满足即拦截并提示（5.5）。', '拖拽目标阶段非法时卡片回弹并提示；阶段变化写入商机历史（变更前后阶段、变更人、时间、备注）。', '同一视觉切片（全部/我的）统计一致；作废需填写原因并记录日志。'],
     flow: ['阶段流转：初步接触 → 需求确认 → 方案沟通 → 报价谈判 → 商务审批 → 赢单/输单；每次推进通过阶段门后写入历史。', '赢单/输单：进入 close 时赢单填合同或订单依据，输单必须填写输单原因与竞争对手；结束后归档不可再推进。', '停滞流转：超过一段时间未推进 → 标记停滞并通知负责人与经理 → 经理介入或调整阶段（7.3）。'],
     errors: ['拖拽目标阶段非法或跳阶段：回弹并提示，不写入变更。', '阶段门必填项或系统检查项未满足：禁止推进并逐项标红。', '卡片被他人并发修改：刷新提示，避免覆盖他人变更。', '商机已赢单/输单：推进按钮禁用，禁止再次变更阶段。'],
@@ -947,8 +948,8 @@ const DOC_PAGES = {
     goal: '以表格方式管理全部商机：更侧重字段对比与批量操作，服务复盘与管理场景。',
     roles: ['销售：查看本人负责商机并推进阶段', '销售经理：查看团队全部商机、批量导出与阶段介入', '管理员：查看全部商机并维护阶段配置'],
     enter: ['左侧导航「商机管理 → 商机列表」，路由 /opps/list', '商机看板右上角「列表视图」切换'],
-    layout: ['顶部：面包屑 + 商机列表标题 + 跟进中商机总数 + 看板/列表切换 + 新建商机', '统计卡：跟进中商机、商机预计金额、本月预计成交、停滞商机、已赢单/已输单', '筛选区：关键词、负责人、来源、类型；重置按钮', '表格：商机编号、商机名称、关联客户、关联联系人、商机来源、商机类型、预计金额、当前阶段、成交概率、预计成交日期、负责人、操作', '底部：真实分页（20 条/页）与总数文案'],
-    fields: ['商机编号｜类型：自动编号｜必填：是｜校验：全局唯一｜说明：点击进入商机详情。', '商机名称｜类型：文本｜必填：是｜校验：非空｜说明：列表主字段。', '关联客户｜类型：客户档案｜必填：是｜校验：必须为有效客户｜说明：客户名称可点击进入详情。', '关联联系人｜类型：联系人｜必填：否｜校验：必须属于关联客户｜说明：辅助联系与决策链分析。', '商机来源｜类型：枚举（线索/客户转介绍/官网/渠道/活动/广告）｜必填：否｜校验：来自来源枚举｜说明：看板与列表共用筛选条件。', '商机类型｜类型：枚举（新购/续费/增购）｜必填：否｜校验：三选一｜说明：统计与筛选维度。', '预计金额｜类型：货币｜必填：是｜校验：大于 0｜说明：统计卡与金额列按分精确汇总。', '当前阶段｜类型：枚举｜必填：是｜校验：按流程相邻推进｜说明：显示阶段名或赢单/输单结果。', '成交概率｜类型：百分比｜必填：是｜校验：随阶段自动映射｜说明：以进度条展示。', '预计成交日期｜类型：日期｜必填：是｜校验：不早于当前日期｜说明：本月预计成交统计依据。', '负责人｜类型：人员｜必填：是｜校验：数据权限内销售｜说明：离职时商机随客户转交。'],
+    layout: ['顶部：面包屑 + 商机列表标题 + 跟进中商机总数 + 看板/列表切换 + 新建商机', '统计卡：跟进中商机、商机预计金额、本月预计成交、停滞商机、已赢单/已输单', '筛选区：关键词、负责人、来源、类型；重置按钮', '表格：商机编号、商机名称、关联客户、关联联系人、商机来源、商机类型、预计金额、当前阶段、赢率、加权预测金额、预计成交日期、负责人、操作', '底部：真实分页（20 条/页）与总数文案'],
+    fields: ['商机编号｜类型：自动编号｜必填：是｜校验：全局唯一｜说明：点击进入商机详情。', '商机名称｜类型：文本｜必填：是｜校验：非空｜说明：列表主字段。', '关联客户｜类型：客户档案｜必填：是｜校验：必须为有效客户｜说明：客户名称可点击进入详情。', '关联联系人｜类型：联系人｜必填：否｜校验：必须属于关联客户｜说明：辅助联系与决策链分析。', '商机来源｜类型：枚举（线索/客户转介绍/官网/渠道/活动/广告）｜必填：否｜校验：来自来源枚举｜说明：看板与列表共用筛选条件。', '商机类型｜类型：枚举（新购/续费/增购）｜必填：否｜校验：三选一｜说明：统计与筛选维度。', '预计金额｜类型：货币｜必填：是｜校验：大于 0｜说明：统计卡与金额列按分精确汇总。', '当前阶段｜类型：枚举｜必填：是｜校验：按流程相邻推进｜说明：显示阶段名或赢单/输单结果。', '赢率｜类型：百分比｜必填：是｜校验：随阶段自动映射（默认赢率 10/25/45/65/85，关闭后赢单 100/输单 0）｜说明：以进度条展示。', '预计成交日期｜类型：日期｜必填：是｜校验：不早于当前日期｜说明：本月预计成交统计依据。', '负责人｜类型：人员｜必填：是｜校验：数据权限内销售｜说明：离职时商机随客户转交。'],
     rules: ['列表与看板共用 store.opps 数据，同一视觉切片（全部/我的）统计一致（4.2）。', '筛选条件变化后分页回到第 1 页，统计卡与表格同步重算。', '推进阶段必须通过阶段门校验，禁止跳阶段、禁止直接赢单；变更写历史（5.4、5.5）。', '作废需填写原因并记录日志；批量操作未选中记录时按钮置灰。'],
     flow: ['状态流转：进行中 →（阶段门校验通过）→ 下一阶段 → 赢单/输单；结束后归档不可再推进。', '阶段回退：提交阶段回退申请并填写原因，不能直接拖回或直接修改状态。'],
     errors: ['筛选无结果：显示空态并允许重置筛选。', '批量操作未选中记录：按钮置灰并提示先勾选。', '阶段门未满足：禁止推进并逐项提示必填或系统检查项。', '商机已结束：推进按钮禁用。'],
@@ -2045,6 +2046,8 @@ const matchRoute = path => {
 };
 
 /* ===== 全局 mock 数据仓库（可交互修改） ===== */
+const stageProb = o => o.stage === 'close' ? (o.result === '赢单' ? 100 : 0) : (o.prob || 0);
+const wAmount = o => Math.round((o.amount || 0) * stageProb(o) / 100);
 const store = reactive({
   leads: JSON.parse(JSON.stringify(LEADS_INIT)),
   customers: JSON.parse(JSON.stringify(CUSTOMERS_INIT)).concat([
@@ -3141,21 +3144,23 @@ const AnalyticsDetailPage = {
         const xs = store.opps.filter(o => inM(o.date) && passO(o.owner) && passC(o.customer));
         const cnt = STAGES.map(s => xs.filter(o => o.stage === s.key).length);
         const amt = STAGES.map(s => Math.round(xs.filter(o => o.stage === s.key).reduce((x, o) => x + o.amount, 0)));
+        const wAmt = STAGES.map(s => xs.filter(o => o.stage === s.key && o.stage !== 'close').reduce((x, o) => x + wAmount(o), 0));
         const custs = new Set(xs.map(o => o.customer));
-        const shape = [100, 80, 60, 40, 25, 15];
+        const shape = STAGES.map(s => s.funnelWidth);
+        const wTotal = wAmt.reduce((a, b) => a + b, 0);
         return {
-          stats: [['商机总数', String(xs.length), ''], ['预计总金额', wanT(amt.reduce((a, b) => a + b, 0)), 'ok'], ['覆盖客户', String(custs.size), ''], ['报价后阶段占比', (xs.length ? Math.round(cnt[3] * 1000 / Math.max(1, xs.length)) / 10 : 0) + '%', 'warn']],
+          stats: [['商机总数', String(xs.length), ''], ['预计总金额', wanT(amt.reduce((a, b) => a + b, 0)), 'ok'], ['加权预测金额（未结束商机）', wanT(wTotal), 'ok'], ['覆盖客户', String(custs.size), '']],
           opt: {
-            tooltip: { trigger: 'item', formatter: q => '<b>' + q.name + '</b><br/>商机数量：' + cnt[q.dataIndex] + ' 个<br/>预计金额：' + wanT(amt[q.dataIndex]) },
+            tooltip: { trigger: 'item', formatter: q => '<b>' + q.name + '</b><br/>商机数量：' + cnt[q.dataIndex] + ' 个<br/>预计金额：' + wanT(amt[q.dataIndex]) + '<br/>加权预测金额：' + wanT(wAmt[q.dataIndex]) + '（= 预计金额 × 赢率，未结束商机计入）' },
             series: [{ type: 'funnel', left: '6%', right: '6%', top: 8, bottom: 8, min: 0, max: 100, minSize: '18%', sort: 'none', gap: 3,
               label: { show: true, position: 'inside', color: '#fff', fontSize: 12, formatter: q => q.name + '  ' + cnt[q.dataIndex] + ' 个 · ' + wanT(amt[q.dataIndex]) },
               data: STAGES.map((s, i) => ({ name: s.name, value: shape[i], itemStyle: { color: mixHex(pal[0], '#000000', .48 * i / 5) } })) }],
           },
-          note: '注：漏斗宽度为示意（100% → 15%），不代表真实转化率；数据取预计成交日期在筛选区间内的全部商机。',
-          rows: xs.slice().sort((a, b) => b.amount - a.amount),
+          note: '注：漏斗各段宽度仅按 funnelWidth（100%/80%/60%/40%/25%/15%）展示，不代表转化率、也不代表赢率；各阶段默认赢率为初步接触 10%、需求确认 25%、方案沟通 45%、报价谈判 65%、商务审批 85%、赢单 100%、输单 0%（原型假设，待业务确认）；加权预测金额 = ⌊预计金额 × 赢率 / 100⌋（按分计算），仅未结束商机（stage ≠ close）计入预测。数据取预计成交日期在筛选区间内的全部商机。',
+          rows: xs.slice().sort((a, b) => b.amount - a.amount).map(o => ({ ...o, wAmt: o.stage !== 'close' ? wAmount(o) : '—' })),
           cols: [{ p: 'no', l: '商机编号', w: 130, fmt: 'mono' }, { p: 'name', l: '商机名称', w: 200, fmt: 'link', to: 'opp' },
             { p: 'customer', l: '客户', w: 190, fmt: 'custName' }, { p: 'stage', l: '阶段', w: 100, fmt: 'tag', tagMap: STAGES.reduce((m, s) => (m[s.name] = 'primary', m), {}) },
-            { p: 'amount', l: '预计金额', w: 110, fmt: 'money' }, { p: 'owner', l: '负责人', w: 90 }, { p: 'date', l: '预计成交', w: 110 }],
+            { p: 'amount', l: '预计金额', w: 110, fmt: 'money' }, { p: 'wAmt', l: '加权预测金额', w: 120, fmt: 'money' }, { p: 'owner', l: '负责人', w: 90 }, { p: 'date', l: '预计成交', w: 110 }],
         };
       }
       /* --- 业绩目标达成 --- */
@@ -6795,14 +6800,15 @@ const MSBOppsScreen = {
     const filtered = computed(() => store.opps.filter(o => o.stage === st.value && (!kw.value.trim() || (o.name + o.customer + o.no).includes(kw.value.trim()))).sort((a, b) => b.amount - a.amount));
     const opened = computed(() => store.opps.filter(o => o.stage !== 'close').length);
     const amountSum = computed(() => filtered.value.reduce((s, o) => s + o.amount, 0));
-    return { kw, st, segs, filtered, MSB_stageName, mpush, money: msaMoney, opened, amountSum, prob: o => o.prob };
+    const wSum = computed(() => filtered.value.filter(o => o.stage !== 'close').reduce((s, o) => s + wAmount(o), 0));
+    return { kw, st, segs, filtered, MSB_stageName, mpush, money: msaMoney, opened, amountSum, wSum, prob: o => o.prob };
   },
   template: `<div class="m-page">
     <m-search v-model="kw" placeholder="搜索商机：名称 / 客户 / 编号"/>
     <div class="m-seg m-seg-scroll">
       <span v-for="s in segs" :key="s.k" :class="{on:st===s.k}" @click="st=s.k">{{ s.name }}<i v-if="s.n">{{ s.n }}</i></span>
     </div>
-    <div class="m-result-tip">跟进中商机 {{ opened }} 个 · 当前阶段预计金额 {{ amountSum ? money(amountSum / 10000 * 10000) : '¥0' }}</div>
+    <div class="m-result-tip">跟进中商机 {{ opened }} 个 · 当前阶段预计金额 {{ amountSum ? money(amountSum / 10000 * 10000) : '¥0' }}<template v-if="st !== 'close'"> · 加权预测 {{ wSum ? money(wSum) : '¥0' }}</template></div>
     <m-empty v-if="!filtered.length" text="该阶段暂无商机" icon="TrendCharts"/>
     <div class="m-card" v-else>
       <div class="m-list-item" v-for="o in filtered" :key="o.no" @click="mpush('opp-detail', {no:o.no})">
@@ -7732,11 +7738,12 @@ DOCS_DEFAULT['opp-detail'] = mkDoc('opp-detail', {
   layout: ['头部：商机名称 + 客户链接 + 金额 + 预计成交日期 + 负责人 + 阶段进度条 + 赢率 + 推进 / 赢单 / 输单按钮', 'Tab：基本信息 / 跟进记录 / 关联联系人 / 关联报价 / 关联合同 / 阶段变更历史 / 操作日志'],
   fields: [
     '商机编号｜文本｜只读｜格式：SJ-年月-序号',
-    '阶段｜枚举｜必填：是｜校验：仅能按相邻阶段推进，报价谈判前须有有效报价', '赢率｜百分比｜只读｜说明：随阶段自动映射（10–100）',
+    '阶段｜枚举｜必填：是｜校验：仅能按相邻阶段推进，报价谈判前须有有效报价', '赢率｜百分比｜只读｜说明：随阶段取默认赢率（初步接触 10%、需求确认 25%、方案沟通 45%、报价谈判 65%、商务审批 85%、赢单 100%、输单 0%；默认赢率为原型假设，待业务确认）',
     '预计金额｜货币｜必填：是｜校验：> 0',
+    '加权预测金额｜货币（计算）｜只读｜校验：= Math.round(预计金额 × 赢率 / 100)，按分计算｜说明：仅未结束商机（stage ≠ close）计入预测；漏斗图的 100%/80%/60%/40%/25%/15% 仅为展示宽度，不代表转化率或赢率。',
     '阶段必填信息｜按阶段｜推进时校验：需求确认 / 方案沟通 / 商务审批各有最少必填项',
   ],
-  rules: ['阶段推进需通过阶段门：必填项完整 + 系统校验（如报价谈判需有效报价、赢单需合同审批通过）', '禁止跳阶段与回退；回退需提交「阶段回退」申请', '输单必须填写输单原因；赢单自动将成交概率置 100'],
+  rules: ['阶段推进需通过阶段门：必填项完整 + 系统校验（如报价谈判需有效报价、赢单需合同审批通过）', '禁止跳阶段与回退；回退需提交「阶段回退」申请', '输单必须填写输单原因；赢单赢率置 100、输单赢率置 0，加权预测金额同步重算（= 预计金额 × 赢率，按分计算）'],
   flow: ['阶段流转：初步接触 → 需求确认 → 方案沟通 → 报价谈判 → 商务审批 → 赢单 / 输单', '每次变更记录：变更前后阶段、变更人、变更时间、备注'],
   errors: ['不满足阶段条件推进：校验弹窗标红缺失项并阻止', '输单未填原因：前端拦截'],
   api: ['商机详情查询、阶段变更接口 / 阶段门校验接口、报价与合同关联查询、跟进时间线查询（示例）'],
@@ -7797,7 +7804,7 @@ const OppDetailPage = {
       o.stage = gate.target; o.history = (o.history || []).concat([{ from, to: gate.target === 'close' ? o.result : STAGES[STAGE_IDX[gate.target]].name, by: '张三', time: TODAY + ' 16:00', remark: gate.remark || '-' }]);
       gate.show = false; ElMessage.success('阶段已变更：' + from + ' → ' + (gate.target === 'close' ? o.result : STAGES[STAGE_IDX[gate.target]].name) + '，变更记录已保留');
     };
-    return { opp, c, tab, stageName, stageTag, INFO_LABEL, infoRows, follows, quotesOf, contractsOf, ordersOf, filesOf, logs, gate, request, rule, sysOk, confirmMove, go, yuan, fmtC, fmtY, STAGES, STAGE_IDX };
+    return { opp, c, tab, stageName, stageTag, INFO_LABEL, infoRows, follows, quotesOf, contractsOf, ordersOf, filesOf, logs, gate, request, rule, sysOk, confirmMove, go, yuan, fmtC, fmtY, wAmount, STAGES, STAGE_IDX };
   },
   template: `<div v-if="opp">
     <el-breadcrumb separator="/" class="crumb"><el-breadcrumb-item><a @click="$go('/opps')">商机管理</a></el-breadcrumb-item><el-breadcrumb-item><a @click="$go('/opps/list')">商机列表</a></el-breadcrumb-item><el-breadcrumb-item>{{ opp.no }}</el-breadcrumb-item></el-breadcrumb>
@@ -7812,7 +7819,7 @@ const OppDetailPage = {
           <el-button size="small" :disabled="opp.stage==='close'" @click="request(opp, 'close'); gate.mode='lose'">标记输单</el-button>
         </div>
       </div>
-      <div class="sum-cards"><div class="sum-card"><div class="v">{{ yuan(opp.amount) }}</div><div class="l">预计金额</div></div><div class="sum-card"><div class="v">{{ opp.prob }}%</div><div class="l">赢率（按阶段）</div></div></div>
+      <div class="sum-cards"><div class="sum-card"><div class="v">{{ yuan(opp.amount) }}</div><div class="l">预计金额</div></div><div class="sum-card"><div class="v">{{ opp.prob }}%</div><div class="l">赢率（按阶段默认赢率）</div></div><div class="sum-card" :class="opp.stage!=='close' ? 'ok' : ''"><div class="v">{{ yuan(wAmount(opp) || 0) }}</div><div class="l">加权预测金额</div></div></div>
     </div>
     <div class="card card-pad">
       <el-steps :active="STAGE_IDX[opp.stage]+(opp.stage==='close'?1:0)" finish-status="success" align-center style="margin-bottom:18px"><el-step v-for="s in STAGES" :key="s.key" :title="s.name.replace(' / ','/')"/></el-steps>
@@ -7822,7 +7829,7 @@ const OppDetailPage = {
             <el-descriptions-item label="商机名称" :span="2">{{ opp.name }}</el-descriptions-item><el-descriptions-item label="负责人">{{ opp.owner }}</el-descriptions-item>
             <el-descriptions-item label="关联客户" :span="2"><a @click="$go('/customer/'+($cno(opp.customer)))">{{ opp.customer }}</a></el-descriptions-item><el-descriptions-item label="关联联系人">{{ opp.contact || '-' }}</el-descriptions-item>
             <el-descriptions-item label="商机来源">{{ opp.source || '-' }}</el-descriptions-item><el-descriptions-item label="商机类型">{{ opp.type || '-' }}</el-descriptions-item><el-descriptions-item label="预计金额">{{ yuan(opp.amount) }}</el-descriptions-item>
-            <el-descriptions-item label="预计成交日期">{{ opp.date }}</el-descriptions-item><el-descriptions-item label="当前阶段">{{ opp.stage === 'close' ? opp.result : stageName(opp.stage) }}</el-descriptions-item><el-descriptions-item label="成交概率">{{ opp.prob }}%</el-descriptions-item>
+            <el-descriptions-item label="预计成交日期">{{ opp.date }}</el-descriptions-item><el-descriptions-item label="当前阶段">{{ opp.stage === 'close' ? opp.result : stageName(opp.stage) }}</el-descriptions-item><el-descriptions-item label="赢率">{{ opp.prob }}%</el-descriptions-item><el-descriptions-item label="加权预测金额" :span="3">{{ opp.stage !== 'close' ? yuan(wAmount(opp) || 0) + '（预计金额 × 赢率，未结束商机计入预测）' : '—（已赢单/输单，不再计入预测）' }}</el-descriptions-item>
             <el-descriptions-item label="主要需求" :span="3">{{ opp.need || '-' }}</el-descriptions-item>
             <el-descriptions-item v-if="opp.loseReason" label="输单原因" :span="3">{{ opp.loseReason }}</el-descriptions-item>
             <el-descriptions-item v-if="opp.winReason" label="赢单原因" :span="3">{{ opp.winReason }}</el-descriptions-item>
@@ -7928,6 +7935,8 @@ const OppsPage = {
     const colAmount = key => store.opps.filter(o => o.stage === key).reduce((s, o) => s + o.amount, 0);
     const totalOpen = computed(() => STAGES.slice(0, 5).reduce((s, st) => s + colCount(st.key), 0));
     const totalAmt = computed(() => STAGES.slice(0, 5).reduce((s, st) => s + colAmount(st.key), 0));
+    const totalW = computed(() => store.opps.filter(o => o.stage !== 'close').reduce((s, o) => s + wAmount(o), 0));
+    const colW = key => store.opps.filter(o => o.stage === key).reduce((s, o) => s + wAmount(o), 0);
     const thisMonthAmount = computed(() => wan(store.opps.filter(o => o.stage !== 'close' && o.date >= TODAY.slice(0, 8) + '01' && o.date < '2026-12-01').reduce((s, o) => s + o.amount, 0)));
     const wonCount = computed(() => store.opps.filter(o => o.stage === 'close' && o.result === '赢单').length);
     const lostCount = computed(() => store.opps.filter(o => o.stage === 'close' && o.result === '输单').length);
@@ -7967,17 +7976,18 @@ const OppsPage = {
     const page = ref(1); const size = 20;
     const pagedRows = computed(() => listRows.value.slice((page.value - 1) * size, page.value * size));
     watch([owner, kw, source, type], () => { page.value = 1; });
-    return { owner, kw, source, type, SOURCES, TYPES, cards, colCards, colCount, colAmount, totalOpen, totalAmt, thisMonthAmount, wonCount, lostCount, stalled, dragNo, overKey, onDrop, gate, nextStage, request, rule, sysOk, confirmMove, stageName, stageTagType, listRows, pagedRows, page, size, STAGES, OWNERS, fmtY, yuan, wan, go, view: computed(() => props.view), STAGE_IDX };
+    return { owner, kw, source, type, SOURCES, TYPES, cards, colCards, colCount, colAmount, colW, totalOpen, totalAmt, totalW, thisMonthAmount, wAmount, wonCount, lostCount, stalled, dragNo, overKey, onDrop, gate, nextStage, request, rule, sysOk, confirmMove, stageName, stageTagType, listRows, pagedRows, page, size, STAGES, OWNERS, fmtY, yuan, wan, go, view: computed(() => props.view), STAGE_IDX };
   },
   template: `<div>
     <page-head :crumbs="['商机管理', view==='board' ? '商机看板' : '商机列表']" :title="view==='board' ? '商机看板' : '商机列表'" :total="'跟进中商机共 '+totalOpen+' 个'">
       <el-radio-group :model-value="view" @change="v => $go(v==='board'?'/opps':'/opps/list')"><el-radio-button label="board"><el-icon><grid/></el-icon> 看板视图</el-radio-button><el-radio-button label="list"><el-icon><list/></el-icon> 列表视图</el-radio-button></el-radio-group>
       <el-button type="primary" icon="Plus" @click="$msg.info('示例：新建商机（必须关联客户）')">新建商机</el-button>
     </page-head>
-    <div class="stat-row" style="grid-template-columns:repeat(5,1fr)">
+    <div class="stat-row" style="grid-template-columns:repeat(6,1fr)">
       <div class="stat-card"><span class="lb">跟进中商机</span><span class="vl">{{ totalOpen }}</span><span class="ft">初步接触 → 商务审批</span></div>
       <div class="stat-card"><span class="lb">商机预计金额</span><span class="vl">{{ wan(totalAmt) }}</span><span class="ft">不含已结束商机</span></div>
-      <div class="stat-card ok"><span class="lb">本月预计成交</span><span class="vl">{{ thisMonthAmount }}</span><span class="ft">按预计成交日期（未结束商机）</span></div>
+      <div class="stat-card" :class="thisMonthAmount ? 'ok' : ''"><span class="lb">本月预计成交</span><span class="vl">{{ thisMonthAmount }}</span><span class="ft">按预计成交日期（未结束商机）</span></div>
+      <div class="stat-card" :class="totalW ? 'ok' : ''"><span class="lb">加权预测金额合计</span><span class="vl">{{ wan(totalW) }}</span><span class="ft">Σ 预计金额 × 赢率（不含赢单/输单）</span></div>
       <div class="stat-card warn"><span class="lb">停滞商机</span><span class="vl">{{ stalled }}</span><span class="ft">超 7 天未推进，已提醒负责人与经理</span></div>
       <div class="stat-card"><span class="lb">已赢单 / 已输单</span><span class="vl">{{ wonCount }} / {{ lostCount }}</span><span class="ft">输单需填原因与竞争对手</span></div>
     </div>
@@ -7986,8 +7996,8 @@ const OppsPage = {
 
     <div v-if="view==='board'" class="kanban">
       <div class="kcol" :class="{over:overKey===s.key}" v-for="s in STAGES" :key="s.key" @dragover.prevent="overKey=s.key" @dragleave="overKey=''" @drop.prevent="onDrop(s.key)">
-        <div class="kcol-h"><b>{{ s.name }}</b><span class="cnt">{{ colCount(s.key) }}</span><span class="muted" style="margin-left:auto;font-size:12px">{{ s.key==='close' ? '本月' : '阶段示意 '+s.ratio+'%' }}</span></div>
-        <div class="kcol-sum">预计金额 {{ wan(colAmount(s.key)) }}</div>
+        <div class="kcol-h"><b>{{ s.name }}</b><span class="cnt">{{ colCount(s.key) }}</span><span class="muted" style="margin-left:auto;font-size:12px">{{ s.key==='close' ? '本月' : '漏斗展示宽度 '+s.funnelWidth+'%' }}</span></div>
+        <div class="kcol-sum">预计金额 {{ wan(colAmount(s.key)) }}<span v-if="s.key!=='close'"> · 加权预测 {{ wan(colW(s.key)) }}</span></div>
         <div class="kcard" v-for="o in colCards(s.key)" :key="o.no" draggable="true" @dragstart="dragNo=o.no" @click="go('/opp/'+o.no)">
           <div class="nm">{{ o.name }}</div><div class="cu">{{ o.customer }}</div>
           <div class="muted" style="font-size:12px;margin-top:2px">{{ o.source }} · {{ o.type }} · {{ o.contact }}</div>
@@ -8011,7 +8021,8 @@ const OppsPage = {
       <el-table-column prop="type" label="商机类型" min-width="90"/>
       <el-table-column label="预计金额" min-width="120" align="right"><template #default="{row}"><span class="money">{{ yuan(row.amount) }}</span></template></el-table-column>
       <el-table-column label="当前阶段" min-width="110"><template #default="{row}"><el-tag size="small" :type="stageTagType(row)">{{ row.stage==='close' ? row.result : stageName(row.stage) }}</el-tag></template></el-table-column>
-      <el-table-column label="成交概率" min-width="130"><template #default="{row}"><el-progress :percentage="row.prob" :stroke-width="6"/></template></el-table-column>
+      <el-table-column label="赢率" min-width="100"><template #default="{row}"><el-progress :percentage="row.stage==='close' ? (row.result==='赢单'?100:0) : row.prob" :stroke-width="6"/></template></el-table-column>
+      <el-table-column label="加权预测金额" min-width="130" align="right"><template #default="{row}"><span class="money">{{ row.stage!=='close' ? yuan(wAmount(row)) : '—' }}</span></template></el-table-column>
       <el-table-column prop="date" label="预计成交日期" min-width="120"/><el-table-column prop="owner" label="负责人" min-width="80"/>
       <el-table-column label="操作" width="170" fixed="right"><template #default="{row}"><el-button link type="primary" @click="go('/opp/'+row.no)">查看</el-button><el-button link type="primary" :disabled="row.stage==='close'" @click="request(row, STAGES[STAGE_IDX[row.stage]+1].key)">推进阶段</el-button></template></el-table-column>
     </el-table><div class="pager"><span class="batch">共 {{ listRows.length }} 条示例商机</span><el-pagination v-model:current-page="page" layout="prev, pager, next" :total="listRows.length" :page-size="size" background size="small"/></div></div>
@@ -9858,7 +9869,7 @@ const SystemPage = {
     const dictExtra = reactive({});
     dictCats.forEach(k => { dictExtra[k] = []; SYS_DICT_BASE[k].forEach(v => { dictOff[k + '|' + v] = false; }); });
     const dictRows = computed(() => {
-      const k = dictK.value, base = (SYS_DICT_BASE[k] || []).map(o => ({ val: o, base: true, prob: k === '商机阶段' ? ((STAGES.find(s => s.name === o) || {}).prob || 0) + '%' : '' }));
+      const k = dictK.value, base = (SYS_DICT_BASE[k] || []).map(o => ({ val: o, base: true, prob: k === '商机阶段' ? (o === STAGES[5].name ? '赢单 100% / 输单 0%' : ((STAGES.find(s => s.name === o) || {}).prob || 0) + '%') : '' }));
       const extra = dictExtra[k].map(o => ({ val: o, base: false, prob: '' }));
       return base.concat(extra);
     });
@@ -10088,7 +10099,7 @@ const SystemPage = {
         <div class="card table-card">
           <div style="padding:12px 14px;display:flex;align-items:center;gap:10px">
             <span class="sec-title" style="margin:0">「{{ dictK }}」选项</span>
-            <span class="muted" style="font-size:12px">停用的选项不再出现在相关表单中（原型演示，正式版同步新表表单与导入模板）；商机阶段概率需要在阶段配置中调整（8.1）。</span>
+            <span class="muted" style="font-size:12px">停用的选项不再出现在相关表单中（原型演示，正式版同步新表表单与导入模板）；商机阶段默认赢率为原型假设，待业务确认，需要在阶段配置中调整（8.1）。</span>
           </div>
           <div style="padding:0 14px 12px;display:flex;gap:8px">
             <el-input v-model="dictAddV" placeholder="新增选项名称，如：抖音" style="width:220px" @keyup.enter="dictAdd"/>
@@ -10096,7 +10107,7 @@ const SystemPage = {
           </div>
           <el-table :data="dictRows" style="width:100%" :header-cell-style="{height:'42px'}" :empty-text="'「' + dictK + '」暂无选项'">
             <el-table-column prop="val" label="选项值" min-width="180"/>
-            <el-table-column label="附加信息" min-width="110"><template #default="{row}"><span v-if="row.prob">阶段概率 {{ row.prob }}</span><span v-else class="muted">—</span></template></el-table-column>
+            <el-table-column label="附加信息" min-width="150"><template #default="{row}"><span v-if="row.prob">默认赢率 {{ row.prob }}</span><span v-else class="muted">—</span></template></el-table-column>
             <el-table-column label="状态" min-width="90"><template #default="{row}"><el-tag size="small" :type="dictIsOff(row)?'info':'success'" effect="light">{{ dictIsOff(row)?'停用':'启用' }}</el-tag></template></el-table-column>
             <el-table-column label="操作" min-width="150">
               <template #default="{row}">
@@ -10159,7 +10170,7 @@ const SystemPage = {
           <el-table-column prop="note" label="规则说明" min-width="330" show-overflow-tooltip/>
         </el-table>
       </div>
-      <el-alert type="info" show-icon :closable="false" style="margin-top:14px" title="说明" description="客户/线索回收周期、商机阶段概率等业务参数在公海规则与字典管理中配置；本页规则触发后写入操作日志，超时升级按规则通知主管（第十二章）。"/>
+      <el-alert type="info" show-icon :closable="false" style="margin-top:14px" title="说明" description="客户/线索回收周期、商机阶段默认赢率（10/25/45/65/85，赢单 100 / 输单 0，原型假设，待业务确认）等业务参数在公海规则与字典管理中配置；本页规则触发后写入操作日志，超时升级按规则通知主管（第十二章）。"/>
     </template>
 
     <!-- 操作日志 -->
@@ -10307,17 +10318,18 @@ const WorkbenchPage = {
     });
     const funnelC = computed(() => STAGES.slice(0, 5).map(s => periodOpps.value.filter(o => o.stage === s.key).length));
     const funnelA = computed(() => STAGES.slice(0, 5).map(s => Math.round(periodOpps.value.filter(o => o.stage === s.key).reduce((x, o) => x + o.amount, 0) / 10000)));
-    const SHAPE = [100, 80, 60, 40, 25];
+    // 加权预测金额 = 预计金额 × 赢率（按分计算），仅未结束商机计入预测；漏斗宽度只是展示宽度（funnelWidth），不代表转化率或赢率
+    const funnelW = computed(() => STAGES.slice(0, 5).map(s => periodOpps.value.filter(o => o.stage === s.key && o.stage !== 'close').reduce((x, o) => x + wAmount(o), 0) / 10000));
     const funnelOpt = computed(() => {
-      const c = funnelC.value, a = funnelA.value;
+      const c = funnelC.value, a = funnelA.value, w = funnelW.value;
       const p = (theme.value, cssVar('--el-color-primary')) || '#2f9bff';
       const shades = [mixHex(p, '#ffffff', 0.35), mixHex(p, '#ffffff', 0.15), p, mixHex(p, '#000000', 0.2), mixHex(p, '#000000', 0.38)];
       return {
-        tooltip: { trigger: 'item', formatter: p => `<b>${p.name}</b><br/>商机数量：${c[p.dataIndex]} 个<br/>预计金额：¥${a[p.dataIndex]} 万` },
+        tooltip: { trigger: 'item', formatter: p => `<b>${p.name}</b><br/>商机数量：${c[p.dataIndex]} 个<br/>预计金额：¥${a[p.dataIndex]} 万<br/>加权预测金额：¥${w[p.dataIndex]} 万（= 预计金额 × 赢率）` },
         series: [{ type: 'funnel', left: '4%', right: '4%', top: 6, bottom: 6, width: '92%', min: 0, max: 100, minSize: '40%', maxSize: '100%', sort: 'none', gap: 3,
           label: { show: true, position: 'inside', color: '#fff', fontSize: 12, formatter: p => `${p.name}  ${c[p.dataIndex]} 个 · ¥${a[p.dataIndex]}万` },
           itemStyle: { borderWidth: 0 },
-          data: STAGES.slice(0, 5).map((s, i) => ({ name: s.name, value: SHAPE[i], itemStyle: { color: shades[i] } })) }],
+          data: STAGES.slice(0, 5).map((s, i) => ({ name: s.name, value: s.funnelWidth, itemStyle: { color: shades[i] } })) }],
       };
     });
     const perfColor = computed(() => (theme.value, cssVar('--el-color-primary')));
@@ -10357,7 +10369,7 @@ const WorkbenchPage = {
     const paidMonth = computed(() => wan(store.pay.records.filter(r => r.date >= '2026-11-01' && r.date < '2026-12-01').reduce((s, r) => s + (r.confirm === '财务已确认' ? r.amount : 0), 0) / 100));
     const readMsg = m => { m.read = true; };
     const readAll = () => store.messages.forEach(m => m.read = true);
-    return { period, funnelOpt, funnelC, funnelA, perfColor, perfPeriod, perf, msgs, unread, todos, recent, sched, quick, readMsg, readAll, myCusts, myNewCusts, txnAmt, paidMonth, plannedActs, yuan, fmtY, store };
+    return { period, funnelOpt, funnelC, funnelA, funnelW, perfColor, perfPeriod, perf, msgs, unread, todos, recent, sched, quick, readMsg, readAll, myCusts, myNewCusts, txnAmt, paidMonth, plannedActs, yuan, fmtY, store };
   },
   template: `<div>
     <el-breadcrumb separator="/" class="crumb"><el-breadcrumb-item>工作台</el-breadcrumb-item><el-breadcrumb-item>个人工作台</el-breadcrumb-item></el-breadcrumb>
@@ -10378,7 +10390,7 @@ const WorkbenchPage = {
             <div class="card-title">销售漏斗
               <el-radio-group v-model="period" size="small" style="margin-left:auto"><el-radio-button label="month">本月</el-radio-button><el-radio-button label="quarter">本季</el-radio-button><el-radio-button label="year">本年</el-radio-button></el-radio-group></div>
             <e-chart :option="funnelOpt" height="290px"/>
-            <div class="muted" style="font-size:12px;margin-top:4px">注：漏斗宽度仅为阶段示意（100% → 25%），不代表实际转化率；统计口径：预计成交日期在所选周期（本月/本季/本年）内的进行中商机，按当前阶段与预计金额（不含税）分组。</div>
+            <div class="muted" style="font-size:12px;margin-top:4px">注：漏斗各段宽度仅为展示宽度（100%/80%/60%/40%/25%，funnelWidth），不代表转化率，也不是赢率；统计周期内按预计成交日期（本月/本季/本年）分组。tooltip 口径：预计金额、加权预测金额 = ⌊预计金额 × 阶段默认赢率 / 100⌋（按分计算，默认赢率 10/25/45/65/85，原型假设，待业务确认），仅未结束商机计入预测。当前周期加权预测金额合计：¥{{ Math.round(funnelW.reduce((a,b)=>a+b,0)) }} 万。</div>
           </div>
           <div class="card card-pad">
             <div class="card-title">业绩进度
@@ -10816,22 +10828,23 @@ const PZ_DOC_M_CFG = {
     layout: [
       '顶部搜索框：占位「搜索商机：名称 / 客户 / 编号」。',
       '阶段分段横栏：初步接触 → 需求确认 → 方案沟通 → 报价谈判 → 商务审批 → 赢单/输单，各段带商机数徽标，选中段高亮。',
-      '计数行：跟进中商机 N 个 · 当前阶段预计金额 ¥X（左为非 close 段总数，右为当前筛选段金额合计）。',
+      '计数行：跟进中商机 N 个 · 当前阶段预计金额 ¥X · 加权预测 ¥Y（左为非 close 段总数；中为当前筛选段金额合计；右为当前段非 close 商机的加权预测金额合计 = Σ⌊预计金额 × 赢率 / 100⌋，按分计算）。',
       '商机卡片列表：名称、客户 · 负责人 · 预计成交日期、右侧金额与赢率（close 段按赢单 100% / 输单 0% 展示）。',
       '空态：当前筛选段无商机时显示「该阶段暂无商机」。'
     ],
     fields: [
       '阶段｜类型：枚举（contact/need/plan/quote/approve/close）｜必填：是｜校验：chips 默认初步接触｜说明：分段主键，决定列表过滤与徽标。',
       '预计金额｜类型：货币｜必填：是｜校验：> 0，以分存储、元展示｜说明：卡片金额与当前阶段合计均由真实数据汇总。',
-      '赢率｜类型：百分比｜必填：是｜校验：随阶段就近映射（10/25/45/65/85），close 段按成结果 100% 或 0%｜说明：只读展示，手机上不能手改。',
+      '赢率｜类型：百分比｜必填：是｜校验：随阶段取默认赢率（初步接触 10%、需求确认 25%、方案沟通 45%、报价谈判 65%、商务审批 85%；赢单 100%、输单 0%；默认赢率为原型假设，待业务确认）｜说明：只读展示，手机上不能手改。',
       '客户｜类型：文本｜必填：是｜校验：客户存在且参与搜索｜说明：与商机名称、编号共同构成关键字匹配源。',
+      '加权预测金额｜类型：货币（计算）｜必填：是（计数行实算）｜校验：= ⌊预计金额 × 赢率 / 100⌋，按分计算避免浮点误差｜说明：头部汇总展示当前段非 close 商机的加权合计；close 段不展示加权（已结束商机不计入预测）。',
       '负责人｜类型：人员｜必填：是｜校验:有效销售人员｜说明：用于权限过滤与卡片展示。',
       '预计成交日期｜类型：日期｜必填：是｜校验：非空｜说明：卡片副标题「预计 X」展示。',
       '搜索关键字｜类型：文本｜必填：否｜校验：跨名称 / 客户 / 编号 contains 匹配｜说明：与阶段 filter 叠加生效。'
     ],
     rules: [
       '列表在当前阶段内按预计金额倒序排列，便于先跟大单。',
-      '「跟进中商机 N 个」= 阶段 ≠ close 的全部商机数；「当前阶段预计金额」= 当前阶段 + 关键字过滤后的金额合计；二者都实时计算。',
+      '「跟进中商机 N 个」= 阶段 ≠ close 的全部商机数；「当前阶段预计金额」= 当前阶段 + 关键字过滤后的金额合计；「加权预测」= 同一过滤范围内非 close 商机的 Σ⌊预计金额 × 赢率 / 100⌋；三者都实时计算，加权口径已排除赢单/输单。',
       '阶段徽标数为全量阶段分布计数，关键字不改变徽标但改变筛选段列表。',
       '点击卡片进入商机详情（mpush），可继续做阶段更新 / 写跟进 / 查看客户；返回后选中阶段保持。',
       '弱网与离线：以最近一次成功加载的缓存展示商机并提示数据可能非最新，恢复网络后静默刷新。'
@@ -10856,7 +10869,7 @@ const PZ_DOC_M_CFG = {
     ],
     accept: [
       '六段徽标数与 store.opps 中各阶段真实计数一致，切段后列表与金额合计联动正确。',
-      '「跟进中商机 N 个」与「当前阶段预计金额」均可复算（不含 close 段 / 过滤后合计）。',
+      '「跟进中商机 N 个」「当前阶段预计金额」与「加权预测」均可复算（不含 close 段；加权 = Σ⌊预计金额 × 赢率 / 100⌋，按分计算）。',
       'close 段商机赢率显示 100%（赢单）或 0%（输单），非 close 段显示映射赢率。',
       '关键字搜索跨名称 / 客户 / 编号生效并与阶段筛选叠加。',
       '点击卡片进入对应商机详情且返回后状态保持，页面无控制台报错。'
@@ -10890,7 +10903,7 @@ const PZ_DOC_M_CFG = {
       '商机编号｜类型：文本｜必填：是｜校验：SJ- 年月-序号全局唯一｜说明：与客户一起展示在卡头副标题。',
       '阶段｜类型：枚举（六段）｜必填：是｜校验：tabs 进度条按 STAGE_IDX 对齐高亮｜说明：仅详情展示，修改需通过阶段更新屏。',
       '预计金额｜类型：货币｜必填：是｜校验：>0｜说明：基本信息卡首行，分存元示。',
-      '赢率｜类型：百分比｜必填：是｜校验：随阶段自动映射｜说明：灰标签展示，随阶段变更自动更新。',
+      '赢率｜类型：百分比｜必填：是｜校验：随阶段取默认赢率（10/25/45/65/85；赢单 100%、输单 0%；默认赢率为原型假设，待业务确认）｜说明：灰标签展示，随阶段变更自动更新。',
       '预计成交日期｜类型：日期｜必填：是｜校验：非空｜说明：基本信息卡第二行。',
       '负责人｜类型：人员｜必填：是｜校验：有效销售人员｜说明：用于权限与责任链。',
       '商机档案字段｜类型：键值对（阶段门收集：客户需求 / 采购时间 / 预算范围 / 方案说明 / 商务条件 / 审批材料 / 竞争对手等）｜必填：否｜校验：随阶段门逐段补充｜说明：逐步积累成 profile，展示在基本信息卡末尾。',
@@ -10967,7 +10980,7 @@ const PZ_DOC_M_CFG = {
       '第一个校验为「禁止跳阶段」：目标段下标 - 当前段下标 > 1 直接 error 轻提示终止，任何字段都不更新。',
       '第二步：目标段（按 STAGE_RULES 规则定义）必填字段逐个非空校验（竞争对手为选填例外）；失败时警示条 + 轻提示指向具体缺失字段。',
       '第三步：系统检查项（如进入报价谈判段 requires 有效报价单 flags.hasQuote；赢单 requires 合同已审批 flags.contractApproved）以红 / 绿点呈现，未通过校验失败并提示 hint（如「禁止直接标记赢单，需先完成合同审批」）。',
-      '校验通过后写库：stage = 目标段；prob 按目标段映射（close 段按成结果 100 / 0）；info 以表单内容合并（仅按非 undefined 的字段）；输单时 loseReason 落库；赢单时置 contractApproved = true 防止重复障碍；追一条阶段变更历史 {from,to,操作人,时间,remark} 并写操作日志。',
+      '校验通过后写库：stage = 目标段；prob 按目标段默认赢率写回（初步接触 10 / 需求确认 25 / 方案沟通 45 / 报价谈判 65 / 商务审批 85，默认赢率为原型假设，待业务确认；close 段按成结果赢单 100 / 输单 0）；info 以表单内容合并（仅按非 undefined 的字段）；输单时 loseReason 落库；赢单时置 contractApproved = true 防止重复障碍；追一条阶段变更历史 {from,to,操作人,时间,remark} 并写操作日志。',
       '成功后轻提示「阶段已变更：X → Y」并在 500ms 后 mback，明细屏进度条与历史刷新。',
       '弱网提示：确认变更输入时表单可滚动，键盘弹起不遮挡「确认变更」按钮。'
     ],
@@ -12583,6 +12596,7 @@ const PZ_DOC_PC_CFG = {
       '明细记录｜类型：对象数组｜必填：是｜校验：总数取筛选后的真实条数｜说明：漏斗取商机、总览与目标取合同、销售人员取员工聚合行、回款取回款计划、客户取客户档案、线索取线索、合同分析取合同、交付取交付项目、活动取活动、工单取服务工单。',
       '商机/合同/客户编号｜类型：文本｜必填：是｜校验：单据必须存在｜说明：以链接方式提供详情下钻，编号列使用等宽字体。',
       '金额｜类型：货币｜必填：是｜校验：按分精确汇总后格式化｜说明：预计金额、已签金额、合同金额、计划回款、已回款、个人业绩、累计成交额等。',
+      '加权预测金额｜类型：货币（计算）｜必填：是（销售漏斗报表实算）｜校验：= ⌊预计金额 × 赢率 / 100⌋，按分计算避免浮点误差｜说明：销售漏斗报表统计卡与明细列展示；仅未结束商机（stage ≠ close）计入预测，close 商机明细行显示「—」；图表段宽仍按 funnelWidth 绘制，与赢率无关。',
       '比率｜类型：百分比｜必填：是｜校验：分母为 0 时返回 0，不出现 NaN｜说明：目标完成率、回款率、转化率、有效率、赢单率、完成率、延期率、验收通过率、超时率等保留一位小数。',
       '状态/结果｜类型：枚举标签｜必填：否｜校验：必须命中各业务状态枚举｜说明：合同为草稿/待签署/生效/履约中/已完成/已到期，回款计划为已回款/部分回款/未回款，商机为赢单/输单，交付为未启动/实施中/验收中/已完成，工单为待受理/待分派/处理中/待客户确认/已解决/已关闭/已退回。'
     ],
@@ -12599,7 +12613,7 @@ const PZ_DOC_PC_CFG = {
     flow: [
       '分析主流程：进入报表详情 → 选择统计周期/部门/员工/客户维度 → 四张指标卡和图表刷新 → 滚动或翻页查看明细 → 点击业务编号下钻到单据详情。',
       '回款计划状态：未回款 → 部分回款 → 已回款；已回款指财务已确认到账并按核销结果匹配到该计划期次，计划日期早于今天且未结清计为逾期（第十二章：回款录入错误走冲销，不计入已回款口径）。',
-      '商机漏斗阶段顺序固定为初步接触 → 需求确认 → 方案沟通 → 报价谈判 → 商务审批 → 赢单/输单，漏斗宽度为示意值而非真实转化率；停滞商机（flags.stalled）超过提醒阈值自动提醒并在商机分析中计数（第十二章）。',
+      '商机漏斗阶段顺序固定为初步接触 → 需求确认 → 方案沟通 → 报价谈判 → 商务审批 → 赢单/输单；漏斗各段宽度仅按 funnelWidth（100%/80%/60%/40%/25%/15%）绘制，规划方案 5.5 明确该比例用于展示阶段顺序、不代表实际销售转化率，也不得当作赢率展示；各阶段默认赢率为 10/25/45/65/85（赢单 100、输单 0，默认赢率为原型假设，待业务确认）；报表明细增加「加权预测金额」列 = ⌊预计金额 × 赢率 / 100⌋（按分计算），仅未结束商机（stage ≠ close）计入预测；停滞商机（flags.stalled）超过提醒阈值自动提醒并在商机分析中计数（第十二章）。',
       '商机分析只统计阶段为 close 且日期落在所选周期的商机，结果为赢单或输单；输单原因缺失时归入「未填写」（商机关闭时必填原因）',
       '销售人员分析按个人业绩降序排名；业绩口径与销售总览相同（已签署合同金额）。',
       '交付分析：未启动/实施中/验收中/已完成；延期 = 计划结束日期早于今天且未完成（触发预警并记录延期原因，第十二章）；验收状态由里程碑推导。',
@@ -12648,7 +12662,7 @@ const PZ_DOC_PC_CFG = {
       '用户管理页签：统计卡（用户总数/启用/已停用/角色数）+ 搜索筛选（关键词/部门/角色/状态）+ 表格（账号/姓名/部门/角色/电话/最近登录/状态/操作）+ 真分页。',
       '角色权限页签：左侧角色列表 + 右侧配置卡（菜单权限树勾选、数据权限单选、按钮权限多选、字段脱敏多选、角色说明）。',
       '组织架构页签：部门树（可新增子部门，每节点显示人数）+ 部门概览。',
-      '字典管理页签：左侧字典分类（线索来源/客户类型/客户等级/客户行业/客户状态/客户规模/商机阶段）+ 右侧选项表（选项值/附加信息/状态/操作）+ 新增选项输入。',
+      '字典管理页签：左侧字典分类（线索来源/客户类型/客户等级/客户行业/客户状态/客户规模/商机阶段）+ 右侧选项表（选项值/附加信息〔商机阶段显示默认赢率：初步接触 10%、需求确认 25%、方案沟通 45%、报价谈判 65%、商务审批 85%，赢单 100% / 输单 0%，默认赢率为原型假设，待业务确认〕/状态/操作）+ 新增选项输入。',
       '编号规则页签：规则表（对象/前缀/日期格式/序号位数/规则示例/说明）+ 保存按钮。',
       '通知与提醒页签：提醒规则表（规则/启用开关/阈值/通知渠道/说明）+ 保存按钮。',
       '操作日志页签：统计卡（日志总数/今日操作/系统模块操作/涉及操作人）+ 筛选（关键词/操作人/模块）+ 表格（时间/操作人/模块/动作/操作内容/来源 IP）+ 真分页。'
@@ -12674,6 +12688,7 @@ const PZ_DOC_PC_CFG = {
       '角色权限保存即时写回角色配置：菜单树勾选（父级自动包含子菜单）、数据权限、按钮权限、字段脱敏，并写入操作日志（谁改的、改了什么可追溯）。',
       '数据权限只能按第三章四档配置：本人、本部门、本部门及下属（下级）、全部；客户/商机/合同的数据权限在服务端校验，不能只在前端隐藏按钮（9.4），越权访问被拦截并记录安全日志（第三章、第十二章）。',
       '字典停用的选项不再出现在相关表单中；删除仅对新增选项开放，内置选项只能停用，与历史数据兼容。',
+      '字典「商机阶段」的附加信息为各阶段默认赢率（初步接触 10%、需求确认 25%、方案沟通 45%、报价谈判 65%、商务审批 85%，赢单 100% / 输单 0%）；默认赢率为原型假设，待业务确认，阶段推进/赢单、输单时按其写回商机赢率（数据字段 key 为 prob），与漏斗展示宽度（funnelWidth）互不相干。',
       '编号规则只影响保存后新开单据，历史编号不变；示例按（前缀-年月-序号）实时预览。',
       '提醒规则保存后按阈值与渠道触发，执行写入操作日志；公海回收周期由公海规则页配置并与本页联动。',
       '所有配置变更（用户、部门、角色、字典、编号、提醒）都写操作日志，满足第十四章「操作日志：重要操作可以查询到操作人和时间」。'
@@ -12729,7 +12744,7 @@ const PZ_DOC_PC_CFG = {
     layout: [
       '顶部欢迎横幅：「欢迎回来，张三」+ 日期（2026年11月2日）+ 部门/角色与数据范围说明；右侧汇总数字（待跟进/待审批报价/未读消息）。',
       '数据概览统计卡 4 张（5.1 功能表第一行「客户数、商机数、预计业绩、回款额：按用户权限统计」）：我的客户（副标签本月新增 N 家）、跟进中商机（副标签待跟进 N 个 · 停滞 N 个）、本月预计成交（预计金额）、本月已回款（实际到账），全部由真实数据实算。',
-      '功能区：销售漏斗（各阶段商机数量、金额，可按本月/本季/本年切换查看）与业绩进度（目标、完成额、完成率，按月/季度/年度统计）并排两卡。',
+      '功能区：销售漏斗（各阶段商机数量、预计金额与加权预测金额，可按本月/本季/本年切换查看；漏斗各段宽度仅为展示宽度 funnelWidth 100%/80%/60%/40%/25%，不代表转化率或赢率）与业绩进度（目标、完成额、完成率，按月/季度/年度统计）并排两卡。',
       '右侧栏：我的待办四项（待跟进客户、待审批报价、即将到期合同、待处理客户投诉，点击进入具体业务）、快捷入口四宫格、今日日程时间线（今日拜访/电话/会议，支持创建和提醒）、消息通知（分配通知、审批结果、逾期提醒等，支持已读/未读）。',
       '左侧下方：近期客户跟进时间线（客户 · 事项 · 时间，例：南京某某科技 · 方案沟通 · 今天 10:00）。'
     ],
@@ -12742,6 +12757,7 @@ const PZ_DOC_PC_CFG = {
       '本月预计成交金额｜类型：货币（元）｜必填：是｜校验：按分存储汇总，进行中商机预计成交日期在本月的金额合计｜说明：预计业绩卡主数字。',
       '本月已回款金额｜类型：货币（元）｜必填：是｜校验：仅统计「财务已确认」的到账记录｜说明：实际到账口径，避免把未确认到账计入业绩。',
       '统计周期｜类型：枚举（month/quarter/year）｜必填：是｜校验：默认 month｜说明：切换后销售漏斗重算该周期内预计成交商机的阶段分布。',
+      '加权预测金额｜类型：货币（计算）｜必填：是（漏斗 tooltip 与注脚实算）｜校验：= ⌊预计金额 × 赢率 / 100⌋，按分计算避免浮点误差｜说明：默认赢率 10/25/45/65/85（赢单 100 / 输单 0，原型假设，待业务确认）；仅未结束商机（stage ≠ close）计入预测；漏斗展示宽度（funnelWidth）不参与该计算，也不是赢率。',
       '目标与完成率｜类型：货币/百分比｜必填：是｜校验：完成率 = 完成额 ÷ 目标额，按月/季度/年度统计｜说明：业绩进度仪表盘，目标来自销售目标配置。',
       '待办分类与数量｜类型：枚举 + 整数｜必填：是｜校验：数量与对应业务列表实算一致（待跟进活动、待审批报价、30 天内到期合同、未完结投诉工单）｜说明：我的待办四项，点击进入具体业务处理。',
       '近期跟进｜类型：文本 + 日期时间｜必填：是｜校验：时间取跟进/计划时间｜说明：显示客户 · 事项 · 时间，点击客户进入客户详情。',
@@ -12750,7 +12766,7 @@ const PZ_DOC_PC_CFG = {
     ],
     rules: [
       '数据概览四个统计卡按用户权限统计（5.1）：所有数字由 store 实际数据实算，不允许写死假总数；空数据显示空态而非 0 占位。',
-      '销售漏斗按各阶段商机数量、金额展示且可按时间查看（5.1）：本月/本季/本年切换后按预计成交日期重新分组，200ms 内重绘。',
+      '销售漏斗按各阶段商机数量、金额展示且可按时间查看（5.1）：本月/本季/本年切换后按预计成交日期重新分组，200ms 内重绘；漏斗各段宽度仅按 funnelWidth（100%/80%/60%/40%/25%）绘制，规划方案 5.5 明确该比例用于展示阶段顺序、不代表实际销售转化率，不得把漏斗宽度当作赢率展示；tooltip 与注脚额外展示各阶段加权预测金额 = ⌊预计金额 × 阶段默认赢率 / 100⌋（按分计算，默认赢率原型假设，待业务确认），仅未结束商机计入预测。',
       '我的待办点击进入具体业务（5.1）：待跟进客户→活动管理、待审批报价→审批中心、即将到期合同→合同管理、待处理客户投诉→服务管理。',
       '日程安排支持创建和提醒（5.1）：「+ 新建」弹出新建日程并设置提醒（原型为示例提示），今日日程按时间排序并显示完成状态。',
       '消息通知支持已读、未读（5.1）：单条点击标记已读，「全部已读」批量置为已读，未读角标随之更新；顶部栏通知中心与工作台同源。',
@@ -12779,7 +12795,7 @@ const PZ_DOC_PC_CFG = {
     accept: [
       '第十四章「登录权限」验收：切换角色/数据范围后，工作台四张统计卡数字仅统计授权范围内数据，越权数据不可见。',
       '第十四章「报表：统计口径统一，数据与明细可以核对」验收：我的客户数、跟进中商机数、本月预计成交、本月已回款均可与其各自业务明细列表复算一致（含本月新增、待跟进、停滞副标签）。',
-      '销售漏斗月/季/年切换后图形在 200ms 内重绘，各阶段数量与金额之和等于该周期内预计成交商机的实算值。',
+      '销售漏斗月/季/年切换后图形在 200ms 内重绘，各阶段数量与金额之和等于该周期内预计成交商机的实算值；加权预测金额合计 = Σ⌊预计金额 × 默认赢率 / 100⌋（不含赢单/输单）可复算，且注脚明确漏斗宽度仅为展示宽度。',
       '待办四项点击分别跳转到活动管理、审批中心、合同管理、服务管理，且显示数字与目标页列表实算一致（第十四章「操作日志/导入导出」之外的通用沉淀以对应页面验收为准）。',
       '第十四章重点场景「销售人员离职，将客户及未完成任务转移给其他人员」：交接后原负责人的待跟进与目标随转移自动变化，历史记录不变。',
       '消息：单条已读与全部已读生效，未读角标与顶部栏一致；快捷入口四项均可达对应新建/记录页面；页面无控制台报错。'
@@ -13447,7 +13463,7 @@ const PZ_DOC_PC_CFG = {
       '菜单：销售经理可查看团队全部商机并调整阶段，管理员可查看全量数据。',
       '按钮：销售拥有推进阶段和查看详情；经理额外可调整负责人与处理停滞商机；新建商机按钮对销售开放。',
       '数据：销售数据范围为本人的商机，经理为本部门及下级，管理员为全部；看板列统计按全量商机计算。',
-      '字段：预计金额、成交概率、客户名称、负责人、停滞天数、商机来源与类型可见，成本与毛利等敏感字段不在看板展示。',
+      '字段：预计金额、赢率、客户名称、负责人、停滞天数、商机来源与类型可见，成本与毛利等敏感字段不在看板展示。',
       '数据：商机关闭后归档，不物理删除；输单必须记录原因与竞争对手（适用时），阶段变更保留历史。'
     ],
     enter: [
@@ -13457,9 +13473,9 @@ const PZ_DOC_PC_CFG = {
     ],
     layout: [
       '顶部：面包屑「商机管理 / 商机看板」、跟进中商机总数、看板/列表视图切换和新建商机按钮。',
-      '统计卡：跟进中商机、商机预计金额、本月预计成交、停滞商机、已赢单/已输单五张卡。',
+      '统计卡：跟进中商机、商机预计金额、本月预计成交、加权预测金额合计（不含赢单/输单）、停滞商机、已赢单/已输单六张卡。',
       '筛选区：关键词按商机名称、客户、编号、联系人和主要需求模糊搜索，负责人、商机来源、商机类型下拉筛选，支持查询与重置。',
-      '看板区：六列分别为初步接触、需求确认、方案沟通、报价谈判、商务审批、赢单/输单，每列显示数量、阶段示意比例、预计金额合计和商机卡片。',
+      '看板区：六列分别为初步接触、需求确认、方案沟通、报价谈判、商务审批、赢单/输单，每列显示数量、漏斗展示宽度（funnelWidth：100%/80%/60%/40%/25%/15%，仅为展示宽度）、预计金额合计、加权预测金额合计（未结束商机计入）和商机卡片。',
       '推进弹窗：展示当前阶段到目标阶段、阶段门必填字段、系统检查项、成交结果（赢单/输单）和变更备注。'
     ],
     fields: [
@@ -13470,7 +13486,8 @@ const PZ_DOC_PC_CFG = {
       '商机来源｜下拉框｜必填：是｜校验：线索/客户转介绍/官网/渠道/活动/广告等配置枚举｜说明：用于来源转化分析。',
       '商机类型｜下拉框｜必填：是｜校验：新购/续费/增购等配置枚举｜说明：用于新购与存量业务区分。',
       '预计金额｜金额｜必填：是｜校验：大于 0，单位为元｜说明：卡片和列汇总按金额展示，已结束商机不进入跟进中合计。',
-      '成交概率｜百分比｜必填：是｜校验：0 至 100，按阶段或人工配置｜说明：阶段推进后按阶段默认值更新；阶段示意比例 100%/80%/60%/40%/25%/15% 仅表示阶段顺序，不代表实际销售转化率。',
+      '赢率｜百分比｜必填：是｜校验：0 至 100，随阶段按默认赢率更新｜说明：各阶段默认赢率为初步接触 10%、需求确认 25%、方案沟通 45%、报价谈判 65%、商务审批 85%、赢单 100%、输单 0%（默认赢率为原型假设，待业务确认）；漏斗图的 100%/80%/60%/40%/25%/15% 仅为展示宽度（funnelWidth），不代表转化率或赢率。',
+      '加权预测金额｜金额（计算）｜必填：是（列头实时计算）｜校验：= ⌊预计金额 × 赢率 / 100⌋，按分计算避免浮点误差｜说明：看板列头展示该阶段预计金额合计与加权金额合计；统计口径仅含未结束商机（stage ≠ close）。',
       '预计成交日期｜日期｜必填：是｜校验：有效业务日期｜说明：用于本月预计成交统计与漏斗周期筛选。',
       '当前阶段｜下拉框｜必填：是｜校验：初步接触/需求确认/方案沟通/报价谈判/商务审批/赢单/输单｜说明：决定商机所在看板列；已关闭商机以赢单或输单结果展示。',
       '竞争对手｜文本/关联｜必填：否｜校验：输单时适用则填写｜说明：记录竞争品牌、竞争态势和应对策略，详情页单独展示竞争对手分析。',
@@ -13492,19 +13509,20 @@ const PZ_DOC_PC_CFG = {
       '进入需求确认、方案沟通、商务审批分别校验客户需求、采购时间、预算范围、方案说明、参与联系人、商务条件、审批材料等必填字段；未填项在弹窗中逐项标红并阻止推进。',
       '进入报价谈判前系统检查是否存在有效报价单，进入赢单前系统检查 contractApproved（合同已审批或订单已确认）；未满足时显示「未满足」原因和「前往处理」跳转。',
       '赢单和输单必须通过同一关闭阶段门：赢单需满足企业配置的成交条件，输单需选择输单原因，竞争对手在适用时填写。',
-      '每次阶段变更必须保留变更前后阶段、变更人、变更时间和备注；推进成功后写回阶段、成交概率、阶段信息与变更历史。',
+      '每次阶段变更必须保留变更前后阶段、变更人、变更时间和备注；推进成功后写回阶段、赢率（取目标阶段默认赢率；赢单 100 / 输单 0）、阶段信息与变更历史；列头加权预测金额随之重算。',
+      '加权预测金额口径：商机看板每列列头、统计卡与收益预测均按「预计金额 × 默认赢率」按分计算；赢单/输单商机已结束，不计入加权预测金额合计。',
       '禁止将商机直接标记为赢单；禁止跳阶段推进，回退需提交「阶段回退」申请并填写原因。',
       '超过 7 天未推进的商机标记为停滞并自动提醒负责人与销售经理，支持经理介入（规划方案第十二章「商机长时间停滞」）。',
       '看板列的数量和金额汇总取全部商机而非当前筛选结果，筛选只影响每列展示的卡片；卡片超出时提示另有数量并引导查看全部。',
       '点击卡片进入详情，点击卡片内「推进」按钮阻止冒泡，避免误跳转；拖拽放置后触发同一套阶段门校验。'
     ],
     flow: [
-      '阶段主流程：初步接触 → 需求确认 → 方案沟通 → 报价谈判 → 商务审批 → 赢单/输单；阶段示意比例依次为 100%/80%/60%/40%/25%/15%，仅表示阶段顺序，不代表实际转化率。',
+      '阶段主流程：初步接触 → 需求确认 → 方案沟通 → 报价谈判 → 商务审批 → 赢单/输单；漏斗各段高度 100%/80%/60%/40%/25%/15% 仅是漏斗图的展示宽度（规划方案 5.5 明确说明其不代表实际销售转化率），赢率另按各阶段默认赢率 10/25/45/65/85/100/0 计（原型假设，待业务确认）。',
       '阶段进入/退出条件：初步接触需有明确潜在客户，退出时客户需求初步明确；需求确认需客户表达需求，退出时需求得到确认；方案沟通需有初步方案，退出时客户认可方案方向。',
       '报价谈判需产品与范围基本明确，退出时报价达成基本一致；商务审批需接近签约，退出时商务条件确认；赢单需满足成交条件，输单需明确不再推进并记录原因和竞争对手（适用时）。',
       '阶段推进只能进入相邻下一阶段，不支持直接回退或跳阶段；需要回退时必须提交阶段回退申请并填写原因。',
-      '关闭流转：商务审批 → 赢单或输单；赢单概率置 100，输单概率置 0，输赢单原因写入商机并进入赢输分析，已关闭商机归档后不能再推进。',
-      '阶段规则应支持后台配置，阶段、必填项和成交条件不在程序写死；成交概率按阶段或人工配置。'
+      '关闭流转：商务审批 → 赢单或输单；赢单赢率置 100、输单赢率置 0，输赢单原因写入商机并进入赢输分析，已关闭商机归档后不能再推进，也不再计入加权预测金额。',
+      '阶段规则应支持后台配置，阶段、必填项和成交条件不在程序写死；赢率按阶段默认赢率自动更新（默认赢率为原型假设，待业务确认）。'
     ],
     errors: [
       '拖拽跨越多个阶段：阻止变更并明确提示当前阶段和目标阶段，告知下一阶段应为哪一个。',
@@ -13525,10 +13543,10 @@ const PZ_DOC_PC_CFG = {
       '商机详情接口：返回商机基础信息、阶段信息、历史记录与关联报价合同订单，用于卡片跳转。'
     ],
     accept: [
-      '对应规划方案第十四章「商机：阶段变化符合配置规则，输赢单记录完整」：六列看板按阶段正确分组，列内卡片数量与列头数量一致，预计金额合计可复算。',
+      '对应规划方案第十四章「商机：阶段变化符合配置规则，输赢单记录完整」：六列看板按阶段正确分组，列内卡片数量与列头数量一致，预计金额合计与加权预测金额合计（=Σ⌊预计金额×赢率/100⌋，不含赢单/输单）均可复算；列头「漏斗展示宽度」只是宽度标注，不得当作赢率或转化率。',
       '拖拽或点击推进只能进入相邻下一阶段，跨阶段、回退和已关闭商机推进均被拦截并给出明确提示；阶段变更历史包含变更前后阶段、变更人、变更时间和备注。',
       '需求确认、方案沟通、商务审批的阶段必填项缺失时无法确认推进，补全后可成功变更并刷新卡片所在列；报价谈判无有效报价单时被拦截。',
-      '赢单需合同已审批或订单已确认，禁止直接标记赢单；输单必须选择输单原因，关闭后卡片显示赢单或输单标签且概率分别为 100 或 0。',
+      '赢单需合同已审批或订单已确认，禁止直接标记赢单；输单必须选择输单原因，关闭后卡片显示赢单或输单标签且赢率分别为 100% 或 0%，加权预测金额不再计入。',
       '商机超过 7 天未推进显示停滞标签并给出提醒文案，筛选、重置、看板/列表切换、卡片点击和推进按钮均可用。',
       '对应第十四章重点场景「从商机推进到报价、合同审批、签署和订单生成」：阶段推进与关联报价、合同、订单跳转链路可用，页面无控制台报错。'
     ]
@@ -13536,13 +13554,13 @@ const PZ_DOC_PC_CFG = {
 
   'opps-list': {
     name: '商机列表', module: '商机管理',
-    goal: '以表格方式管理全部商机，侧重字段对比、批量选择与阶段推进操作：展示商机编号、名称、客户、联系人、来源、类型、预计金额、当前阶段、成交概率、预计成交日期和负责人，支持按名称/客户/编号、负责人、来源和类型筛选，并与看板共享统计口径和阶段门校验，服务销售复盘与经理管理场景。',
+    goal: '以表格方式管理全部商机，侧重字段对比、批量选择与阶段推进操作：展示商机编号、名称、客户、联系人、来源、类型、预计金额、当前阶段、赢率、加权预测金额、预计成交日期和负责人，支持按名称/客户/编号、负责人、来源和类型筛选，并与看板共享统计口径和阶段门校验，服务销售复盘与经理管理场景。',
     roles: [
       '菜单：销售通过「商机管理 → 商机列表」进入，只查看本人商机。',
       '菜单：销售经理可查看团队全部商机，管理员可查看全量商机。',
       '按钮：销售可勾选商机、查看详情和推进阶段；经理可批量调整负责人或处理停滞商机；新建商机按钮对有创建权限的角色开放。',
       '数据：数据范围按角色控制，销售本人、经理本部门及下级、管理员全部；统计卡与看板保持一致。',
-      '字段：金额、阶段、概率、预计成交日期、来源、类型和负责人可见，成本、毛利等敏感字段按权限脱敏。',
+      '字段：金额、阶段、赢率、加权预测金额、预计成交日期、来源、类型和负责人可见，成本、毛利等敏感字段按权限脱敏。',
       '数据：商机关闭后归档保留历史，不物理删除；阶段变更和输赢单原因必须留痕。'
     ],
     enter: [
@@ -13552,9 +13570,9 @@ const PZ_DOC_PC_CFG = {
     ],
     layout: [
       '顶部：面包屑「商机管理 / 商机列表」、跟进中商机总数、看板/列表视图切换和新建商机按钮。',
-      '统计卡：跟进中商机、商机预计金额、本月预计成交、停滞商机、已赢单/已输单五张卡，与看板同源。',
+      '统计卡：跟进中商机、商机预计金额、本月预计成交、加权预测金额合计（不含赢单/输单）、停滞商机、已赢单/已输单六张卡，与看板同源。',
       '筛选区：关键词输入框按商机名称、客户、编号、联系人和主要需求模糊搜索，负责人、商机来源、商机类型下拉筛选，支持查询与重置。',
-      '列表区：首列为多选框，其后为商机编号、商机名称、关联客户、关联联系人、商机来源、商机类型、预计金额、当前阶段、成交概率进度条、预计成交日期、负责人和操作列。',
+      '列表区：首列为多选框，其后为商机编号、商机名称、关联客户、关联联系人、商机来源、商机类型、预计金额、当前阶段、赢率进度条、加权预测金额、预计成交日期、负责人和操作列。',
       '底部：显示筛选后的真实总条数与分页控件，每页 20 条；操作列提供查看和推进阶段按钮。'
     ],
     fields: [
@@ -13566,7 +13584,8 @@ const PZ_DOC_PC_CFG = {
       '商机类型｜下拉框｜必填：是｜校验：新购/续费/增购等配置枚举｜说明：用于新购与存量业务区分。',
       '预计金额｜金额｜必填：是｜校验：大于 0｜说明：按元展示，已结束商机不进入跟进中金额合计。',
       '当前阶段｜下拉框｜必填：是｜校验：初步接触/需求确认/方案沟通/报价谈判/商务审批/赢单/输单｜说明：已关闭商机显示赢单或输单结果标签。',
-      '成交概率｜百分比｜必填：是｜校验：0 至 100，按阶段或人工配置｜说明：以进度条展示，阶段推进后自动更新；阶段示意比例 100%/80%/60%/40%/25%/15% 仅表示阶段顺序。',
+      '赢率｜百分比｜必填：是｜校验：0 至 100，随阶段按默认赢率更新｜说明：以进度条展示，阶段推进后自动更新为该阶段默认赢率（初步接触 10%、需求确认 25%、方案沟通 45%、报价谈判 65%、商务审批 85%、赢单 100%、输单 0%，默认赢率为原型假设，待业务确认）；漏斗图的 100%/80%/60%/40%/25%/15% 仅为展示宽度（funnelWidth），不代表转化率或赢率。',
+      '加权预测金额｜金额（计算）｜必填：是（实时计算）｜校验：= ⌊预计金额 × 赢率 / 100⌋，按分计算避免浮点误差｜说明：新增列展示；统计卡「加权预测金额合计」仅累计未结束商机（stage ≠ close），已赢单/输单商机该列显示「—」。',
       '预计成交日期｜日期｜必填：是｜校验：有效业务日期｜说明：用于本月预计成交与周期分析。',
       '竞争对手｜文本/关联｜必填：否｜校验：输单时适用则填写｜说明：记录竞争品牌与竞争态势。',
       '主要需求｜多行文本｜必填：否（进入需求确认阶段必填）｜校验：非空｜说明：客户核心需求，支持关键词搜索。',
@@ -13583,12 +13602,12 @@ const PZ_DOC_PC_CFG = {
       '已关闭商机的推进按钮禁用，避免对归档商机重复变更；查看按钮始终可用。',
       '列表首列支持多选，批量操作前需判断选中数量，未选中时提示先勾选；批量操作保留操作日志。',
       '底部显示筛选后的真实总条数，分页按 20 条每页切片；正式版接服务端分页接口，当前原型以前端集合驱动。',
-      '金额、阶段、概率等列使用统一格式化与标签颜色，主题切换后颜色变量跟随，不写死颜色。'
+      '金额、阶段、赢率、加权预测金额等列使用统一格式化与标签颜色，主题切换后颜色变量跟随，不写死颜色。'
     ],
     flow: [
       '列表状态跟随商机阶段：初步接触 → 需求确认 → 方案沟通 → 报价谈判 → 商务审批 → 赢单或输单；列表阶段标签在关闭前显示阶段名，关闭后显示结果。',
       '阶段推进需通过阶段门：必填字段逐项补全，系统检查未满足时前往报价或合同页面处理后再推进，禁止跳阶段和直接回退。',
-      '赢单条件为合同已审批或订单已确认，输单必须选择输单原因；关闭后商机归档，概率分别置为 100 或 0。',
+      '赢单条件为合同已审批或订单已确认，输单必须选择输单原因；关闭后商机归档，赢单赢率置 100、输单赢率置 0，加权预测金额不再计入统计卡。',
       '每次阶段变更保留变更前后阶段、变更人、变更时间和备注；超过 7 天未推进自动提醒负责人与销售经理。',
       '批量选择商机后可执行批量分配或导出，操作结果影响负责人或导出文件，并写入操作日志。'
     ],
@@ -13608,10 +13627,10 @@ const PZ_DOC_PC_CFG = {
       '商机详情与关联单据接口：返回商机详情、关联客户、报价、合同和订单，用于编号与客户跳转。'
     ],
     accept: [
-      '对应规划方案第十四章「商机：阶段变化符合配置规则，输赢单记录完整」：列表正确展示商机编号、名称、客户、联系人、来源、类型、金额、阶段、概率、日期和负责人，点击编号与客户可进入对应详情。',
+      '对应规划方案第十四章「商机：阶段变化符合配置规则，输赢单记录完整」：列表正确展示商机编号、名称、客户、联系人、来源、类型、金额、阶段、赢率、加权预测金额、日期和负责人，点击编号与客户可进入对应详情。',
       '关键词、负责人、来源、类型筛选可用，查询和重置后列表同步变化，总数等于筛选后的真实条数，翻页后数据不同。',
       '点击推进阶段只能进入相邻下一阶段，跨阶段、回退和已关闭商机均被拦截，阶段门必填项与有效报价、成交条件校验生效。',
-      '赢单需合同已审批或订单已确认，输单必须选择输单原因，关闭后概率分别为 100 或 0 且历史可查。',
+      '赢单需合同已审批或订单已确认，输单必须选择输单原因，关闭后赢率分别为 100% 或 0%、加权预测金额列显示「—」且历史可查。',
       '未选中商机时批量操作被拦截，选中后操作有明确结果提示；列表与看板切换数据一致，页面无控制台报错。'
     ]
   },
@@ -13624,7 +13643,7 @@ const PZ_DOC_PC_CFG = {
       '菜单：销售经理可查看团队全部商机，审核阶段推进与特殊折扣，处理停滞商机；管理员拥有全量权限。',
       '按钮：负责人可推进阶段、标记赢单或输单、查看关联单据；赢单需满足成交条件，输单必须填写原因；回退需提交阶段回退申请。',
       '数据：销售数据范围为本人的商机，经理为本部门及下级，管理员为全部；跨部门查看按数据权限拦截。',
-      '字段：金额、成交概率、客户、联系人、竞争对手、输单原因为业务字段；成本、毛利等敏感字段按字段权限隐藏或脱敏。',
+      '字段：金额、赢率、加权预测金额、客户、联系人、竞争对手、输单原因为业务字段；成本、毛利等敏感字段按字段权限隐藏或脱敏。',
       '数据：商机和阶段历史不可物理删除，关闭后归档；阶段变更、关联报价与合同修改均需留痕。'
     ],
     enter: [
@@ -13633,9 +13652,9 @@ const PZ_DOC_PC_CFG = {
       '跳转：客户名称进入 /customer/:no，报价编号进入 /quote/:no，合同编号进入 /contract/:no，订单编号进入 /order/:no；推进弹窗系统检查未满足时可点击「前往处理」前往报价或合同页面。'
     ],
     layout: [
-      '头部：商机名称、阶段 / 输赢结果标签、商机编号、客户链接、关联联系人、负责人、预计成交日期、预计金额、成交概率、阶段进度条，以及推进到下一阶段、标记赢单、标记输单按钮。',
+      '头部：商机名称、阶段 / 输赢结果标签、商机编号、客户链接、关联联系人、负责人、预计成交日期、预计金额、赢率、加权预测金额、阶段进度条，以及推进到下一阶段、标记赢单、标记输单按钮。',
       'Tab：基本信息、跟进记录、关联联系人、关联报价、关联合同、关联订单、商机附件、阶段变更历史、操作日志。',
-      '基本信息：商机编号、名称、客户、联系人、来源、类型、金额、成交日期、当前阶段、成交概率、主要需求、输赢单原因，以及竞争对手分析、各阶段必填信息和客户需求/方案记录。',
+      '基本信息：商机编号、名称、客户、联系人、来源、类型、金额、成交日期、当前阶段、赢率、加权预测金额、主要需求、输赢单原因，以及竞争对手分析、各阶段必填信息和客户需求/方案记录。',
       '阶段变更历史：每次变更展示变更前后阶段、变更人、变更时间和备注；操作日志展示重要操作的执行人、时间和详情。'
     ],
     fields: [
@@ -13646,7 +13665,8 @@ const PZ_DOC_PC_CFG = {
       '商机来源｜下拉框｜必填：是｜校验：线索/客户转介绍/官网/渠道/活动/广告等配置枚举｜说明：用于来源转化分析。',
       '商机类型｜下拉框｜必填：是｜校验：新购/续费/增购等配置枚举｜说明：区分新购与存量业务。',
       '预计金额｜金额｜必填：是｜校验：大于 0，单位为元｜说明：详情头部汇总卡展示。',
-      '成交概率｜百分比｜必填：是｜校验：0 至 100，按阶段或人工配置｜说明：阶段推进后按阶段默认值更新；阶段示意比例 100%/80%/60%/40%/25%/15% 仅表示阶段顺序，不代表实际销售转化率。',
+      '赢率｜百分比｜必填：是｜校验：0 至 100，随阶段按默认赢率更新｜说明：汇总卡与基本信息展示；各阶段默认赢率为初步接触 10%、需求确认 25%、方案沟通 45%、报价谈判 65%、商务审批 85%、赢单 100%、输单 0%（默认赢率为原型假设，待业务确认）；漏斗图的 100%/80%/60%/40%/25%/15% 仅为展示宽度（funnelWidth），不代表转化率或赢率。',
+      '加权预测金额｜金额（计算）｜必填：是（汇总卡实时计算）｜校验：= ⌊预计金额 × 赢率 / 100⌋，按分计算避免浮点误差｜说明：详情汇总卡第三卡展示；仅未结束商机（stage ≠ close）计入预测，已赢单/输单商机展示「—」。',
       '预计成交日期｜日期｜必填：是｜校验：有效业务日期｜说明：预计赢单时间，用于本月预计成交和漏斗周期统计。',
       '当前阶段｜下拉框｜必填：是｜校验：初步接触/需求确认/方案沟通/报价谈判/商务审批/赢单/输单｜说明：阶段进度条高亮当前阶段；关闭后显示赢单或输单结果。',
       '竞争对手｜文本/关联｜必填：否｜校验：输单时适用则填写｜说明：详情页「竞争对手分析」展示竞争品牌和竞争情况。',
@@ -13669,7 +13689,7 @@ const PZ_DOC_PC_CFG = {
       '进入需求确认、方案沟通、商务审批分别校验客户需求、采购时间、预算范围、方案说明、参与联系人、商务条件、审批材料等必填字段；未填项逐项标红并阻止推进。',
       '进入报价谈判前系统检查是否存在有效报价单；进入赢单前系统检查合同已审批或订单已确认；未满足时显示原因和「前往处理」链接。',
       '赢单必须满足企业配置的成交条件，禁止直接标记为赢单；输单必须选择输单原因，竞争对手在适用时填写。',
-      '每次阶段变更保留变更前后阶段、变更人、变更时间和备注；推进成功后写回阶段、成交概率、阶段必填信息和阶段变更历史。',
+      '每次阶段变更保留变更前后阶段、变更人、变更时间和备注；推进成功后写回阶段、赢率（取目标阶段默认赢率；赢单 100 / 输单 0）、阶段必填信息和阶段变更历史，加权预测金额同步重算。',
       '关联联系人、报价、合同、订单、附件和跟进记录均按当前商机与所属客户真实数据展示，不与其他商机混用。',
       '超过 7 天未推进显示停滞并提醒负责人与销售经理，支持经理介入；阶段规则支持后台配置。',
       '查看和操作受数据权限与按钮权限控制，越权请求由后端拦截并记录安全日志。'
@@ -13678,7 +13698,7 @@ const PZ_DOC_PC_CFG = {
       '阶段主流程：初步接触 → 需求确认 → 方案沟通 → 报价谈判 → 商务审批 → 赢单/输单；阶段示意比例依次为 100%/80%/60%/40%/25%/15%，仅表示阶段顺序，不代表实际转化率。',
       '进入条件：初步接触需有明确潜在客户；需求确认需客户表达需求；方案沟通需有初步方案；报价谈判需产品与范围基本明确；商务审批需接近签约；赢单需满足成交条件；输单需明确不再推进。',
       '退出条件：初步接触退出时客户需求初步明确；需求确认退出时需求得到确认；方案沟通退出时客户认可方案方向；报价谈判退出时报价达成基本一致；商务审批退出时商务条件确认。',
-      '关闭流转：商务审批 → 赢单或输单；赢单概率置 100，输单概率置 0；输单原因和竞争对手写入商机，赢单原因可选记录，结果进入赢输分析。',
+      '关闭流转：商务审批 → 赢单或输单；赢单赢率置 100、输单赢率置 0；输单原因和竞争对手写入商机，赢单原因可选记录，结果进入赢输分析，商机不再计入加权预测金额。',
       '关联流转：赢单前须合同审批通过或订单已确认；赢单后生成订单与交付任务，进入履约流程；输单后记录原因并归档。'
     ],
     errors: [
@@ -13701,9 +13721,9 @@ const PZ_DOC_PC_CFG = {
       '自动化提醒接口：扫描长时间停滞商机并通知负责人与销售经理（示例）。'
     ],
     accept: [
-      '对应规划方案第十四章「商机：阶段变化符合配置规则，输赢单记录完整」：详情头部和基本信息完整展示 5.5 的 14 个字段（商机编号、名称、关联客户、关联联系人、来源、类型、预计金额、成交概率、预计成交日期、当前阶段、竞争对手、主要需求、负责人、输赢单原因）。',
+      '对应规划方案第十四章「商机：阶段变化符合配置规则，输赢单记录完整」：详情头部和基本信息完整展示 5.5 的 14 个字段（商机编号、名称、关联客户、关联联系人、来源、类型、预计金额、赢率、预计成交日期、当前阶段、竞争对手、主要需求、负责人、输赢单原因），另增加权预测金额汇总卡（预计金额 × 赢率，按分计算，未结束商机计入）。',
       '阶段推进只能进入相邻下一阶段，跨阶段、回退和已关闭商机推进均被拦截；需求确认、方案沟通、报价谈判、商务审批、赢单、输单的阶段门校验与规划方案 6.3 一致。',
-      '赢单必须合同已审批或订单已确认，输单必须填写输单原因；关闭后概率分别为 100 或 0，输赢单原因可在基本信息查看。',
+      '赢单必须合同已审批或订单已确认，输单必须填写输单原因；关闭后赢率分别为 100% 或 0%，加权预测金额不再计入预测，输赢单原因可在基本信息查看。',
       '阶段变更历史每次包含变更前后阶段、变更人、变更时间和备注；操作日志可查询操作人和时间。',
       '关联联系人、报价、合同、订单、附件、跟进记录均来自当前商机及其客户，空数据展示空态不报错。',
       '对应第十四章重点场景「从商机推进到报价、合同审批、签署和订单生成」：从本页可核对报价、合同、订单链路；修改报价或合同后历史版本和操作记录可查，页面无控制台报错。'
