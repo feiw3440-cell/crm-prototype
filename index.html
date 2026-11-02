@@ -686,11 +686,11 @@ const PH = {
       { no: 'CP-0012', name: '数据迁移服务', cat: '服务', spec: '历史数据清洗导入', unit: '项', price: 15800, cost: 6000, status: '在售', book: '标准价' },
       { no: 'CP-0021', name: '年度运维服务', cat: '维护费用', spec: '7×12 小时响应', unit: '年', price: 18000, cost: 7000, status: '在售', book: '标准价' } ] },
   contracts: { title: '合同管理', crumbs: ['合同管理', '合同台账'], unit: '份', total: 436, stats: [['合同总数', '436'], ['待审批', '7', 'warn'], ['履约中', '218', 'ok'], ['30天内到期', '9', 'danger']],
-    filters: [{ k: 'kw', label: '搜索合同', ph: '合同编号 / 名称 / 客户' }, { k: 'type', label: '合同类型', opts: ['销售合同', '服务合同', '续费合同'] }, { k: 'status', label: '合同状态', opts: ['草稿', '审批中', '履约中', '已完成', '已驳回'] }],
+    filters: [{ k: 'kw', label: '搜索合同', ph: '合同编号 / 名称 / 客户' }, { k: 'type', label: '合同类型', opts: ['销售合同', '服务合同', '续费合同'] }, { k: 'status', label: '合同状态', opts: ['草稿', '待审批', '审批通过', '待签署', '生效', '履约中', '已完成', '已驳回', '已撤销', '已终止', '已到期'] }],
     ops: ['新增合同', '导出'],
     cols: [{ p: 'no', l: '合同编号', w: 150, link: true }, { p: 'name', l: '合同名称', w: 230 }, { p: 'customer', l: '客户名称', w: 210, link: 'cust' }, { p: 'opp', l: '关联商机', w: 150, link: true }, { p: 'type', l: '合同类型', w: 100 }, { p: 'amount', l: '合同金额', w: 120, money: true }, { p: 'sign', l: '签署日期', w: 110 }, { p: 'end', l: '到期日期', w: 110 }, { p: 'owner', l: '负责人', w: 80 }, { p: 'status', l: '合同状态', w: 100, tag: { 草稿: 'info', 审批中: 'warning', 履约中: 'primary', 已完成: 'success', 已驳回: 'danger' } }],
     rows: [
-      { no: 'HT-202611-0006', name: '苏州某某汽配渠道平台合同', customer: '苏州某某汽配有限公司', opp: 'SJ-202609-0010', type: '销售合同', amount: 420000, sign: '-', end: '2027-11-21', owner: '李四', status: '审批中' },
+      { no: 'HT-202611-0006', name: '苏州某某汽配渠道平台合同', customer: '苏州某某汽配有限公司', opp: 'SJ-202609-0010', type: '销售合同', amount: 420000, sign: '-', end: '2027-11-21', owner: '李四', status: '待审批' },
       { no: 'HT-202611-0003', name: '南京某某科技 ERP 实施合同', customer: '南京某某科技有限公司', opp: 'SJ-202608-0004', type: '服务合同', amount: 100000, sign: '2026-10-19', end: '2027-04-19', owner: '张三', status: '履约中' },
       { no: 'HT-202608-0012', name: '江苏某某集团平台建设合同', customer: '江苏某某集团', opp: 'SJ-202607-0003', type: '销售合同', amount: 600000, sign: '2026-08-12', end: '2027-08-11', owner: '李四', status: '履约中' },
       { no: 'HT-202607-0004', name: '杭州某某酒店年度服务合同', customer: '杭州某某酒店管理有限公司', opp: 'SJ-202606-0007', type: '续费合同', amount: 180000, sign: '2026-07-05', end: '2026-11-14', owner: '赵六', status: '履约中' },
@@ -699,7 +699,7 @@ const PH = {
   orders: { title: '订单管理', crumbs: ['订单管理', '销售订单'], unit: '笔', total: 389, stats: [['订单总数', '389'], ['待确认', '11', 'warn'], ['交付中', '96', 'ok'], ['异常（暂停/取消）', '5', 'danger']],
     filters: [{ k: 'kw', label: '搜索订单', ph: '订单编号 / 客户 / 合同' }, { k: 'status', label: '订单状态', opts: ['待确认', '已确认', '待交付', '交付中', '已完成', '已取消'] }],
     ops: ['新增订单', '导出'],
-    cols: [{ p: 'no', l: '订单编号', w: 140, link: true }, { p: 'customer', l: '客户', w: 210, link: 'cust' }, { p: 'contract', l: '合同', w: 150, link: true }, { p: 'opp', l: '商机', w: 150 }, { p: 'amount', l: '订单金额', w: 120, money: true }, { p: 'date', l: '订单日期', w: 110 }, { p: 'dlv', l: '交付日期', w: 110 }, { p: 'owner', l: '负责人', w: 80 }, { p: 'status', l: '订单状态', w: 100, tag: { 待确认: 'info', 已确认: 'primary', 待交付: 'warning', 交付中: 'primary', 已完成: 'success', 已取消: 'danger' } }],
+    cols: [{ p: 'no', l: '订单编号', w: 140, link: true }, { p: 'customer', l: '客户', w: 210, link: 'cust' }, { p: 'contract', l: '合同', w: 150, link: true }, { p: 'opp', l: '商机', w: 150, link: true }, { p: 'amount', l: '订单金额', w: 120, money: true }, { p: 'date', l: '订单日期', w: 110 }, { p: 'dlv', l: '交付日期', w: 110 }, { p: 'owner', l: '负责人', w: 80 }, { p: 'status', l: '订单状态', w: 100, tag: { 待确认: 'info', 已确认: 'primary', 待交付: 'warning', 交付中: 'primary', 已完成: 'success', 已取消: 'danger' } }],
     rows: [
       { no: 'DD-202611-0002', customer: '南京某某科技有限公司', contract: 'HT-202611-0003', opp: 'SJ-202608-0004', amount: 100000, date: '2026-10-19', dlv: '2026-12-10', owner: '张三', status: '交付中' },
       { no: 'DD-202608-0009', customer: '江苏某某集团', contract: 'HT-202608-0012', opp: 'SJ-202607-0003', amount: 600000, date: '2026-08-12', dlv: '2026-12-30', owner: '李四', status: '交付中' },
@@ -1277,12 +1277,12 @@ const EXT_CONTRACTS_PRES = [
     plans: [ { stage: '合同签署', date: '2026-10-20', amount: 30000, status: '已回款' }, { stage: '项目上线', date: '2026-10-28', amount: 40000, status: '部分回款' }, { stage: '项目验收', date: '2026-12-15', amount: 30000, status: '未回款' } ],
     attachments: [ { name: 'HT-202611-0003 合同扫描件.pdf', size: '1.6MB', date: '2026-10-19' }, { name: '付款条款确认函.pdf', size: '320KB', date: '2026-10-19' } ],
     approvals: [ { node: '发起申请', who: '张三', result: '提交', time: '2026-10-16 14:00' }, { node: '销售经理', who: '李四', result: '同意', time: '2026-10-17 09:30' }, { node: '财务', who: '王芳', result: '同意', time: '2026-10-18 10:05' } ] },
-  { no: 'HT-202611-0004', name: '宁波某某商贸会员系统升级合同', customer: '宁波某某商贸有限公司', opp: 'SJ-202608-0002', quote: '', type: '续费合同', amount: 220000, sign: '2026-10-30', end: '2027-10-29', owner: '张三', status: '已签署',
+  { no: 'HT-202611-0004', name: '宁波某某商贸会员系统升级合同', customer: '宁波某某商贸有限公司', opp: 'SJ-202608-0002', quote: '', type: '续费合同', amount: 220000, sign: '2026-10-30', end: '2027-10-29', owner: '张三', status: '生效',
     signDate: '2026-10-30', startDate: '2026-11-05', payTerms: '5 / 5',
     plans: [ { stage: '预付款', date: '2026-11-01', amount: 110000, status: '未回款' }, { stage: '验收款', date: '2027-02-01', amount: 110000, status: '未回款' } ],
     attachments: [ { name: 'HT-202611-0004 合同扫描件.pdf', size: '1.2MB', date: '2026-10-30' } ],
     approvals: [ { node: '发起申请', who: '张三', result: '提交', time: '2026-10-27 09:00' }, { node: '销售经理', who: '周总监', result: '同意', time: '2026-10-28 15:40' }, { node: '财务', who: '王芳', result: '同意', time: '2026-10-29 10:20' } ] },
-  { no: 'HT-202611-0006', name: '苏州某某汽配渠道平台合同', customer: '苏州某某汽配有限公司', opp: 'SJ-202609-0010', quote: 'BJ-202610-0006', type: '销售合同', amount: 420000, sign: '-', end: '2027-11-21', owner: '李四', status: '审批中',
+  { no: 'HT-202611-0006', name: '苏州某某汽配渠道平台合同', customer: '苏州某某汽配有限公司', opp: 'SJ-202609-0010', quote: 'BJ-202610-0006', type: '销售合同', amount: 420000, sign: '-', end: '2027-11-21', owner: '李四', status: '待审批',
     signDate: '', startDate: '', payTerms: '3 / 3 / 4',
     plans: [ { stage: '合同签署', date: '2026-11-20', amount: 126000, status: '未回款' }, { stage: '项目上线', date: '2027-03-20', amount: 126000, status: '未回款' }, { stage: '项目验收', date: '2027-05-20', amount: 168000, status: '未回款' } ],
     attachments: [],
@@ -1666,11 +1666,12 @@ function buildExt(customers, leads, opps) {
     const signDate = quote ? extAddDays(quote.date, extRint(r, 3, 12)) : ym.slice(0, 4) + '-' + ym.slice(4) + '-' + extPad(extRint(r, 1, 28), 2);
     const startDate = extAddDays(signDate, extRint(r, 1, 8));
     const amount = quote ? quote.amount : extRint(r, 4, 70) * 10000;
-    const status = quote ? extPick(r, ['履约中', '履约中', '履约中', '已完成', '已签署', '审批中', '草稿', '已终止', '已到期']) : extPick(r, ['履约中', '已完成', '已终止', '已到期']);
+    const status = quote ? extPick(r, ['履约中', '履约中', '履约中', '已完成', '审批通过', '待签署', '待审批', '草稿', '已终止', '已到期', '已驳回', '已撤销', '生效']) : extPick(r, ['履约中', '已完成', '已终止', '已到期', '生效']);
     const terms = PAY_TERMS[extRint(r, 0, PAY_TERMS.length - 1)];
     const plans = terms.map((t, idx) => {
       const d = idx === 0 ? signDate : extAddDays(startDate, Math.round(idx * 55 * (1 + r() * 0.4)));
-      const stt = status === '草稿' || status === '已终止' ? '未回款' : (idx === 0 && status !== '审批中' && status !== '草稿' ? '已回款' : (d < extAddDays(TODAY, -5) ? '部分回款' : '未回款'));
+      const paidStatus = ['生效', '履约中', '已完成', '已到期'].includes(status);
+      const stt = paidStatus ? (idx === 0 ? '已回款' : (d < extAddDays(TODAY, -5) ? '部分回款' : '未回款')) : '未回款';
       return { stage: t[0], date: d, amount: Math.round(amount * t[1]) / 100, status: stt };
     });
     return {
@@ -1682,8 +1683,8 @@ function buildExt(customers, leads, opps) {
       status, owner: cu.owner || '',
       payTerms: terms.map(t => t[0] + ' ' + t[1] + '%').join(' / '),
       plans,
-      attachments: status === '草稿' || status === '审批中' ? [] : [ { name: '合同扫描件.pdf', size: '1.8MB', date: signDate }, { name: '付款条款确认函.pdf', size: '320KB', date: signDate } ],
-      approvals: status === '审批中'
+      attachments: ['草稿', '待审批', '已驳回', '已撤销'].includes(status) ? [] : [ { name: '合同扫描件.pdf', size: '1.8MB', date: signDate }, { name: '付款条款确认函.pdf', size: '320KB', date: signDate } ],
+      approvals: status === '待审批' || status === '已驳回'
         ? [ { node: '发起申请', who: quote ? quote.owner : (cu.owner || ''), result: '提交', time: extAddDays(signDate, 0) + ' 09:40' }, { node: '销售经理', who: extPick(r, ['张三', '李四', '周总监']), result: '待审批', time: '' } ]
         : (status === '草稿' ? [] : [ { node: '发起申请', who: quote ? quote.owner : (cu.owner || ''), result: '提交', time: extAddDays(signDate, -3) + ' 09:40' }, { node: '销售经理', who: extPick(r, ['张三', '李四', '周总监']), result: '同意', time: extAddDays(signDate, -1) + ' 14:20' } ]),
     };
@@ -1713,21 +1714,21 @@ function buildExt(customers, leads, opps) {
     const ym = c.signDate ? c.signDate.slice(0, 7).replace('-', '') : extPick(r, ['202604', '202606', '202609', '202610']);
     const q = c.quote ? quotes.find(x => x.no === c.quote) : null;
     const items = q ? q.items.map(it => ({ ...it })) : genItems(r);
-    const status = extPick(r, ['待确认', '待确认', '备货中', '交付中', '交付中', '已完成', '已完成', '已取消']);
+    const status = extPick(r, ['待确认', '待确认', '已确认', '待交付', '交付中', '交付中', '已完成', '已完成', '已取消', '暂停执行', '已关闭']);
     const cu = byName[c.customer] || {};
     return {
       no: 'DD-' + ym + '-' + extPad(ddSeq++, 4),
       customer: c.customer, contract: c.no, opp: c.opp || '',
       amount: c.amount, date: extAddDays(c.signDate || TODAY, extRint(r, 0, 5)), dlv: extAddDays(c.signDate || TODAY, extRint(r, 20, 80)),
       owner: c.owner, status, items,
-      invoiceStatus: status === '已完成' ? '已开票' : (status === '待确认' ? '未开票' : '部分开票'),
-      shipStatus: status === '已完成' ? '已签收' : (status === '待确认' ? '未发货' : (status === '备货中' ? '未发货' : '已发货')),
+      invoiceStatus: status === '已完成' ? '已开票' : (['待确认', '已确认', '待交付', '已取消', '已关闭', '暂停执行'].includes(status) ? '未开票' : '部分开票'),
+      shipStatus: status === '已完成' ? '已签收' : (['待确认', '已确认', '待交付', '已取消', '已关闭', '暂停执行'].includes(status) ? '未发货' : '已发货'),
       address: (cu.region || '') + '某某产业园',
     };
   };
   contracts.forEach(c => {
     if (takenContracts.has(c.no)) return;
-    if (c.status === '已签署' || c.status === '履约中' || c.status === '已完成' || c.status === '已到期') orders.push(genOrder(c, extRng(extHash(c.no + '|o'))));
+    if (['待签署', '生效', '履约中', '已完成', '已到期'].includes(c.status)) orders.push(genOrder(c, extRng(extHash(c.no + '|o'))));
   });
   let oi = 0;
   while (orders.length < 32) { const cu = customers[oi % customers.length]; orders.push(genOrder({ customer: cu.name, no: '', amount: extRint(extRng(extHash(cu.no + '|amo' + oi)), 3, 60) * 10000, signDate: '', owner: cu.owner || '', status: '待确认' }, extRng(extHash(cu.no + '|topo' + oi)))); oi++; }
@@ -3871,11 +3872,17 @@ store.ext.contracts.forEach(ct => { if (!ct.startDate) ct.startDate = ct.signDat
 
 /* --- 合同状态流转定义与写日志工具 --- */
 const CT_FLOW = [
-  { from: '草稿', act: '提交审批', to: '审批中', tip: '提交后进入审批流程（销售经理 / 法务 / 财务）' },
-  { from: '审批中', act: '审批通过', to: '已签署', tip: '（演示）模拟审批链全部同意后自动置为已签署' },
-  { from: '已签署', act: '开始履约', to: '履约中', tip: '合同生效进入履约期，可开始回款与交付' },
+  { from: '草稿', act: '提交审批', to: '待审批', tip: '提交后进入审批流程（销售经理 / 法务 / 财务）' },
+  { from: '已驳回', act: '重新提交', to: '待审批', tip: '按驳回原因修改后重新提交审批' },
+  { from: '待审批', act: '审批通过', to: '审批通过', tip: '审批链全部同意，进入待签署' },
+  { from: '审批通过', act: '发起签署', to: '待签署', tip: '审批通过后发送客户签署' },
+  { from: '待签署', act: '确认签署', to: '生效', tip: '双方签署完成，合同正式生效' },
+  { from: '生效', act: '开始履约', to: '履约中', tip: '合同生效进入履约期，可开始回款与交付' },
   { from: '履约中', act: '完成履约', to: '已完成', tip: '款项与交付完成后归档' },
 ];
+const CT_STATUS_ALL = ['草稿', '待审批', '审批通过', '待签署', '生效', '履约中', '已完成', '已驳回', '已撤销', '已终止', '已到期'];
+const CT_TERMINABLE = ['待签署', '生效', '履约中'];
+const CT_WITHDRAWABLE = ['草稿', '待审批', '审批通过', '待签署'];
 const ctLogTime = () => TODAY + ' 0' + ((store.ext.logs.length % 8) + 1) + ':' + ((store.ext.logs.length * 7 % 55) + 5);
 function ctLog(no, act, detail) { store.ext.logs.unshift({ time: ctLogTime(), who: '张三', module: '合同', act, detail: detail + '（合同：' + no + '）' }); }
 function ctTransit(ct, act) {
@@ -3919,26 +3926,28 @@ const ContractsPage = {
     const rows = computed(() => store.ext.contracts.filter(ct => (!dr.from || (ct.signDate || '') >= dr.from) && (!dr.to || (ct.signDate || '') <= dr.to)));
     const customerOpts = computed(() => [...new Set(store.ext.contracts.map(ct => ct.customer).filter(Boolean))].sort());
     const ownerOpts = computed(() => [...new Set(store.ext.contracts.map(ct => ct.owner).filter(Boolean))]);
-    const statusOpts = ['草稿', '审批中', '已签署', '履约中', '已完成', '已终止', '已到期'];
+    const statusOpts = CT_STATUS_ALL;
     const cols = [
       { p: 'no', l: '合同编号', w: 150, link: true }, { p: 'name', l: '合同名称', w: 220 }, { p: 'customer', l: '客户名称', w: 200, link: 'cust' },
-      { p: 'type', l: '合同类型', w: 100 }, { p: 'amount', l: '合同金额', w: 130, money: true }, { p: 'signDate', l: '签署日期', w: 110 },
-      { p: 'endDate', l: '到期日期', w: 110 }, { p: 'owner', l: '负责人', w: 90 },
-      { p: 'status', l: '合同状态', w: 100, tag: { 草稿: 'info', 审批中: 'warning', 已签署: 'primary', 履约中: 'primary', 已完成: 'success', 已终止: 'danger', 已到期: 'info' } },
+      { p: 'opp', l: '关联商机', w: 150, link: true }, { p: 'type', l: '合同类型', w: 100 }, { p: 'amount', l: '合同金额', w: 130, money: true },
+      { p: 'signDate', l: '签署日期', w: 110 }, { p: 'startDate', l: '生效日期', w: 110 }, { p: 'endDate', l: '到期日期', w: 110 },
+      { p: 'owner', l: '负责人', w: 90 },
+      { p: 'status', l: '合同状态', w: 100, tag: { 草稿: 'info', 待审批: 'warning', 审批通过: 'warning', 待签署: 'primary', 生效: 'primary', 履约中: 'primary', 已完成: 'success', 已驳回: 'danger', 已撤销: 'info', 已终止: 'danger', 已到期: 'info' } },
     ];
     const filters = computed(() => [
       { k: 'kw', label: '搜索合同', ph: '合同编号 / 名称 / 客户' }, { k: 'customer', label: '客户', opts: customerOpts.value },
+      { k: 'type', label: '合同类型', opts: ['销售合同', '服务合同', '续费合同'] },
       { k: 'status', label: '状态', opts: statusOpts }, { k: 'owner', label: '负责人', opts: ownerOpts.value },
     ]);
     /* ---- 行内操作 ---- */
-    const onLink = (c, row) => go('/contract/' + row.no);
-    const transit = row => { const step = CT_FLOW.find(f => f.from === row.status); if (!step) return ElMessage.info('当前状态「' + row.status + '」不可推进'); ctTransit(row, step.act); ElMessage.success('已' + step.act + '（草稿链演示：' + step.tip + '），状态与日志已更新'); };
+    const onLink = (c, row) => (c.p === 'opp' && row.opp ? go('/opp/' + row.opp) : go('/contract/' + row.no));
+    const transit = row => { const step = CT_FLOW.find(f => f.from === row.status); if (!step) return ElMessage.info('当前状态「' + row.status + '」不可推进'); ctTransit(row, step.act); ElMessage.success('已' + step.act + '（' + step.tip + '），状态与日志已更新'); };
     const terminate = row => ElMessageBox.prompt('终止后合同进入「已终止」终态，未收回款与未完成订单将保持但不允许再推进。请填写终止原因（必填）：', '终止合同 ' + row.no, { confirmButtonText: '确认终止', cancelButtonText: '取消', inputPattern: /\S+/, inputErrorMessage: '终止原因不能为空' })
-      .then(({ value }) => { row.status = '已终止'; ctLog(row.no, '终止', '原因：' + value + '；原状态：' + (row._prev || '')); ElMessage.success('合同已终止，原因已记录'); }).catch(() => {});
+      .then(({ value }) => { const prev = row.status; row.status = '已终止'; ctLog(row.no, '终止', '原因：' + value + '；原状态：' + prev); ElMessage.success('合同已终止，原因已记录'); }).catch(() => {});
     /* ---- 新建合同弹窗 ---- */
     const fref = ref(null);
     const dlg = ref(false);
-    const draft = reactive({ customer: '', name: '', quote: '', type: '销售合同', amount: null, signDate: TODAY, startDate: '', endDate: '', tpl: 'A', owner: '张三' });
+    const draft = reactive({ customer: '', name: '', quote: '', opp: '', type: '销售合同', amount: null, taxRate: 6, signDate: TODAY, startDate: '', endDate: '', tpl: 'A', owner: '张三' });
     const rule = {
       customer: [{ required: true, message: '请选择客户', trigger: 'change' }],
       name: [{ required: true, message: '请填写合同名称', trigger: 'blur' }],
@@ -3947,7 +3956,9 @@ const ContractsPage = {
       tpl: [{ required: true, message: '请选择付款条款', trigger: 'change' }],
     };
     const quoteOpts = computed(() => draft.customer ? store.ext.quotes.filter(q => q.customer === draft.customer && q.appr === '已通过') : []);
-    const watchCust = nv => { draft.quote = ''; if (!draft.name) draft.name = extShort(nv) + ' ' + draft.type; };
+    const oppOpts = computed(() => draft.customer ? store.opps.filter(o => o.customer === draft.customer) : []);
+    const watchCust = nv => { draft.quote = ''; draft.opp = ''; if (!draft.name) draft.name = extShort(nv) + ' ' + draft.type; };
+    const watchQuote = nv => { const q = quoteOpts.value.find(x => x.no === nv); if (q && q.opp) draft.opp = q.opp; };
     const save = () => fref.value.validate(ok => {
       if (!ok) return;
       const tpl = CT_PAY_TPLS.find(t => t.key === draft.tpl);
@@ -3957,16 +3968,16 @@ const ContractsPage = {
       let no; do { no = base + String(seq++).padStart(4, '0'); } while (already.has(no));
       const plans = tpl.stages.map((st, i) => ({ stage: st[0], date: extAddDays(draft.startDate, i * 60), amount: Math.round(draft.amount * st[1]) / 100, status: i === 0 ? '未回款' : '未回款' }));
       store.ext.contracts.unshift({
-        no, name: draft.name, customer: draft.customer, quote: draft.quote || '', opp: (quoteOpts.value.find(q => q.no === draft.quote) || {}).opp || '',
-        type: draft.type, amount: draft.amount, signDate: draft.signDate, startDate: draft.startDate, endDate: draft.endDate,
+        no, name: draft.name, customer: draft.customer, quote: draft.quote || '', opp: draft.opp || (quoteOpts.value.find(q => q.no === draft.quote) || {}).opp || '',
+        type: draft.type, amount: draft.amount, taxRate: draft.taxRate, signDate: draft.signDate, startDate: draft.startDate, endDate: draft.endDate,
         status: '草稿', owner: draft.owner, payTerms: tpl.stages.map(s => s[0] + ' ' + s[1] + '%').join(' / '),
-        plans, attachments: [], approvals: [{ node: '发起申请', who: draft.owner, result: '草稿保存', time: TODAY + ' 09:00' }],
+        plans, attachments: [], changes: [], approvals: [{ node: '发起申请', who: draft.owner, result: '草稿保存', time: TODAY + ' 09:00' }],
       });
       ctLog(no, '新建', '新建合同（客户：' + draft.customer + '，金额：¥' + fmtY(draft.amount) + '，付款条款：' + tpl.label + '）');
       dlg.value = false; ElMessage.success('合同已保存为草稿，可提交审批');
       go('/contract/' + no);
     });
-    return { totalText, stats, rows, cols, filters, dr, store, dlg, fref, draft, rule, CT_PAY_TPLS, quoteOpts, watchCust, save, onLink, transit, terminate, fmtY, fmtC, today: TODAY };
+    return { totalText, stats, rows, cols, filters, dr, store, dlg, fref, draft, rule, CT_PAY_TPLS, quoteOpts, oppOpts, watchCust, watchQuote, save, onLink, transit, terminate, fmtY, fmtC, today: TODAY };
   },
   template: `<div>
     <list-page :crumbs="['合同管理','合同台账']" title="合同台账" :total-text="totalText" :stats="stats" :filters="filters" :rows="rows" :cols="cols" :action-width="200" note-tag="真实数据 · 点击合同编号进入详情"
@@ -3987,21 +3998,27 @@ const ContractsPage = {
       </template>
       <template #actions="{row}">
         <el-button link type="primary" @click="$go('/contract/'+row.no)">查看</el-button>
-        <el-button v-if="['草稿','审批中','已签署','履约中'].includes(row.status)" link type="primary" @click="transit(row)">{{ ({'草稿':'提交审批','审批中':'审批通过','已签署':'开始履约','履约中':'完成履约'})[row.status] }}</el-button>
-        <el-button v-if="['审批中','已签署','履约中'].includes(row.status)" link type="danger" @click="terminate(row)">终止</el-button>
+        <el-button v-if="['草稿','已驳回','待审批','审批通过','待签署','生效','履约中'].includes(row.status)" link type="primary" @click="transit(row)">{{ ({'草稿':'提交审批','已驳回':'重新提交','待审批':'审批通过','审批通过':'发起签署','待签署':'确认签署','生效':'开始履约','履约中':'完成履约'})[row.status] }}</el-button>
+        <el-button v-if="['待签署','生效','履约中'].includes(row.status)" link type="danger" @click="terminate(row)">终止</el-button>
       </template>
     </list-page>
     <el-dialog v-model="dlg" title="新建合同（保存为草稿）" width="680px">
       <el-form ref="fref" :model="draft" :rules="rule" label-width="110px">
         <el-row :gutter="12">
           <el-col :span="12"><el-form-item label="客户" prop="customer"><el-select v-model="draft.customer" filterable placeholder="选择客户" style="width:100%" @change="watchCust"><el-option v-for="c in store.customers" :key="c.no" :label="c.name" :value="c.name"/></el-select></el-form-item></el-col>
-          <el-col :span="12"><el-form-item label="关联报价"><el-select v-model="draft.quote" clearable placeholder="该客户已通过的报价" style="width:100%"><el-option v-for="q in quoteOpts" :key="q.no" :label="q.no + '（¥' + fmtY(q.amount) + '）'" :value="q.no"/></el-select></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="关联报价"><el-select v-model="draft.quote" clearable placeholder="该客户已通过的报价" style="width:100%" @change="watchQuote"><el-option v-for="q in quoteOpts" :key="q.no" :label="q.no + '（¥' + fmtY(q.amount) + '）'" :value="q.no"/></el-select></el-form-item></el-col>
         </el-row>
-        <el-form-item label="合同名称" prop="name"><el-input v-model="draft.name" placeholder="如：某某科技 ERP 实施合同" style="width:100%"/></el-form-item>
+        <el-row :gutter="12">
+          <el-col :span="12"><el-form-item label="关联商机"><el-select v-model="draft.opp" clearable filterable placeholder="选择该客户的商机" style="width:100%"><el-option v-for="o in oppOpts" :key="o.no" :label="o.no + ' · ' + o.name" :value="o.no"/></el-select></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="合同名称" prop="name"><el-input v-model="draft.name" placeholder="如：某某科技 ERP 实施合同" style="width:100%"/></el-form-item></el-col>
+        </el-row>
         <el-row :gutter="12">
           <el-col :span="8"><el-form-item label="合同金额" prop="amount"><el-input-number v-model="draft.amount" :min="0" :step="10000" :controls="false" placeholder="元" style="width:100%"/></el-form-item></el-col>
           <el-col :span="8"><el-form-item label="合同类型"><el-select v-model="draft.type" style="width:100%"><el-option v-for="x in ['销售合同','服务合同','续费合同']" :key="x" :value="x"/></el-select></el-form-item></el-col>
-          <el-col :span="8"><el-form-item label="签署日期"><el-date-picker v-model="draft.signDate" type="date" value-format="YYYY-MM-DD" style="width:100%"/></el-form-item></el-col>
+          <el-col :span="8"><el-form-item label="税率(%)"><el-input-number v-model="draft.taxRate" :min="0" :max="100" :controls="false" style="width:100%"/></el-form-item></el-col>
+        </el-row>
+        <el-row :gutter="12">
+          <el-col :span="12"><el-form-item label="签署日期"><el-date-picker v-model="draft.signDate" type="date" value-format="YYYY-MM-DD" style="width:100%"/></el-form-item></el-col>
         </el-row>
         <el-form-item label="起止日期" prop="dates">
           <el-date-picker v-model="draft.startDate" type="date" value-format="YYYY-MM-DD" placeholder="开始日期" style="width:49%"/>
@@ -4050,31 +4067,83 @@ const ContractDetailPage = {
     const buttons = computed(() => {
       const c = ct.value; if (!c) return [];
       const b = [];
-      const step = CT_FLOW.find(f => f.from === c.status);
-      if (step) b.push({ act: step.act, type: 'primary', label: step.act, tip: step.tip });
-      if (['审批中', '已签署', '履约中'].includes(c.status)) b.push({ act: 'terminate', type: 'danger', plain: true, label: '终止合同' });
+      if (c.status === '待审批') {
+        b.push({ act: '审批通过', type: 'primary', label: '审批通过', tip: '审批链同意后进入审批通过' });
+        b.push({ act: 'reject', type: 'danger', plain: true, label: '驳回' });
+      } else {
+        const step = CT_FLOW.find(f => f.from === c.status);
+        if (step) b.push({ act: step.act, type: 'primary', label: step.act, tip: step.tip });
+      }
+      if (CT_WITHDRAWABLE.includes(c.status)) b.push({ act: 'withdraw', type: 'warning', plain: true, label: '撤销' });
+      if (['生效', '履约中'].includes(c.status)) b.push({ act: 'change', type: 'warning', plain: true, label: '合同变更' });
+      if (CT_TERMINABLE.includes(c.status)) b.push({ act: 'terminate', type: 'danger', plain: true, label: '终止合同' });
       return b;
     });
-    const termDlg = ref(false); const termRf = reactive({ reason: '', fref: null });
-    const termRule = { reason: [{ required: true, message: '终止原因必填', trigger: 'blur' }] };
+    const termDlg = ref(false); const termRf = reactive({ reason: '' });
+    const reasonDlg = ref(false); const reasonMode = ref('reject'); const reasonRf = reactive({ reason: '' });
+    const chgDlg = ref(false); const chgRf = reactive({ type: '金额变更', reason: '', amount: 0 });
+    const changes = computed(() => (ct.value && ct.value.changes) || []);
+    const taxRate = computed(() => (ct.value && ct.value.taxRate != null ? ct.value.taxRate : 6));
+    const parties = computed(() => {
+      const c = ct.value; if (!c) return [];
+      return [
+        ['甲方（客户）', c.customer],
+        ['乙方（我方）', '某某软件有限公司'],
+        ['甲方签约人', c.owner || '-'],
+        ['乙方签约人', '商务负责人 ' + (c.owner || '-')],
+        ['签署方式', c.signDate ? '电子签章 + 纸质原件' : '待签署'],
+        ['签署时间', c.signDate || '待签署'],
+      ];
+    });
     const doAct = b => {
       if (b.act === 'terminate') { termRf.reason = ''; termDlg.value = true; return; }
+      if (b.act === 'reject') { reasonMode.value = 'reject'; reasonRf.reason = ''; reasonDlg.value = true; return; }
+      if (b.act === 'withdraw') { reasonMode.value = 'withdraw'; reasonRf.reason = ''; reasonDlg.value = true; return; }
+      if (b.act === 'change') { chgRf.type = '金额变更'; chgRf.reason = ''; chgRf.amount = ct.value.amount; chgDlg.value = true; return; }
       if (ctTransit(ct.value, b.act)) ElMessage.success('已' + b.act + '（' + b.tip + '），状态与操作日志已更新');
       else ElMessage.info('当前状态不可执行该操作');
+    };
+    const doReason = () => {
+      const v = reasonRf.reason.trim();
+      if (!v) return ElMessage.warning('请填写原因（必填）');
+      const prev = ct.value.status;
+      if (reasonMode.value === 'reject') {
+        ct.value.status = '已驳回';
+        ct.value.approvals = ct.value.approvals || [];
+        ct.value.approvals.push({ node: '审批驳回', who: '审批人', result: '已驳回', time: TODAY + ' 15:00' });
+        ctLog(ct.value.no, '驳回', '审批驳回，原因：' + v + '；原状态：' + prev);
+      } else {
+        ct.value.status = '已撤销';
+        ctLog(ct.value.no, '撤销', '撤销原因：' + v + '；原状态：' + prev);
+      }
+      reasonDlg.value = false;
+      ElMessage.success(reasonMode.value === 'reject' ? '合同已驳回，原因已记录' : '合同已撤销，原因已记录');
     };
     const doTerminate = () => {
       const v = termRf.reason.trim();
       if (!v) return ElMessage.warning('请填写终止原因（必填）');
+      const prev = ct.value.status;
       ct.value.status = '已终止';
-      ctLog(ct.value.no, '终止', '终止原因：' + v);
+      ctLog(ct.value.no, '终止', '终止原因：' + v + '；原状态：' + prev);
       termDlg.value = false;
       ElMessage.success('合同已终止，原因已写入操作日志');
     };
-    return { ct, tab, custNo, planRows, paySum, ordersOf, quoteOf, oppOf, logs, buttons, doAct, termDlg, termRf, doTerminate, fmtY, fmtC, CT_FLOW, today: TODAY };
+    const doChange = () => {
+      const v = chgRf.reason.trim();
+      if (!v) return ElMessage.warning('请填写变更原因（必填）');
+      if (chgRf.type === '金额变更' && (!chgRf.amount || chgRf.amount <= 0)) return ElMessage.warning('变更后金额必须大于 0');
+      const c = ct.value;
+      if (!c.changes) c.changes = [];
+      c.changes.unshift({ time: TODAY + ' 16:00', type: chgRf.type, reason: v, before: c.amount, after: chgRf.type === '金额变更' ? chgRf.amount : c.amount, status: '待审批', who: '张三' });
+      ctLog(c.no, '变更申请', chgRf.type + '：' + v + '；变更前 ¥' + fmtY(c.amount) + (chgRf.type === '金额变更' ? '，变更后 ¥' + fmtY(chgRf.amount) : '') + '，需重新审批后生效');
+      chgDlg.value = false;
+      ElMessage.success('变更申请已提交，需重新审批后生效');
+    };
+    return { ct, tab, custNo, planRows, paySum, ordersOf, quoteOf, oppOf, logs, buttons, doAct, termDlg, termRf, doTerminate, reasonDlg, reasonMode, reasonRf, doReason, chgDlg, chgRf, doChange, changes, taxRate, parties, fmtY, fmtC, CT_FLOW, today: TODAY };
   },
   template: `<div v-if="ct">
     <el-breadcrumb separator="/" class="crumb"><el-breadcrumb-item><a @click="$go('/contracts')">合同管理</a></el-breadcrumb-item><el-breadcrumb-item><a @click="$go('/contracts')">合同台账</a></el-breadcrumb-item><el-breadcrumb-item>{{ ct.no }}</el-breadcrumb-item></el-breadcrumb>
-    <div class="page-head"><h1>{{ ct.name }}</h1><el-tag :type="({草稿:'info',审批中:'warning',已签署:'primary',履约中:'primary',已完成:'success',已终止:'danger',已到期:'info'})[ct.status]||'info'">{{ ct.status }}</el-tag><span class="total">合同金额 ¥{{ fmtY(ct.amount) }} · <a class="link" @click="$go('/customer/'+custNo)">{{ ct.customer }}</a></span></div>
+    <div class="page-head"><h1>{{ ct.name }}</h1><el-tag :type="({草稿:'info',待审批:'warning',审批通过:'warning',待签署:'primary',生效:'primary',履约中:'primary',已完成:'success',已驳回:'danger',已撤销:'info',已终止:'danger',已到期:'info'})[ct.status]||'info'">{{ ct.status }}</el-tag><span class="total">合同金额 ¥{{ fmtY(ct.amount) }} · <a class="link" @click="$go('/customer/'+custNo)">{{ ct.customer }}</a></span></div>
     <div class="ops" style="margin-top:-4px">
       <el-button v-for="b in buttons" :key="b.act" :type="b.type" :plain="!!b.plain" @click="doAct(b)">{{ b.label }}</el-button>
       <el-button icon="Document" @click="$msg.info('示例：下载合同 PDF')">下载</el-button>
@@ -4089,16 +4158,42 @@ const ContractDetailPage = {
               <el-descriptions-item label="合同名称">{{ ct.name }}</el-descriptions-item>
               <el-descriptions-item label="合同类型">{{ ct.type }}</el-descriptions-item>
               <el-descriptions-item label="客户"><a class="link" @click="$go('/customer/'+custNo)">{{ ct.customer }}</a></el-descriptions-item>
+              <el-descriptions-item label="关联商机"><a v-if="ct.opp" class="link" @click="$go('/opp/'+ct.opp)">{{ ct.opp }}</a><span v-else>-</span></el-descriptions-item>
               <el-descriptions-item label="合同金额"><span class="money">¥{{ fmtY(ct.amount) }}</span></el-descriptions-item>
+              <el-descriptions-item label="税率">{{ taxRate }}%</el-descriptions-item>
               <el-descriptions-item label="负责人">{{ ct.owner }}</el-descriptions-item>
               <el-descriptions-item label="签署日期">{{ ct.signDate || '-' }}</el-descriptions-item>
-              <el-descriptions-item label="开始日期">{{ ct.startDate || '-' }}</el-descriptions-item>
+              <el-descriptions-item label="生效日期">{{ ct.startDate || '-' }}</el-descriptions-item>
               <el-descriptions-item label="到期日期">{{ ct.endDate || '-' }}</el-descriptions-item>
             </el-descriptions>
             <el-descriptions :column="1" border style="margin-top:12px">
               <el-descriptions-item label="履约期限">{{ (ct.startDate || '-') + ' 至 ' + (ct.endDate || '-') }}</el-descriptions-item>
-              <el-descriptions-item label="付款条款">{{ ct.payTerms || '-' }}</el-descriptions-item>
+              <el-descriptions-item label="付款条件">{{ ct.payTerms || '-' }}</el-descriptions-item>
             </el-descriptions>
+          </div>
+        </el-tab-pane>
+        <el-tab-pane label="签约与变更" name="sign">
+          <div class="card card-pad" style="padding:14px 18px">
+            <div class="card-title">合同主体及签约方</div>
+            <el-descriptions :column="2" border>
+              <el-descriptions-item v-for="p in parties" :key="p[0]" :label="p[0]">{{ p[1] }}</el-descriptions-item>
+            </el-descriptions>
+            <div class="card-title" style="margin-top:16px">签署信息</div>
+            <el-descriptions :column="2" border>
+              <el-descriptions-item label="签署日期">{{ ct.signDate || '待签署' }}</el-descriptions-item>
+              <el-descriptions-item label="合同生效日期">{{ ct.startDate || '-' }}</el-descriptions-item>
+              <el-descriptions-item label="签署状态">{{ ct.signDate ? '已签署' : '待签署' }}</el-descriptions-item>
+              <el-descriptions-item label="合同文件">{{ (ct.attachments && ct.attachments.length) ? ct.attachments[0].name : '待上传' }}</el-descriptions-item>
+            </el-descriptions>
+            <div class="card-title" style="margin-top:16px">变更、补充协议</div>
+            <el-alert v-if="!changes.length" type="info" show-icon :closable="false" title="暂无变更记录；合同审批后如需修改金额 / 付款条件，应提交变更申请并重新审批（第十二章「合同审批后修改」）。"/>
+            <el-table v-else :data="changes" size="small" border>
+              <el-table-column prop="time" label="申请时间" width="150"/><el-table-column prop="type" label="变更类型" width="110"/>
+              <el-table-column prop="reason" label="变更原因" min-width="220"/>
+              <el-table-column label="金额变化" width="220"><template #default="{row}">¥{{ fmtY(row.before) }} → ¥{{ fmtY(row.after) }}</template></el-table-column>
+              <el-table-column prop="status" label="审批状态" width="100"><template #default="{row}"><el-tag size="small" :type="row.status==='已通过'?'success':'warning'">{{ row.status }}</el-tag></template></el-table-column>
+              <el-table-column prop="who" label="申请人" width="90"/>
+            </el-table>
           </div>
         </el-tab-pane>
         <el-tab-pane label="合同条款与付款条款" name="terms">
@@ -4139,7 +4234,7 @@ const ContractDetailPage = {
               <el-table-column label="订单金额" width="130" align="right"><template #default="{row}"><span class="money">¥{{ fmtY(row.amount) }}</span></template></el-table-column>
               <el-table-column prop="date" label="订单日期" width="110"/><el-table-column prop="dlv" label="交付日期" width="110"/>
               <el-table-column prop="owner" label="负责人" width="90"/>
-              <el-table-column label="状态" width="100"><template #default="{row}"><el-tag size="small" :type="({待确认:'info',备货中:'warning',交付中:'primary',已完成:'success',已取消:'danger'})[row.status]||'info'">{{ row.status }}</el-tag></template></el-table-column>
+              <el-table-column label="状态" width="100"><template #default="{row}"><el-tag size="small" :type="({待确认:'info',已确认:'warning',待交付:'warning',交付中:'primary',已完成:'success',已取消:'danger',已关闭:'info',暂停执行:'danger'})[row.status]||'info'">{{ row.status }}</el-tag></template></el-table-column>
             </el-table>
             <div style="margin-top:12px"><el-button type="primary" plain icon="Plus" @click="$go('/orders')">去订单管理新建</el-button></div>
           </div>
@@ -4166,7 +4261,7 @@ const ContractDetailPage = {
         </el-tab-pane>
         <el-tab-pane label="附件" name="files">
           <div class="card card-pad" style="padding:14px 18px">
-            <el-alert v-if="!(ct.attachments||[]).length" type="info" show-icon :closable="false" title="暂无附件；草稿 / 审批中合同可先上传付款条款确认函等材料。"/>
+            <el-alert v-if="!(ct.attachments||[]).length" type="info" show-icon :closable="false" title="暂无附件；草稿 / 待审批合同可先上传付款条款确认函等材料。"/>
             <el-table v-else :data="ct.attachments" size="small" border>
               <el-table-column label="文件名" min-width="240"><template #default="{row}"><a class="link"><el-icon style="vertical-align:-2px"><document/></el-icon> {{ row.name }}</a></template></el-table-column>
               <el-table-column prop="size" label="大小" width="90"/><el-table-column prop="date" label="上传日期" width="120"/>
@@ -4189,6 +4284,20 @@ const ContractDetailPage = {
         </div></el-tab-pane>
       </el-tabs>
     </el-card>
+    <el-dialog v-model="reasonDlg" :title="reasonMode==='reject' ? '驳回合同（原因必填）' : '撤销合同（原因必填）'" width="480px">
+      <el-alert type="warning" show-icon :closable="false" style="margin-bottom:12px" :title="reasonMode==='reject' ? '驳回后合同状态变为「已驳回」，修改后可重新提交审批。' : '撤销后合同状态变为「已撤销」，可在合同台账查看历史记录。'"/>
+      <el-input v-model="reasonRf.reason" type="textarea" :rows="3" placeholder="请填写原因（将写入审批记录与操作日志）"/>
+      <template #footer><el-button @click="reasonDlg=false">取消</el-button><el-button type="danger" @click="doReason">确认</el-button></template>
+    </el-dialog>
+    <el-dialog v-model="chgDlg" title="合同变更申请（需重新审批）" width="520px">
+      <el-alert type="warning" show-icon :closable="false" style="margin-bottom:12px" title="合同审批后修改金额、付款条件或补充协议，必须提交变更申请并重新审批；未审批通过前不覆盖原合同内容。"/>
+      <el-form label-width="100px">
+        <el-form-item label="变更类型"><el-select v-model="chgRf.type" style="width:100%"><el-option v-for="x in ['金额变更','付款条件变更','补充协议']" :key="x" :value="x"/></el-select></el-form-item>
+        <el-form-item v-if="chgRf.type==='金额变更'" label="变更后金额"><el-input-number v-model="chgRf.amount" :min="0" :step="10000" :controls="false" style="width:100%"/></el-form-item>
+        <el-form-item label="变更原因"><el-input v-model="chgRf.reason" type="textarea" :rows="3" placeholder="请填写变更原因（必填）"/></el-form-item>
+      </el-form>
+      <template #footer><el-button @click="chgDlg=false">取消</el-button><el-button type="primary" @click="doChange">提交变更审批</el-button></template>
+    </el-dialog>
     <el-dialog v-model="termDlg" title="终止合同（原因必填）" width="480px">
       <el-alert type="warning" show-icon :closable="false" style="margin-bottom:12px" title="终止后合同进入终态「已终止」，未收回款与未完成订单保持原状且不可再推进。"/>
       <el-input v-model="termRf.reason" type="textarea" :rows="3" placeholder="请填写终止原因（将写入操作日志）"/>
@@ -7624,17 +7733,26 @@ DOCS_DEFAULT['order-detail'] = mkDoc('order-detail', {
 
 /* --- 订单状态流转定义 --- */
 const OD_FLOW = [
-  { from: '待确认', act: '确认订单', to: '备货中', tip: '订单信息确认无误，进入备货' },
-  { from: '备货中', act: '开始交付', to: '交付中', tip: '货物 / 服务准备就绪，开始交付' },
+  { from: '待确认', act: '确认订单', to: '已确认', tip: '订单信息确认无误，进入已确认' },
+  { from: '已确认', act: '确认待交付', to: '待交付', tip: '商品 / 服务准备就绪，进入待交付' },
+  { from: '待交付', act: '开始交付', to: '交付中', tip: '开始向客户交付货物或服务' },
   { from: '交付中', act: '确认完成', to: '已完成', tip: '客户已签收 / 验收通过' },
 ];
-const OD_CANCELABLE = ['待确认', '备货中', '交付中'];
+const OD_STATUS_ALL = ['待确认', '已确认', '待交付', '交付中', '已完成', '已取消', '已关闭', '暂停执行'];
+const OD_CANCELABLE = ['待确认', '已确认', '待交付'];
+const OD_PAUSABLE = ['已确认', '待交付', '交付中'];
+const OD_CLOSABLE = ['待确认', '已确认', '待交付', '交付中', '暂停执行'];
 function odLog(no, act, detail) { store.ext.logs.unshift({ time: TODAY + ' 1' + ((store.ext.logs.length % 7) + 1) + ':' + ((store.ext.logs.length * 13 % 50) + 9), who: '张三', module: '订单', act, detail: detail + '（订单：' + no + '）' }); }
+function odShipOf(status) {
+  if (status === '已完成') return '已签收';
+  if (status === '交付中') return '已发货';
+  return '未发货';
+}
 function odTransit(od, act) {
   const step = OD_FLOW.find(f => f.from === od.status && f.act === act);
   if (!step) return false;
   od.status = step.to;
-  od.shipStatus = od.status === '已完成' ? '已签收' : (od.status === '交付中' ? '已发货' : '未发货');
+  od.shipStatus = odShipOf(od.status);
   odLog(od.no, act, '状态由「' + step.from + '」变更为「' + step.to + '」');
   return true;
 }
@@ -7649,32 +7767,32 @@ const OrdersPage = {
       const a = store.ext.orders;
       return [
         ['订单总数', String(a.length), ''],
-        ['待确认', String(a.filter(o => o.status === '待确认').length), 'warn'],
+        ['待处理', String(a.filter(o => ['待确认', '已确认', '待交付'].includes(o.status)).length), 'warn'],
         ['交付中', String(a.filter(o => o.status === '交付中').length), 'ok'],
         ['已完成', String(a.filter(o => o.status === '已完成').length), 'ok'],
-        ['已取消', String(a.filter(o => o.status === '已取消').length), 'danger'],
+        ['异常', String(a.filter(o => ['已取消', '已关闭', '暂停执行'].includes(o.status)).length), 'danger'],
       ];
     });
     const cols = [
-      { p: 'no', l: '订单编号', w: 150, link: true }, { p: 'customer', l: '客户', w: 200, link: 'cust' }, { p: 'contract', l: '关联合同', w: 160 },
-      { p: 'amount', l: '订单金额', w: 130, money: true }, { p: 'date', l: '订单日期', w: 110 }, { p: 'dlv', l: '交付日期', w: 110 },
-      { p: 'owner', l: '负责人', w: 90 }, { p: 'status', l: '订单状态', w: 100, tag: { 待确认: 'info', 备货中: 'warning', 交付中: 'primary', 已完成: 'success', 已取消: 'danger' } },
+      { p: 'no', l: '订单编号', w: 150, link: true }, { p: 'customer', l: '客户', w: 200, link: 'cust' }, { p: 'contract', l: '合同', w: 160, link: true },
+      { p: 'opp', l: '商机', w: 150, link: true }, { p: 'amount', l: '订单金额', w: 130, money: true }, { p: 'date', l: '订单日期', w: 110 }, { p: 'dlv', l: '交付日期', w: 110 },
+      { p: 'owner', l: '负责人', w: 90 }, { p: 'status', l: '订单状态', w: 100, tag: { 待确认: 'info', 已确认: 'warning', 待交付: 'warning', 交付中: 'primary', 已完成: 'success', 已取消: 'danger', 已关闭: 'info', 暂停执行: 'danger' } },
       { p: 'invoiceStatus', l: '开票状态', w: 100, tag: { 未开票: 'info', 部分开票: 'warning', 已开票: 'success' } },
     ];
     const filters = computed(() => [
-      { k: 'kw', label: '搜索订单', ph: '订单编号 / 客户 / 合同' }, { k: 'status', label: '订单状态', opts: ['待确认', '备货中', '交付中', '已完成', '已取消'] },
+      { k: 'kw', label: '搜索订单', ph: '订单编号 / 客户 / 合同' }, { k: 'status', label: '订单状态', opts: OD_STATUS_ALL },
       { k: 'invoiceStatus', label: '开票状态', opts: ['未开票', '部分开票', '已开票'] },
     ]);
-    const onLink = (c, row) => (c.p === 'contract' ? go('/contract/' + row.contract) : go('/order/' + row.no));
+    const onLink = (c, row) => (c.p === 'contract' && row.contract ? go('/contract/' + row.contract) : (c.p === 'opp' && row.opp ? go('/opp/' + row.opp) : go('/order/' + row.no)));
     const transit = row => { const step = OD_FLOW.find(f => f.from === row.status); if (!step) return ElMessage.info('当前状态「' + row.status + '」不可推进'); odTransit(row, step.act); ElMessage.success('已' + step.act + '（' + step.tip + '），状态与日志已更新'); };
     const cancel = row => ElMessageBox.prompt('取消后订单进入「已取消」终态，可释放该合同的金额占用。请填写取消原因（必填）：', '取消订单 ' + row.no, { confirmButtonText: '确认取消', cancelButtonText: '返回', inputPattern: /\S+/, inputErrorMessage: '取消原因不能为空' })
-      .then(({ value }) => { row.status = '已取消'; odLog(row.no, '取消', '取消原因：' + value + '；合同金额占用已释放'); ElMessage.success('订单已取消，原因已记录'); }).catch(() => {});
+      .then(({ value }) => { row.status = '已取消'; row.shipStatus = '未发货'; odLog(row.no, '取消', '取消原因：' + value + '；合同金额占用已释放'); ElMessage.success('订单已取消，原因已记录'); }).catch(() => {});
     /* ---- 新建订单弹窗 ---- */
     const fref = ref(null);
     const dlg = ref(false);
     const draft = reactive({ contract: '', amount: null, date: TODAY, dlv: '', owner: '张三' });
     const rule = { contract: [{ required: true, message: '请选择合同', trigger: 'change' }], amount: [{ required: true, message: '请填写订单金额', trigger: 'blur' }] };
-    const ctOpts = computed(() => store.ext.contracts.filter(ct => ['已签署', '履约中', '已完成'].includes(ct.status)));
+    const ctOpts = computed(() => store.ext.contracts.filter(ct => ['审批通过', '待签署', '生效', '履约中', '已完成'].includes(ct.status)));
     const selCt = computed(() => store.ext.contracts.find(ct => ct.no === draft.contract) || null);
     const cap = computed(() => selCt.value ? odCapOf(selCt.value) : 0);
     /* 订单默认明细：优先复用合同报价明细，否则单行合同标的 */
@@ -7715,14 +7833,14 @@ const OrdersPage = {
       </template>
       <template #actions="{row}">
         <el-button link type="primary" @click="$go('/order/'+row.no)">查看</el-button>
-        <el-button v-if="['待确认','备货中','交付中'].includes(row.status)" link type="primary" @click="transit(row)">{{ ({'待确认':'确认订单','备货中':'开始交付','交付中':'确认完成'})[row.status] }}</el-button>
-        <el-button v-if="['待确认','备货中','交付中'].includes(row.status)" link type="danger" @click="cancel(row)">取消</el-button>
+        <el-button v-if="['待确认','已确认','待交付','交付中'].includes(row.status)" link type="primary" @click="transit(row)">{{ ({'待确认':'确认订单','已确认':'确认待交付','待交付':'开始交付','交付中':'确认完成'})[row.status] }}</el-button>
+        <el-button v-if="['待确认','已确认','待交付'].includes(row.status)" link type="danger" @click="cancel(row)">取消</el-button>
       </template>
     </list-page>
     <el-dialog v-model="dlg" title="新建订单（从合同发起）" width="640px">
       <el-form ref="fref" :model="draft" :rules="rule" label-width="110px">
         <el-form-item label="关联合同" prop="contract">
-          <el-select v-model="draft.contract" filterable placeholder="选择已签署 / 履约中 / 已完成的合同" style="width:100%">
+          <el-select v-model="draft.contract" filterable placeholder="选择审批通过 / 待签署 / 生效 / 履约中 / 已完成的合同" style="width:100%">
             <el-option v-for="c in ctOpts" :key="c.no" :label="c.no + ' · ' + c.name" :value="c.no"/>
           </el-select>
         </el-form-item>
@@ -7751,11 +7869,21 @@ const OrderDetailPage = {
   props: { no: String },
   setup(props) {
     const od = computed(() => store.ext.orders.find(x => x.no === props.no) || null);
-    const tab = ref('items');
+    const tab = ref('info');
     const custNo = computed(() => cno((od.value || {}).customer || ''));
     const ct = computed(() => od.value ? store.ext.contracts.find(c => c.no === od.value.contract) || null : null);
+    const opp = computed(() => (od.value && od.value.opp) ? store.opps.find(o => o.no === od.value.opp) || null : null);
     const items = computed(() => (od.value ? od.value.items || [] : []).map((it, i) => ({ ...it, seq: i + 1, sub: Math.round((it.price || 0) * (it.qty || 1) * ((it.discount == null ? 100 : it.discount)) / 100) })));
     const deliveryOf = computed(() => od.value ? store.ext.deliveries.filter(d => d.order === od.value.no) : []);
+    const planRows = computed(() => {
+      const o = od.value, c = ct.value; if (!o || !c) return []; let n = 1;
+      return (c.plans || []).map(p => {
+        const got = ctRecvOf(c, p);
+        return { seq: n++, stage: p.stage, date: p.date, amount: p.amount, got, rest: Math.max(0, p.amount - got), status: p.status };
+      });
+    });
+    const paySum = computed(() => ({ got: planRows.value.reduce((s, r) => s + r.got, 0), rest: planRows.value.reduce((s, r) => s + r.rest, 0) }));
+    const changes = computed(() => (od.value && od.value.changes) || []);
     const invoiceAmt = computed(() => {
       if (!od.value) return 0;
       if (od.value.invoiceStatus === '已开票') return od.value.amount;
@@ -7775,36 +7903,74 @@ const OrderDetailPage = {
       const b = [];
       const step = OD_FLOW.find(f => f.from === o.status);
       if (step) b.push({ act: step.act, type: 'primary', label: step.act, tip: step.tip });
+      if (OD_PAUSABLE.includes(o.status)) b.push({ act: 'pause', type: 'warning', plain: true, label: '暂停执行' });
+      if (o.status === '暂停执行') b.push({ act: 'resume', type: 'primary', plain: true, label: '恢复执行' });
       if (OD_CANCELABLE.includes(o.status)) b.push({ act: 'cancel', type: 'danger', plain: true, label: '取消订单' });
+      if (OD_CLOSABLE.includes(o.status)) b.push({ act: 'close', type: 'danger', plain: true, label: '关闭订单' });
       return b;
     });
     const doAct = b => {
-      if (b.act === 'cancel') { cfRf.reason = ''; cfDlg.value = true; return; }
+      if (['cancel', 'pause', 'close'].includes(b.act)) { cfRf.mode = b.act; cfRf.reason = ''; cfDlg.value = true; return; }
+      if (b.act === 'resume') { od.value.status = '待交付'; od.value.shipStatus = '未发货'; odLog(od.value.no, '恢复执行', '订单由「暂停执行」恢复为「待交付」'); ElMessage.success('订单已恢复执行'); return; }
       if (odTransit(od.value, b.act)) ElMessage.success('已' + b.act + '（' + b.tip + '），状态与操作日志已更新');
       else ElMessage.info('当前状态不可执行该操作');
     };
-    const cfDlg = ref(false); const cfRf = reactive({ reason: '' });
+    const cfDlg = ref(false); const cfRf = reactive({ reason: '', mode: 'cancel' });
+    const cfTitle = computed(() => cfRf.mode === 'cancel' ? '取消订单（原因必填）' : (cfRf.mode === 'pause' ? '暂停执行（原因必填）' : '关闭订单（原因必填）'));
     const doCancel = () => {
       const v = cfRf.reason.trim();
-      if (!v) return ElMessage.warning('请填写取消原因（必填）');
-      od.value.status = '已取消';
-      odLog(od.value.no, '取消', '取消原因：' + v);
+      if (!v) return ElMessage.warning('请填写原因（必填）');
+      const map = { cancel: ['已取消', '取消'], pause: ['暂停执行', '暂停执行'], close: ['已关闭', '关闭'] };
+      const m = map[cfRf.mode];
+      od.value.status = m[0];
+      od.value.shipStatus = '未发货';
+      odLog(od.value.no, m[1], '原因：' + v + '；状态变更为「' + m[0] + '」' + (cfRf.mode === 'cancel' ? '，合同金额占用已释放' : ''));
       cfDlg.value = false;
-      ElMessage.success('订单已取消，原因已写入操作日志');
+      ElMessage.success('订单已' + m[1] + '，原因已写入操作日志');
     };
-    return { od, tab, custNo, ct, items, deliveryOf, invoiceAmt, logs, buttons, doAct, cfDlg, cfRf, doCancel, fmtY, fmtC, OD_FLOW };
+    const chgDlg = ref(false); const chgRf = reactive({ type: '交付日期变更', reason: '', date: '', amount: 0 });
+    const doChange = () => {
+      const v = chgRf.reason.trim();
+      if (!v) return ElMessage.warning('请填写变更原因（必填）');
+      const o = od.value;
+      if (!o.changes) o.changes = [];
+      o.changes.unshift({ time: TODAY + ' 16:20', type: chgRf.type, reason: v, before: chgRf.type === '订单金额变更' ? o.amount : o.dlv, after: chgRf.type === '订单金额变更' ? chgRf.amount : (chgRf.date || o.dlv), status: '已登记', who: '张三' });
+      odLog(o.no, '订单变更', chgRf.type + '：' + v + '；变更已登记并留痕');
+      chgDlg.value = false;
+      ElMessage.success('订单变更已登记，可在「订单变更」页签查看');
+    };
+    return { od, tab, custNo, ct, opp, items, deliveryOf, planRows, paySum, changes, invoiceAmt, logs, buttons, doAct, cfDlg, cfRf, cfTitle, doCancel, chgDlg, chgRf, doChange, fmtY, fmtC, OD_FLOW };
   },
   template: `<div v-if="od">
     <el-breadcrumb separator="/" class="crumb"><el-breadcrumb-item><a @click="$go('/orders')">订单管理</a></el-breadcrumb-item><el-breadcrumb-item><a @click="$go('/orders')">销售订单</a></el-breadcrumb-item><el-breadcrumb-item>{{ od.no }}</el-breadcrumb-item></el-breadcrumb>
-    <div class="page-head"><h1>订单 {{ od.no }}</h1><el-tag :type="({待确认:'info',备货中:'warning',交付中:'primary',已完成:'success',已取消:'danger'})[od.status]||'info'">{{ od.status }}</el-tag><span class="total">订单金额 ¥{{ fmtY(od.amount) }} · 负责人 {{ od.owner }}</span></div>
+    <div class="page-head"><h1>订单 {{ od.no }}</h1><el-tag :type="({待确认:'info',已确认:'warning',待交付:'warning',交付中:'primary',已完成:'success',已取消:'danger',已关闭:'info',暂停执行:'danger'})[od.status]||'info'">{{ od.status }}</el-tag><span class="total">订单金额 ¥{{ fmtY(od.amount) }} · 负责人 {{ od.owner }}</span></div>
     <div class="ops" style="margin-top:-4px">
       <el-button v-for="b in buttons" :key="b.act" :type="b.type" :plain="!!b.plain" @click="doAct(b)">{{ b.label }}</el-button>
       <el-button icon="Printer" @click="$msg.info('示例：打印销售订单')">打印</el-button>
     </div>
     <el-alert v-if="od.status==='已取消'" type="error" show-icon :closable="false" style="margin-bottom:12px" title="该订单已取消：仅可查看历史数据，取消原因见「操作日志」。"/>
+    <el-alert v-if="od.status==='已关闭'" type="info" show-icon :closable="false" style="margin-bottom:12px" title="该订单已关闭：仅可查看历史数据，关闭原因见「操作日志」。"/>
+    <el-alert v-if="od.status==='暂停执行'" type="warning" show-icon :closable="false" style="margin-bottom:12px" title="该订单已暂停执行：恢复后进入「待交付」；暂停原因见「操作日志」。"/>
     <el-alert v-if="!ct" type="warning" show-icon :closable="false" style="margin-bottom:12px" title="该订单关联合同在合同台账中查不到（历史数据），合同相关字段展示为空。"/>
     <el-card shadow="never" style="margin-bottom:14px" :body-style="{padding:'0'}">
       <el-tabs v-model="tab">
+        <el-tab-pane label="基本信息" name="info"><div class="card card-pad" style="padding:14px 18px">
+          <el-descriptions :column="3" border>
+            <el-descriptions-item label="订单编号">{{ od.no }}</el-descriptions-item>
+            <el-descriptions-item label="客户"><a class="link" @click="$go('/customer/'+custNo)">{{ od.customer }}</a></el-descriptions-item>
+            <el-descriptions-item label="关联合同"><a v-if="ct" class="link" @click="$go('/contract/'+ct.no)">{{ ct.no }}</a><span v-else>{{ od.contract || '-' }}</span></el-descriptions-item>
+            <el-descriptions-item label="关联商机"><a v-if="opp" class="link" @click="$go('/opp/'+opp.no)">{{ opp.no }} · {{ opp.name }}</a><span v-else>{{ od.opp || '-' }}</span></el-descriptions-item>
+            <el-descriptions-item label="订单金额"><span class="money">¥{{ fmtY(od.amount) }}</span></el-descriptions-item>
+            <el-descriptions-item label="负责人">{{ od.owner }}</el-descriptions-item>
+            <el-descriptions-item label="订单日期">{{ od.date }}</el-descriptions-item>
+            <el-descriptions-item label="交付日期">{{ od.dlv }}</el-descriptions-item>
+            <el-descriptions-item label="订单状态">{{ od.status }}</el-descriptions-item>
+            <el-descriptions-item label="订单明细">{{ items.length }} 行</el-descriptions-item>
+            <el-descriptions-item label="开票状态">{{ od.invoiceStatus }}</el-descriptions-item>
+            <el-descriptions-item label="发货状态">{{ od.shipStatus }}</el-descriptions-item>
+          </el-descriptions>
+          <div style="margin-top:12px"><el-button size="small" type="primary" plain @click="chgRf.type='交付日期变更';chgRf.reason='';chgRf.date=od.dlv;chgDlg=true">登记订单变更</el-button></div>
+        </div></el-tab-pane>
         <el-tab-pane label="订单明细" name="items"><div class="card card-pad" style="padding:14px 18px">
           <el-table :data="items" size="small" border show-summary :summary-method="() => ['','合计 ' + items.length + ' 行','','','','','¥' + fmtY(items.reduce((s,i)=>s+i.sub,0))]">
             <el-table-column prop="seq" label="行" width="50"/>
@@ -7858,15 +8024,52 @@ const OrderDetailPage = {
           </el-descriptions>
           <div style="margin-top:12px"><el-button size="small" @click="$go('/contract/'+od.contract)">查看合同详情</el-button></div>
         </div></el-tab-pane>
+        <el-tab-pane label="回款计划" name="plans"><div class="card card-pad" style="padding:14px 18px">
+          <el-alert v-if="!ct" type="info" show-icon :closable="false" title="该订单未关联有效合同，暂无回款计划；回款计划以合同付款条件为准。"/>
+          <template v-else>
+            <div class="stat-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:10px">
+              <div class="stat-card"><span class="lb">已收金额</span><span class="vl">¥{{ fmtY(paySum.got) }}</span><span class="ft">含部分核销</span></div>
+              <div class="stat-card warn"><span class="lb">待收金额</span><span class="vl">¥{{ fmtY(paySum.rest) }}</span><span class="ft">合同计划总额 ¥{{ fmtY(ct.amount) }}</span></div>
+              <div class="stat-card ok"><span class="lb">回款完成度</span><span class="vl">{{ ct.amount ? Math.round(paySum.got*100/ct.amount) : 0 }}%</span><span class="ft">已收 / 合同金额</span></div>
+            </div>
+            <el-table :data="planRows" size="small" border>
+              <el-table-column prop="seq" label="期次" width="60"/><el-table-column prop="stage" label="款项阶段" min-width="110"/><el-table-column prop="date" label="计划日期" width="110"/>
+              <el-table-column label="计划金额" width="120" align="right"><template #default="{row}">¥{{ fmtY(row.amount) }}</template></el-table-column>
+              <el-table-column label="已收" width="120" align="right"><template #default="{row}">¥{{ fmtY(row.got) }}</template></el-table-column>
+              <el-table-column label="待收" width="120" align="right"><template #default="{row}">¥{{ fmtY(row.rest) }}</template></el-table-column>
+              <el-table-column prop="status" label="状态" width="110"><template #default="{row}"><el-tag size="small" :type="({已回款:'success',部分回款:'warning',未回款:'info'})[row.status]||'info'">{{ row.status }}</el-tag></template></el-table-column>
+            </el-table>
+            <div style="margin-top:12px"><el-button size="small" type="primary" plain @click="$go('/payments')">前往回款管理登记收款</el-button></div>
+          </template>
+        </div></el-tab-pane>
+        <el-tab-pane label="订单变更" name="changes"><div class="card card-pad" style="padding:14px 18px">
+          <div class="ops"><el-button size="small" type="primary" plain @click="chgRf.type='交付日期变更';chgRf.reason='';chgRf.date=od.dlv;chgDlg=true">登记变更</el-button></div>
+          <el-alert v-if="!changes.length" type="info" show-icon :closable="false" title="暂无订单变更记录；交付日期、金额等变更需登记原因并保留历史。"/>
+          <el-table v-else :data="changes" size="small" border>
+            <el-table-column prop="time" label="登记时间" width="150"/><el-table-column prop="type" label="变更类型" width="130"/><el-table-column prop="reason" label="变更原因" min-width="220"/>
+            <el-table-column label="变更前 → 变更后" min-width="220"><template #default="{row}">{{ row.before }} → {{ row.after }}</template></el-table-column>
+            <el-table-column prop="status" label="状态" width="100"/><el-table-column prop="who" label="操作人" width="90"/>
+          </el-table>
+        </div></el-tab-pane>
         <el-tab-pane label="操作日志" name="logs"><div class="card card-pad" style="padding:14px 18px">
           <el-table :data="logs" size="small"><el-table-column prop="time" label="时间" width="150"/><el-table-column prop="who" label="操作人" width="100"/><el-table-column prop="act" label="操作" width="130"/><el-table-column prop="detail" label="内容" min-width="280"/></el-table>
         </div></el-tab-pane>
       </el-tabs>
     </el-card>
-    <el-dialog v-model="cfDlg" title="取消订单（原因必填）" width="480px">
-      <el-alert type="warning" show-icon :closable="false" style="margin-bottom:12px" title="取消后订单进入终态「已取消」，并释放该合同的金额占用。"/>
-      <el-input v-model="cfRf.reason" type="textarea" :rows="3" placeholder="请填写取消原因（将写入操作日志）"/>
-      <template #footer><el-button @click="cfDlg=false">返回</el-button><el-button type="danger" @click="doCancel">确认取消</el-button></template>
+    <el-dialog v-model="cfDlg" :title="cfTitle" width="480px">
+      <el-alert type="warning" show-icon :closable="false" style="margin-bottom:12px" :title="cfRf.mode==='cancel' ? '取消后订单进入终态「已取消」，并释放该合同的金额占用。' : (cfRf.mode==='pause' ? '暂停后订单进入「暂停执行」，恢复后回到「待交付」。' : '关闭后订单进入终态「已关闭」，仅保留历史记录。')"/>
+      <el-input v-model="cfRf.reason" type="textarea" :rows="3" placeholder="请填写原因（将写入操作日志）"/>
+      <template #footer><el-button @click="cfDlg=false">返回</el-button><el-button type="danger" @click="doCancel">确认</el-button></template>
+    </el-dialog>
+    <el-dialog v-model="chgDlg" title="登记订单变更（留痕）" width="500px">
+      <el-alert type="info" show-icon :closable="false" style="margin-bottom:12px" title="订单交付日期、金额或明细变更需登记原因并保留历史；订单变更不得绕过合同额度校验。"/>
+      <el-form label-width="100px">
+        <el-form-item label="变更类型"><el-select v-model="chgRf.type" style="width:100%"><el-option v-for="x in ['交付日期变更','订单金额变更','订单明细变更']" :key="x" :value="x"/></el-select></el-form-item>
+        <el-form-item v-if="chgRf.type==='交付日期变更'" label="变更后日期"><el-date-picker v-model="chgRf.date" type="date" value-format="YYYY-MM-DD" style="width:100%"/></el-form-item>
+        <el-form-item v-if="chgRf.type==='订单金额变更'" label="变更后金额"><el-input-number v-model="chgRf.amount" :min="0" :step="10000" :controls="false" style="width:100%"/></el-form-item>
+        <el-form-item label="变更原因"><el-input v-model="chgRf.reason" type="textarea" :rows="3" placeholder="请填写变更原因（必填）"/></el-form-item>
+      </el-form>
+      <template #footer><el-button @click="chgDlg=false">取消</el-button><el-button type="primary" @click="doChange">确认登记</el-button></template>
     </el-dialog>
   </div>`,
 };
@@ -8012,7 +8215,7 @@ function prRead() {
   if (Array.isArray(saved.logs)) out.logs = saved.logs;
   return out;
 }
-const prHasContract = c => (store.ext.contracts || []).some(t => t.customer === c.name && (t.status === '履约中' || t.status === '已签署'));
+const prHasContract = c => (store.ext.contracts || []).some(t => t.customer === c.name && (t.status === '履约中' || t.status === '生效' || t.status === '待签署' || t.status === '审批通过'));
 const prHasOpenComplaint = c => (store.ext.tickets || []).some(t => t.customer === c.name && t.type === '投诉' && t.status !== '已关闭');
 const prHasSpecial = c => !!(c.specialProtect || c.protected);
 
@@ -8073,7 +8276,7 @@ const PoolRulesPage = {
             kept.push({ n: c.name, w: c.owner, why: '重点客户保护开启' });
             return;
           }
-          if (rule.protectContract && prHasContract(c)) return kept.push({ n: c.name, w: c.owner, why: '名下有履约中/已签署合同（保护）' });
+          if (rule.protectContract && prHasContract(c)) return kept.push({ n: c.name, w: c.owner, why: '名下有生效/履约中合同（保护）' });
           if (prHasOpenComplaint(c)) return kept.push({ n: c.name, w: c.owner, why: '存在未处理投诉（保护，6.2）' });
           if (prHasSpecial(c)) return kept.push({ n: c.name, w: c.owner, why: '客户存在特殊保护（保护，6.2）' });
           if (!inScope) {
@@ -8206,7 +8409,7 @@ const PoolRulesPage = {
 registerRoute('/system/pool-rules', PoolRulesPage, 'pool-rules');
 
 /* ===== 第 3 阶段：产品目录 /products + 产品详情 /product/:no + 价格表 /pricebooks ===== */
-const PRODUCT_CATS = ['软件', '服务', '实施费用', '维护费用', '增值服务', '套餐'];
+const PRODUCT_CATS = ['产品', '软件', '服务', '实施费用', '维护费用', '增值服务', '套餐'];
 const PRODUCT_STS = ['在售', '停售', '停用'];
 const PRODUCT_STATUS_TAG = { 在售: 'success', 停售: 'warning', 停用: 'info' };
 const genProductNo = () => {
@@ -8219,7 +8422,9 @@ const genProductNo = () => {
 const ProductsPage = {
   components: { ListPage },
   setup() {
-    const rows = computed(() => store.ext.products);
+    const rows = computed(() => store.ext.products.map(p => ({
+      ...p, books: store.ext.pricebooks.filter(b => b.items.some(i => i.productNo === p.no)).length + ' 张',
+    })));
     const stats = computed(() => {
       const a = store.ext.products;
       return [['产品总数', String(a.length), '', PRODUCT_CATS.length + ' 个分类'], ['在售', String(a.filter(p => p.status === '在售').length), 'ok'], ['停售 / 停用', String(a.filter(p => p.status !== '在售').length), 'warn'], ['价格表', String(store.ext.pricebooks.length), '']];
@@ -8227,7 +8432,7 @@ const ProductsPage = {
     const cols = [
       { p: 'no', l: '产品编号', w: 110 }, { p: 'name', l: '产品名称', w: 200, link: true }, { p: 'cat', l: '产品分类', w: 100 },
       { p: 'spec', l: '产品规格', w: 150 }, { p: 'unit', l: '标准单位', w: 95 }, { p: 'price', l: '标准售价', w: 115, money: true },
-      { p: 'cost', l: '成本价', w: 110, money: true }, { p: 'status', l: '产品状态', w: 95, tag: PRODUCT_STATUS_TAG }, { p: 'desc', l: '产品说明', w: 220 },
+      { p: 'cost', l: '成本价', w: 110, money: true }, { p: 'status', l: '产品状态', w: 95, tag: PRODUCT_STATUS_TAG }, { p: 'desc', l: '产品说明', w: 220 }, { p: 'books', l: '适用价格表', w: 100 },
     ];
     const filters = [
       { k: 'kw', label: '搜索产品', ph: '产品编号 / 名称 / 说明' }, { k: 'cat', label: '产品分类', opts: PRODUCT_CATS }, { k: 'status', label: '产品状态', opts: PRODUCT_STS },
@@ -8258,11 +8463,12 @@ const ProductsPage = {
       dlg.open = false;
     });
     const toggleSale = row => {
-      const goOut = row.status === '在售';
-      ElMessageBox.confirm(`确认将产品「${row.name}」${goOut ? '停售' : '恢复在售'}？${goOut ? '停售后不能再加入新报价，历史报价不受影响。' : '恢复后可正常用于报价。'}`, goOut ? '停售确认' : '恢复在售', { type: 'warning' }).then(() => {
-        row.status = goOut ? '停售' : '在售';
-        store.ext.logs.unshift({ time: TODAY + ' 09:00', who: '张三', module: '系统', act: '编辑', detail: `产品「${row.name}」（${row.no}）状态变更为：${row.status}` });
-        ElMessage.success(`已${goOut ? '停售' : '恢复在售'}：${row.name}`);
+      const t = store.ext.products.find(x => x.no === row.no) || row;
+      const goOut = t.status === '在售';
+      ElMessageBox.confirm(`确认将产品「${t.name}」${goOut ? '停售' : '恢复在售'}？${goOut ? '停售后不能再加入新报价，历史报价不受影响。' : '恢复后可正常用于报价。'}`, goOut ? '停售确认' : '恢复在售', { type: 'warning' }).then(() => {
+        t.status = goOut ? '停售' : '在售';
+        store.ext.logs.unshift({ time: TODAY + ' 09:00', who: '张三', module: '系统', act: '编辑', detail: `产品「${t.name}」（${t.no}）状态变更为：${t.status}` });
+        ElMessage.success(`已${goOut ? '停售' : '恢复在售'}：${t.name}`);
       }).catch(() => {});
     };
     return { rows, stats, cols, filters, dlg, f, fref, rule, openAdd, openEdit, save, toggleSale, PRODUCT_CATS, PRODUCT_STS, store, fmtY, fmtC };
@@ -8310,14 +8516,16 @@ const ProductDetail = {
     const p = computed(() => store.ext.products.find(x => x.no === props.no) || null);
     const bookRows = computed(() => !p.value ? [] : store.ext.pricebooks.map(b => {
       const it = b.items.find(i => i.productNo === p.value.no) || {};
-      return { no: b.no, name: b.name, type: b.type, status: b.status, price: it.price == null ? (p.value.price || 0) : it.price, minDiscount: it.minDiscount == null ? 85 : it.minDiscount, ratio: p.value.price ? Math.round(it.price * 100 / p.value.price) : 100 };
+      const price = it.price == null ? (p.value.price || 0) : it.price;
+      return { no: b.no, name: b.name, type: b.type, status: b.status, price, minDiscount: it.minDiscount == null ? 85 : it.minDiscount, ratio: p.value.price ? Math.round(price * 100 / p.value.price) : 100 };
     }));
     const quoteRows = computed(() => !p.value ? [] : store.ext.quotes.filter(q => (q.items || []).some(it => it.productNo === props.no)).map(q => {
       const it = (q.items || []).find(x => x.productNo === props.no);
       return { no: q.no, customer: q.customer, date: q.date, appr: q.appr, qty: it.qty, unit: it.unit, price: it.price, discount: it.discount };
     }));
+    const appBooks = computed(() => !p.value ? '' : store.ext.pricebooks.filter(b => b.items.some(i => i.productNo === p.value.no)).map(b => b.name).join('、'));
     const QuoteTag = { 已通过: 'success', 审批中: 'warning', 草稿: 'info', 已驳回: 'danger' };
-    return { p, bookRows, quoteRows, QuoteTag, PRODUCT_STATUS_TAG, fmtY, fmtC, store };
+    return { p, bookRows, quoteRows, appBooks, QuoteTag, PRODUCT_STATUS_TAG, fmtY, fmtC, store };
   },
   template: `<div v-if="p">
     <el-breadcrumb separator="/" class="crumb"><el-breadcrumb-item><a @click="$go('/products')">产品管理</a></el-breadcrumb-item><el-breadcrumb-item><a @click="$go('/products')">产品目录</a></el-breadcrumb-item><el-breadcrumb-item>{{ p.name }}</el-breadcrumb-item></el-breadcrumb>
@@ -8325,7 +8533,7 @@ const ProductDetail = {
       <div class="cust-logo" style="border-radius:12px;font-size:20px">{{ p.cat }}</div>
       <div>
         <h2>{{ p.name }}<el-tag :type="PRODUCT_STATUS_TAG[p.status]" size="small">{{ p.status }}</el-tag><el-tag type="info" size="small" effect="plain">{{ p.cat }}</el-tag></h2>
-        <div class="cust-meta"><span>产品编号：<b>{{ p.no }}</b></span><span>规格：<b>{{ p.spec || '-' }}</b></span><span>标准单位：<b>{{ p.unit }}</b></span></div>
+        <div class="cust-meta"><span>产品编号：<b>{{ p.no }}</b></span><span>规格：<b>{{ p.spec || '-' }}</b></span><span>标准单位：<b>{{ p.unit }}</b></span><span>适用价格表：<b>{{ appBooks || '-' }}</b></span></div>
         <div style="margin-top:8px"><el-button size="small" type="primary" plain @click="$go('/pricebooks')">价格表管理</el-button></div>
       </div>
       <div class="sum-cards"><div class="sum-card"><div class="v">¥{{ fmtY(p.price) }}</div><div class="l">标准售价</div></div><div class="sum-card"><div class="v">¥{{ fmtY(p.cost) }}</div><div class="l">成本价</div></div><div class="sum-card"><div class="v">{{ quoteRows.length }}</div><div class="l">引用报价数</div></div></div>
@@ -8421,6 +8629,24 @@ const QuotePage = {
     const base = JSON.stringify(items.value);
     const modified = computed(() => JSON.stringify(items.value) !== base);
     const calc = computed(() => calcQuote(items.value));
+    /* 最低价格底线：按客户类型/等级命中价格表，逐行比较折扣是否低于该表最低折扣（5.7、7.2） */
+    const floorViolations = computed(() => {
+      if (isFixed || !q.value) return [];
+      const cu = store.customers.find(c => c.name === q.value.customer);
+      const bookType = cu && cu.type === '渠道客户' ? '渠道价' : (cu && (cu.level === '重点客户' || cu.level === '战略客户') ? '重点客户价' : '标准价');
+      const books = store.ext.pricebooks.filter(b => b.type === bookType);
+      const book = books.find(b => b.status === '启用') || books[0];
+      if (!book) return [];
+      const out = [];
+      items.value.forEach((it, i) => {
+        const pno = ((q.value.items || [])[i] || {}).productNo || '';
+        const row = book.items.find(x => x.productNo === pno);
+        if (row && Number(it.disc) < row.minDiscount) out.push({ name: it.name, disc: Number(it.disc), min: row.minDiscount });
+      });
+      return out;
+    });
+    const autoPass = computed(() => !floorViolations.value.length && calc.value.discBp <= 500);
+    const approvalRole = computed(() => floorViolations.value.length ? '总经理 / 财务负责人（低于最低价格底线）' : calc.value.rule.role);
     const status = ref((q.value && q.value.appr) || (isFixed ? '审批中' : '草稿'));
     const version = ref((q.value && q.value.ver) || 'V1');
     const versions = ref(isFixed ? [
@@ -8442,40 +8668,66 @@ const QuotePage = {
     const contactName = computed(() => { const cs = (custBundle((q.value || {}).customer || '') || {}).contacts || []; return cs.length ? cs[0].name : '-'; });
     function discountNote() {
       const d = calc.value.discBp / 100;
-      return '整体折扣 ' + d.toFixed(2) + (d <= 5 ? '%，在销售授权范围内，直接通过。' : '%，超出销售授权（5%），需销售经理审批。');
+      if (floorViolations.value.length) return '整体折扣 ' + d.toFixed(2) + '%，且存在低于最低价格底线的明细（' + floorViolations.value.map(x => x.name + ' ' + x.disc + '% < ' + x.min + '%').join('；') + '），需总经理 / 财务负责人审批。';
+      if (d <= 5) return '整体折扣 ' + d.toFixed(2) + '%，在销售授权范围内，提交后自动通过。';
+      return '整体折扣 ' + d.toFixed(2) + '%，超出销售授权（5%），需「' + approvalRole.value + '」审批。';
     }
+    const nextVer = v => 'V' + ((parseInt(String(v || 'V1').replace(/\D/g, ''), 10) || 1) + 1);
     const delta = ref('');
     const save = () => {
       if (!modified.value) return ElMessage.info('没有变更，无需保存');
       versions.value.forEach(v => v.cur = false);
-      const nv = 'V' + (versions.value.length + 1);
-      versions.value.unshift({ v: nv, date: TODAY + ' 07:05', by: '张三', total: calc.value.total, disc: calc.value.discount, st: '草稿（当前版本）', note: '修改明细后保存草稿', cur: true });
+      const nv = nextVer(version.value);
+      versions.value.unshift({ v: nv, date: TODAY + ' 07:05', by: '张三', total: calc.value.total, disc: calc.value.discount, st: '草稿（当前版本）', note: '修改明细后保存草稿，已审批通过的旧版本保持锁定', cur: true });
       version.value = nv; status.value = '草稿';
       if (q.value) { q.value.ver = nv; q.value.appr = '草稿'; }
-      ElMessage.success(`已生成新版本 ${nv}；已提交审批的旧版本保持锁定、不被覆盖`);
+      ElMessage.success(`已生成新版本 ${nv}；已审批通过的旧版本保持锁定、不被覆盖`);
     };
-    const submit = () => ElMessageBox.confirm(`将提交审批：整体折扣 ${(calc.value.discBp / 100).toFixed(2)}%，需「${calc.value.rule.role}」审批。`, '提交审批', { type: 'info' }).then(() => {
-      status.value = '审批中'; if (q.value) q.value.appr = '审批中';
-      appr.value[1] = { t: TODAY + ' 09:00', who: '张三', role: '销售经理', act: '审批中', op: discountNote(), st: 'cur' };
-      ElMessage.success('已提交审批，审批人已收到通知');
+    const revise = () => ElMessageBox.confirm('已审批通过的版本已锁定，修改价格必须生成新版本并重新审批。确认由当前版本生成新版本？', '生成新版本', { type: 'warning' }).then(() => {
+      const oldVer = version.value;
+      versions.value.forEach(v => v.cur = false);
+      const nv = nextVer(oldVer);
+      version.value = nv; status.value = '草稿';
+      if (q.value) { q.value.ver = nv; q.value.appr = '草稿'; }
+      versions.value.unshift({ v: nv, date: TODAY + ' 09:05', by: '张三', total: calc.value.total, disc: calc.value.discount, st: '草稿（当前版本，可修改）', note: '由已审批版本 ' + oldVer + ' 派生新版本，原版本锁定不被覆盖', cur: true });
+      ElMessage.success('已生成新版本 ' + nv + '，原审批版本保持锁定');
     }).catch(() => {});
+    const submit = () => {
+      const tip = autoPass.value
+        ? `提交审批：整体折扣 ${(calc.value.discBp / 100).toFixed(2)}%，在销售授权范围内，将自动通过并锁定当前版本。`
+        : `将提交审批：整体折扣 ${(calc.value.discBp / 100).toFixed(2)}%，需「${approvalRole.value}」审批。`;
+      return ElMessageBox.confirm(tip, '提交审批', { type: 'info' }).then(() => {
+        if (autoPass.value) {
+          status.value = '已通过'; if (q.value) q.value.appr = '已通过';
+          appr.value[1] = { t: TODAY + ' 09:00', who: '系统', role: '销售人员（授权范围内自动通过）', act: '自动通过', op: discountNote(), st: 'done' };
+          ElMessage.success('已提交并按授权规则自动通过，当前版本已锁定');
+        } else {
+          status.value = '审批中'; if (q.value) q.value.appr = '审批中';
+          appr.value[1] = { t: TODAY + ' 09:00', who: '张三', role: approvalRole.value, act: '审批中', op: discountNote(), st: 'cur' };
+          ElMessage.success('已提交审批，审批人已收到通知');
+        }
+      }).catch(() => {});
+    };
     const withdraw = () => ElMessageBox.confirm('撤回后报价回到草稿状态，可修改后重新提交。', '撤回审批', { type: 'warning' }).then(() => { status.value = '草稿'; if (q.value) q.value.appr = '草稿'; ElMessage.success('已撤回'); }).catch(() => {});
     const toContract = () => { if (status.value !== '已通过') return ElMessage.warning('报价审批通过后才能转为合同（当前：' + status.value + '）'); ElMessage.success('已生成合同草稿，可在合同模块继续完善'); };
     const approvedSim = () => {
       status.value = '已通过'; if (q.value) q.value.appr = '已通过';
-      appr.value[appr.value.length - 1] = { t: TODAY + ' 07:10', who: '张三', role: '销售经理', act: '同意', op: '同意，折扣在经理授权范围内。', st: 'done' };
+      appr.value[appr.value.length - 1] = { t: TODAY + ' 07:10', who: '张三', role: approvalRole.value, act: '同意', op: '同意，折扣与价格底线符合审批规则。', st: 'done' };
       ElMessage.success('（演示）审批已通过，已审批版本被锁定，可转为合同');
     };
     const stTag = computed(() => ({ 草稿: 'info', 审批中: 'warning', 已通过: 'success', 已驳回: 'danger' }[status.value] || 'info'));
+    /* 报价状态（规划方案 5.7 列字段）：审批未过与审批状态一致，已通过后按引用合同/有效期推导 */
+    const qSt = computed(() => { const qq = q.value; const a = status.value; if (a !== '已通过') return a; if (qq && store.ext.contracts.some(c => c.quote === qq.no)) return '已转合同'; return daysBetween(TODAY, (qq || {}).valid) < 0 ? '已过期' : '正式报价'; });
+    const qStTag = computed(() => ({ 草稿: 'info', 审批中: 'warning', 已驳回: 'danger', 正式报价: 'success', 已过期: 'warning', 已转合同: '' }[qSt.value] || 'info'));
     const reset = () => { items.value = JSON.parse(base); };
     const titleTag = computed(() => isFixed ? '南京某某 ERP 升级项目' : (oppName.value || ((q.value || {}).customer || '通用报价')));
-    return { items, modified, calc, status, version, versions, pays, payOk, appr, save, submit, withdraw, toContract, approvedSim, stTag, reset, fmtC, fmtY, TAX_RATE_BP, tab: ref('appr'), locked: computed(() => status.value === '已通过'), isFixed, q, custNo, contactName, titleTag, oppName };
+    return { items, modified, calc, floorViolations, autoPass, approvalRole, status, version, versions, pays, payOk, appr, save, revise, submit, withdraw, toContract, approvedSim, stTag, qSt, qStTag, reset, fmtC, fmtY, TAX_RATE_BP, tab: ref('appr'), locked: computed(() => status.value === '已通过'), isFixed, q, custNo, contactName, titleTag, oppName };
   },
   template: `<div>
     <el-breadcrumb separator="/" class="crumb"><el-breadcrumb-item>报价管理</el-breadcrumb-item><el-breadcrumb-item><a @click="$go('/quotes')">报价列表</a></el-breadcrumb-item><el-breadcrumb-item>{{ no }}</el-breadcrumb-item></el-breadcrumb>
-    <div class="page-head"><h1>报价单 {{ no }}</h1><el-tag :type="stTag">{{ status }}</el-tag><el-tag type="primary" effect="plain">{{ version }}</el-tag><span class="total">{{ titleTag }}</span></div>
+    <div class="page-head"><h1>报价单 {{ no }}</h1><el-tag :type="stTag">{{ status }}</el-tag><el-tag :type="qStTag" effect="plain">报价状态：{{ qSt }}</el-tag><el-tag type="primary" effect="plain">{{ version }}</el-tag><span class="total">{{ titleTag }}</span></div>
     <div class="ops" style="margin-top:-4px">
-      <div style="display:flex;gap:8px;flex-wrap:wrap"><el-button @click="save">保存草稿</el-button><el-button type="primary" @click="submit" :disabled="status==='审批中'">提交审批</el-button><el-button @click="withdraw" :disabled="status!=='审批中'">撤回</el-button><el-button @click="$msg.success('已复制为新报价草稿')">复制报价</el-button><el-button icon="Download" @click="$msg.info('示例：下载正式报价 PDF')">下载 PDF</el-button><el-button @click="$msg.info('示例：发送给客户（仅审批通过版本）')">发送客户</el-button><el-button type="success" @click="toContract">转为合同</el-button></div></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><el-button @click="save">保存草稿</el-button><el-button v-if="locked" type="warning" plain @click="revise">生成新版本</el-button><el-button type="primary" @click="submit" :disabled="status==='审批中'">提交审批</el-button><el-button @click="withdraw" :disabled="status!=='审批中'">撤回</el-button><el-button @click="$msg.success('已复制为新报价草稿')">复制报价</el-button><el-button icon="Download" @click="$msg.info('示例：下载正式报价 PDF')">下载 PDF</el-button><el-button @click="$msg.info('示例：发送给客户（仅审批通过版本）')">发送客户</el-button><el-button type="success" @click="toContract">转为合同</el-button></div></div>
     <el-alert v-if="locked" type="success" show-icon :closable="false" style="margin-bottom:12px" title="该版本已审批通过并锁定；修改价格将生成新版本并重新审批。"/>
     <el-alert v-if="!q" type="warning" show-icon :closable="false" style="margin-bottom:12px" title="该报价编号在报价列表中不存在（未找到数据），以下按缺省字段渲染。"/>
     <div class="card card-pad" style="margin-bottom:14px"><div class="card-title">报价基本信息</div>
@@ -8497,7 +8749,8 @@ const QuotePage = {
       <div style="display:flex;margin-top:16px;gap:24px;align-items:flex-start">
         <div style="flex:1">
           <div class="sec-title">审批规则触发</div>
-          <el-alert :type="calc.discBp<=500?'success':'warning'" show-icon :closable="false" :title="'整体折扣 '+(calc.discBp/100).toFixed(2)+'%（优惠 ¥'+fmtC(calc.discount)+'）→ 需「'+calc.rule.role+'」审批'"/>
+          <el-alert :type="autoPass?'success':'warning'" show-icon :closable="false" :title="'整体折扣 '+(calc.discBp/100).toFixed(2)+'%（优惠 ¥'+fmtC(calc.discount)+'）→ '+(autoPass?'销售授权内自动通过':'需「'+approvalRole+'」审批')"/>
+          <div v-if="floorViolations.length" class="muted danger-text" style="font-size:12px;margin-top:4px">低于价格底线：{{ floorViolations.map(x => x.name+' '+x.disc+'% < '+x.min+'%').join('；') }}</div>
           <div class="muted" style="font-size:12px;margin-top:8px;line-height:1.8">规则：≤5% 销售授权内自动通过；≤10% 销售经理；≤20% 销售总监；超过 20% 或低于价格底线 → 总经理 / 财务负责人。</div>
           <div class="sec-title" style="margin-top:14px">交付说明</div>
           <el-descriptions :column="1" size="small" border><el-descriptions-item label="交付周期">合同生效后 90 个自然日内完成上线（以合同约定为准）</el-descriptions-item><el-descriptions-item label="实施范围">按报价明细行对应的部署范围执行</el-descriptions-item><el-descriptions-item label="服务期限">软件授权按年度；运维服务自验收之日起按合同周期</el-descriptions-item></el-descriptions>
@@ -8528,9 +8781,18 @@ const QuotePage = {
 registerRoute('/quote/:no', QuotePage, 'quote-detail');
 
 /* ===== 第 3 阶段：报价列表 /quotes（真实数据 + 新建报价弹窗写回 store.ext.quotes） ===== */
+/* 报价状态（规划方案 5.7 列字段，为推导值）：审批未过与审批状态一致；已通过后按引用合同/有效期推导 */
+const QUOTE_ST_TAG = { 草稿: 'info', 审批中: 'warning', 已驳回: 'danger', 正式报价: 'success', 已过期: 'warning', 已转合同: '' };
+const quoteStOf = q => {
+  if (!q) return '草稿';
+  if (q.appr !== '已通过') return q.appr;
+  if (store.ext.contracts.some(c => c.quote === q.no)) return '已转合同';
+  return daysBetween(TODAY, q.valid) < 0 ? '已过期' : '正式报价';
+};
 const QuotesPage = {
   components: { ListPage },
   setup() {
+    const rows = computed(() => store.ext.quotes.map(q => ({ ...q, st: quoteStOf(q) })));
     const totalText = computed(() => '报价列表共 ' + store.ext.quotes.length + ' 份');
     const stats = computed(() => {
       const a = store.ext.quotes; const date = new Date(TODAY);
@@ -8542,7 +8804,7 @@ const QuotesPage = {
       { p: 'no', l: '报价编号', w: 150, link: true }, { p: 'customer', l: '客户名称', w: 200, link: 'cust' }, { p: 'opp', l: '关联商机', w: 150 },
       { p: 'amount', l: '报价金额（含税）', w: 140, money: true }, { p: 'disc', l: '折扣金额', w: 110, money: true },
       { p: 'date', l: '报价日期', w: 110 }, { p: 'valid', l: '有效期至', w: 110 }, { p: 'owner', l: '负责人', w: 85 },
-      { p: 'appr', l: '审批状态', w: 100, tag: { 草稿: 'info', 审批中: 'warning', 已通过: 'success', 已驳回: 'danger' } }, { p: 'ver', l: '版本', w: 70 },
+      { p: 'appr', l: '审批状态', w: 100, tag: { 草稿: 'info', 审批中: 'warning', 已通过: 'success', 已驳回: 'danger' } }, { p: 'st', l: '报价状态', w: 100, tag: QUOTE_ST_TAG }, { p: 'ver', l: '版本', w: 70 },
     ];
     const filters = computed(() => [
       { k: 'kw', label: '搜索报价', ph: '报价编号 / 客户 / 商机' }, { k: 'appr', label: '审批状态', opts: ['草稿', '审批中', '已通过', '已驳回'] },
@@ -8590,14 +8852,19 @@ const QuotesPage = {
     const openEdit = row => { Object.keys(ed).forEach(k => delete ed[k]); Object.assign(ed, row); edDlg.value = true; };
     const saveEd = () => {
       const t = store.ext.quotes.find(q => q.no === ed.no); if (!t) return;
-      Object.assign(t, { amount: ed.amount, disc: ed.disc, appr: ed.appr, owner: ed.owner, date: ed.date, valid: ed.valid });
-      store.ext.logs.unshift({ time: TODAY + ' 09:00', who: '张三', module: '报价', act: '编辑', detail: `编辑报价「${t.no}」金额/状态等字段` });
-      edDlg.value = false; ElMessage.success('报价已更新');
+      const wasApproved = t.appr === '已通过';
+      const oldVer = t.ver || 'V1';
+      const nv = wasApproved ? 'V' + ((parseInt(String(oldVer).replace(/\D/g, ''), 10) || 1) + 1) : oldVer;
+      Object.assign(t, { amount: ed.amount, disc: ed.disc, owner: ed.owner, date: ed.date, valid: ed.valid, ver: nv, appr: wasApproved ? '草稿' : t.appr });
+      store.ext.logs.unshift({ time: TODAY + ' 09:00', who: '张三', module: '报价', act: '编辑', detail: wasApproved
+        ? `已审批报价「${t.no}」价格变更：生成新版本 ${oldVer}→${nv}，状态回到草稿并需重新审批（原审批版本锁定）`
+        : `编辑报价「${t.no}」金额/负责人等字段（审批状态不直接修改，走审批流程）` });
+      edDlg.value = false; ElMessage.success(wasApproved ? `已审批报价不可直接覆盖，已生成新版本 ${nv} 并需重新审批` : '报价已更新');
     };
-    return { totalText, stats, cols, filters, store, fref, dlg, items, draft, rule, addProduct, addProductRow, delProductRow, money, oppOptions, save, edDlg, ed, openEdit, saveEd, OWNERS, fmtC, fmtY };
+    return { rows, totalText, stats, cols, filters, store, fref, dlg, items, draft, rule, addProduct, addProductRow, delProductRow, money, oppOptions, save, edDlg, ed, openEdit, saveEd, OWNERS, QUOTE_ST_TAG, fmtC, fmtY };
   },
   template: `<div>
-    <list-page :crumbs="['报价管理','报价列表']" title="报价列表" :total-text="totalText" :stats="stats" :filters="filters" :rows="store.ext.quotes" :cols="cols" :action-width="150" note-tag="真实数据 · 点击报价编号进入详情"
+    <list-page :crumbs="['报价管理','报价列表']" title="报价列表" :total-text="totalText" :stats="stats" :filters="filters" :rows="rows" :cols="cols" :action-width="150" note-tag="真实数据 · 点击报价编号进入详情"
       @link="(c,row) => $go('/quote/'+row.no)">
       <template #ops><el-button type="primary" icon="Plus" @click="dlg=true">新增报价</el-button><el-button icon="Download" @click="$msg.info('示例：导出报价（敏感字段按权限脱敏）')">导出</el-button></template>
       <template #actions="{row}">
@@ -8614,7 +8881,7 @@ const QuotesPage = {
         <el-row :gutter="12">
           <el-col :span="8"><el-form-item label="负责人" prop="owner"><el-select v-model="draft.owner" style="width:100%"><el-option v-for="o in OWNERS" :key="o" :value="o"/></el-select></el-form-item></el-col>
           <el-col :span="8"><el-form-item label="报价日期"><el-date-picker v-model="draft.date" type="date" value-format="YYYY-MM-DD" style="width:100%"/></el-form-item></el-col>
-          <el-col :span="8"><el-form-item label="审批状态"><el-select v-model="draft.appr" style="width:100%"><el-option v-for="x in ['草稿','审批中','已通过']" :key="x" :value="x"/></el-select></el-form-item></el-col>
+          <el-col :span="8"><el-form-item label="审批状态"><el-input :model-value="'草稿（提交审批后流转）'" disabled/></el-form-item></el-col>
         </el-row>
         <el-form-item label="产品明细" :required="true">
           <div style="width:100%">
@@ -8649,9 +8916,9 @@ const QuotesPage = {
         <el-form-item label="负责人"><el-select v-model="ed.owner" style="width:200px"><el-option v-for="o in OWNERS" :key="o" :value="o"/></el-select></el-form-item>
         <el-form-item label="报价日期"><el-date-picker v-model="ed.date" type="date" value-format="YYYY-MM-DD" style="width:200px"/></el-form-item>
         <el-form-item label="有效期至"><el-date-picker v-model="ed.valid" type="date" value-format="YYYY-MM-DD" style="width:200px"/></el-form-item>
-        <el-form-item label="审批状态"><el-select v-model="ed.appr" style="width:200px"><el-option v-for="x in ['草稿','审批中','已通过','已驳回']" :key="x" :value="x"/></el-select></el-form-item>
+        <el-form-item label="审批状态"><el-input :model-value="ed.appr" disabled/></el-form-item>
       </el-form>
-      <el-alert type="info" show-icon :closable="false" title="明细行请在报价单详情页编辑；此处保存即写回报价列表数据。"/>
+      <el-alert type="info" show-icon :closable="false" title="明细行请在报价单详情页编辑；审批状态不可在此直接修改，须经报价详情「提交审批 / 撤回」或审批中心流转（状态变化不得绕过审批）。已审批通过的报价修改金额/折扣金额时，保存会生成新版本并回到草稿重新审批，不覆盖原批准版本。"/>
       <template #footer><el-button @click="edDlg=false">取消</el-button><el-button type="primary" @click="saveEd">保存</el-button></template>
     </el-dialog>
   </div>`,
@@ -11990,20 +12257,21 @@ const PZ_DOC_PC_CFG = {
     layout: [
       '通用列表 ListPage：面包屑「产品管理 / 产品目录」+ 标题 + 操作区（新增产品、价格表管理、导入）。',
       '统计卡：产品总数（注明分类数）、在售、停售/停用、价格表张数，由真实数据计算。',
-      '筛选区：搜索产品（编号/名称/说明模糊）、产品分类下拉（软件/服务/实施费用/维护费用/增值服务/套餐）、产品状态下拉（在售/停售/停用）。',
-      '表格：产品编号、产品名称（链接）、产品分类、产品规格、标准单位、标准售价、成本价、产品状态标签（在售绿/停售橙/停用灰）、产品说明，右侧操作列（编辑/详情/停售或恢复）。',
+      '筛选区：搜索产品（编号/名称/说明模糊）、产品分类下拉（产品/软件/服务/实施费用/维护费用/增值服务/套餐，与规划方案 5.6 七类一致）、产品状态下拉（在售/停售/停用）。',
+      '表格：产品编号、产品名称（链接）、产品分类、产品规格、标准单位、标准售价、成本价、产品状态标签（在售绿/停售橙/停用灰）、产品说明、适用价格表（该产品出现在几张价格表明细中，如「3 张」），右侧操作列（编辑/详情/停售或恢复）。',
       '新增/编辑弹窗：名称、分类、状态、规格、标准单位、标准售价、成本价、产品说明，底部提示「新增产品会自动同步到全部价格表」。'
     ],
     fields: [
-      '产品编号｜类型：文本｜必填：是｜校验：系统生成 CP-四位，查重循环防撞号｜说明：主键，报价明细与价格表明细通过它关联。',
-      '产品名称｜类型：文本｜必填：是｜校验：失焦非空校验，为空提示「请填写产品名称」｜说明：列表链接列，点击进入产品详情。',
-      '产品分类｜类型：枚举（软件/服务/实施费用/维护费用/增值服务/套餐）｜必填：是｜校验：变更触发必选校验｜说明：决定产品归类与筛选统计。',
+      '产品编号｜类型：文本｜必填：是｜校验：系统生成 CP-四位，查重循环防撞号｜说明：唯一编号（5.6），主键，报价明细与价格表明细通过它关联。',
+      '产品名称｜类型：文本｜必填：是｜校验：失焦非空校验，为空提示「请填写产品名称」｜说明：商品或服务名称（5.6）；列表链接列，点击进入产品详情。',
+      '产品分类｜类型：枚举（产品/软件/服务/实施费用/维护费用/增值服务/套餐）｜必填：是｜校验：与规划方案 5.6 七类一致，变更触发必选校验｜说明：决定产品归类与筛选统计。',
+      '产品规格｜类型：文本｜必填：否｜校验：无｜说明：型号或服务规格（5.6），如「50 用户 · 年付」，报价与详情页展示。',
+      '标准单位｜类型：枚举文本（套/件/年/人天等）｜必填：否｜校验：如 套/人天/年｜说明：报价明细的数量单位默认取此值。',
+      '标准售价｜类型：货币｜必填：是｜校验：必须大于 0（最小 0.01 元）｜说明：标准销售价格（5.6），报价默认取单价基准，各价格表价格以它为参照计算相对标准价。',
+      '成本价｜类型：货币｜必填：否｜校验：不能为负数，为空按 0 保存｜说明：内部成本（5.6），用于毛利测算，按角色字段权限展示。',
+      '产品说明｜类型：多行文本｜必填：否｜校验：无｜说明：目录列与详情展示，作为筛选关键词的匹配源之一。',
       '产品状态｜类型：枚举（在售/停售/停用）｜必填：是｜校验：三选一｜说明：停售产品不能再加入新报价，历史报价不受影响。',
-      '标准售价｜类型：货币｜必填：是｜校验：必须大于 0（最小 0.01 元）｜说明：报价默认取单价基准，各价格表价格以它为参照计算相对标准价。',
-      '成本价｜类型：货币｜必填：否｜校验：不能为负数，为空按 0 保存｜说明：用于毛利测算，按角色字段权限展示。',
-      '产品规格｜类型：文本｜必填：否｜校验：无｜说明：如「50 用户 · 年付」，报价与详情页展示。',
-      '标准单位｜类型：文本｜必填：否｜校验：如 套/人天/年｜说明：报价明细的数量单位默认取此值。',
-      '产品说明｜类型：多行文本｜必填：否｜校验：无｜说明：目录列与详情展示，作为筛选关键词的匹配源之一。'
+      '适用价格表｜类型：对象集合（引用计数展示）｜必填：是｜校验：新增产品自动同步到全部价格表明细，缺行视为数据缺陷｜说明：规划方案 5.6「适用价格表」字段；详情页展开为客户等级/区域/渠道对应各价格表的价格与最低折扣，支持价格有效期（见价格表）。'
     ],
     rules: [
       '列表与统计卡基于 store.ext.products 实时计算：在售、停售/停用数量随状态变化即时更新，无写死总数。',
@@ -12011,7 +12279,8 @@ const PZ_DOC_PC_CFG = {
       '编辑按编号定位原始对象整体覆盖（保留编号），保存后目录、详情、价格表明细与报价取价即时同步，并记录「编辑产品」日志。',
       '停售/恢复需二次确认：停售提示「不能再加入新报价，历史报价不受影响」，恢复提示可正常用于报价；确认后状态翻转并写日志。',
       '表单校验规则：产品名称必填、产品分类必选、标准售价必填且大于 0、成本价非负；校验失败时弹窗保持打开并在字段下提示。',
-      '导入按钮为示例提示；正式版导入需查重（编号/名称）、校验售价与必填项并反馈错误行。'
+      '产品组合、折扣与价格有效期落在报价折扣（5.7 折扣审批 5%/10%/20% 分档与最低价格底线）与价格表有效期起止（5.6「价格有效期」），本页数据是取价链路的源头。',
+      '导入按钮为示例提示；正式版导入需查重（编号/名称）、校验售价与必填项，失败返回错误行号、字段与原因，不静默丢数据（第十二章「数据导入失败」）。'
     ],
     flow: [
       '产品状态流转：在售 ↔ 停售 / 停用；停售后报价新增不可选，恢复后在售可选，状态变更全部留痕。',
@@ -12022,6 +12291,7 @@ const PZ_DOC_PC_CFG = {
     errors: [
       '产品名称为空或售价非法：保存被校验拦截，字段下方提示具体原因。',
       '停售产品被加入新报价：产品下拉只列在售产品，从源头拦截；若绕过则应提示该产品已停售。',
+      '产品导入失败：返回错误行号、字段与原因，不静默丢数据（第十二章）；当前导入为示例提示，正式版需实现。',
       '点击不存在的产品详情：显示「未找到该产品」空态并引导返回产品目录。',
       '筛选无结果：表格显示空态，统计卡仍展示全量真实数字，可重置筛选。',
       '页面无控制台报错；主题切换后金额、标签配色跟随主题变量。'
@@ -12030,14 +12300,16 @@ const PZ_DOC_PC_CFG = {
       '产品分页查询接口：支持关键词、分类、状态筛选并返回真实总数。',
       '产品新增/编辑接口：编号生成、查重、价格表同步与日志写入在同一事务完成。',
       '产品停售/恢复接口：状态流转并通知报价模块限制选择。',
+      '产品导入接口：返回逐行校验结果（行号/字段/原因），通过行入库、失败行不落库（示例）。',
       '价格表明细同步接口：新增产品时自动填充各价格表默认价格与最低折扣（示例）。'
     ],
     accept: [
       '新增产品保存后出现在目录列表，且每张价格表明细都能看到该产品的价格行与默认最低折扣。',
       '编辑产品后在详情与价格表明细同步生效，操作日志新增一条编辑记录。',
       '停售产品后不出现在报价产品下拉，恢复后重新可选；历史报价仍可查看。',
-      '筛选与统计卡的分类/状态下拉枚举与数据一致，总数可复算。',
-      '表单三类校验生效，页面无控制台报错。'
+      '产品分类筛选枚举为规划方案 5.6 的七类（产品/软件/服务/实施费用/维护费用/增值服务/套餐），与数据一致可复算。',
+      '适用价格表列计数与价格表明细真实匹配（可对照详情页各价格表行数），无缺行。',
+      '表单三类校验生效，页面无控制台报错（第 14 章：报价金额计算正确依赖本页标准售价与价格表价格）。'
     ]
   },
 
@@ -12066,6 +12338,7 @@ const PZ_DOC_PC_CFG = {
       '产品编号｜类型：文本｜必填：是｜校验：必须存在于产品目录｜说明：CP-四位，路由参数，页面按它检索。',
       '产品名称｜类型：文本｜必填：是｜校验：非空｜说明：头部标题主体。',
       '产品状态｜类型：枚举（在售/停售/停用）｜必填：是｜校验：标签颜色 在售绿/停售橙/停用灰｜说明：决定能否加入新报价，详情页只读展示。',
+      '适用价格表｜类型：对象集合｜必填：是｜校验：仅统计该产品存在明细的价格表，展示于头部元信息（如 标准价、重点客户价、渠道价）｜说明：规划方案 5.6「适用价格表」字段，支撑不同客户等级/区域/渠道取不同价格。',
       '标准售价｜类型：货币｜必填：是｜校验：大于 0｜说明：各价格表相对标准价的分母，为 0 时相对标准价按 100% 展示。',
       '成本价｜类型：货币｜必填：否｜校验：非负｜说明：汇总卡展示，用于毛利评估。',
       '价格表价格｜类型：货币｜必填：是｜校验：明细缺失时取标准售价｜说明：按客户命中的价格表取价依据。',
@@ -12100,8 +12373,9 @@ const PZ_DOC_PC_CFG = {
     accept: [
       '每个产品的详情使用自己的编号取数，价格表行数与 store.ext.pricebooks 数量一致。',
       '相对标准价与最低折扣显示正确，缺省逻辑（缺明细时用标准价/85%）不导致空行或报错。',
+      '头部「适用价格表」展示该产品命中的价格表名称集合，与价格表明细一致。',
       '报价数量与列表随报价数据实时变化，点击报价编号与客户名称正确跳转。',
-      '总价与金额格式化以元展示且分位精确，页面无控制台报错。'
+      '产品—价格表—报价取价链路金额计算正确（第 14 章「报价」验收依赖本页入口）；页面无控制台报错。'
     ]
   },
 
@@ -12130,7 +12404,7 @@ const PZ_DOC_PC_CFG = {
     fields: [
       '价格表编号｜类型：文本｜必填：是｜校验：全局唯一｜说明：抽屉标题与列表定位使用。',
       '价格表名称｜类型：文本｜必填：是｜校验：非空｜说明：如标准价格表、重点客户价格表，体现适用对象。',
-      '价格类型｜类型：枚举（标准价/重点客户价/渠道价）｜必填：是｜校验：三选一｜说明：决定适用对象（全部客户/重点战略客户/渠道客户）与新增产品默认折扣。',
+      '价格类型｜类型：枚举（标准价/重点客户价/渠道价）｜必填：是｜校验：三选一｜说明：决定适用对象（全部客户/重点·战略客户/渠道客户，对应规划方案 5.6 客户等级与渠道维度；区域维度预留扩展），以及新增产品默认最低折扣。',
       '有效期起/止｜类型：日期｜必填：是｜校验：起 ≤ 止｜说明：过期价格表不再被报价命中。',
       '状态｜类型：枚举（启用/停用）｜必填：是｜校验：二选一｜说明：停用价格表只保留历史取价记录。',
       '明细数｜类型：整数｜必填：是｜校验：等于该表 items 数组长度｜说明：新增产品自动追加一行。',
@@ -12169,8 +12443,9 @@ const PZ_DOC_PC_CFG = {
       '列表展示与 store.ext.pricebooks 一致：张数、明细数、状态标签正确。',
       '抽屉内修改价格或最低折扣后保存按钮从禁用变为可用，保存后数据写回且刷新页面仍在。',
       '放弃修改后抽屉数据还原为库内值，不产生日志。',
-      '最低折扣 50–100 校验生效，价格为分位精确的金额。',
-      '保存后产品详情页各价格表价格同步变化，页面无控制台报错。'
+      '最低折扣 50–100 校验生效，价格为分位精确的金额；有效期起 ≤ 有效期止。',
+      '有效期内且启用的价格表才可被报价命中（规划方案 5.6「价格有效期」），过期/停用表不被新报价取价。',
+      '保存后产品详情页各价格表价格同步变化，页面无控制台报错；取价链路金额计算正确支撑第 14 章「报价」验收。'
     ]
   },
 
@@ -12193,56 +12468,66 @@ const PZ_DOC_PC_CFG = {
       '通用 ListPage：面包屑「报价管理 / 报价列表」+ 标题 + 总数说明（报价列表共 N 份）+「新增报价」「导出」按钮，角标注明真实数据与点击编号进详情。',
       '统计卡：报价总数、审批中、已通过、草稿/已驳回、7 天内到期（已通过且剩余 0–7 天）五张。',
       '筛选区：搜索报价（编号/客户/商机模糊）、审批状态（草稿/审批中/已通过/已驳回）、负责人下拉（由真实报价负责人去重生成）。',
-      '表格：报价编号（链接）、客户名称（链接）、关联商机、报价金额（含税）、折扣金额、报价日期、有效期至、负责人、审批状态标签（灰/橙/绿/红）、版本。',
-      '新增报价弹窗：客户（必选，过滤商机）、关联商机（随客户联动可清空）、负责人（必选）、报价日期、审批状态，产品明细添加区（在售产品下拉 + 数量 + 折扣）与金额汇总箱。',
-      '编辑弹窗：修改金额、折扣金额、负责人、日期、有效期与审批状态（编号与客户只读），注明明细行请在详情页编辑。'
+      '表格：报价编号（链接）、客户名称（链接）、关联商机、报价金额（含税）、折扣金额、报价日期、有效期至、负责人、审批状态标签（灰/橙/绿/红）、报价状态标签（草稿灰/审批中橙/已驳回红/正式报价绿/已过期橙/已转合同蓝）、版本。',
+      '新增报价弹窗：客户（必选，过滤商机）、关联商机（随客户联动可清空）、负责人（必选）、报价日期、审批状态（固定草稿，只读提示「提交审批后流转」），产品明细添加区（在售产品下拉 + 数量 + 折扣）与金额汇总箱。',
+      '编辑弹窗：修改金额、折扣金额、负责人、日期、有效期（编号与客户只读；审批状态只读展示，状态变化必须走报价详情的提交审批/撤回或审批中心，不得绕过审批，4.3），注明明细行请在详情页编辑。'
     ],
     fields: [
       '报价编号｜类型：文本｜必填：是｜校验：保存时生成 BJ-年月-四位并循环查重防撞号｜说明：主键，点击进入报价详情。',
-      '客户｜类型：客户选择｜必填：是｜校验：未选提示「请选择客户」｜说明：决定数据权限与商机联动范围。',
+      '客户名称｜类型：客户选择｜必填：是｜校验：未选提示「请选择客户」｜说明：规划方案 5.7 列字段；决定数据权限与商机联动范围。',
       '关联商机｜类型：商机选择｜必填：否｜校验：只列当前客户名下商机，可清空｜说明：报价与商机漏斗、赢输分析打通。',
+      '报价金额（含税）｜类型：货币｜必填：是｜校验：明细合计按 13% 增值税计算，保留分位｜说明：规划方案 5.7 列字段「报价金额」，汇总展示与复核口径。',
+      '折扣金额｜类型：货币｜必填：是｜校验：原价合计 − 折后不含税金额之差，可复算｜说明：规划方案 5.7 列字段；与整体折扣率联动。',
+      '报价日期｜类型：日期｜必填：是｜校验：默认今天，不得晚于有效期｜说明：有效期基准（默认 +30 天）与列表排序依据。',
+      '有效期至｜类型：日期｜必填：是｜校验：不早于报价日期｜说明：规划方案 5.7 列字段「有效期」；7 天内到期统计与续期提醒依据。',
       '负责人｜类型：人员选择｜必填：是｜校验：未选提示「请选择负责人」｜说明：新建默认张三，可从 OWNERS 选择。',
-      '报价日期｜类型：日期｜必填：是｜校验：默认今天｜说明：有效期基准（默认 +30 天）与列表排序依据。',
-      '有效期至｜类型：日期｜必填：是｜校验：不早于报价日期｜说明：7 天内到期统计与续期提醒依据。',
-      '报价金额（含税）｜类型：货币｜必填：是｜校验：明细合计按 13% 增值税计算，保留分位｜说明：汇总展示与复核口径。',
-      '折扣金额｜类型：货币｜必填：否｜校验：原价合计 − 折后不含税金额｜说明：与整体折扣率联动。',
-      '审批状态｜类型：枚举（草稿/审批中/已通过/已驳回）｜必填：是｜校验：标签颜色区分｜说明：草稿灰、审批中橙、已通过绿、已驳回红。',
-      '版本｜类型：文本｜必填：是｜校验：V1 起递增｜说明：详情页修改生成新版本。',
+      '审批状态｜类型：枚举（草稿/审批中/已通过/已驳回）｜必填：是｜校验：只能经「提交审批/审批动作」变更，列表/编辑弹窗不提供直接修改｜说明：草稿灰、审批中橙、已通过绿、已驳回红。',
+      '报价状态｜类型：枚举（草稿/审批中/已驳回/正式报价/已过期/已转合同）｜必填：是｜校验：推导值不可手工修改：审批非已通过时与审批状态一致；已通过后「存在引用合同→已转合同 / 超有效期→已过期 / 其余→正式报价」｜说明：规划方案 5.7 列字段「报价状态」。',
+      '版本｜类型：文本｜必填：是｜校验：V1 起递增，修改生成新版本，历史版本不被覆盖｜说明：规划方案 6.4「系统应记录报价每次版本变化，不能覆盖已发送客户的历史报价」。',
       '报价明细｜类型：对象数组｜必填：是｜校验：至少添加一条，未添加提示「请至少添加一条报价明细」｜说明：只能添加在售产品，单品不可重复行，数量 ≥1、折扣 50–100。'
     ],
     rules: [
       '五张统计卡由 store.ext.quotes 实时计算：审批中、已通过、草稿/已驳回按状态过滤，「7 天内到期」只统计已通过且有效期在 0–7 天内的报价。',
       '筛选为前端即时过滤：关键词匹配编号/客户/商机，状态与负责人精确匹配，查询后回到第 1 页。',
-      '新建报价保存时：客户与负责人必填、明细非空校验前置；金额按「原价 − 行折扣 → ×1.13 含税」以分精确计算；有效期 = 报价日期 + 30 天；版本 V1；写操作日志并跳转新报价详情。',
+      '新建报价保存时：客户与负责人必填、明细非空校验前置；金额按「原价 − 行折扣 → ×1.13 含税」以分精确计算；有效期 = 报价日期 + 30 天；版本 V1；审批状态固定为草稿（不可直接创建为审批中/已通过，4.3 状态变化不得绕过审批），提交审批在报价详情完成；写操作日志并跳转新报价详情。',
+      '报价状态为推导列：审批状态非「已通过」时与其一致；已通过后按「存在引用本报价的合同 → 已转合同 / 超过有效期 → 已过期 / 其余 → 正式报价」映射，随数据变化即时重算。',
       '商机下拉只展示所选客户名下的商机，切换客户时联动刷新；从产品目录添加仅限在售产品且同产品不允许重复添加。',
-      '行内编辑只修改金额、折扣金额、负责人、日期、有效期与审批状态，编号与客户锁定，保存写回并记录日志；明细修改入口在报价详情。',
+      '行内编辑只修改金额、折扣金额、负责人、日期、有效期，编号与客户锁定，审批状态只读（状态流转必须走审批），保存写回并记录日志；明细修改入口在报价详情。',
       '导出按钮为示例提示：正式版需按数据权限脱敏并带出当前筛选条件。'
     ],
     flow: [
-      '审批状态流转：草稿 → 提交审批 → 审批中 →（经理审批）→ 已通过 / 已驳回；撤回回草稿；已通过报价可转合同，修改则生成新版本重新审批。',
-      '有效期流转：报价日期 + 30 天 → 剩余 0–7 天时进入「7 天内到期」统计（需已通过状态），逾期报价可续期生成新版本。',
-      '版本流转：详情页保存草稿 → V(n+1) 且状态置回草稿；已发送客户的历史版本锁定不被覆盖。',
-      '转合同链路：已通过报价 → 生成合同草稿 → 合同签署 → 生成回款计划。'
+      '审批状态流转：草稿 → 提交审批 → 审批中 →（经理审批）→ 已通过 / 已驳回；撤回回草稿；审批被拒绝时保存拒绝原因（审批意见），修改后重新提交，不得直接改回已通过（第十二章「报价审批拒绝」）。',
+      '折扣审批触发（5.7 / 7.2）：整体折扣 ≤5%（销售授权内）直接通过；超销售权限 ≤10% 销售经理审批；超经理折扣范围 ≤20% 销售总监审批；低于最低价格底线 → 总经理 / 财务负责人审批。',
+      '有效期流转：报价日期 + 30 天 → 剩余 0–7 天时进入「7 天内到期」统计提醒续期，逾期报价的报价状态显示「已过期」，续期需生成新版本。',
+      '报价状态流转：草稿 → 审批中 → 正式报价（审批通过）；正式报价发送客户 →（客户接受）创建合同 → 报价状态「已转合同」；客户不接受则生成新报价版本重新谈判（6.4）；正式报价超有效期未签约显示「已过期」。',
+      '版本流转：详情页保存草稿 → V(n+1) 且状态置回草稿；已发送客户的历史版本锁定不被覆盖（6.4：不能覆盖掉已发送给客户的历史报价）。',
+      '转合同链路：已通过报价 → 生成合同草稿 → 合同审批 → 签署 → 生成回款计划（6.4 流程四）。'
     ],
     errors: [
       '新建未选客户/负责人：表单校验拦截并弹出对应字段提示。',
       '明细为空保存：提示「请至少添加一条报价明细」不生成报价。',
       '添加重复产品：提示「该产品已在明细中，请直接调整数量与折扣」；选择停售产品：下拉中不出现。',
+      '报价审批被拒绝：保留审批意见（拒绝原因），报价回到已驳回，修改后需重新提交，不得越权改回已通过（第十二章「报价审批拒绝」）。',
+      '已审批通过报价被修改：生成新版本并通过折扣规则重新审批，原批准版本保持锁定不被覆盖（第十二章「已审批报价修改」/ 6.4）。',
+      '直接把审批状态改为已通过/审批中：编辑弹窗与列表均不提供该入口，状态变化只能走审批（4.3）。',
       '折扣输入越界（<50 或 >100）：数量/折扣输入组件 min/max 直接限制。',
       '筛选无结果：表格空态，统计卡仍为全量真实数字，可重置。',
       '报价编号在列表中不存在（直接输入 URL）：详情页按缺省字段渲染并给出警示条，列表页无此情况。'
     ],
     api: [
-      '报价分页查询接口：接收关键词、审批状态、负责人、页码与每页条数，返回明细与过滤后总条数。',
-      '新建报价接口：编号生成查重、金额含税计算、有效期计算与日志写入在同一事务。',
-      '报价编辑接口：更新金额/状态等字段并写日志；明细字段由报价详情页接口维护。',
+      '报价分页查询接口：接收关键词、审批状态、负责人、页码与每页条数，返回明细与过滤后总条数（含推导的报价状态）。',
+      '新建报价接口：编号生成查重、金额含税计算、有效期计算与日志写入在同一事务，初始状态固定草稿。',
+      '报价编辑接口：更新金额/负责人等字段并写日志；审批状态由审批接口流转，明细字段由报价详情页接口维护。',
       '报价导出接口：按数据权限脱敏导出（示例）。'
     ],
     accept: [
       '五张统计卡数字与列表数据可复算一致，筛选与分页后总数正确。',
-      '新建报价全流程可用：校验生效，保存后新报价出现在列表首位（unshift）且自动跳转详情。',
-      '点击报价编号/客户名称跳转正确，审批状态标签颜色映射正确。',
-      '编辑弹窗保存后列表行即时更新并写日志，编号与客户不可改。',
+      '新建报价全流程可用：校验生效，保存后新报价出现在列表首位（unshift）且审批状态为草稿、自动跳转详情（第 14 章重点场景「从商机推进到报价、合同审批、签署和订单生成」的起点）。',
+      '「报价状态」列推导正确：可抽查任一报价按合同引用与有效期复算，与状态标签一致。',
+      '金额计算正确（第 14 章「报价」）：任选一行按「原价 − 行折扣 → ×1.13」复算含税金额与折扣金额一致。',
+      '审批和版本记录完整（第 14 章「报价」）：列表可直接进入详情查看审批记录与版本记录；修改报价后检查历史版本和操作记录（第 14 章重点场景）。',
+      '点击报价编号/客户名称跳转正确，审批状态与报价状态标签颜色映射正确。',
+      '编辑弹窗保存后列表行即时更新并写日志，编号、客户与审批状态不可改。',
       '页面无控制台报错，金额以元展示且分位精确。'
     ]
   },
@@ -12263,7 +12548,7 @@ const PZ_DOC_PC_CFG = {
       '跳转：面包屑返回 /quotes；客户名称进入 /customer/:no；关联商机进入 /opp/:no；审批页签「前往审批中心」进入 /approvals。'
     ],
     layout: [
-      '面包屑：报价管理 / 报价列表 / 报价编号；页头：报价单 + 编号 + 状态标签 + 版本标签 + 标题（关联商机名或客户名）。',
+      '面包屑：报价管理 / 报价列表 / 报价编号；页头：报价单 + 编号 + 审批状态标签 + 报价状态标签（草稿/审批中/已驳回/正式报价/已过期/已转合同）+ 版本标签 + 标题（关联商机名或客户名）。',
       '操作行：保存草稿、提交审批（审批中禁用）、撤回（仅审批中可用）、复制报价、下载 PDF、发送客户、转为合同（需状态已通过）。',
       '锁定提示：已通过版本显示绿色提示「该版本已审批通过并锁定；修改价格将生成新版本并重新审批」；编号不存在时显示橙色警示条。',
       '基本信息卡：报价编号、客户（链接）、联系人（客户第 1 个联系人）、关联商机（链接）、报价日期、有效期至、负责人、币种/税率（人民币/13%）。',
@@ -12456,6 +12741,764 @@ const PZ_DOC_PC_CFG = {
 };
 
 Object.entries(PZ_DOC_PC_CFG).forEach(([k, c]) => { DOCS_DEFAULT[k] = mkDoc(k, c); });
+
+/* ===== S6 产品与报价专项对齐：覆盖 products / product-detail / pricebooks / quotes / quote-detail 需求文档 =====
+   依据规划方案 5.6、5.7、6.4、7.2、第三章、4.2/4.3、第十二章、第十四章。 */
+const PZ_DOC_S6_CFG = {
+  products: {
+    name: '产品目录', module: '产品管理',
+    goal: '维护可售产品主数据：按规划方案 5.6 的分类与状态浏览、检索产品，支持新增、编辑、停售/恢复；产品编号、标准售价、成本价与适用价格表是报价和销售订单取价的基础，新增产品自动同步到全部价格表，避免报价取价缺行。',
+    roles: [
+      '菜单：销售、销售经理、管理员通过左侧导航「产品管理 → 产品目录」进入本页，路由 /products（第三章菜单权限）。',
+      '按钮：销售可查看详情并从报价中选择在售产品；销售经理与管理员可新增、编辑产品并执行停售/恢复；导入按钮对所有角色展示（当前为示例提示，正式版需按钮权限控制）。',
+      '数据：产品目录为全局共享基础数据，所有角色可见；修改权限由角色按钮权限控制，每次修改写入操作日志（第三章数据权限与操作日志）。',
+      '字段：标准售价、成本价对销售可见，成本价按字段权限可脱敏；产品规格、标准单位、产品说明与适用价格表全员可见（第三章字段权限）。',
+      '数据：产品不物理删除，停售/停用为状态流转，历史报价仍引用原产品编号可追溯（4.3 重要业务对象优先逻辑删除/作废）。'
+    ],
+    enter: [
+      '入口：左侧导航「产品管理 → 产品目录」，路由 /products。',
+      '关联入口：报价明细「从产品目录添加」只列在售产品；产品详情页「价格表管理」按钮指向 /pricebooks。',
+      '跳转：点击产品编号或名称进入 /product/:no 产品详情；「价格表管理」按钮进入 /pricebooks。'
+    ],
+    layout: [
+      '通用列表 ListPage：面包屑「产品管理 / 产品目录」+ 标题 + 操作区（新增产品、价格表管理、导入）。',
+      '统计卡：产品总数（注明分类数）、在售、停售/停用、价格表张数，全部由真实数据计算，无写死总数（4.2）。',
+      '筛选区：搜索产品（编号/名称/说明模糊）、产品分类下拉（产品/软件/服务/实施费用/维护费用/增值服务/套餐，与 5.6 七类一致）、产品状态下拉（在售/停售/停用）。',
+      '表格：产品编号、产品名称（链接）、产品分类、产品规格、标准单位、标准售价、成本价、产品状态标签（在售绿/停售橙/停用灰）、产品说明、适用价格表（该产品命中的价格表数量），右侧操作列（编辑/详情/停售或恢复）。',
+      '新增/编辑弹窗：产品名称、产品分类、产品状态、产品规格、标准单位、标准售价、成本价、产品说明，底部提示新增后自动同步全部价格表。'
+    ],
+    fields: [
+      '产品编号｜类型：文本｜必填：是｜校验：系统生成 CP-四位并循环查重防撞号｜说明：5.6 唯一编号，产品主键，报价明细与价格表明细通过它关联。',
+      '产品名称｜类型：文本｜必填：是｜校验：失焦非空，为空提示「请填写产品名称」｜说明：5.6 商品或服务名称，列表链接进入产品详情。',
+      '产品分类｜类型：枚举（产品/软件/服务/实施费用/维护费用/增值服务/套餐）｜必填：是｜校验：必须为 5.6 七类之一，选择校验｜说明：决定产品归类、筛选与统计口径。',
+      '产品规格｜类型：文本｜必填：否｜校验：无，建议填写型号或服务规格｜说明：5.6 型号或服务规格，如「50 用户 · 年付」，报价与详情展示。',
+      '标准单位｜类型：文本（套/件/年/人天等）｜必填：否｜校验：如套、件、年、人天、用户·年｜说明：5.6 标准单位，报价明细数量单位默认取此值。',
+      '标准售价｜类型：货币｜必填：是｜校验：必须大于 0（最小 0.01 元）｜说明：5.6 标准销售价格，报价默认取价基准，价格表相对标准价以它为分母。',
+      '成本价｜类型：货币｜必填：否｜校验：不能为负数，为空按 0 保存｜说明：5.6 内部成本，用于毛利测算，按字段权限展示。',
+      '产品说明｜类型：多行文本｜必填：否｜校验：无｜说明：5.6 产品描述，列表与详情展示，并作为关键词筛选匹配源。',
+      '产品状态｜类型：枚举（在售/停售/停用）｜必填：是｜校验：三选一｜说明：5.6 产品状态；停售/停用产品不能加入新报价，历史报价不受影响。',
+      '适用价格表｜类型：对象集合（引用计数展示）｜必填：是｜校验：新增产品自动同步到全部价格表明细，缺行视为数据缺陷｜说明：5.6 产品对应价格策略；详情页按客户等级/渠道展示各价格表价格、最低折扣与价格有效期。'
+    ],
+    rules: [
+      '列表与统计卡实时读取 store.ext.products：在售、停售/停用数量随状态变化即时更新，产品总数与价格表张数不写死（4.2、AGENTS 真分页）。',
+      '新增产品保存时生成唯一 CP 编号，写入产品目录并向全部价格表明细追加价格行（默认价格=标准售价，渠道价最低折扣 80%、其余 85%），同时写操作日志。',
+      '编辑按编号定位原始对象整体覆盖并保留编号，保存后目录、详情、价格表明细与报价取价即时同步，并记录「编辑产品」日志（4.3 变更留痕）。',
+      '停售/恢复需二次确认：停售提示「不能再加入新报价，历史报价不受影响」，恢复提示可正常用于报价；确认后状态翻转并写日志。',
+      '表单校验：产品名称必填、产品分类必选、标准售价必填且大于 0、成本价非负；校验失败时弹窗保持打开并在字段下提示（4.3 新增/编辑先校验）。',
+      '5.6 要求支持不同客户等级、区域、渠道使用不同价格表，并支持产品组合、折扣和价格有效期：当前价格表按标准价/重点客户价/渠道价三类覆盖客户等级与渠道，区域价与产品组合作为后续扩展；折扣与有效期在报价和价格表层落地。',
+      '导入按钮为示例提示；正式版导入需查重（编号/名称）、校验售价与必填项，失败返回错误行号、字段与原因，不静默丢数据（第十二章「数据导入失败」）。'
+    ],
+    flow: [
+      '产品状态流转：在售 ↔ 停售 / 停用；停售/停用后报价新增不可选，恢复在售后可选，状态变更全部留痕（4.3 状态变化不得绕过业务校验）。',
+      '新增流程：填写表单 → 保存生成编号 → 同步写回全部价格表明细 → 写操作日志 → 列表出现新行。',
+      '修改流程：编辑 → 预填表单 → 保存覆盖原对象 → 详情/价格表/报价联动更新 → 写操作日志。',
+      '取价链路：产品标准售价 + 价格表明细价格/最低折扣 → 报价按客户命中的价格表取价，折扣不得低于该表最低折扣；低于底线触发折扣审批（5.7、7.2）。',
+      '价格有效期：价格表有效期起止内且状态启用的价格表才被新报价命中，过期或停用表只保留历史取价记录（5.6）。'
+    ],
+    errors: [
+      '产品名称为空或标准售价非法：保存被表单校验拦截，字段下方提示具体原因。',
+      '停售/停用产品被加入新报价：报价产品下拉只列在售产品，从源头拦截；若绕过应提示该产品已停售（第十二章边界）。',
+      '产品导入失败：返回错误行号、字段与原因，不静默丢数据（第十二章「数据导入失败」）；当前导入为示例提示，正式版需实现。',
+      '点击不存在的产品详情：显示「未找到该产品」空态并引导返回产品目录，不渲染残缺卡片。',
+      '用户越权修改产品：正式版由后端按菜单/按钮权限拦截并记录安全日志（第三章、第十二章「用户越权操作」）。',
+      '筛选无结果：表格显示空态，统计卡仍展示全量真实数字，可重置筛选；页面无控制台报错，主题切换后金额与标签配色跟随变量。'
+    ],
+    api: [
+      '产品分页查询接口：支持关键词、分类、状态筛选并返回过滤后的真实总数。',
+      '产品新增/编辑接口：编号生成、查重、价格表同步与日志写入同一事务完成。',
+      '产品停售/恢复接口：状态流转并通知报价模块限制选择。',
+      '产品导入接口：返回逐行校验结果（行号/字段/原因），通过行入库、失败行不落库（示例）。',
+      '价格表明细同步接口：新增产品时自动填充各价格表默认价格与最低折扣（示例）。'
+    ],
+    accept: [
+      '新增产品保存后出现在目录列表，且每张价格表明细都能看到该产品的价格行与默认最低折扣。',
+      '编辑产品后在详情与价格表明细同步生效，操作日志新增一条编辑记录（第十四章「操作日志」）。',
+      '停售/停用产品不出现在报价产品下拉，恢复在售后重新可选；历史报价仍可查看。',
+      '产品分类筛选枚举完整覆盖规划方案 5.6 七类（产品/软件/服务/实施费用/维护费用/增值服务/套餐），与数据一致可复算。',
+      '适用价格表列计数与价格表明细真实匹配（可对照详情页各价格表行数），无缺行。',
+      '表单四类校验生效；页面无控制台报错；产品—价格表—报价取价链路支撑第十四章「报价：金额计算正确」验收。'
+    ]
+  },
+
+  'product-detail': {
+    name: '产品详情', module: '产品管理',
+    goal: '全景呈现单个产品：基础信息（编号/分类/规格/单位/售价/成本/状态）、该产品在每张价格表中的价格、最低折扣与相对标准价，以及引用该产品的全部报价明细（数量/单价/折扣/审批状态），支撑销售报价取价与管理员定价决策。',
+    roles: [
+      '菜单：所有业务角色可经「产品目录」点击产品进入本页，路由 /product/:no（第三章菜单权限）。',
+      '按钮：销售仅查看与「价格表管理」跳转；销售经理/管理员拥有价格表维护入口；价格与最低折扣的编辑权限在价格表页控制（第三章按钮权限）。',
+      '数据：价格表数据来自全部价格表中该产品的明细行，报价数据来自引用该产品编号的报价单，页面不做数据合并伪造。',
+      '字段：标准售价、各价格表价格、最低折扣可见；成本价按字段权限脱敏；折扣低于价格底线需走报价折扣审批（第三章字段权限、5.7）。',
+      '数据：产品只读归档，不提供编辑入口；停售产品详情仍可查看供历史报价追溯（4.3 逻辑删除/归档）。'
+    ],
+    enter: [
+      '入口：产品目录点击产品编号或名称进入 /product/:no。',
+      '关联入口：价格表明细与报价明细中的产品编号链接。',
+      '跳转：面包屑/「返回产品目录」回到 /products；「价格表管理」按钮进入 /pricebooks；报价编号进入 /quote/:no；客户名称进入 /customer/:no。'
+    ],
+    layout: [
+      '面包屑：产品管理 / 产品目录 / 产品名称。',
+      '头部卡：分类圆形标识、产品名称+产品状态标签（在售/停售/停用）+分类标签、产品编号/规格/标准单位/适用价格表元信息、「价格表管理」按钮；右侧三张汇总卡：标准售价、成本价、引用报价数。',
+      '价格表卡：各价格表中的价格表格（价格表名称/类型/状态/价格/相对标准价/最低折扣），底部注明按客户命中价格表取价且折扣不得低于最低折扣。',
+      '报价卡：使用该产品的报价 N 份表格（报价编号/客户/报价数量+单位/单价/折扣/报价日期/审批状态标签），无引用时显示「暂无报价使用该产品」空态。'
+    ],
+    fields: [
+      '产品编号｜类型：文本｜必填：是｜校验：必须存在于产品目录｜说明：5.6 唯一编号，CP-四位，作为路由与反查参数。',
+      '产品名称｜类型：文本｜必填：是｜校验：非空｜说明：5.6 商品或服务名称，头部标题主体。',
+      '产品分类｜类型：枚举（产品/软件/服务/实施费用/维护费用/增值服务/套餐）｜必填：是｜校验：5.6 七类之一｜说明：头部标签与分类统计依据。',
+      '产品规格｜类型：文本｜必填：否｜校验：无｜说明：5.6 型号或服务规格，头部元信息展示。',
+      '标准单位｜类型：文本｜必填：否｜校验：套/件/年/人天等｜说明：5.6 标准单位，报价数量单位默认值。',
+      '标准售价｜类型：货币｜必填：是｜校验：大于 0｜说明：5.6 标准销售价格，各价格表相对标准价的分母；为 0 时相对标准价按 100% 展示。',
+      '成本价｜类型：货币｜必填：否｜校验：非负｜说明：5.6 内部成本，汇总卡展示，用于毛利评估，可按字段权限脱敏。',
+      '产品说明｜类型：多行文本｜必填：否｜校验：无｜说明：5.6 产品描述文本。',
+      '产品状态｜类型：枚举（在售/停售/停用）｜必填：是｜校验：标签颜色 在售绿/停售橙/停用灰｜说明：5.6 产品状态，决定能否加入新报价，本页只读展示。',
+      '适用价格表｜类型：对象集合｜必填：是｜校验：仅统计该产品存在明细的价格表，头部展示名称集合｜说明：5.6 产品对应价格策略，支撑不同客户等级/渠道取不同价格。',
+      '价格表价格｜类型：货币｜必填：是｜校验：明细缺失时取标准售价｜说明：该产品在对应价格表中的生效价，报价按客户命中价格表取价。',
+      '相对标准价｜类型：百分比｜必填：是｜校验：价格表价格 ÷ 标准售价 × 100 取整｜说明：直观展示各级价目相对标准价的系数。',
+      '最低折扣｜类型：百分比｜必填：是｜校验：缺失时默认 85%，有效范围 50–100｜说明：该价格表对应该产品的折扣红线，报价折扣低于它触发折扣审批（5.7、7.2）。',
+      '引用报价明细｜类型：对象数组｜必填：否｜校验：来自报价单中该产品编号的明细行｜说明：展示该产品在历史报价中的数量、单价、折扣与审批状态，用于追溯。'
+    ],
+    rules: [
+      '价格表行由全部价格表逐张匹配本产品编号生成：明细缺失时价格取标准售价、最低折扣取默认 85%，相对标准价按最终展示价格计算，保证表格不缺行、不出现 NaN。',
+      '相对标准价 = 价格表价格 × 100 / 标准售价取整；标准售价为 0 时按 100% 展示，避免除零。',
+      '引用报价数与报价表格来自真实报价单明细：只有明细中出现该产品编号的报价才纳入，数量按明细行展示。',
+      '页面不提供编辑入口：价格与最低折扣的维护统一收敛到价格表页，「价格表管理」按钮负责跳转（4.3 关联对象可跳转）。',
+      '审批状态标签映射：已通过绿、审批中橙、草稿灰、已驳回红；未知状态按灰色展示。',
+      '成本价为敏感字段，正式版按第三章字段权限对无权限角色脱敏展示，但不得影响售价与折扣计算。'
+    ],
+    flow: [
+      '产品状态：在售 ↔ 停售 / 停用；停售/停用后不能再加入新报价，但本页历史报价引用仍完整可见（5.6）。',
+      '取价链路：客户命中价格表 → 该表本产品价格 → 报价折扣不得低于该表最低折扣，违反即触发折扣审批（5.7、7.2）。',
+      '价格变更链路：价格表页编辑保存 → 价格表明细与详情页各价格表价格实时同步（数据同源）。',
+      '有效期链路：价格表有效期起止内且启用的价格表才命中新报价，过期/停用表不参与新报价取价（5.6 价格有效期）。'
+    ],
+    errors: [
+      '产品编号不存在或路由错误：整页显示「未找到该产品」空态并提供「返回产品目录」按钮，不渲染残缺卡片。',
+      '价格表明细缺行：列表照常展示标准售价与默认最低折扣，并在价格表页可补录，不显示空值或 NaN。',
+      '没有报价引用：报价卡显示空态「暂无报价使用该产品」，引用报价数显示 0。',
+      '客户已被合并或作废：报价列表的客户链接按客户详情页权限提示处理，页面不报错。',
+      '用户越权查看成本价或修改价格：正式版由后端按字段/按钮权限拦截并记录安全日志（第三章、第十二章「用户越权操作」）。'
+    ],
+    api: [
+      '产品详情查询接口：返回基本信息、状态与售价，供头部与汇总卡展示。',
+      '价格表明细反查接口：按产品编号返回各价格表价格、最低折扣、有效期与表状态。',
+      '引用报价反查接口：按产品编号检索报价单明细行并带出报价审批状态。',
+      '产品取价预览接口：给定客户返回命中的价格表与生效价、折扣底线（示例）。'
+    ],
+    accept: [
+      '每个产品的详情使用自己的编号取数，价格表行数与 store.ext.pricebooks 数量一致（AGENTS 数据隔离要求）。',
+      '相对标准价与最低折扣显示正确，缺明细时用标准价/85% 的缺省逻辑不导致空行、NaN 或报错。',
+      '头部「适用价格表」展示该产品命中的价格表名称集合，与价格表明细一致。',
+      '报价数量与列表随报价数据实时变化，点击报价编号与客户名称正确跳转。',
+      '产品—价格表—报价取价链路金额计算正确，支撑第十四章「报价：金额计算正确」验收；页面无控制台报错。'
+    ]
+  },
+
+  pricebooks: {
+    name: '价格表', module: '产品管理',
+    goal: '维护标准价、重点客户价、渠道价等多套价格体系：列表管理各价格表的有效期、状态与明细规模，抽屉中可直接编辑每个产品的价格与最低折扣（50–100%）并写回数据，为报价按客户等级/渠道命中的价目表取价提供基础。',
+    roles: [
+      '菜单：销售经理、管理员通过「产品管理 → 价格表」或产品目录「价格表管理」按钮进入，路由 /pricebooks（第三章菜单权限）。',
+      '按钮：销售经理与管理员可查看明细并编辑价格/最低折扣、保存修改；销售只读参照，保存按钮按权限置灰；导出与复制价格为示例提示（第三章按钮权限）。',
+      '数据：价格表为全局基础数据，所有报价取价都引用它；修改影响后续新报价，不回溯已生成报价（4.3 变更留痕）。',
+      '字段：价格与最低折扣可编辑，相对标准价为计算展示；价格底线与折扣范围由本页约束（第三章字段权限）。',
+      '数据：明细修改写回 store.ext.pricebooks 并追加系统操作日志，保留变更留痕（第十四章操作日志）。'
+    ],
+    enter: [
+      '入口：左侧导航「产品管理 → 价格表」，路由 /pricebooks。',
+      '关联入口：产品目录页「价格表管理」按钮、产品详情页「价格表管理」按钮。',
+      '跳转：列表「查看明细」打开抽屉；「复制」为示例提示；面包屑「产品管理」返回 /products。'
+    ],
+    layout: [
+      '面包屑：产品管理 / 价格表。',
+      '页头：标题 + 「共 N 张 · 覆盖 M 个产品」 + 「导出」按钮，数字由真实数据计算。',
+      '价格表列表：编号、价格表名称、价格类型（标准价/重点客户价/渠道价）、有效期起、有效期止、状态标签（启用绿/停用灰）、明细数、明细总价、操作列（查看明细/复制）。',
+      '详情抽屉：顶部说明（可直接编辑价格与最低折扣，范围 50–100%），基本信息描述（价格类型/状态/有效期/适用对象），明细表格逐行编辑：产品编号、产品名称、价格输入、相对标准价、最低折扣输入。',
+      '抽屉底部：「保存修改」「放弃修改」按钮受 dirty 标记控制，未修改时禁用，右侧提示价格与折扣直接写回。'
+    ],
+    fields: [
+      '价格表编号｜类型：文本｜必填：是｜校验：全局唯一｜说明：抽屉标题与列表定位使用，如 PB-001。',
+      '价格表名称｜类型：文本｜必填：是｜校验：非空｜说明：如标准价、重点客户价、渠道价，体现适用对象。',
+      '价格类型｜类型：枚举（标准价/重点客户价/渠道价）｜必填：是｜校验：三选一｜说明：决定适用对象（全部客户/重点·战略客户/渠道客户）与新增产品默认最低折扣，覆盖 5.6 客户等级与渠道维度，区域价预留扩展。',
+      '适用对象｜类型：枚举文本｜必填：是｜校验：随价格类型联动只读展示｜说明：标准价→全部客户、重点客户价→重点/战略客户、渠道价→渠道客户。',
+      '有效期起｜类型：日期｜必填：是｜校验：有效期起 ≤ 有效期止｜说明：5.6 价格有效期起点，过期价格表不再被新报价命中。',
+      '有效期止｜类型：日期｜必填：是｜校验：不早于有效期起｜说明：5.6 价格有效期终点，过期后只保留历史取价记录。',
+      '状态｜类型：枚举（启用/停用）｜必填：是｜校验：二选一｜说明：仅启用且在有效期内的价格表参与新报价取价，停用表只保留历史记录。',
+      '明细数｜类型：整数｜必填：是｜校验：等于该表 items 数组长度｜说明：覆盖产品规模，新增产品自动追加一行。',
+      '明细总价｜类型：货币｜必填：是｜校验：各行价格求和｜说明：价格表规模参考，行数据变更后重算。',
+      '产品编号｜类型：文本｜必填：是｜校验：必须存在于产品目录｜说明：价格表明细行关联的产品主键。',
+      '产品名称｜类型：文本｜必填：是｜校验：非空｜说明：取自产品目录，便于识读。',
+      '价格｜类型：货币｜必填：是｜校验：输入组件最小 0.01｜说明：该价格表内该产品的生效价，保存写回。',
+      '相对标准价｜类型：百分比｜必填：是｜校验：价格 ÷ 产品标准售价 × 100 取整｜说明：只读参考列，展示本表价相对标准价的系数。',
+      '最低折扣｜类型：百分比｜必填：是｜校验：输入组件限 50–100，越界拦截｜说明：报价折扣红线，低于它触发折扣审批，越界值标红提示。'
+    ],
+    rules: [
+      '列表与抽屉同一数据源：抽屉内逐行修改价格/最低折扣仅先修改行数据并置 dirty=true，点击「保存修改」才整体写回 store.ext.pricebooks 并追加「价格表明细价格/最低折扣变更」日志。',
+      '放弃修改会重新按价格表打开抽屉还原为库内数据；未做任何修改时「保存修改」「放弃修改」均禁用，避免无意义日志。',
+      '最低折扣输入范围强制 50–100，价格最小 0.01；编辑越界由输入组件直接拦截（4.3 保存前校验）。',
+      '价格类型决定适用对象展示：标准价→全部客户、重点客户价→重点/战略客户、渠道价→渠道客户；新增产品同步时渠道价默认最低折扣 80%、其余 85%。',
+      '保存成功提示「已保存：价格与最低折扣已写回（操作留痕）」，报价模块下次取价即用新价格；进行中的报价不自动重算。',
+      '5.6 要求价格表支持不同客户等级、区域、渠道：当前以标准价/重点客户价/渠道价覆盖客户等级与渠道，区域价格表与产品组合价为后续扩展，页面预留价格类型扩展位。',
+      '导出与复制价格表为示例提示，正式版复制应生成新价格表编号并复制全部明细，导出按权限控制（4.2、第三章）。'
+    ],
+    flow: [
+      '价格表状态：启用 →（版本替代或手动停用）→ 停用；仅启用且在有效期内的价格表被新报价取价命中（5.6）。',
+      '编辑流程：查看明细 → 修改价格/最低折扣（dirty 标记）→ 保存修改 → 写回明细 + 操作日志 → 相对标准价与产品详情同步更新。',
+      '生效链路：价格表价格 × 报价折扣 = 成交单价，且折扣 ≥ 该表最低折扣；低于底线触发折扣审批（5.7、7.2）。',
+      '折扣审批分档：整体折扣 ≤5% 销售授权内自动通过；≤10% 销售经理；≤20% 销售总监；>20% 或击穿最低价格底线 → 总经理 / 财务负责人（7.2）。'
+    ],
+    errors: [
+      '最低折扣输入越界（<50 或 >100）：输入组件限制并标红，保存前即拦截。',
+      '价格为空或低于 0.01：输入组件拦截拒绝输入，不允许写入非法价格。',
+      '未修改点击保存：按钮禁用无响应，避免覆盖产生无意义日志。',
+      '抽屉打开时价格表已被删除：基本信息与明细区为空，列出空态并允许关闭抽屉，不报错。',
+      '用户越权修改价格表：正式版由后端按按钮权限拦截并记录安全日志（第三章、第十二章「用户越权操作」）。',
+      '筛选或列表无数据：显示空态，总数与覆盖产品数仍为真实数字。'
+    ],
+    api: [
+      '价格表列表查询接口：返回价格表、类型、有效期、状态、明细数与明细总价。',
+      '价格表明细查询接口：按价格表返回产品行（价格/相对标准价/最低折扣）。',
+      '明细保存接口：批量写回各行价格与最低折扣并校验范围，生成变更日志。',
+      '价格历史查询接口：按产品返回各价格表历史价格与折扣调整记录（示例）。'
+    ],
+    accept: [
+      '列表展示与 store.ext.pricebooks 一致：张数、明细数、状态标签正确。',
+      '抽屉内修改价格或最低折扣后保存按钮从禁用变为可用，保存后数据写回且刷新页面仍在。',
+      '放弃修改后抽屉数据还原为库内值，不产生日志。',
+      '最低折扣 50–100 校验生效，价格为分位精确的金额；有效期起 ≤ 有效期止。',
+      '有效期内且启用的价格表才可被新报价命中（5.6「价格有效期」），过期/停用表不被新报价取价。',
+      '保存后产品详情页各价格表价格同步变化，页面无控制台报错；取价链路支撑第十四章「报价：金额计算正确」验收。'
+    ]
+  },
+
+  quotes: {
+    name: '报价列表', module: '报价管理',
+    goal: '汇总管理全部报价单：五张状态统计卡 + 关键词/审批状态/负责人筛选 + 表格展示规划方案 5.7 的报价编号、客户名称、关联商机、报价金额、折扣金额、报价日期、有效期、负责人、审批状态与报价状态；支持新建报价（选客户带出商机、从产品目录加明细、自动编号与有效期）、编辑与跳转报价单详情。',
+    roles: [
+      '菜单：销售、销售经理通过「报价管理 → 报价列表」进入本页，路由 /quotes；顶部全局搜索报价编号可跳入（第三章菜单权限）。',
+      '按钮：销售可新增报价（本人或被授权负责客户）、查看、编辑自己的报价；销售经理可编辑团队报价；导出按字段权限脱敏（当前为示例提示，第三章按钮权限）。',
+      '数据：销售默认看到本人及共享客户的报价，经理看到本部门，管理员全量；统计卡数字按全量真实数据计算（第三章数据权限）。',
+      '字段：报价金额、折扣金额、审批状态、版本对授权角色可见；客户联系数据不在列表展示，详情页按客户权限查看（第三章字段权限）。',
+      '数据：报价不物理删除，作废走审批；金额与状态修改写操作日志留痕（4.3、第十四章操作日志）。'
+    ],
+    enter: [
+      '入口：左侧导航「报价管理 → 报价列表」，路由 /quotes。',
+      '关联入口：报价详情面包屑「报价列表」返回；商机详情与审批中心的报价链接。',
+      '跳转：点击报价编号进入 /quote/:no；点击客户名称进入 /customer/:no；新建保存后自动跳转新报价详情。'
+    ],
+    layout: [
+      '通用 ListPage：面包屑「报价管理 / 报价列表」+ 标题 + 总数说明（报价列表共 N 份）+「新增报价」「导出」按钮，角标注明真实数据与点击编号进详情。',
+      '统计卡：报价总数、审批中、已通过、草稿/已驳回、7 天内到期（已通过且剩余 0–7 天）五张，全部由真实数据计算（4.2）。',
+      '筛选区：搜索报价（编号/客户/商机模糊）、审批状态（草稿/审批中/已通过/已驳回）、负责人下拉（由真实报价负责人去重生成）。',
+      '表格：报价编号（链接）、客户名称（链接）、关联商机、报价金额（含税）、折扣金额、报价日期、有效期至、负责人、审批状态标签（灰/橙/绿/红）、报价状态标签（草稿灰/审批中橙/已驳回红/正式报价绿/已过期橙/已转合同蓝）、版本。',
+      '新增报价弹窗：客户（必选，联动商机）、关联商机（随客户联动可清空）、负责人（必选）、报价日期、审批状态（固定草稿，只读提示提交审批后流转），产品明细添加区（在售产品下拉 + 数量 + 折扣）与金额汇总箱。',
+      '编辑弹窗：修改报价金额、折扣金额、负责人、日期、有效期（编号与客户只读；审批状态只读，状态变化必须走报价详情的提交审批/撤回或审批中心，不得绕过审批，4.3）。'
+    ],
+    fields: [
+      '报价编号｜类型：文本｜必填：是｜校验：保存时生成 BJ-年月-四位并循环查重防撞号｜说明：5.7 主键，点击进入报价详情。',
+      '客户名称｜类型：客户选择｜必填：是｜校验：未选提示「请选择客户」｜说明：5.7 列字段，决定数据权限与商机联动范围。',
+      '关联商机｜类型：商机选择｜必填：否｜校验：只列当前客户名下商机，可清空｜说明：5.7 列字段，报价与商机漏斗、赢输分析打通（6.4 商机进入报价阶段）。',
+      '报价金额（含税）｜类型：货币｜必填：是｜校验：明细合计按 13% 增值税计算并保留分位｜说明：5.7 列字段「报价金额」，列表汇总与复核口径。',
+      '折扣金额｜类型：货币｜必填：是｜校验：原价合计 − 折后不含税金额，可复算｜说明：5.7 列字段「折扣金额」，与整体折扣率联动。',
+      '报价日期｜类型：日期｜必填：是｜校验：默认今天，不得晚于有效期｜说明：5.7 列字段，有效期基准（默认 +30 天）与列表排序依据。',
+      '有效期至｜类型：日期｜必填：是｜校验：不早于报价日期｜说明：5.7 列字段「有效期」，7 天内到期统计与续期提醒依据。',
+      '负责人｜类型：人员选择｜必填：是｜校验：未选提示「请选择负责人」｜说明：5.7 列字段，新建默认张三，可从 OWNERS 选择。',
+      '审批状态｜类型：枚举（草稿/审批中/已通过/已驳回）｜必填：是｜校验：只能经提交审批/审批动作变更，列表与编辑弹窗不提供直接修改｜说明：5.7 列字段「审批状态」，草稿灰、审批中橙、已通过绿、已驳回红。',
+      '报价状态｜类型：枚举（草稿/审批中/已驳回/正式报价/已过期/已转合同）｜必填：是｜校验：推导值不可手工修改：审批非已通过时与审批状态一致；已通过后存在引用合同→已转合同 / 超有效期→已过期 / 其余→正式报价｜说明：5.7 列字段「报价状态」。',
+      '版本｜类型：文本｜必填：是｜校验：V1 起递增，修改生成新版本，历史版本不被覆盖｜说明：6.4 要求系统记录报价每次版本变化，不能覆盖已发送客户的历史报价。',
+      '报价明细｜类型：对象数组｜必填：是｜校验：至少添加一条，未添加提示「请至少添加一条报价明细」｜说明：只能添加在售产品，同产品不可重复行，数量 ≥1、折扣 50–100。'
+    ],
+    rules: [
+      '五张统计卡由 store.ext.quotes 实时计算：审批中、已通过、草稿/已驳回按状态过滤，「7 天内到期」只统计已通过且有效期在 0–7 天内的报价（4.2 统计口径）。',
+      '筛选为前端即时过滤：关键词匹配编号/客户/商机，状态与负责人精确匹配，查询后回到第 1 页；分页总数取过滤后的真实条数。',
+      '新建报价保存时：客户与负责人必填、明细非空校验前置；金额按「原价 − 行折扣 → ×1.13 含税」以分精确计算；有效期 = 报价日期 + 30 天；版本 V1；审批状态固定草稿（不可直接创建为审批中/已通过，4.3 状态变化不得绕过审批），提交审批在报价详情完成；写操作日志并跳转新报价详情。',
+      '报价状态为推导列：审批状态非「已通过」时与其一致；已通过后按「存在引用本报价的合同 → 已转合同 / 超过有效期 → 已过期 / 其余 → 正式报价」映射，随数据变化即时重算（5.7、6.4）。',
+      '商机下拉只展示所选客户名下的商机，切换客户时联动刷新；从产品目录添加仅限在售产品且同产品不允许重复添加。',
+      '编辑保存：编号与客户锁定，审批状态只读；若原报价已审批通过，修改金额/折扣金额时生成新版本（V(n+1)）并把审批状态置回草稿重新审批，原批准版本不覆盖；未审批通过的报价保持原审批状态并写日志（5.7、6.4、第十二章「已审批报价修改」）。',
+      '导出按钮为示例提示：正式版需按数据权限脱敏并带出当前筛选条件（第三章、4.2）。'
+    ],
+    flow: [
+      '审批状态流转：草稿 → 提交审批 → 审批中 →（经理/总监/财务审批）→ 已通过 / 已驳回；撤回回草稿；审批被拒绝时保存拒绝原因（审批意见），修改后重新提交，不得直接改回已通过（第十二章「报价审批拒绝」）。',
+      '折扣审批触发（5.7、7.2）：整体折扣 ≤5%（销售授权内）提交后自动通过；超销售权限 ≤10% 销售经理审批；超经理折扣范围 ≤20% 销售总监审批；低于最低价格底线 → 总经理 / 财务负责人审批。',
+      '有效期流转：报价日期 + 30 天 → 剩余 0–7 天时进入「7 天内到期」统计提醒续期；逾期报价的报价状态显示「已过期」，续期需生成新版本（5.7、7.3 提醒）。',
+      '报价状态流转：草稿 → 审批中 → 正式报价（审批通过）；正式报价发送客户 →（客户接受）创建合同 → 报价状态「已转合同」；客户不接受则重新谈判并生成新报价版本（6.4）；正式报价超有效期未签约显示「已过期」。',
+      '版本流转：详情页保存草稿 → V(n+1) 且状态置回草稿；已审批通过或已发送客户的历史版本锁定不被覆盖（6.4）。',
+      '转合同链路：已通过报价 → 生成合同草稿 → 合同审批 → 签署 → 生成回款计划（6.4 流程四）。'
+    ],
+    errors: [
+      '新建未选客户/负责人：表单校验拦截并弹出对应字段提示。',
+      '明细为空保存：提示「请至少添加一条报价明细」不生成报价。',
+      '添加重复产品：提示「该产品已在明细中，请直接调整数量与折扣」；选择停售/停用产品：下拉中不出现。',
+      '报价审批被拒绝：保存拒绝原因（审批意见），报价回到已驳回，修改后需重新提交，不得越权改回已通过（第十二章「报价审批拒绝」）。',
+      '已审批通过报价被修改：通过编辑生成新版本并重新审批，原批准版本保持锁定不被覆盖（第十二章「已审批报价修改」、6.4）。',
+      '直接把审批状态改为已通过/审批中：编辑弹窗与列表均不提供该入口，状态变化只能走审批（4.3）。',
+      '折扣输入越界（<50 或 >100）：数量/折扣输入组件 min/max 直接限制。',
+      '筛选无结果：表格空态，统计卡仍为全量真实数字，可重置；报价编号在列表中不存在（直接输入 URL）时详情页按缺省字段渲染并给出警示条。'
+    ],
+    api: [
+      '报价分页查询接口：接收关键词、审批状态、负责人、页码与每页条数，返回明细与过滤后总条数（含推导的报价状态）。',
+      '新建报价接口：编号生成查重、金额含税计算、有效期计算与日志写入在同一事务，初始状态固定草稿。',
+      '报价编辑接口：更新金额/负责人等字段并写日志；已审批报价生成新版本并重置审批状态；审批状态由审批接口流转，明细字段由报价详情页接口维护。',
+      '报价导出接口：按数据权限脱敏导出（示例）。'
+    ],
+    accept: [
+      '五张统计卡数字与列表数据可复算一致，筛选与分页后总数正确。',
+      '新建报价全流程可用：校验生效，保存后新报价出现在列表首位且审批状态为草稿、自动跳转详情（第十四章重点场景「从商机推进到报价、合同审批、签署和订单生成」的起点）。',
+      '「报价状态」列推导正确：可抽查任一报价按合同引用与有效期复算，与状态标签一致。',
+      '金额计算正确（第十四章「报价：金额计算正确」）：任选一行按「原价 − 行折扣 → ×1.13」复算含税金额与折扣金额一致。',
+      '审批和版本记录完整（第十四章「报价」）：列表可直接进入详情查看审批记录与版本记录；修改报价后检查历史版本和操作记录（第十四章重点场景）。',
+      '点击报价编号/客户名称跳转正确，审批状态与报价状态标签颜色映射正确。',
+      '编辑已审批报价后生成新版本并回到草稿重新审批，原版本不被覆盖（6.4、第十二章）。',
+      '页面无控制台报错，金额以元展示且分位精确。'
+    ]
+  },
+
+  'quote-detail': {
+    name: '报价单详情', module: '报价管理',
+    goal: '承载单张报价单的编辑、算价与审批流转：可编辑数量与折扣并按分精确算价（原价/优惠/不含税/税额/含税）、整体折扣与最低价格底线自动匹配审批角色、付款条件 30/40/30 分项校验、审批记录与版本记录展示；保存草稿生成新版本，提交审批后按规则流转，通过后锁定并可转合同，已发送客户的历史版本不可覆盖。',
+    roles: [
+      '菜单：销售通过「报价管理 → 报价列表」点击编号进入本页，路由 /quote/:no（第三章菜单权限）。',
+      '按钮：申请人销售拥有保存草稿、提交审批、撤回、复制报价、下载 PDF、发送客户与转为合同；审批中只能撤回；已通过版本锁定，可通过「生成新版本」派生草稿后再修改（5.7 核心按钮、第三章按钮权限）。',
+      '数据：报价按编号从 store.ext.quotes 取数；客户链接使用该客户的联系人，商机链接关联漏斗；页面数据与他单隔离（AGENTS 数据隔离）。',
+      '字段：金额按分精确计算复核；整体折扣与最低价格底线决定审批人；成本价不在本页展示，客户手机号等敏感字段按权限脱敏（第三章字段权限、5.7）。',
+      '数据：已发送客户/已审批通过的旧版本锁定不覆盖，任何修改生成新版本并留痕（版本记录含时间、操作人、金额、折扣）。'
+    ],
+    enter: [
+      '入口：报价列表点击报价编号进入 /quote/:no。',
+      '关联入口：产品详情引用报价、商机详情与审批中心的报价链接。',
+      '跳转：面包屑返回 /quotes；客户名称进入 /customer/:no；关联商机进入 /opp/:no；审批页签「前往审批中心」进入 /approvals。'
+    ],
+    layout: [
+      '面包屑：报价管理 / 报价列表 / 报价编号；页头：报价单 + 编号 + 审批状态标签 + 报价状态标签（草稿/审批中/已驳回/正式报价/已过期/已转合同）+ 版本标签 + 标题（关联商机名或客户名）。',
+      '操作行：保存草稿、生成新版本（仅已通过锁定版本显示）、提交审批（审批中禁用）、撤回（仅审批中可用）、复制报价、下载 PDF、发送客户、转为合同（需状态已通过）。',
+      '锁定提示：已通过版本显示绿色提示「该版本已审批通过并锁定；修改价格将生成新版本并重新审批」；编号不存在时显示橙色警示条。',
+      '基本信息卡：报价编号、客户（链接）、联系人（客户第 1 个联系人）、关联商机（链接）、报价日期、有效期至、负责人、币种/税率（人民币/13%）。',
+      '产品明细卡：产品、规格、数量、单位、标准单价、折扣、成交单价、小计（数量与折扣可编辑，锁定时禁用）、还原按钮、修改中的黄色告警、合计行、审批规则触发告警（含最低价格底线明细）、交付说明与金额箱（原价合计/优惠金额/不含税/税额/含税）。',
+      '付款条件卡：预付款 30% + 阶段款 40% + 验收款 30%，末期倒挤保证分项合计 = 含税金额并打勾/叉标签。',
+      '右侧页签：审批记录（流程节点图 + 审批表 + 模拟审批/前往审批中心）、版本记录（版本/时间/金额/状态/说明，历史版本不被覆盖）、附件（正式报价 PDF + 折扣说明）。'
+    ],
+    fields: [
+      '报价编号｜类型：文本｜必填：是｜校验：路由参数，必须可定位报价｜说明：5.7 主键，BJ-年月-四位；不存在时页面按缺省字段渲染并提示。',
+      '客户｜类型：客户引用｜必填：是｜校验：必须存在于客户库，链接到客户详情｜说明：5.7 报价基本信息，决定价格表命中与数据权限。',
+      '联系人｜类型：联系人引用｜必填：否｜校验：取自该客户联系人列表｜说明：5.7 报价基本信息，默认展示客户第 1 个联系人。',
+      '关联商机｜类型：商机引用｜必填：否｜校验：商机必须属于该客户｜说明：5.7 报价基本信息，链接到商机详情并支撑 6.4 报价阶段。',
+      '报价日期｜类型：日期｜必填：是｜校验：不得晚于有效期至｜说明：5.7 报价基本信息，有效期与版本记录基准。',
+      '有效期至｜类型：日期｜必填：是｜校验：不早于报价日期，默认报价日期 +30 天｜说明：5.7 报价基本信息；超过有效期且已通过时报价状态推导为「已过期」。',
+      '负责人｜类型：人员｜必填：是｜校验：必须为有效用户｜说明：5.7 报价基本信息，审批申请人与数据权限归属。',
+      '币种 / 税率｜类型：枚举 / 百分比｜必填：是｜校验：人民币 / 13%｜说明：金额计算口径，税额 = 不含税金额 × 13%。',
+      '产品｜类型：产品引用｜必填：是｜校验：必须为在售产品目录产品｜说明：5.7 产品明细，取产品标准售价与规格。',
+      '规格｜类型：文本｜必填：否｜校验：取自产品档案｜说明：5.7 产品明细，展示型号或服务规格。',
+      '数量｜类型：整数｜必填：是｜校验：min 1，输入组件直接限制｜说明：5.7 产品明细，锁定版本不可编辑。',
+      '单位｜类型：文本｜必填：是｜校验：取自产品标准单位｜说明：5.7 产品明细，如套/人天/年/用户·年。',
+      '标准单价｜类型：货币｜必填：是｜校验：大于 0，取产品标准售价或价格表价格｜说明：5.7 产品明细，成交单价计算基准。',
+      '折扣（%）｜类型：百分比｜必填：是｜校验：min 50 / max 100，且不得低于命中价格表最低折扣｜说明：5.7 产品明细，成交单价 = 标准单价 × 折扣；低于最低折扣触发低价审批。',
+      '成交单价｜类型：货币｜必填：是｜校验：标准单价 × 折扣，按分四舍五入｜说明：5.7 产品明细，只读计算列。',
+      '小计｜类型：货币｜必填：是｜校验：成交单价 × 数量，按分精确｜说明：5.7 产品明细，产品行金额合计。',
+      '原价合计｜类型：货币｜必填：是｜校验：Σ(标准单价 × 数量)，分位精确｜说明：5.7 金额汇总「原价」，优惠金额与原价的计算基础。',
+      '优惠金额｜类型：货币｜必填：是｜校验：原价合计 − 不含税金额，等于各行折扣减免合计｜说明：5.7 金额汇总「优惠金额」。',
+      '不含税金额｜类型：货币｜必填：是｜校验：Σ行小计，按分精确｜说明：5.7 金额汇总计算中间值，税额与含税金额的基础。',
+      '税额｜类型：货币｜必填：是｜校验：不含税金额 × 13%，四舍五入到分｜说明：5.7 金额汇总「税额」。',
+      '含税金额｜类型：货币｜必填：是｜校验：不含税金额 + 税额，等于付款条件分项合计｜说明：5.7 金额汇总「含税金额」，报价金额与转合同金额口径。',
+      '整体折扣率｜类型：百分比｜必填：是｜校验：优惠金额 ÷ 原价合计，由明细推导｜说明：触发审批角色映射；≤5% 销售授权自动通过，≤10% 经理，≤20% 总监，>20% 或低于最低价格底线 → 总经理/财务负责人（5.7、7.2）。',
+      '最低价格底线｜类型：百分比（引用价格表）｜必填：是｜校验：明细折扣不得低于客户命中价格表的最低折扣｜说明：低于底线时审批角色强制升级为总经理/财务负责人。',
+      '付款条件｜类型：比例数组｜必填：是｜校验：分项合计必须等于含税金额，不等时红色标签警示｜说明：5.7 预付款/阶段款/验收款，按 30% + 40% + 30% 末期倒挤。',
+      '交付说明｜类型：对象｜必填：是｜校验：含交付周期、实施范围、服务期限｜说明：5.7 报价单详情交付说明区域，转合同时作为合同条款来源。',
+      '审批状态｜类型：枚举（草稿/审批中/已通过/已驳回）｜必填：是｜校验：只能经提交审批/审批动作变更｜说明：决定按钮可用性与标签颜色（info/warning/success/danger）。',
+      '报价状态｜类型：枚举（草稿/审批中/已驳回/正式报价/已过期/已转合同）｜必填：是｜校验：推导值不可手工修改｜说明：审批非已通过时与审批状态一致；已通过后按合同引用与有效期推导，与列表口径一致（5.7）。',
+      '版本号｜类型：文本｜必填：是｜校验：V1 起递增，保存草稿或已通过后生成新版本时 +1｜说明：6.4 已发送客户的历史版本锁定不覆盖。',
+      '审批记录｜类型：对象数组｜必填：是｜校验：含时间、审批人、角色、动作、审批意见｜说明：5.7 审批记录，拒绝时保存拒绝原因，流程节点图展示进度。',
+      '版本记录｜类型：对象数组｜必填：是｜校验：含版本、时间、操作人、含税金额、折扣、状态、说明｜说明：6.4 记录每次版本变化，历史版本不可覆盖。',
+      '附件｜类型：文件列表｜必填：否｜校验：正式报价 PDF、补充文件｜说明：5.7 附件区域；正式版需上传/下载留痕。'
+    ],
+    rules: [
+      '明细编辑（数量/折扣）实时触发算价：行小计 = 标准单价 × 数量 × 折扣；不含税金额、税额（13%）、含税金额按分四舍五入，避免浮点误差（5.7 金额计算口径）。',
+      '「保存草稿」前校验存在修改（无变更提示无需保存）：取消所有版本的当前标记，按当前版本号 +1 生成 V(n+1) 并把状态置回草稿，同步写回报价对象；已审批通过的旧版本保持锁定不被覆盖（6.4、第十二章）。',
+      '「提交审批」确认框展示整体折扣、是否自动通过或审批角色；折扣 ≤5% 且未击穿价格底线时提交后自动通过并锁定；否则进入审批中并追加对应审批节点；「撤回」回草稿可改后重新提交；审批中状态下提交按钮禁用（5.7）。',
+      '折扣审批触发规则：整体折扣 ≤5% 销售授权内自动通过；≤10% 销售经理；≤20% 销售总监；>20% 或低于最低价格底线 → 总经理/财务负责人；审批页签显示对应意见文案（5.7、7.2）。',
+      '已通过版本锁定：状态为「已通过」时数量/折扣输入禁用；点击「生成新版本」由当前版本派生 V(n+1) 草稿，原版本保持锁定；「转为合同」在非已通过状态拦截提示（5.7、6.4）。',
+      '付款条件按比例取整、末期倒挤：分项合计若不等于含税金额则打叉警示，正常时打勾（5.7 付款条件）。',
+      '报价状态与版本状态分离展示：审批状态只反映审批流转，报价状态按合同引用与有效期推导为正式报价/已过期/已转合同（5.7、6.4）。',
+      '复制报价/下载 PDF/发送客户/添加产品当前为示例提示；正式版发送客户仅允许已通过版本，复制生成新报价草稿并保留来源编号（5.7 核心按钮，第十二章版本规则）。'
+    ],
+    flow: [
+      '状态机：草稿 → 提交审批 → 审批中 → 经理/总监/财务审批 →（同意）已通过 /（驳回）已驳回；审批中可撤回回草稿；已通过版本锁定，生成新版本后回到草稿重新审批（5.7、6.4）。',
+      '版本流转：V1 →（保存修改/生成新版本）→ V2 → 逐次递增；已发送客户的历史版本不可被覆盖，当前版本标记唯一（6.4）。',
+      '转合同：已通过报价生成合同草稿 → 合同审批 → 签署 → 合同生效；合同可引用已审批报价，但签约金额、付款条件和交付内容仍需单独确认，报价与合同不是同一对象（6.4）。',
+      '客户不接受报价：重新谈判并生成新报价版本，不能覆盖已发送给客户的历史报价（6.4、第十二章）。',
+      '折扣审批链路：提交 → 按整体折扣与最低价格底线匹配角色 → 审批中心可见该单据；驳回可修改后重新提交（7.2、第十二章「报价审批拒绝」）。'
+    ],
+    errors: [
+      '报价编号不存在：顶部橙色警示（该报价在报价列表中不存在），页面按缺省值渲染且不报错。',
+      '无修改点击保存草稿：提示「没有变更，无需保存」不生成版本。',
+      '整体折扣超出授权或低于价格底线未走审批链路：不得直接通过，触发规则提示需对应角色审批（支持演示按钮模拟经理通过）。',
+      '已审批报价被修改：只能生成新版本后修改，原批准版本锁定不被覆盖（第十二章「已审批报价修改」）。',
+      '报价审批被拒绝：保存拒绝原因，状态置为已驳回，修改后重新提交，不得越权改回已通过（第十二章「报价审批拒绝」）。',
+      '未审批通过点击转为合同：拦截并提示当前状态，不生成合同草稿。',
+      '折扣输入越界或数据为 0：输入组件 min/max 限制；金额箱各分项与合计必须勾稽一致，否则打叉标签暴露问题。',
+      '用户越权审批或修改报价：正式版由后端按按钮/数据权限拦截并记录安全日志（第三章、第十二章「用户越权操作」）。'
+    ],
+    api: [
+      '报价详情查询接口：按编号返回基础信息、明细、状态、版本与审批记录。',
+      '报价保存/版本接口：生成新版本（幂等）并锁定已发送/已审批旧版本，写变更留痕。',
+      '折扣审批提交接口：按整体折扣与最低价格底线路由到对应审批角色并通知审批人。',
+      '转合同接口：校验报价已通过后生成合同草稿并回写来源报价编号（示例）。',
+      '附件/发送接口：PDF 生成与客户发送留痕（示例）。'
+    ],
+    accept: [
+      '明细修改后金额箱数字实时重算，且原价、优惠、不含税、税额、含税勾稽一致（第十四章「报价：金额计算正确」）。',
+      '保存草稿按当前版本号递增生成新版本、状态回草稿、已审批通过的旧版本保持锁定；提交审批后撤回可回草稿（6.4）。',
+      '整体折扣率与审批角色映射正确（5%/10%/20% 分档），低于最低价格底线时审批角色升级为总经理/财务负责人（5.7、7.2）。',
+      '折扣 ≤5% 且未击穿价格底线时提交后自动通过并锁定当前版本，审批记录写入自动通过节点。',
+      '已通过版本点击「生成新版本」得到 V(n+1) 草稿且原版本仍锁定；未审批通过点击转为合同被拦截。',
+      '付款条件三个分项合计等于含税金额并显示打勾标签。',
+      '审批记录与版本记录按操作追加展示，历史版本与操作记录可查询（第十四章「操作日志」「修改报价后检查历史版本」）；页面无控制台报错。'
+    ]
+  }
+};
+
+Object.entries(PZ_DOC_S6_CFG).forEach(([k, c]) => { DOCS_DEFAULT[k] = mkDoc(k, c); });
+
+/* ===== S7 合同与订单专项对齐：覆盖 contracts / contract-detail / orders / order-detail 需求文档 =====
+   依据规划方案 5.8、5.9、6.5、第三章、4.2/4.3、第十二章、第十四章。 */
+const PZ_DOC_S7_CFG = {
+  contracts: {
+    name: '合同台账', module: '合同管理',
+    goal: '集中管理销售合同从创建、审批、签署到履约、完成或终止的全过程：按规划方案 5.8 展示合同清单、统计与筛选，支持从已审批报价转为合同、新建草稿和按状态推进；合同与客户、商机、报价、订单、回款计划互相关联，保证「双方约定了什么」可追溯、可审计。',
+    roles: [
+      '菜单：销售、销售经理、销售总监、财务、企业负责人、管理员通过左侧导航「合同管理 → 合同台账」进入 /contracts（第三章菜单权限）。',
+      '按钮：销售可新建本人合同草稿、提交审批；销售经理 / 销售总监可审批、推进、终止本团队合同；财务可查看合同金额与回款计划；终止、作废、金额变更必须受按钮权限控制并要求填写操作原因（5.8、第三章）。',
+      '数据：销售仅看本人负责合同，销售经理看本团队，销售总监看所辖部门，财务与管理员按授权范围查看；列表统计卡数字与筛选后的真实数据一致（第三章数据权限、4.2）。',
+      '字段：合同金额、税率、付款条件等敏感字段按字段权限展示或脱敏；客户名称、关联商机、合同编号提供可点击链接进入对应详情（第三章字段权限、4.3 关联对象）。'
+    ],
+    enter: [
+      '入口：左侧导航「合同管理 → 合同台账」，路由 /contracts。',
+      '关联入口：报价详情审批通过后点击「转为合同」生成合同草稿；商机详情「关联合同」、客户详情「合同」Tab、订单详情「关联合同」可跳转。',
+      '跳转：点击合同编号或「查看」进入 /contract/:no 合同详情；点击客户进入客户详情；点击关联商机进入商机详情。'
+    ],
+    layout: [
+      '页面顶部：面包屑「合同管理 / 合同台账」+ 页面标题 + 合同总数（由 store.ext.contracts 实算，不写死，4.2）。',
+      '统计卡：合同总数、履约中、即将到期（30 天内）、合同总金额；数字均由列表真实数据计算（4.2）。',
+      '查询区域：关键词（合同编号 / 名称 / 客户）、客户、合同类型、合同状态、负责人、签署日期区间；区间先按签署日期过滤，再与其余条件叠加（4.2）。',
+      '操作区域：新建合同、导出（示例）；新建合同从已存在客户发起，可选该客户已通过的报价并自动带出关联商机，保存后生成合同草稿与回款计划。',
+      '数据表格：按 5.8 列出合同编号、合同名称、客户名称、关联商机、合同类型、合同金额、签署日期、生效日期、到期日期、负责人、合同状态共 11 列，状态用统一标签展示。',
+      '行操作：查看、按当前状态推进（提交审批 / 审批通过 / 发起签署 / 确认签署 / 开始履约 / 完成履约）、终止（仅待签署 / 生效 / 履约中）；分页为真实分页，支持 20 / 50 条每页。'
+    ],
+    fields: [
+      '合同编号｜类型：文本｜必填：是｜校验：系统自动生成 HT-年月-四位序号且全库唯一，不可手工修改｜说明：5.8 合同主键，贯穿审批、订单、回款与操作日志。',
+      '合同名称｜类型：文本｜必填：是｜校验：非空，建议为「客户简称 + 项目或采购主题 + 合同」｜说明：5.8 项目或采购名称，列表与详情标题展示。',
+      '客户名称｜类型：关联对象（客户）｜必填：是｜校验：必须选择已存在的客户，保存时校验客户存在｜说明：5.8 关联客户，列表可点击进入客户详情。',
+      '关联商机｜类型：关联对象（商机）｜必填：否｜校验：所选商机必须属于同一客户；从报价转合同时自动带出报价关联商机｜说明：5.8 关联商机，可点击进入商机详情，用于成交链路追溯。',
+      '合同类型｜类型：枚举（销售合同 / 服务合同 / 续费合同等）｜必填：是｜校验：必须为字典内类型｜说明：5.8 合同类型，列表可按类型筛选。',
+      '合同金额｜类型：货币｜必填：是｜校验：必须大于 0，精确到分；金额变更须走合同变更审批｜说明：5.8 合同总金额，是订单额度校验与回款计划生成基准。',
+      '签署日期｜类型：日期｜必填：是｜校验：不得晚于生效日期；未签署时可留空并保持待签署状态｜说明：5.8 实际签署时间，用于签署日期区间筛选。',
+      '生效日期｜类型：日期｜必填：是｜校验：不得早于签署日期，且不得晚于到期日期｜说明：5.8 合同生效时间，生效后方可开始履约、生成订单与回款计划。',
+      '到期日期｜类型：日期｜必填：是｜校验：必须不早于生效日期；到期前 30 天内计入即将到期提醒｜说明：5.8 合同终止时间，用于到期预警与续费跟进。',
+      '负责人｜类型：人员｜必填：是｜校验：必须为在职用户，默认当前登录人｜说明：5.8 商务负责人，决定数据权限与待办归属。',
+      '合同状态｜类型：枚举（草稿 / 待审批 / 审批通过 / 待签署 / 生效 / 履约中 / 已完成 / 已驳回 / 已撤销 / 已终止 / 已到期）｜必填：是｜校验：只读，只能通过状态流转按钮变更，禁止直接编辑｜说明：5.8 合同状态，终态为已完成 / 已撤销 / 已终止 / 已到期。'
+    ],
+    rules: [
+      '列表数据全部来自 store.ext.contracts，统计卡、总数文案与分页总数均按真实数据实时计算，不允许写死假总数（4.2、AGENTS 真分页）。',
+      '筛选顺序固定：签署日期区间先过滤，再叠加关键词 / 客户 / 合同类型 / 状态 / 负责人；筛选条件变化后回到第 1 页，无结果时展示空态并可重置。',
+      '新建合同必须先选客户：客户选定后带出该客户已通过的报价与商机候选；保存时生成唯一合同编号、按付款条款模板生成回款计划、写操作日志并进入草稿状态。',
+      '付款条件按阶段与比例保存，各期比例合计必须为 100%，各期金额合计等于合同金额；付款条件是生成回款计划与应收的依据（5.8、6.5）。',
+      '状态不允许直接修改：只能点击与当前状态匹配的流转按钮；每次变更写回 store.ext.contracts 并写入操作日志，记录操作人、时间、原状态与目标状态（4.3 状态变化）。',
+      '终止合同必须二次确认并填写终止原因；终止后合同进入终态「已终止」，未收回款与未完成订单保留历史但不允许再推进。',
+      '合同审批通过后修改金额、付款条件或补充协议，必须提交合同变更申请并重新审批，不得直接覆盖原审批内容（第十二章「合同审批后修改」）。',
+      '即将到期（30 天内）的履约中合同在统计卡中提示，并在工作台到期提醒中展示；到期未续签的合同可由有权限人员置为「已到期」（5.8、7.3）。'
+    ],
+    flow: [
+      '合同状态枚举：草稿、待审批、审批通过、待签署、生效、履约中、已完成；异常 / 结束状态：已驳回、已撤销、已终止、已到期（5.8）。',
+      '主流程：草稿 →（提交审批）→ 待审批 →（审批通过）→ 审批通过 →（发起签署）→ 待签署 →（确认签署）→ 生效 →（开始履约）→ 履约中 →（完成履约）→ 已完成。',
+      '驳回与重新提交：待审批 →（审批驳回，原因必填）→ 已驳回 →（修改后重新提交）→ 待审批。',
+      '撤销：草稿 / 待审批 / 审批通过 / 待签署可撤销，必须填写原因，状态变为「已撤销」，撤销后不可恢复。',
+      '终止：待签署 / 生效 / 履约中可终止，必须填写原因并保留历史，状态变为「已终止」；已完成、已撤销、已终止、已到期为终态。',
+      '审批触发条件：所有合同提交审批后进入待审批；金额、付款条件变更或补充协议按合同变更规则重新审批；审批通过前不得签署、生效或生成订单（5.8、6.5、第十二章）。',
+      '自动化提醒：生效日期到达、到期前 30 天、合同长期停留在待审批时提示负责人与审批人；提醒规则应与系统统一待办 / 通知中心一致（7.3）。'
+    ],
+    errors: [
+      '新建合同必填项未填、金额 ≤ 0、起止日期倒置或付款比例合计不等于 100%：前端拦截并在字段下提示，不写入数据。',
+      '合同审批后修改：按合同变更规则提交变更申请并重新审批，不得直接覆盖；变更记录进入「变更、补充协议」（第十二章「合同审批后修改」）。',
+      '同一合同部分收款：允许多笔收款并动态计算已收 / 待收余额，不得仅允许一次性收齐（第十二章「同一合同部分收款」）。',
+      '超额收款：提示超出合同应收金额的异常，转入待核实或预收款处理，不直接计入已核销（第十二章「超额收款」）。',
+      '回款录入错误：走冲销或更正流程并保留原记录，不物理删除历史收款（第十二章「回款录入错误」）。',
+      '用户越权查看 / 修改 / 终止合同：正式版由后端按菜单、按钮、数据权限拦截并记录安全日志（第三章、第十二章「用户越权操作」）。',
+      '合同编号不存在或已被删除：显示未找到数据提示并给出返回合同台账入口，不渲染残缺页面。',
+      '关联报价审批被拒绝或已被新版本替代：不得转为合同，提示先处理报价版本与审批状态（第十二章「报价审批拒绝」「已审批报价修改」）。'
+    ],
+    api: [
+      '合同分页查询接口：返回筛选后的真实总数、统计卡汇总与当前页数据。',
+      '合同新建 / 转合同接口：校验客户与报价状态，生成合同编号、回款计划并写操作日志（示例）。',
+      '合同状态流转接口：校验当前状态与目标状态合法性，记录操作人、时间、原因与审批结果。',
+      '合同变更申请接口：金额 / 付款条件 / 补充协议变更进入重新审批，审批通过前不覆盖原合同（示例）。',
+      '合同到期提醒与回款计划查询接口：向工作台、回款管理提供到期与应收数据（示例）。'
+    ],
+    accept: [
+      '合同列表 11 个字段与规划方案 5.8 一致：合同编号、合同名称、客户名称、关联商机、合同类型、合同金额、签署日期、生效日期、到期日期、负责人、合同状态均可核对。',
+      '合同状态枚举完整覆盖 5.8：草稿、待审批、审批通过、待签署、生效、履约中、已完成、已驳回、已撤销、已终止、已到期；页面不允许绕过按钮直接改状态。',
+      '新建合同从客户与已通过报价发起，保存后列表、统计卡、详情和回款计划同步更新，可进入详情；付款比例合计为 100%。',
+      '按状态完成一次完整流转（草稿 → 待审批 → 审批通过 → 待签署 → 生效 → 履约中 → 已完成）后，详情状态、列表标签与操作日志一致（第十四章「合同：审批、签署、状态变更符合规则」）。',
+      '驳回、撤销、终止都必须填写原因并留痕，终态不可再推进；越权操作被拦截（第十四章「操作日志」「安全性」）。',
+      '合同审批后修改金额或付款条件会生成变更记录并重新审批，原审批内容不被覆盖（第十四章重点场景「修改合同后检查历史版本和操作记录」）。',
+      '列表筛选（含签署日期区间）与真实分页可用，统计数字与明细可核对，页面无控制台报错（4.2）。'
+    ]
+  },
+
+  'contract-detail': {
+    name: '合同详情', module: '合同管理',
+    goal: '展示单份合同的全量信息并按规划方案 5.8 覆盖基础信息、合同主体及签约方、金额税率与付款条件、合同文件及附件、审批流程、签署信息、关联订单、回款计划和收款记录、变更与补充协议、操作日志；同时作为合同状态流转、审批、变更与终止操作的落点页面。',
+    roles: [
+      '菜单：合同台账点击合同编号进入 /contract/:no，或从客户、商机、订单、回款等关联入口进入（第三章）。',
+      '按钮：负责人销售可提交审批 / 发起签署 / 开始履约并登记变更；销售经理 / 销售总监可审批、驳回、终止；财务可查看金额、税率与回款计划；所有敏感操作受按钮权限控制（第三章）。',
+      '数据：详情仅展示当前合同及当前用户有权限查看的关联客户、商机、报价、订单、回款与日志，禁止跨权限读取（第三章数据权限）。',
+      '字段：合同金额、税率、付款条件、回款金额按字段权限展示；附件、审批记录、操作日志保留操作人和时间，支持审计（第三章字段权限、第十四章操作日志）。'
+    ],
+    enter: [
+      '入口：合同台账点击合同编号或「查看」进入 /contract/:no。',
+      '关联入口：客户详情「合同」Tab、商机详情「关联合同」、订单详情「关联合同」、回款管理合同链接。',
+      '跳转：客户、商机、报价、订单、交付项目、回款管理均提供可点击链接；返回合同台账面包屑固定。'
+    ],
+    layout: [
+      '头部：面包屑 + 合同名称 + 合同状态标签 + 合同金额 + 客户链接；右侧为按状态动态显示的操作按钮（提交审批 / 审批通过 / 驳回 / 发起签署 / 确认签署 / 开始履约 / 完成履约 / 撤销 / 合同变更 / 终止合同 / 下载）。',
+      '基础信息：合同编号、合同名称、合同类型、客户、关联商机、合同金额、税率、负责人、签署日期、生效日期、到期日期、履约期限、付款条件（5.8）。',
+      '合同主体及签约方：甲方（客户）、乙方（我方）、双方签约人、签署方式、签署时间；合同文件及附件单独页签展示文件名、大小与上传日期（5.8）。',
+      '金额与付款条件：合同金额、税率、分期阶段、承付比例、计划日期与金额，分期比例合计 100%；回款计划页签展示已收、待收、完成度与每期核销状态（5.8、6.5）。',
+      '审批流程与签署信息：审批节点、处理人、结果、时间；签署日期、生效日期、签署状态与合同文件（5.8）。',
+      '关联订单与变更：关联订单列表（编号、金额、订单日期、交付日期、负责人、状态）；变更、补充协议列表（时间、类型、原因、金额变化、审批状态、申请人）。',
+      '操作日志：按时间倒序展示操作人、操作类型与内容，覆盖新建、提交审批、审批、签署、变更、终止等全部关键动作（5.8）。'
+    ],
+    fields: [
+      '合同编号｜类型：文本｜必填：是｜校验：只读，全库唯一｜说明：5.8 合同主键，详情与关联单据均以它关联。',
+      '合同名称｜类型：文本｜必填：是｜校验：非空，新建时校验｜说明：5.8 项目或采购名称，详情标题展示。',
+      '合同类型｜类型：枚举（销售合同 / 服务合同 / 续费合同等）｜必填：是｜校验：字典内类型｜说明：5.8 合同类型，决定合同条款与付款模板。',
+      '客户名称｜类型：关联对象（客户）｜必填：是｜校验：必须为已存在客户，链接可跳转｜说明：5.8 关联客户，同时作为合同甲方。',
+      '关联商机｜类型：关联对象（商机）｜必填：否｜校验：须属于同一客户｜说明：5.8 关联商机，展示编号并支持跳转。',
+      '合同金额｜类型：货币｜必填：是｜校验：大于 0，金额变更须审批｜说明：5.8 合同总金额，是订单额度校验与回款计划基准。',
+      '税率｜类型：百分比｜必填：是｜校验：0–100，默认按合同类型取值｜说明：5.8 合同税率，用于价税分离与开票口径。',
+      '付款条件｜类型：文本 / 分期结构｜必填：是｜校验：分期比例合计 100%，金额合计等于合同金额｜说明：5.8 付款条件，是生成回款计划和应收的依据。',
+      '签署日期｜类型：日期｜必填：是｜校验：不得晚于生效日期｜说明：5.8 实际签署时间，签署信息区块展示。',
+      '生效日期｜类型：日期｜必填：是｜校验：不早于签署日期且不晚于到期日期｜说明：5.8 合同生效时间，生效后才能履约与生成订单。',
+      '到期日期｜类型：日期｜必填：是｜校验：不早于生效日期｜说明：5.8 合同终止时间，用于到期提醒。',
+      '负责人｜类型：人员｜必填：是｜校验：在职用户｜说明：5.8 商务负责人，决定待办与数据权限。',
+      '合同状态｜类型：枚举（草稿 / 待审批 / 审批通过 / 待签署 / 生效 / 履约中 / 已完成 / 已驳回 / 已撤销 / 已终止 / 已到期）｜必填：是｜校验：只读，由流转按钮变更｜说明：5.8 合同状态，详情头部与操作按钮按它联动。',
+      '合同主体及签约方｜类型：对象（甲方 / 乙方 / 双方签约人 / 签署方式 / 签署时间）｜必填：是｜校验：签约方名称与客户、我方主体一致｜说明：5.8 合同主体及签约方，详情「签约与变更」页签展示。',
+      '合同文件及附件｜类型：文件列表（文件名 / 大小 / 上传日期）｜必填：是｜校验：签署生效合同必须上传合同扫描件或电子签章文件｜说明：5.8 合同文件及附件，附件页签展示并支持上传示例。',
+      '审批流程｜类型：记录列表（节点 / 处理人 / 结果 / 时间）｜必填：是｜校验：提交审批后至少存在发起节点｜说明：5.8 审批流程，审批记录页签展示。',
+      '签署信息｜类型：对象（签署日期 / 签署状态 / 签署方式 / 合同文件）｜必填：是｜校验：待签署状态不得显示已签署｜说明：5.8 签署信息，与合同状态保持一致。',
+      '关联订单｜类型：记录列表（订单编号 / 金额 / 订单日期 / 交付日期 / 负责人 / 状态）｜必填：否｜校验：订单金额合计不得超过合同金额｜说明：5.8 关联订单，订单页签展示并可跳转。',
+      '回款计划和收款记录｜类型：记录列表（期次 / 阶段 / 计划日期 / 计划金额 / 已收 / 待收 / 状态）｜必填：是｜校验：已收按核销记录汇总，已收 + 待收 = 计划金额｜说明：5.8 回款计划和收款记录，支持多笔部分收款与核销。',
+      '变更、补充协议｜类型：记录列表（时间 / 类型 / 原因 / 金额变化 / 审批状态 / 申请人）｜必填：否｜校验：金额与付款条件变更必须重新审批｜说明：5.8 变更、补充协议，审批通过前不覆盖原合同。',
+      '合同操作日志｜类型：记录列表（时间 / 操作人 / 操作 / 内容）｜必填：是｜校验：关键操作必须可查询操作人和时间｜说明：5.8 合同操作日志，覆盖新建、审批、签署、变更、终止等动作。'
+    ],
+    rules: [
+      '详情数据全部来自当前合同自身对象与其关联数据，不使用其他合同的联系人、订单、回款或日志（AGENTS 客户数据隔离要求）。',
+      '操作按钮按状态动态显示：草稿可提交审批；待审批可通过或驳回；审批通过可发起签署；待签署可确认签署；生效可开始履约；履约中可完成履约；待签署 / 生效 / 履约中可终止；草稿至待签署可撤销；生效 / 履约中可登记变更。',
+      '审批通过、驳回、撤销、终止、变更都必须填写原因或审批意见，并写入审批记录与操作日志；终止 / 作废 / 金额变更受按钮权限控制（5.8、4.3）。',
+      '回款计划已收金额优先取回款管理中该合同的核销记录，未登记核销时按计划状态折算；部分收款按多笔累计动态计算余额（第十二章「同一合同部分收款」）。',
+      '合同审批后修改金额、付款条件或补充协议：只新增变更记录并标记待审批，审批通过前不改变原合同金额与条款（第十二章「合同审批后修改」）。',
+      '关联订单、报价、商机、客户、交付项目均提供可点击链接；关联数据缺失时显示空态，不影响主体信息展示。',
+      '附件为示例上传：正式版需校验文件类型、大小与权限，并保留上传人与上传时间（5.8、第三章）。'
+    ],
+    flow: [
+      '主流程与合同台账一致：草稿 → 待审批 → 审批通过 → 待签署 → 生效 → 履约中 → 已完成。',
+      '异常流转：待审批 → 已驳回（原因必填）→ 重新提交 → 待审批；草稿 / 待审批 / 审批通过 / 待签署 → 已撤销（原因必填）；待签署 / 生效 / 履约中 → 已终止（原因必填）。',
+      '审批触发：提交审批后进入待审批；合同变更申请必须重新审批；审批通过前不得确认签署或开始履约（5.8、6.5）。',
+      '签署与生效：待签署状态确认签署后记录签署信息并进入生效；生效后按合同付款条件生成应收计划，可创建订单与交付项目（5.8、6.5）。',
+      '履约与完成：生效 → 开始履约 → 履约中；回款核销完成、交付验收通过后可完成履约并归档；到期未续签可置为已到期。',
+      '变更：金额变更、付款条件变更、补充协议均生成变更记录，审批通过后新版本生效，原审批版本与操作日志保留。'
+    ],
+    errors: [
+      '合同编号不存在：显示「未找到该合同」提示并给出返回合同台账入口，不渲染残缺详情。',
+      '终止 / 驳回 / 撤销 / 变更未填原因：前端拦截并提示，不执行状态变更。',
+      '合同审批后修改：必须走变更申请并重新审批，直接覆盖原条款应被拦截（第十二章「合同审批后修改」）。',
+      '同一合同部分收款 / 超额收款 / 回款录入错误：分别支持多笔累计、转入待核实或预收款、冲销更正并保留记录（第十二章）。',
+      '关联订单 / 报价 / 商机 / 回款数据缺失：对应页签显示空态提示，不报错、不串用其他合同数据。',
+      '用户越权审批、终止或查看合同：正式版由后端拦截并记录安全日志（第三章、第十二章「用户越权操作」）。'
+    ],
+    api: [
+      '合同详情查询接口：按合同编号返回基础信息、主体与签约方、金额税率、附件、审批、签署、关联订单、回款计划、变更与日志。',
+      '合同状态流转接口：校验当前状态与操作权限，写入审批记录和操作日志。',
+      '合同变更申请接口：新增变更记录并触发重新审批，审批通过前不覆盖原合同。',
+      '回款计划 / 核销记录查询接口：按合同返回多笔收款与核销余额（示例）。',
+      '关联单据查询接口：按合同编号查询报价、商机、订单、交付项目与操作日志（示例）。'
+    ],
+    accept: [
+      '详情覆盖规划方案 5.8 的十项内容：基础信息、合同主体及签约方、金额税率付款条件、合同文件及附件、审批流程、签署信息、关联订单、回款计划和收款记录、变更补充协议、合同操作日志。',
+      '头部状态、金额、客户链接与当前合同自身数据一致；任一状态流转后头部标签、列表与操作日志即时更新（第十四章「合同：审批、签署、状态变更符合规则」）。',
+      '待审批合同可通过或驳回；驳回 / 撤销 / 终止 / 变更原因必填并可在审批记录或操作日志中查询（第十四章「操作日志」）。',
+      '回款计划已收、待收与核销记录一致，支持同一合同多笔部分收款，余额动态计算（第十二章、第十四章「回款：分批收款、部分核销和逾期计算正确」）。',
+      '合同审批后变更金额或付款条件会新增变更记录并进入待审批，原合同金额与历史日志不被覆盖（第十四章重点场景）。',
+      '关联订单金额合计不超过合同金额，订单与合同链接可互相跳转；关联数据缺失时显示空态且无控制台报错（第十四章「订单：合同和订单关系正确，金额一致」）。',
+      '客户、商机、报价、订单、回款链接均可跳转，页面无控制台报错。'
+    ]
+  },
+
+  orders: {
+    name: '销售订单', module: '订单管理',
+    goal: '承接合同审批或签署后的执行环节：按规划方案 5.9 以合同为源头创建订单并进行合同额度校验，跟踪待确认、已确认、待交付、交付中、已完成及取消 / 关闭 / 暂停执行等状态，展示订单明细、交付与开票信息，保证「实际要执行什么」与合同约定一致且可追溯。',
+    roles: [
+      '菜单：销售、销售经理、销售总监、实施人员、财务、管理员通过左侧导航「订单管理 → 销售订单」进入 /orders（第三章菜单权限）。',
+      '按钮：销售可从合同新建订单、确认订单与推进交付；销售经理可流转、暂停、关闭与取消本团队订单；财务可查看开票信息；取消 / 关闭 / 暂停必须填写原因（5.9、第三章）。',
+      '数据：销售仅看本人负责订单，销售经理看本团队，实施人员看分配给自己的订单与交付任务，财务看开票与金额字段（第三章数据权限）。',
+      '字段：订单金额、折扣、开票信息按字段权限展示；客户、合同、商机编号提供可点击链接（第三章字段权限、4.3 关联对象）。'
+    ],
+    enter: [
+      '入口：左侧导航「订单管理 → 销售订单」，路由 /orders。',
+      '关联入口：合同详情「关联订单」Tab、客户详情「订单」Tab、商机详情「关联订单」可进入。',
+      '跳转：点击订单编号进入 /order/:no；点击合同进入合同详情；点击客户进入客户详情；点击商机进入商机详情。'
+    ],
+    layout: [
+      '页面顶部：面包屑「订单管理 / 销售订单」+ 页面标题 + 订单总数（由 store.ext.orders 实算，4.2）。',
+      '统计卡：订单总数、待处理（待确认 + 已确认 + 待交付）、交付中、已完成、异常（已取消 + 已关闭 + 暂停执行），全部由真实数据计算（4.2）。',
+      '查询区域：关键词（订单编号 / 客户 / 合同）、订单状态、开票状态（4.2）。',
+      '操作区域：新建订单（必须从合同发起）、导出（示例）；新建订单选择合同后自动带出客户、商机和默认订单明细，并显示合同剩余可开单额度。',
+      '数据表格：按 5.9 列出订单编号、客户、合同、商机、订单金额、订单日期、交付日期、订单状态、负责人、开票状态，订单明细在详情页展示；状态用统一标签。',
+      '行操作：查看、按当前状态推进（确认订单 / 确认待交付 / 开始交付 / 确认完成）、取消（待确认 / 已确认 / 待交付）；分页为真实分页，支持 10 / 20 / 50 条每页。'
+    ],
+    fields: [
+      '订单编号｜类型：文本｜必填：是｜校验：系统自动生成 DD-年月-四位序号且全库唯一，不可手工修改｜说明：5.9 订单主键，贯穿交付、开票与操作日志。',
+      '客户｜类型：关联对象（客户）｜必填：是｜校验：选择合同后自动带出，不可单独修改｜说明：5.9 客户，必须与所选合同客户一致。',
+      '合同｜类型：关联对象（合同）｜必填：是｜校验：必须为审批通过 / 待签署 / 生效 / 履约中 / 已完成状态的合同｜说明：5.9 合同，是订单生成的源头与金额上限依据。',
+      '商机｜类型：关联对象（商机）｜必填：否｜校验：须与合同关联商机或客户一致｜说明：5.9 商机，从合同自动带出，支持跳转。',
+      '订单金额｜类型：货币｜必填：是｜校验：大于 0，且同一合同下未取消订单金额合计 + 本单 ≤ 合同金额｜说明：5.9 订单金额，必须与订单明细小计合计一致，并与合同金额勾稽。',
+      '订单日期｜类型：日期｜必填：是｜校验：默认为今天，不得早于合同签署日期｜说明：5.9 订单日期，用于统计与操作日志时间基准。',
+      '交付日期｜类型：日期｜必填：是｜校验：不得早于订单日期；默认订单日期后 30 天｜说明：5.9 交付日期，与交付项目计划联动并触发延期预警。',
+      '订单状态｜类型：枚举（待确认 / 已确认 / 待交付 / 交付中 / 已完成 / 已取消 / 已关闭 / 暂停执行）｜必填：是｜校验：只读，只能通过状态流转按钮变更｜说明：5.9 订单状态，异常状态为已取消、已关闭、暂停执行。',
+      '负责人｜类型：人员｜必填：是｜校验：在职用户，默认合同负责人｜说明：5.9 负责人，决定待办与数据权限。',
+      '订单明细｜类型：明细行列表（产品 / 服务 / 数量 / 单位 / 单价 / 折扣 / 小计）｜必填：是｜校验：至少 1 行，各行小计合计等于订单金额｜说明：5.9 订单明细，来源于合同报价明细或合同标的，详情页展示。',
+      '开票状态｜类型：枚举（未开票 / 部分开票 / 已开票）｜必填：是｜校验：开票金额不得超过订单金额｜说明：5.9 发票信息，列表与详情展示，正式版由财务开票登记回写。'
+    ],
+    rules: [
+      '列表数据全部来自 store.ext.orders，统计卡、总数文案与分页总数均按真实数据实时计算，不允许写死假总数（4.2、AGENTS 真分页）。',
+      '新建订单必须先选合同：客户与商机自动带出；订单金额必须大于 0，且「同合同未取消订单金额合计 + 本单」不得超过合同金额，超出时明确提示并阻止保存（5.9、6.5）。',
+      '订单默认明细优先复用合同关联报价的明细，无报价时以合同标的生成一行；订单金额与明细小计合计必须勾稽一致（5.9、第十四章「订单：合同和订单关系正确，金额一致」）。',
+      '取消、关闭、暂停执行必须填写原因并写操作日志；已取消 / 已关闭订单不计入合同金额占用，暂停执行订单仍占用合同额度（5.9）。',
+      '状态不允许直接修改，只能点击与当前状态匹配的流转按钮；每次变更写回 store.ext.orders 并写入操作日志（4.3 状态变化）。',
+      '订单变更（交付日期 / 金额 / 明细）必须登记原因并保留变更历史，不得绕过合同额度校验（5.9、第十二章）。',
+      '交付日期与交付项目联动：项目计划完成日期晚于订单交付日期时触发延期预警并记录延期原因（第十二章「项目延期」）。'
+    ],
+    flow: [
+      '订单状态枚举：待确认、已确认、待交付、交付中、已完成；异常状态：已取消、已关闭、暂停执行（5.9）。',
+      '主流程：待确认 →（确认订单）→ 已确认 →（确认待交付）→ 待交付 →（开始交付）→ 交付中 →（确认完成）→ 已完成。',
+      '取消：待确认 / 已确认 / 待交付可取消，必须填写原因，状态变为「已取消」并释放合同金额占用。',
+      '暂停与恢复：已确认 / 待交付 / 交付中可暂停执行，必须填写原因；暂停后状态为「暂停执行」，恢复后回到「待交付」。',
+      '关闭：待确认 / 已确认 / 待交付 / 交付中 / 暂停执行可关闭，必须填写原因，状态变为「已关闭」；已取消、已关闭、已完成为终态。',
+      '触发条件：合同审批通过或签署后才能生成订单；合同已终止 / 已撤销 / 已到期时不允许新增订单；订单确认后进入交付与回款计划联动（5.9、6.5）。'
+    ],
+    errors: [
+      '未选合同直接保存、订单金额 ≤ 0：前端拦截并提示。',
+      '订单金额超出合同剩余可开单额度：提示「超出合同金额上限」并阻止保存，不写入数据（5.9）。',
+      '取消 / 关闭 / 暂停未填原因：拦截并提示，状态不变。',
+      '订单关联合同不存在或已终止：禁止新建订单或显示历史数据警示，避免生成无合同依据的订单。',
+      '项目延期：交付项目计划完成日期晚于订单交付日期时触发预警并记录延期原因（第十二章「项目延期」）。',
+      '用户越权取消 / 关闭 / 修改订单：正式版由后端按按钮与数据权限拦截并记录安全日志（第三章、第十二章「用户越权操作」）。',
+      '查询无结果：显示空态并可重置筛选，页面无控制台报错。'
+    ],
+    api: [
+      '订单分页查询接口：返回筛选后的真实总数、统计卡汇总与当前页数据。',
+      '订单新建接口：校验合同状态、合同剩余额度与明细合计，生成订单编号并写操作日志（示例）。',
+      '订单状态流转 / 取消 / 关闭 / 暂停 / 恢复接口：校验当前状态与原因，写入操作日志。',
+      '订单变更接口：登记交付日期、金额或明细变更并保留历史（示例）。',
+      '开票信息查询接口：向财务提供开票状态与金额，正式版与开票登记联动（示例）。'
+    ],
+    accept: [
+      '订单列表字段与规划方案 5.9 一致：订单编号、客户、合同、商机、订单金额、订单日期、交付日期、订单状态、负责人、订单明细（详情页展示）。',
+      '订单状态枚举完整覆盖 5.9：待确认、已确认、待交付、交付中、已完成，以及已取消、已关闭、暂停执行。',
+      '从合同新建订单后订单出现在列表并进入详情，客户、商机、合同关系正确，订单金额与明细合计一致（第十四章「订单：合同和订单关系正确，金额一致」）。',
+      '订单金额超过合同剩余额度时被拦截且不写入；取消 / 关闭 / 暂停原因必填并可在操作日志查询。',
+      '按状态完成一次完整流转（待确认 → 已确认 → 待交付 → 交付中 → 已完成）后，列表标签、详情与操作日志一致。',
+      '暂停执行可恢复为待交付；已取消 / 已关闭 / 已完成不可再流转，页面无控制台报错。',
+      '订单变更保留历史记录，交付项目延期触发预警并记录原因（第十二章）。'
+    ]
+  },
+
+  'order-detail': {
+    name: '订单详情', module: '订单管理',
+    goal: '展示单笔订单按规划方案 5.9 的完整信息：订单基本信息、商品或服务明细、订单金额和折扣、关联合同、交付任务、回款计划、发票信息、订单变更和操作日志；同时作为订单状态流转、取消、暂停、关闭与变更登记的落点页面。',
+    roles: [
+      '菜单：订单列表点击订单编号进入 /order/:no，或从合同、客户、商机、交付项目关联入口进入（第三章）。',
+      '按钮：负责人销售可确认订单、确认待交付、开始交付、完成订单；销售经理可暂停 / 恢复 / 取消 / 关闭；财务查看开票信息；所有操作受按钮权限控制（第三章）。',
+      '数据：详情仅展示当前订单及有权限的关联合同、客户、商机、交付项目、回款与日志，禁止跨权限读取（第三章数据权限）。',
+      '字段：订单金额、折扣、开票金额按字段权限展示；操作日志保留操作人与时间，支持审计（第三章字段权限、第十四章操作日志）。'
+    ],
+    enter: [
+      '入口：订单列表点击订单编号或「查看」进入 /order/:no。',
+      '关联入口：合同详情「关联订单」、客户详情「订单」Tab、商机详情「关联订单」、交付项目订单链接。',
+      '跳转：合同、客户、商机、交付项目、回款管理均提供可点击链接；返回订单列表面包屑固定。'
+    ],
+    layout: [
+      '头部：面包屑 + 订单编号 + 订单状态标签 + 订单金额 + 负责人；右侧为按状态动态显示的操作按钮（确认订单 / 确认待交付 / 开始交付 / 确认完成 / 暂停执行 / 恢复执行 / 取消订单 / 关闭订单 / 打印）。',
+      '基本信息：订单编号、客户、关联合同、关联商机、订单金额、负责人、订单日期、交付日期、订单状态、订单明细行数、开票状态、发货状态（5.9）。',
+      '商品或服务明细：产品 / 服务、数量、单位、单价、折扣、小计与合计，订单金额与明细合计勾稽一致（5.9）。',
+      '订单金额和折扣：订单金额、明细合计、折扣金额与开票金额展示；金额变更需登记并保留历史（5.9）。',
+      '关联合同：合同编号、合同名称、合同金额、合同状态，支持跳转合同详情（5.9）。',
+      '交付任务：计划交付日期、收货地址、发货状态与关联交付项目（项目编号、名称、项目经理、计划起止、进度、状态）；交付延期触发预警（5.9、第十二章）。',
+      '回款计划：按关联合同付款条件展开各期计划金额、已收、待收与核销状态，支持跳转回款管理（5.9、6.5）。',
+      '发票信息：开票状态、发票抬头、开票金额、未开票金额、开票类型与开票记录（5.9）。',
+      '订单变更和操作日志：变更记录（时间、类型、原因、变更前后、状态、操作人）与操作日志（时间、操作人、操作、内容）分开展示（5.9）。'
+    ],
+    fields: [
+      '订单编号｜类型：文本｜必填：是｜校验：只读，全库唯一｜说明：5.9 订单主键，关联交付、开票与日志。',
+      '客户｜类型：关联对象（客户）｜必填：是｜校验：与合同客户一致，链接可跳转｜说明：5.9 客户，详情基本信息展示。',
+      '合同｜类型：关联对象（合同）｜必填：是｜校验：必须存在且状态允许开单｜说明：5.9 合同，订单金额不得超过合同剩余可开单额度。',
+      '商机｜类型：关联对象（商机）｜必填：否｜校验：须与合同关联商机或客户一致｜说明：5.9 商机，从合同自动带出并支持跳转。',
+      '订单金额｜类型：货币｜必填：是｜校验：大于 0，等于明细小计合计，且不超过合同剩余额度｜说明：5.9 订单金额，详情与列表一致。',
+      '订单日期｜类型：日期｜必填：是｜校验：不早于合同签署日期｜说明：5.9 订单日期。',
+      '交付日期｜类型：日期｜必填：是｜校验：不早于订单日期｜说明：5.9 交付日期，与交付项目计划联动。',
+      '订单状态｜类型：枚举（待确认 / 已确认 / 待交付 / 交付中 / 已完成 / 已取消 / 已关闭 / 暂停执行）｜必填：是｜校验：只读，由流转按钮变更｜说明：5.9 订单状态，头部与按钮按它联动。',
+      '负责人｜类型：人员｜必填：是｜校验：在职用户｜说明：5.9 负责人，决定待办与数据权限。',
+      '订单明细｜类型：明细行列表（产品 / 服务 / 数量 / 单位 / 单价 / 折扣 / 小计）｜必填：是｜校验：至少 1 行，小计合计等于订单金额｜说明：5.9 订单明细，详情页逐行展示。',
+      '商品或服务明细｜类型：明细行列表｜必填：是｜校验：产品编号存在或服务名称非空，数量 > 0，折扣 0–100%｜说明：5.9 商品或服务明细，是金额与折扣计算依据。',
+      '订单金额和折扣｜类型：金额汇总（原价 / 折扣 / 应收 / 开票金额）｜必填：是｜校验：折扣金额 = 原价 − 应收，各项勾稽一致｜说明：5.9 订单金额和折扣，详情金额区展示。',
+      '交付任务｜类型：记录列表（计划交付日期 / 收货地址 / 发货状态 / 交付项目）｜必填：否｜校验：交付项目计划完成日期晚于交付日期时预警｜说明：5.9 交付任务，与交付管理关联。',
+      '回款计划｜类型：记录列表（期次 / 阶段 / 计划日期 / 计划金额 / 已收 / 待收 / 状态）｜必填：是｜校验：已收按合同核销记录汇总，已收 + 待收 = 计划金额｜说明：5.9 回款计划，以合同付款条件为准。',
+      '发票信息｜类型：对象（开票状态 / 发票抬头 / 开票金额 / 未开票金额 / 开票类型）｜必填：否｜校验：开票金额不得超过订单金额｜说明：5.9 发票信息，详情开票页签展示。',
+      '订单变更｜类型：记录列表（时间 / 类型 / 原因 / 变更前后 / 状态 / 操作人）｜必填：否｜校验：变更必须填写原因并留痕，金额变更不得突破合同额度｜说明：5.9 订单变更，变更页签展示。',
+      '操作日志｜类型：记录列表（时间 / 操作人 / 操作 / 内容）｜必填：是｜校验：关键操作可查询操作人和时间｜说明：5.9 操作日志，覆盖新建、状态流转、取消、关闭、暂停、变更等动作。'
+    ],
+    rules: [
+      '详情数据全部来自当前订单自身对象与其关联数据，不使用其他订单或合同的明细、交付、回款与日志（AGENTS 数据隔离要求）。',
+      '操作按钮按状态动态显示：待确认可确认订单；已确认可确认待交付；待交付可开始交付；交付中可确认完成；已确认 / 待交付 / 交付中可暂停；暂停执行可恢复为待交付；待确认 / 已确认 / 待交付可取消；待确认 / 已确认 / 待交付 / 交付中 / 暂停执行可关闭。',
+      '取消、关闭、暂停、恢复与变更必须填写原因或说明并写入操作日志；终止性操作受按钮权限控制（5.9、4.3）。',
+      '订单金额、明细合计与折扣必须勾稽一致；订单金额不得超过关联合同剩余可开单额度，超出时不允许保存或变更（5.9、第十四章）。',
+      '回款计划取关联合同的付款条件与核销记录，部分收款按多笔累计动态计算余额；超额收款转入待核实或预收款处理（第十二章）。',
+      '交付任务与交付项目联动：项目延期时详情提示预警并记录延期原因，不覆盖原计划日期（第十二章「项目延期」）。',
+      '关联合同、客户、商机、交付项目均提供可点击链接；关联数据缺失时显示空态，不影响主体信息展示。'
+    ],
+    flow: [
+      '主流程与订单列表一致：待确认 → 已确认 → 待交付 → 交付中 → 已完成。',
+      '异常流转：待确认 / 已确认 / 待交付 → 已取消（原因必填）；已确认 / 待交付 / 交付中 → 暂停执行（原因必填）→ 恢复执行 → 待交付；待确认 / 已确认 / 待交付 / 交付中 / 暂停执行 → 已关闭（原因必填）。',
+      '终态：已完成、已取消、已关闭，不再允许状态流转；暂停执行为中间异常状态，可恢复或关闭。',
+      '触发条件：合同审批通过或签署后才能生成订单；合同终止 / 撤销 / 到期后不允许新增订单；订单确认后进入交付与回款计划联动（5.9、6.5）。',
+      '变更：交付日期、金额或明细变更需登记原因并保留历史；金额变更需要重新校验合同剩余可开单额度。'
+    ],
+    errors: [
+      '订单编号不存在：显示「未找到该订单」提示并给出返回订单列表入口，不渲染残缺详情。',
+      '取消 / 关闭 / 暂停未填原因：前端拦截并提示，状态不变。',
+      '订单金额超过合同剩余额度或明细合计与订单金额不一致：阻止保存 / 变更并提示具体差额（5.9、第十四章）。',
+      '关联合同不存在或已终止：显示警示，历史数据只读，不允许继续推进或新增变更。',
+      '交付项目延期：触发预警并记录延期原因，不静默改期（第十二章「项目延期」）。',
+      '超额收款 / 回款录入错误：超额部分转待核实或预收款，错误记录走冲销或更正并保留历史（第十二章）。',
+      '用户越权取消、关闭或修改订单：正式版由后端拦截并记录安全日志（第三章、第十二章「用户越权操作」）。'
+    ],
+    api: [
+      '订单详情查询接口：按订单编号返回基本信息、明细、金额折扣、关联合同、交付任务、回款计划、发票、变更与日志。',
+      '订单状态流转 / 取消 / 关闭 / 暂停 / 恢复接口：校验状态与权限，写入操作日志。',
+      '订单变更接口：登记变更原因与前后值，金额变更重新校验合同额度（示例）。',
+      '交付项目 / 回款计划查询接口：按订单关联合同返回交付进度与应收核销数据（示例）。',
+      '开票信息查询接口：返回开票状态、金额与记录，正式版与财务开票登记联动（示例）。'
+    ],
+    accept: [
+      '详情覆盖规划方案 5.9 的八项内容：订单基本信息、商品或服务明细、订单金额和折扣、关联合同、交付任务、回款计划、发票信息、订单变更和操作日志。',
+      '头部订单状态、金额、负责人与当前订单自身数据一致；任一状态流转后头部标签、列表与操作日志即时更新。',
+      '订单金额与明细小计合计一致，且不超过关联合同剩余可开单额度（第十四章「订单：合同和订单关系正确，金额一致」）。',
+      '取消 / 关闭 / 暂停 / 变更原因必填并可在操作日志或变更记录中查询；暂停执行可恢复为待交付（第十四章「操作日志」）。',
+      '回款计划与合同付款条件、核销记录一致，支持同一合同多笔部分收款（第十二章、第十四章「回款」）。',
+      '交付任务展示关联交付项目与进度，项目延期提示预警并记录原因（第十二章「项目延期」）。',
+      '关联合同、客户、商机、交付项目链接可跳转；关联数据缺失时显示空态且无控制台报错。'
+    ]
+  }
+};
+
+Object.entries(PZ_DOC_S7_CFG).forEach(([k, c]) => { DOCS_DEFAULT[k] = mkDoc(k, c); });
 
 const App = {
   components: { DocPanel },
