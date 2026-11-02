@@ -644,6 +644,8 @@ function buildPay() {
 const APPROVALS_INIT = [
   { id: 'SP-202611-0042', tab: 'todo', type: '报价折扣审批', title: '报价 BJ-202611-0008 (V3) 折扣审批', biz: '南京某某 ERP 升级项目', applicant: '王五', dept: '华东销售一部', time: '2026-11-02 08:40', amount: toC(334977.2), summary: [['客户', '南京某某科技有限公司'], ['关联商机', 'SJ-202609-0012'], ['整体折扣', '7.88%（超出销售授权 5%）'], ['含税金额', '¥334,977.20'], ['报价版本', 'V3']], nodes: [
     { n: '发起申请', p: '王五', st: 'done', t: '11-02 08:40' }, { n: '销售经理', p: '张三（我）', st: 'cur', t: '' }, { n: '销售总监', p: '（折扣>10% 时触发）', st: 'skip', t: '' }, { n: '审批完成', p: '', st: 'wait', t: '' } ], history: [{ who: '王五', act: '提交申请', op: '客户为重点客户，申请 92 折以内的组合折扣，竞品报价较低。', t: '11-02 08:40' }], cc: false },
+  { id: 'SP-202611-0043', tab: 'todo', type: '低价报价审批', title: '报价 BJ-202611-0011 低价报价审批', biz: '杭州某某酒店年度服务', applicant: '赵六', dept: '华东销售二部', time: '2026-11-02 09:10', amount: toC(158000), summary: [['客户', '杭州某某酒店管理有限公司'], ['报价版本', 'V1'], ['报价金额', '¥158,000.00'], ['最低限价', '¥165,000.00（低于限价 4.24%）']], nodes: [
+    { n: '发起申请', p: '赵六', st: 'done', t: '11-02 09:10' }, { n: '销售总监', p: '周总监', st: 'cur', t: '' }, { n: '财务负责人', p: '王财务', st: 'wait', t: '' }, { n: '审批完成', p: '', st: 'wait', t: '' } ], history: [{ who: '赵六', act: '提交申请', op: '酒店年度服务竞标，申请低于最低限价报价。', t: '11-02 09:10' }], cc: false },
   { id: 'SP-202611-0040', tab: 'todo', type: '合同审批', title: '合同 HT-202611-0006 新建合同审批', biz: '苏州某某汽配渠道平台合同', applicant: '李四', dept: '华东销售二部', time: '2026-11-01 17:10', amount: toC(420000), summary: [['客户', '苏州某某汽配有限公司'], ['合同金额', '¥420,000.00'], ['付款方式', '3 / 3 / 4 分期'], ['签约方', '我方：某某软件有限公司']], nodes: [
     { n: '发起申请', p: '李四', st: 'done', t: '11-01 17:10' }, { n: '业务负责人（销售经理）', p: '张三（我）', st: 'cur', t: '' }, { n: '法务', p: '陈法务', st: 'wait', t: '' }, { n: '财务', p: '王财务', st: 'wait', t: '' } ], history: [{ who: '李四', act: '提交申请', op: '合同已与客户确认条款。', t: '11-01 17:10' }], cc: false },
   { id: 'SP-202611-0038', tab: 'todo', type: '客户转移', title: '重点客户转移 · 苏州某某汽配有限公司', biz: '负责人 李四 → 王五', applicant: '李四', dept: '华东销售二部', time: '2026-10-31 14:20', amount: 0, summary: [['客户', '苏州某某汽配有限公司（重点客户）'], ['原负责人', '李四'], ['新负责人', '王五'], ['转移原因', '区域调整']], nodes: [
@@ -798,6 +800,30 @@ const phDocCfg = k => {
 };
 
 const DOC_PAGES = {
+  contacts: {
+    name: '联系人列表', module: '联系人管理',
+    goal: '集中维护客户组织内的联系人档案：按姓名、电话、邮箱、所属客户、角色、影响力、对我方态度与关键联系人检索，支持新增、编辑、删除与查看详情，为商机推进、关系图谱和客户跟进提供关键人依据。',
+    roles: ['销售：维护本人负责客户的联系人，可新增、编辑、删除并查看详情', '销售经理：查看本团队客户联系人并协助维护', '管理员：维护全部联系人数据，删除与敏感字段按字段权限控制'],
+    enter: ['左侧导航「联系人管理 → 联系人列表」，路由 /contacts', '客户详情联系人页签、客户关系图、商机详情联系人均可点击进入联系人详情'],
+    layout: ['顶部：面包屑 + 页面标题 + 联系人总数（来自全部客户档案）', '统计卡：联系人总数、关键联系人、支持者、反对者，数字由 store.ext.contacts 实算', '筛选区：关键词（姓名/电话/邮箱/客户）、所属客户、联系人角色、影响力、对我方态度、关键联系人', '表格：姓名、所属客户、电话、邮箱、部门、职务、角色、影响力、态度、联系偏好、关键联系人 + 行内编辑/详情/删除', '新增/编辑弹窗：姓名、所属客户、电话、邮箱、部门、职务、角色、影响力、态度、联系偏好、汇报对象、负责人、生日、关键联系人、备注；底部附最近操作日志'],
+    fields: [
+      '联系人姓名｜类型：文本｜必填：是｜校验：非空，列表内可重名但需结合客户区分｜说明：联系人展示名，点击进入详情。',
+      '所属客户｜类型：下拉（客户档案）｜必填：是｜校验：必须为有效客户，选项来自 store.customers｜说明：决定联系人的归属客户与数据权限。',
+      '联系电话｜类型：文本｜必填：是｜校验：允许数字、*、-，格式不合法时拦截｜说明：敏感字段，按角色字段权限脱敏展示。',
+      '电子邮箱｜类型：文本｜必填：否｜校验：邮箱格式校验｜说明：用于邮件联系与后续营销触达。',
+      '联系人角色｜类型：枚举（决策人/使用人/采购人/财务/技术）｜必填：是｜校验：五选一｜说明：关系图与关键人分析依据。',
+      '影响力｜类型：枚举（高/中/低）｜必填：否｜校验：三选一｜说明：辅助判断联系人在决策链中的权重。',
+      '对我方态度｜类型：枚举（支持者/中立/反对者）｜必填：否｜校验：三选一｜说明：统计卡支持者/反对者数量由此计算。',
+      '关键联系人｜类型：布尔｜必填：否｜校验：是/否｜说明：关键联系人纳入统计卡与重点维护提醒。',
+      '汇报对象｜类型：联系人选择｜必填：否｜校验：必须是同一客户下的其他联系人｜说明：用于构建客户内部汇报关系与关系图。',
+      '负责人｜类型：人员｜必填：是｜校验：来自销售负责人列表｜说明：联系人维护责任人，离职时随客户转交。'
+    ],
+    rules: ['列表数据来自 store.ext.contacts，统计卡与总数文案实时计算，不写死。', '新增或编辑保存后立即写回 store 并刷新列表、客户详情与关系图，同时写入联系人模块操作日志。', '删除联系人需二次确认，删除后同步清理其他联系人的汇报对象指向，历史操作日志保留。', '联系电话、邮箱等敏感字段按角色字段权限脱敏或隐藏，越权查看被拦截并记录安全日志（第三章）。'],
+    flow: ['联系人生命周期：新增 → 正常维护 →（客户合并/离职交接）→ 归属调整或停用；历史跟进与关系记录保留。', '保存动作：新增/编辑 → 校验必填与格式 → 写回 store → 刷新列表与所属客户详情 → 写操作日志。'],
+    errors: ['姓名、所属客户、联系电话、角色未填：表单校验拦截并提示对应字段。', '电话或邮箱格式不正确：按校验规则拦截，不写入脏数据。', '所属客户已作废或不存在：保存被拦截并提示重新选择客户。', '删除后汇报关系形成空指向：自动清空汇报对象，不导致关系图渲染失败。'],
+    api: ['联系人分页查询接口：按关键词、客户、角色、影响力、态度、关键联系人过滤。', '联系人新增/编辑/删除接口：校验手机号、邮箱与所属客户有效性，写操作日志。', '联系人详情与关系图接口：按联系人编号返回基本信息、汇报关系与互动历史。'],
+    accept: ['联系人列表为真实数据，统计卡（总数/关键/支持者/反对者）与列表可复算一致。', '六项筛选（关键词/客户/角色/影响力/态度/关键联系人）叠加生效，清空后恢复全量。', '新增/编辑保存后列表、所属客户详情和关系图同步更新；删除二次确认并清理汇报关系。', '必填与电话/邮箱格式校验生效，页面无控制台报错。']
+  },
   workbench: {
     name: '工作台', module: '工作台',
     goal: '作为登录后的首屏，为销售提供「今天该做什么」的统一入口：汇总待办、目标达成、商机漏斗、日程与消息，帮助销售与销售经理快速分配注意力。',
@@ -840,28 +866,28 @@ const DOC_PAGES = {
   'lead-pool': {
     name: '线索公海', module: '线索管理',
     goal: '集中管理未分配或已回收的线索，销售按“先到先得 + 能力规则”领取线索，保障线索不长期沉淀。',
-    roles: ['销售：领取线索', '销售经理：手动分配线索，可打回'],
-    enter: ['左侧导航「线索管理 → 线索公海」'],
-    layout: ['统计：公海数量、超时未领取', '表格：编号、公司、来源、放入时间、超期状态、领取操作'],
-    fields: ['放入时间｜日期｜必填：是｜校验：不晚于今天', '超期状态｜枚举｜说明：超 7 天可抢领，超 30 天自动无效'],
-    rules: ['同一条线索只能被一人领取，领取后立即从公海消失', '无负责人超 30 天自动标记「无效 / 回收」'],
-    flow: ['公海 → 领取（归属个人）→ 30 天未跟进回公海 → 循环'],
-    errors: ['竞争领取：弹出「已被他人领取」提示并刷新列表'],
-    api: ['公海列表、领取接口（带并发校验）、自动回收定时任务（示例）'],
-    accept: ['领取后立即从公海消失且出现在我的线索；无报错'],
+    roles: ['销售：从公海领取线索，领取后进入本人名下并进入保护期', '销售经理：手动分配线索、打回线索并查看团队领取情况', '管理员：维护领取上限与自动回收规则'],
+    enter: ['左侧导航「线索管理 → 线索公海」，路由 /leads/pool', '线索列表顶部「线索公海」页签切换'],
+    layout: ['顶部：面包屑 + 线索公海标题 + 公海线索总数', '统计卡：线索总数、待分配（公海）、跟进中、疑似重复、本月已转化', '筛选区：关键词、来源渠道、线索状态、负责人；表格展示编号、线索名称、公司、联系人、手机、来源、需求、预计金额、状态、负责人、下次联系、创建时间', '行操作：领取、分配、查看；公海记录负责人显示为空'],
+    fields: ['线索编号｜类型：自动编号｜必填：是｜校验：XS-年月-序号全局唯一｜说明：点击进入线索详情。', '公司名称｜类型：文本｜必填：是｜校验：非空，新增时参与查重｜说明：公海线索的主要识别信息。', '手机号码｜类型：文本｜必填：是｜校验：手机号格式，参与查重｜说明：敏感字段按字段权限脱敏。', '来源渠道｜类型：枚举（官网/广告/转介绍/活动/渠道）｜必填：否｜校验：来自来源字典｜说明：用于来源转化分析。', '线索状态｜类型：枚举（新建/跟进中/已转化/无效）｜必填：是｜校验：四选一｜说明：公海仅展示未分配且未转化的线索。', '负责人｜类型：人员｜必填：否｜校验：公海为空，领取或分配后写入｜说明：同一条线索同一时间只能有一个负责人。', '放入时间｜类型：日期时间｜必填：是｜校验：不晚于当前时间｜说明：公海停留时长与自动回收判断依据。', '超期状态｜类型：枚举｜必填：是｜校验：按放入时间计算｜说明：超 7 天可抢领，超 30 天自动标记无效或回收。'],
+    rules: ['公海列表取 store.leads 中负责人为空且状态不为已转化的线索，统计卡与列表同源实算。', '同一条线索只能被一人领取，领取后立即从公海消失并出现在我的线索；并发领取采用先到先得提示。', '无负责人超过 30 天自动标记「无效 / 回收」，退回公海保留历史跟进记录（7.3 线索待分配/线索待跟进提醒）。', '批量分配需选择负责人，超出普通销售权限的批量分配触发销售经理审批（7.2）。'],
+    flow: ['公海 → 领取（归属个人，进入保护期）→ 跟进中 → 已转化 / 无效 → 退回公海 → 循环。', '分配流程：销售经理勾选线索 → 选择负责人 → 写入负责人 → 线索离开公海；批量分配超出权限时先生成审批单。'],
+    errors: ['竞争领取：弹出「已被他人领取」提示并刷新列表，不重复写入负责人。', '未选择负责人执行分配：拦截并提示。', '线索已被转化或标记无效：不可再领取，操作按钮禁用。', '超出领取上限：提示当前已领数量与上限，阻止继续领取。'],
+    api: ['公海列表查询接口：按来源、状态、负责人与关键词过滤。', '领取/分配接口：带并发校验，校验领取上限与数据权限。', '自动回收定时任务：按未跟进周期将线索退回公海或标记无效（示例）。'],
+    accept: ['公海列表只包含无负责人且未转化的线索，统计卡数字与列表条数一致。', '领取后立即从公海消失并出现在我的线索，重复领取给出提示。', '筛选、分页可用；超出权限的批量分配触发审批；页面无控制台报错。'],
   },
   'lead-records': {
     name: '跟进记录', module: '线索管理',
     goal: '沉淀线索和客户的每次跟进（电话、拜访、微信、会议），为后续复盘和团队协作提供统一的时间线视图。',
-    roles: ['销售：为自己跟进的对象写记录', '销售经理：查看团队全部记录'],
-    enter: ['左侧导航「线索管理 → 跟进记录」', '线索 / 客户详情的时间线关联跳转'],
-    layout: ['筛选：时间范围、跟进方全景、方式、关键字', '表列：时间、对象、方式、内容摘要、下次跟进计划'],
-    fields: ['跟进方式｜枚举｜必填：是｜说明：电话 / 拜访 / 微信 / 会议 / 其他', '本次沟通结果｜长文本｜必填：是｜最少 10 字校验', '下一步计划｜日期 / 文本｜必填：是'],
-    rules: ['跟进记录只可追加不可修改历史，删除需管理员且写审计', '写了跟进即刷新对象「最近跟进时间」'],
-    flow: ['本轮跟进完成 → 设置下次跟进 → 到期自动出现在销售待办'],
-    errors: ['必填漏填提交：校验拦截', '对象已被作废：记录只读'],
-    api: ['跟进记录查询 / 新增接口，按对象反查接口（示例）'],
-    accept: ['新增记录后时间线、统计、对象最近跟进时间联动更新；无报错'],
+    roles: ['销售：为自己负责的线索写跟进记录并设置下次联系时间', '销售经理：查看团队全部线索跟进记录', '管理员：按权限查询全部记录并审计删除操作'],
+    enter: ['左侧导航「线索管理 → 线索转化记录 / 跟进记录」，路由 /leads/records', '线索详情抽屉与线索列表行内「记录跟进」入口'],
+    layout: ['顶部：面包屑 + 跟进记录标题 + 线索总数', '统计卡：线索总数、待分配、跟进中、疑似重复、本月已转化', '筛选区：关键词、来源渠道、线索状态、负责人；表格额外展示转化时间与转化为客户列', '行内操作：查看已转化线索、查看客户、记录跟进'],
+    fields: ['跟进对象｜类型：线索/客户｜必填：是｜校验：必须为有效线索或客户｜说明：决定记录归属与时间线展示。', '跟进方式｜类型：枚举（电话/微信/拜访/邮件）｜必填：是｜校验：四选一｜说明：跟进渠道统计依据。', '跟进内容｜类型：长文本｜必填：是｜校验：非空，保存时提示最少填写要求｜说明：本次沟通事项与客户反馈。', '客户反馈｜类型：长文本｜必填：否｜校验：按需填写｜说明：客户态度与意见，供后续复盘。', '下次联系时间｜类型：日期时间｜必填：否｜校验：不早于当前时间｜说明：到期自动生成销售待办并通知负责人。', '转化时间｜类型：日期时间｜必填：否｜校验：仅已转化线索有值｜说明：线索转化记录页签展示。', '转化为客户｜类型：客户编号｜必填：否｜校验：必须为有效客户｜说明：可点击进入客户详情。'],
+    rules: ['跟进记录只可追加，不可修改历史；删除需管理员权限并写审计日志（4.3）。', '写了跟进即刷新对象「最近跟进时间」，并可按下次联系时间自动生成待办（7.3 线索待跟进/客户跟进提醒）。', '已转化线索保留原始记录与转化时间、转化客户，不因转化丢失历史（第十二章线索转化失败保留原始线索）。', '列表按时间倒序，最新记录置顶；筛选条件变化后回到第 1 页。'],
+    flow: ['本轮跟进完成 → 记录跟进内容与客户反馈 → 设置下次跟进 → 到期自动出现在销售待办。', '线索转化 → 状态置为已转化 → 写入转化时间与转化为客户 → 记录在转化记录页签可追溯。'],
+    errors: ['跟进内容未填：提交被拦截并提示。', '对象已被作废或删除：记录只读，不可继续新增跟进。', '跟进记录删除越权：按钮隐藏，后端拦截并记录安全日志。', '无跟进记录：显示空态，不伪造数据。'],
+    api: ['跟进记录查询接口：按对象、方式、时间区间与关键词过滤，返回真实总数。', '跟进新增接口：写内容、反馈与下次跟进时间，并触发待办。', '线索转化记录接口：按已转化状态返回转化时间与客户编号。'],
+    accept: ['新增跟进后时间线、统计与对象最近跟进时间联动更新，最新记录置顶。', '下次联系时间到期自动生成销售待办并通知负责人。', '已转化线索保留原始记录、转化时间与客户链接，可追溯。', '必填校验与权限控制生效，页面无控制台报错。'],
   },
   customers: {
     name: '客户列表', module: '客户管理',
@@ -879,15 +905,15 @@ const DOC_PAGES = {
   'customer-pool': {
     name: '客户公海', module: '客户管理',
     goal: '承接无主客户与超期回收客户，通过保护期机制有序释放客户资源，确保客户资源流动性并避免撞单。',
-    roles: ['销售：领取客户', '销售经理：手动分配与打回'],
-    enter: ['左侧导航「客户管理 → 客户公海」'],
-    layout: ['统计：公海数量、保护期内', '表格：编号、名称、行业、放入时间、原因、超期状态、领取操作'],
-    fields: ['放入原因｜枚举｜必填：是｜说明：主动放弃 / 超期未跟进 / 离职释放', '保护期截止｜日期｜校验：领取日 + 30 天'],
-    rules: ['保护期内原负责人可在期满前「取回」客户', '同一客户同一时间只有一个负责人'],
-    flow: ['客户 → 释放 / 回收 → 公海 → 领取 → 归属个人'],
-    errors: ['并发领取冲突：提示已被他人领取', '重点客户回收需审批'],
-    api: ['公海列表、领取、释放接口（示例）'],
-    accept: ['领取 / 释放即时生效；保护期字段计算正确；无报错'],
+    roles: ['销售：从客户公海领取客户，领取后进入 30 天保护期', '销售经理：手动分配与打回客户，查看团队公海情况', '管理员：维护公海回收规则与回收站数据'],
+    enter: ['左侧导航「客户管理 → 客户公海」，路由 /customers/pool', '客户列表页签「客户公海」切换；客户回收站由相邻页签进入'],
+    layout: ['顶部：面包屑 + 客户公海标题 + 公海客户总数', '统计卡：客户总数、本月新增、重点/战略客户、超 14 天未跟进、流失客户', '筛选区：关键词、客户类型、客户等级、负责人、客户状态；表格展示编号、名称、类型、行业、等级、来源、区域、规模、负责人、状态、最近跟进、最近成交、累计成交金额、创建时间', '行操作：查看、详情、领取、转移；公海客户负责人显示「（公海）」'],
+    fields: ['客户编号｜类型：自动编号｜必填：是｜校验：KH-年月-序号全局唯一｜说明：公海与个人客户共用编号体系。', '客户名称｜类型：文本｜必填：是｜校验：全库查重（名称/手机），命中重复提示关联或合并｜说明：点击进入客户详情。', '客户等级｜类型：枚举（战略/重点/普通/潜在）｜必填：是｜校验：四选一｜说明：重点客户回收与转移需审批。', '放入原因｜类型：枚举（主动放弃/超期未跟进/离职释放）｜必填：是｜校验：三选一｜说明：记录进入公海原因。', '放入时间｜类型：日期时间｜必填：是｜校验：不晚于当前时间｜说明：公海停留时长与自动回收判断依据。', '保护期截止｜类型：日期｜必填：否｜校验：领取日 + 30 天｜说明：保护期内原负责人可申请取回。', '超期状态｜类型：枚举｜必填：是｜校验：按放入时间计算｜说明：超期客户可被重新分配或回收。'],
+    rules: ['公海列表只展示无负责人或已释放的客户，统计卡数字由 store.customers 实算（4.2）。', '同一客户同一时间只有一个主负责人，可设置协同人员但必须明确主负责人（第十二章同一客户多人跟进）。', '保护期内原负责人可在期满前「取回」客户；超过保护期或超期未跟进按公海规则自动回收（7.3 客户自动回收）。', '重点客户回收与合并需审批；负责人离职时未完成客户与待办转交，历史记录不变（第十二章客户负责人离职）。'],
+    flow: ['客户 → 释放 / 回收 → 公海 → 领取 / 分配 → 归属个人并进入保护期 → 正常维护。', '保护期流转：领取日 + 30 天 → 保护期内可被取回 → 期满后进入正常公海竞争领取。'],
+    errors: ['并发领取冲突：提示已被他人领取并刷新列表。', '重点客户回收未审批：拦截并提示先提交审批。', '客户已被他人取回或分配：操作按钮禁用并提示刷新。', '领取超出每日上限：提示上限并阻止领取。'],
+    api: ['公海列表查询接口：按类型、等级、状态、负责人与关键词过滤。', '领取/释放/取回接口：校验保护期、每日领取上限与重点客户审批。', '自动回收任务：按未跟进周期将客户释放到公海并记录原因（示例）。'],
+    accept: ['公海列表只包含无负责人或已释放客户，统计卡与列表条数一致。', '领取 / 释放即时生效，保护期按领取日 + 30 天计算正确。', '重点客户回收需审批，负责人离职转交后历史记录保持不变。', '筛选与分页可用，页面无控制台报错。'],
   },
   'customer-detail': {
     name: '客户详情', module: '客户管理',
@@ -905,28 +931,28 @@ const DOC_PAGES = {
   'opps-board': {
     name: '商机看板', module: '商机管理',
     goal: '以销售阶段看板可视化商机推进：拖拽变更阶段、直观观察分布与金额重心，及时发现停滞商机。',
-    roles: ['销售：操作自己商机', '销售经理：全团队商机与调整'],
-    enter: ['左侧导航「商机管理 · 默认视图」', '客户详情商机 Tab 的「去看板」链接'],
-    layout: ['顶部：阶段统计条', '六列看板：初步接触 / 需求确认 / 方案沟通 / 报价谈判 / 商务审批 / 赢单 · 输单，列内卡片显示商机名、客户、金额、负责人、标签'],
-    fields: ['预计金额｜货币｜必填：是｜校验：> 0', '阶段｜枚举｜必填：是｜拖拽变更后弹窗补充推进检查项', '赢率｜百分比｜只读｜随阶段自动映射'],
-    rules: ['阶段只能按流程推进 / 退回相邻阶段，不可跳跃', '进入「报价谈判」阶段前必须有已关联报价或补全关联'],
-    flow: ['阶段变更前需通过阶段门检查（必填项 + 系统检查项），未通过不允许推进'],
-    errors: ['拖拽目标阶段非法：回弹并提示', '卡片被他人并发修改：刷新提示'],
-    api: ['商机列表、阶段变更接口 / 阶段门检查接口（示例）'],
-    accept: ['拖拽换列后数据真实变更、统计刷新；阶段门校验生效；无报错'],
+    roles: ['销售：操作本人负责商机，拖拽或点击推进相邻阶段', '销售经理：查看全部团队商机，调整归属并介入停滞商机', '管理员：配置阶段概率与阶段门规则'],
+    enter: ['左侧导航「商机管理 → 商机看板」，路由 /opps', '客户详情商机 Tab 的「去看板」链接；商机列表右上角切换到看板视图'],
+    layout: ['顶部：面包屑 + 商机看板标题 + 跟进中商机总数 + 看板/列表视图切换 + 新建商机', '统计卡：跟进中商机、商机预计金额、本月预计成交、停滞商机、已赢单/已输单', '筛选区：关键词、负责人、来源、类型；重置按钮', '六列看板：初步接触 / 需求确认 / 方案沟通 / 报价谈判 / 商务审批 / 赢单·输单，列头显示数量与阶段金额，卡片显示商机名、客户、来源/类型/联系人、金额、停滞标签、预计成交日期与负责人', '阶段推进弹窗：展示当前阶段→目标阶段、阶段门必填项与系统检查项、变更备注，不满足时禁止推进'],
+    fields: ['商机编号｜类型：自动编号｜必填：是｜校验：SJ-年月-序号全局唯一｜说明：点击卡片进入商机详情。', '商机名称｜类型：文本｜必填：是｜校验：非空｜说明：看板卡片主标题。', '关联客户｜类型：客户档案｜必填：是｜校验：必须为有效客户｜说明：客户名称可点击进入客户详情。', '预计金额｜类型：货币｜必填：是｜校验：大于 0｜说明：看板列金额与统计卡按该字段汇总。', '当前阶段｜类型：枚举（初步接触/需求确认/方案沟通/报价谈判/商务审批/赢单·输单）｜必填：是｜校验：按流程相邻推进，不可跳跃｜说明：拖拽或「推进」触发阶段门。', '成交概率｜类型：百分比｜必填：是｜校验：随阶段自动映射｜说明：列表视图与商机详情展示。', '预计成交日期｜类型：日期｜必填：是｜校验：不早于当前日期｜说明：本月预计成交统计依据。', '负责人｜类型：人员｜必填：是｜校验：数据权限内销售｜说明：离职时商机随客户转交（第十二章）。', '停滞标签｜类型：系统标签｜必填：否｜校验：超期未推进自动标记｜说明：停滞商机提醒负责人与经理（7.3 商机停滞提醒）。'],
+    rules: ['阶段只能按流程推进到相邻阶段，禁止跳阶段与直接赢单；回退需提交「阶段回退」申请并填写原因（4.3）。', '进入目标阶段前必须通过阶段门检查：补全必填项并满足系统检查项，任一不满足即拦截并提示（5.5）。', '拖拽目标阶段非法时卡片回弹并提示；阶段变化写入商机历史（变更前后阶段、变更人、时间、备注）。', '同一视觉切片（全部/我的）统计一致；作废需填写原因并记录日志。'],
+    flow: ['阶段流转：初步接触 → 需求确认 → 方案沟通 → 报价谈判 → 商务审批 → 赢单/输单；每次推进通过阶段门后写入历史。', '赢单/输单：进入 close 时赢单填合同或订单依据，输单必须填写输单原因与竞争对手；结束后归档不可再推进。', '停滞流转：超过一段时间未推进 → 标记停滞并通知负责人与经理 → 经理介入或调整阶段（7.3）。'],
+    errors: ['拖拽目标阶段非法或跳阶段：回弹并提示，不写入变更。', '阶段门必填项或系统检查项未满足：禁止推进并逐项标红。', '卡片被他人并发修改：刷新提示，避免覆盖他人变更。', '商机已赢单/输单：推进按钮禁用，禁止再次变更阶段。'],
+    api: ['商机看板查询接口：按负责人、来源、类型、关键词过滤，按阶段分组返回。', '阶段变更接口：校验阶段门、相邻阶段与数据权限，写入变更历史。', '阶段门检查接口：返回必填项与系统检查项结果。'],
+    accept: ['拖拽换列或点击推进后数据真实变更、看板统计与列金额刷新。', '跳阶段、阶段门未满足、已结束商机推进均被拦截并给出明确提示。', '阶段变更历史包含变更前后阶段、操作人、时间与备注，可追溯。', '看板/列表切换数据一致，页面无控制台报错。'],
   },
   'opps-list': {
     name: '商机列表', module: '商机管理',
     goal: '以表格方式管理全部商机：更侧重字段对比与批量操作，服务复盘与管理场景。',
-    roles: ['销售 / 销售经理 / 管理员（同看板权限）'],
-    enter: ['左侧导航「商机管理 → 商机列表」', '看板页右上角「列表视图」'],
-    layout: ['筛选 + 统计卡', '表格：编号、名称、客户、阶段、赢率、预计金额、负责人、预计成交日期等列'],
-    fields: ['商业模式｜枚举｜说明：新业务 / 存量 / 渠道', '预计成交日期｜日期｜校验：不早于今天'],
-    rules: ['同一视觉切片（全部 / 我的）统计一致', '作废需填写原因并记录日志'],
-    flow: ['状态：进行中 →（推进完成）→ 赢 / 输 / 挂起'],
-    errors: ['筛选无结果显示空态', '批量操作无选中时按钮置灰'],
-    api: ['商机分页查询 / 批量导出（示例）'],
-    accept: ['列表 / 看板切换保持数据一致；无报错'],
+    roles: ['销售：查看本人负责商机并推进阶段', '销售经理：查看团队全部商机、批量导出与阶段介入', '管理员：查看全部商机并维护阶段配置'],
+    enter: ['左侧导航「商机管理 → 商机列表」，路由 /opps/list', '商机看板右上角「列表视图」切换'],
+    layout: ['顶部：面包屑 + 商机列表标题 + 跟进中商机总数 + 看板/列表切换 + 新建商机', '统计卡：跟进中商机、商机预计金额、本月预计成交、停滞商机、已赢单/已输单', '筛选区：关键词、负责人、来源、类型；重置按钮', '表格：商机编号、商机名称、关联客户、关联联系人、商机来源、商机类型、预计金额、当前阶段、成交概率、预计成交日期、负责人、操作', '底部：真实分页（20 条/页）与总数文案'],
+    fields: ['商机编号｜类型：自动编号｜必填：是｜校验：全局唯一｜说明：点击进入商机详情。', '商机名称｜类型：文本｜必填：是｜校验：非空｜说明：列表主字段。', '关联客户｜类型：客户档案｜必填：是｜校验：必须为有效客户｜说明：客户名称可点击进入详情。', '关联联系人｜类型：联系人｜必填：否｜校验：必须属于关联客户｜说明：辅助联系与决策链分析。', '商机来源｜类型：枚举（线索/客户转介绍/官网/渠道/活动/广告）｜必填：否｜校验：来自来源枚举｜说明：看板与列表共用筛选条件。', '商机类型｜类型：枚举（新购/续费/增购）｜必填：否｜校验：三选一｜说明：统计与筛选维度。', '预计金额｜类型：货币｜必填：是｜校验：大于 0｜说明：统计卡与金额列按分精确汇总。', '当前阶段｜类型：枚举｜必填：是｜校验：按流程相邻推进｜说明：显示阶段名或赢单/输单结果。', '成交概率｜类型：百分比｜必填：是｜校验：随阶段自动映射｜说明：以进度条展示。', '预计成交日期｜类型：日期｜必填：是｜校验：不早于当前日期｜说明：本月预计成交统计依据。', '负责人｜类型：人员｜必填：是｜校验：数据权限内销售｜说明：离职时商机随客户转交。'],
+    rules: ['列表与看板共用 store.opps 数据，同一视觉切片（全部/我的）统计一致（4.2）。', '筛选条件变化后分页回到第 1 页，统计卡与表格同步重算。', '推进阶段必须通过阶段门校验，禁止跳阶段、禁止直接赢单；变更写历史（5.4、5.5）。', '作废需填写原因并记录日志；批量操作未选中记录时按钮置灰。'],
+    flow: ['状态流转：进行中 →（阶段门校验通过）→ 下一阶段 → 赢单/输单；结束后归档不可再推进。', '阶段回退：提交阶段回退申请并填写原因，不能直接拖回或直接修改状态。'],
+    errors: ['筛选无结果：显示空态并允许重置筛选。', '批量操作未选中记录：按钮置灰并提示先勾选。', '阶段门未满足：禁止推进并逐项提示必填或系统检查项。', '商机已结束：推进按钮禁用。'],
+    api: ['商机分页查询接口：按负责人、来源、类型、关键词过滤并分页。', '批量导出接口：按当前筛选导出，遵循字段权限。', '阶段推进接口：校验阶段门与相邻阶段并写历史。'],
+    accept: ['列表与看板切换数据一致，筛选、分页、统计卡可复算。', '跳阶段、阶段门未满足、已结束商机推进均被拦截并提示。', '批量导出与新建商机入口可用，无选中时批量按钮置灰。', '页面无控制台报错。'],
   },
   'quote-detail': {
     name: '报价单详情', module: '报价管理',
@@ -1091,15 +1117,15 @@ const DOC_PAGES = {
   'user-detail': {
     name: '用户详情', module: '系统管理',
     goal: '全景查看单个用户：账号信息、所属部门、角色及其权限摘要，以及该用户的操作日志，为权限排查与审计提供入口。',
-    roles: ['系统管理员：查看与编辑', '部门负责人：查看本部门成员'],
-    enter: ['用户列表点击姓名', '组织架构树点击部门成员'],
-    layout: ['头部：姓名 + 状态标签 + 返回', '信息卡：账号/部门/角色/联系方式/最近登录', '角色权限摘要：数据范围/菜单/按钮/脱敏', '操作日志（按该用户筛选）'],
-    fields: ['账号｜只读', '最近登录｜只读', '数据范围｜只读｜来自角色配置'],
-    rules: ['详情使用该用户自己的数据', '编辑入口跳回用户管理的编辑弹窗（原型从简）'],
-    flow: ['用户状态：启用 ↔ 停用（用户管理页变更）'],
-    errors: ['用户不存在：空态 + 返回按钮'],
-    api: ['用户详情、角色查询、用户操作日志接口（示例）'],
-    accept: ['每个用户详情展示正确', '返回可用；无报错'],
+    roles: ['系统管理员：查看任意用户详情、权限摘要与操作日志', '部门负责人：查看本部门成员详情（只读）', '普通用户：无本页菜单权限'],
+    enter: ['用户列表点击姓名，路由 /system/user/:id', '组织架构树点击部门成员'],
+    layout: ['头部：面包屑「系统管理 / 用户详情」+ 姓名 + 状态标签 + 返回用户管理按钮', '信息卡：账号、姓名、所属部门、角色、联系电话、邮箱、状态、最近登录；提供编辑与重置密码示例入口', '角色权限摘要卡：数据权限、角色说明、菜单权限、按钮权限、字段脱敏', '本人的操作日志表：操作时间、模块、动作、操作内容、来源 IP（按该用户过滤，最多 12 条，倒序）'],
+    fields: ['账号｜类型：文本｜必填：是｜校验：系统生成且唯一，编辑时不可修改｜说明：登录标识。', '姓名｜类型：文本｜必填：是｜校验：非空｜说明：操作日志按姓名匹配。', '所属部门｜类型：部门｜必填：是｜校验：必须为有效部门｜说明：决定数据权限范围。', '角色｜类型：角色库｜必填：是｜校验：必须为有效角色｜说明：决定菜单/按钮/数据权限与字段脱敏。', '状态｜类型：枚举（启用/停用）｜必填：是｜校验：二选一｜说明：停用后失去登录权限，历史日志保留。', '最近登录｜类型：日期时间｜必填：否｜校验：无｜说明：登录安全审计参考。', '数据权限｜类型：枚举（本人/本部门/本部门及下级/全部）｜必填：是｜校验：来自角色配置，只读｜说明：权限排查核心字段。', '菜单权限｜类型：数组｜必填：否｜校验：来自角色配置，只读｜说明：展示该角色可访问菜单。', '按钮权限｜类型：数组｜必填：否｜校验：来自角色配置，只读｜说明：展示该角色可执行动作。', '字段脱敏｜类型：数组｜必填：否｜校验：来自角色配置，只读｜说明：展示敏感字段脱敏范围。', '操作日志｜类型：对象数组｜必填：是｜校验：按时间倒序，最多 12 条｜说明：含操作人、模块、动作、内容与来源 IP。'],
+    rules: ['详情使用该用户自己的数据，切换不同用户 id 页面正确重建（第三章）。', '角色权限摘要实时读取角色配置，菜单数量可复算；未配置角色时显示占位，不隐藏整卡。', '停用用户立即失去登录权限，进行中的审批不受影响；停用与编辑动作写操作日志（第八章）。', '编辑入口跳回用户管理的编辑弹窗，重置密码需二次确认并通知用户（原型为示例提示）。'],
+    flow: ['用户状态：启用 ↔ 停用（二次确认 + 操作日志）；用户不物理删除，离职停用后客户与待办转交（第十二章客户负责人离职）。', '权限变更：角色配置修改 → 保存 → 对该角色全部成员生效 → 写日志，本页摘要同步刷新。'],
+    errors: ['用户不存在：显示「用户不存在（可能已被删除）」空态并提供返回按钮。', '未配置角色：权限摘要显示「—」占位，菜单数量按 0 计算。', '字段脱敏未配置：显示「无」，不隐藏整卡。', '越权查看他人详情：正式版后端拦截并记录安全日志（第十二章用户越权操作）。', '日志数据缺失：显示空态而不伪造记录。'],
+    api: ['用户详情查询接口：按用户 id 返回账号信息与状态。', '角色权限查询接口：按角色名返回数据权限、菜单、按钮与字段脱敏配置。', '用户操作日志接口：按操作人过滤，分页倒序返回。', '重置密码 / 停用接口：二次确认后生效并通知用户，写操作日志。'],
+    accept: ['进入详情展示的数据与用户 id 一一对应，切换不同用户 id 页面正确重建。', '角色权限摘要四项（数据权限/菜单/按钮/字段脱敏）与角色配置一致且实时联动。', '操作日志最多 12 条、倒序、含操作人与时间与 IP，无日志时显示空态文案。', '用户不存在空态与返回入口正确，页面无控制台报错。'],
   },
   'pool-rules': {
     name: '公海规则', module: '系统管理',
@@ -2596,6 +2622,9 @@ store.leads.push(...extraLeads());
 store.opps.push(...extraOpps());
 store.ext = reactive(buildExt(store.customers, store.leads, store.opps));
 
+/* 5.14 销售总览口径：商机补 created（创建日期），用于平均成交周期 = 赢单日期 − 创建日期（确定性派生） */
+store.opps.forEach(o => { if (!o.created && o.date) o.created = extAddDays(o.date, -(15 + extRint(extRng(extHash(o.no + '|cd')), 5, 45))); });
+
 /* 全局便捷函数：computed 友好（纯函数，返回该客户 360 视图的全部数据） */
 const custBundle = name => customerBundle(store.ext, name, store.opps);
 
@@ -2980,15 +3009,20 @@ registerRoute('/activity/:no', ActivityDetailPage, 'activity-detail');
 
 /* ===== 第 6 阶段：数据分析（报表列表 /analytics + 报表详情 /analytics/:id） ===== */
 const AN_REPORTS = [
+  { id: 'overview', name: '销售总览', icon: 'TrendCharts', metric: '销售额、目标完成率、赢单率、平均成交周期', text: '销售额口径：已签署合同金额（履约中/生效/已完成/已到期）', who: '老板/管理层' },
   { id: 'funnel', name: '销售漏斗', icon: 'Filter', metric: '各阶段商机数量与预计金额', text: '按商机当前阶段汇总；金额为预计成交金额（不含税）', who: '销售经理' },
   { id: 'target', name: '业绩目标达成', icon: 'Aim', metric: '月度合同签署金额 vs 目标与达成率', text: '销售额口径：已签署合同金额（示例目标 60 万/月）', who: '管理层' },
-  { id: 'payment', name: '回款分析', icon: 'Coin', metric: '月度计划回款、已回款与回款率', text: '已回款 = 财务已确认到账金额', who: '财务' },
-  { id: 'customer', name: '客户分析', icon: 'OfficeBuilding', metric: '行业分布、等级结构与新增/公海', text: '按客户档案的行业与等级统计', who: '管理层' },
-  { id: 'lead', name: '线索来源转化', icon: 'Share', metric: '各来源线索量与转化率', text: '转化率 = 已转化线索 / 该来源线索总数', who: '市场/经理' },
-  { id: 'opps', name: '商机赢输单分析', icon: 'Trophy', metric: '赢单/输单数量、金额与输单原因', text: '统计「赢单 / 输单」阶段的历史商机', who: '销售经理' },
+  { id: 'opps', name: '商机分析', icon: 'Trophy', metric: '商机金额、各阶段金额、赢单率、输单原因', text: '统计「赢单 / 输单」商机并按阶段汇总金额', who: '销售经理' },
+  { id: 'staff', name: '销售人员分析', icon: 'User', metric: '个人业绩、跟进次数、商机转化、排名', text: '个人业绩 = 名下已签署合同金额，按业绩倒序排名', who: '销售经理' },
+  { id: 'customer', name: '客户分析', icon: 'OfficeBuilding', metric: '客户数量、客户等级、客户增长、流失率', text: '按客户档案的行业与等级统计，客户增长按创建时间', who: '管理层' },
+  { id: 'lead', name: '线索分析', icon: 'Share', metric: '线索量、来源分布、有效率、转化率', text: '有效率 =（线索量 − 无效）/ 线索量', who: '市场/经理' },
+  { id: 'contract', name: '合同分析', icon: 'Tickets', metric: '合同金额、签署数量、到期数量、履约情况', text: '按签署日期统计合同金额与状态分布', who: '销售经理/法务' },
+  { id: 'payment', name: '回款分析', icon: 'Coin', metric: '应收金额、已收金额、逾期金额、回款率', text: '已回款 = 财务已确认到账金额；逾期 = 计划日期已过未结清', who: '财务' },
   { id: 'activity', name: '活动效率', icon: 'Calendar', metric: '跟进方式分布与完成率', text: '统计跟进活动按方式 / 状态分布', who: '经理' },
-  { id: 'ticket', name: '服务工单分析', icon: 'Headset', metric: '工单类型、状态与优先级分布', text: '统计服务工单按类型 / 状态 / 优先级', who: '客服' },
+  { id: 'ticket', name: '服务分析', icon: 'Headset', metric: '工单数量、处理时长、超时率、满意度', text: '超时 = 未在紧急 2h/高 4h/中 24h/低 48h SLA 内解决或关闭', who: '客服' },
+  { id: 'delivery', name: '交付分析', icon: 'Box', metric: '项目数量、完成率、延期率、验收通过率', text: '延期 = 计划结束日期已过仍未完成；验收状态由里程碑推导', who: '交付/管理层' },
 ];
+const AN_SIGNED = ['生效', '履约中', '已完成', '已到期']; /* 销售额统计口径：已签署状态 */
 const AN_PERIODS = {
   m3: ['2026-09', '2026-10', '2026-11'], m6: ['2026-06', '2026-07', '2026-08', '2026-09', '2026-10', '2026-11'],
   y: ['2026-01', '2026-02', '2026-03', '2026-04', '2026-05', '2026-06', '2026-07', '2026-08', '2026-09', '2026-10', '2026-11'],
@@ -3049,17 +3083,61 @@ const AnalyticsDetailPage = {
   setup(props) {
     const rep = computed(() => AN_REPORTS.find(r => r.id === props.id));
     const period = ref('m6'), owner = ref('');
+    const SIGNED = ['生效', '履约中', '已完成', '已到期'];
+    /* 5.14 统一筛选项：时间范围、部门、员工、客户类型、客户来源、行业、区域 */
+    const dept = ref(''), ctype = ref(''), csrc = ref(''), cind = ref(''), creg = ref('');
+    const anDepts = computed(() => store.ext.depts.map(d => d.name));
+    const anCtypes = ['企业客户', '个人客户', '渠道客户'];
+    const anCsrcs = computed(() => [...new Set(store.customers.map(c => c.source).filter(Boolean))]);
+    const anInds = computed(() => [...new Set(store.customers.map(c => c.industry).filter(Boolean))]);
+    const anRegs = computed(() => [...new Set(store.customers.map(c => c.region).filter(Boolean))]);
+    const anDeptOf = n => { const u = store.ext.users.find(x => x.name === n); return u ? u.dept : ''; };
+    const passO = o => (!owner.value || o === owner.value) && (!dept.value || (!!o && anDeptOf(o) === dept.value));
+    const passC = n => {
+      if (!ctype.value && !csrc.value && !cind.value && !creg.value) return true;
+      const c = custByName(String(n || '')); if (!c) return false;
+      return (!ctype.value || c.type === ctype.value) && (!csrc.value || c.source === csrc.value) &&
+        (!cind.value || c.industry === cind.value) && (!creg.value || c.region === creg.value);
+    };
+    const clearF = () => { dept.value = ''; ctype.value = ''; csrc.value = ''; cind.value = ''; creg.value = ''; };
     const months = computed(() => AN_PERIODS[period.value] || []);
     const page = ref(1), size = ref(10);
-    watch([period, owner], () => { page.value = 1; });
+    watch([period, owner, dept, ctype, csrc, cind, creg], () => { page.value = 1; });
 
     const data = computed(() => {
       const M = months.value, inM = y => M.includes((y || '').slice(0, 7)), owf = owner.value, hasO = !!owf;
       const pal = AN_PAL(), SUB = cssVar('--sub') || '#67768f', axis = anBaseAxis();
       const wanT = n => '¥' + (n / 10000).toLocaleString('zh-CN', { maximumFractionDigits: 1 }) + ' 万';
+      /* --- 销售总览 --- */
+      if (props.id === 'overview') {
+        const cs = store.ext.contracts.filter(c => c.amount > 0 && SIGNED.includes(c.status) && inM(c.signDate) && passO(c.owner) && passC(c.customer));
+        const byM = {}; cs.forEach(c => { byM[c.signDate.slice(0, 7)] = (byM[c.signDate.slice(0, 7)] || 0) + c.amount; });
+        const mAmt = M.map(m => byM[m] || 0), mTgt = M.map(() => AN_TARGET_MONTH);
+        const done = mAmt.reduce((a, b) => a + b, 0), tgt = mTgt.reduce((a, b) => a + b, 0);
+        const closes = store.opps.filter(o => o.stage === 'close' && o.result && inM(o.date) && passO(o.owner) && passC(o.customer));
+        const wins = closes.filter(o => o.result === '赢单');
+        const cycles = wins.map(o => Math.round((new Date(o.date) - new Date(o.created)) / 86400000)).filter(v => v >= 0);
+        const avgCyc = cycles.length ? Math.round(cycles.reduce((a, b) => a + b, 0) / cycles.length) : 0;
+        return {
+          stats: [['销售额（已签署合同）', wanT(done), 'ok'], ['目标完成率', Math.round(done * 1000 / tgt) / 10 + '%', done >= tgt ? 'ok' : 'warn'],
+            ['赢单率', (closes.length ? Math.round(wins.length * 1000 / closes.length) / 10 : 0) + '%', ''], ['平均成交周期', avgCyc + ' 天', '']],
+          opt: {
+            tooltip: { trigger: 'axis' }, legend: { data: ['合同签署金额', '目标'], textStyle: { color: SUB }, right: 6, top: 0, itemWidth: 14 },
+            grid: { left: 8, right: 14, top: 30, bottom: 4, containLabel: true },
+            xAxis: { type: 'category', data: M, ...axis }, yAxis: { type: 'value', name: '万元', axisLabel: { color: SUB, fontSize: 11, formatter: v => v / 10000 }, splitLine: axis.splitLine },
+            series: [
+              { name: '合同签署金额', type: 'bar', barWidth: 18, itemStyle: { color: pal[0] }, data: mAmt.map(v => Math.round(v / 10000 * 10) / 10) },
+              { name: '目标', type: 'line', smooth: true, symbol: 'circle', symbolSize: 7, itemStyle: { color: pal[3] }, data: mTgt.map(v => v / 10000) } ],
+          },
+          note: '注：销售额 = 已签署合同金额（履约中/生效/已完成/已到期状态，签署口径，按月归集）；目标完成率 = 区间销售额 ÷ 区间目标（示例 60 万/月，可在系统管理调整）；赢单率 = 赢单 ÷（赢单 + 输单）；平均成交周期 = 赢单商机「创建 → 赢单」的平均天数。',
+          rows: M.map((m, i) => ({ m, amt: mAmt[i], target: mTgt[i], rate: mTgt[i] ? Math.round(mAmt[i] * 1000 / mTgt[i]) / 10 : 0, ok: mAmt[i] >= mTgt[i] })),
+          cols: [{ p: 'm', l: '月份', w: 100, fmt: 'tag', tagMap: {} }, { p: 'amt', l: '已签金额', w: 120, fmt: 'money' }, { p: 'target', l: '目标', w: 120, fmt: 'money' },
+            { p: 'rate', l: '达成率', w: 140, fmt: 'rate' }],
+        };
+      }
       /* --- 销售漏斗 --- */
       if (props.id === 'funnel') {
-        const xs = store.opps.filter(o => inM(o.date) && (!hasO || o.owner === owf));
+        const xs = store.opps.filter(o => inM(o.date) && passO(o.owner) && passC(o.customer));
         const cnt = STAGES.map(s => xs.filter(o => o.stage === s.key).length);
         const amt = STAGES.map(s => Math.round(xs.filter(o => o.stage === s.key).reduce((x, o) => x + o.amount, 0)));
         const custs = new Set(xs.map(o => o.customer));
@@ -3081,7 +3159,7 @@ const AnalyticsDetailPage = {
       }
       /* --- 业绩目标达成 --- */
       if (props.id === 'target') {
-        const cs = store.ext.contracts.filter(c => inM(c.signDate) && (!hasO || c.owner === owf) && c.amount > 0);
+        const cs = store.ext.contracts.filter(c => inM(c.signDate) && passO(c.owner) && passC(c.customer) && c.amount > 0 && SIGNED.includes(c.status));
         const byM = {}; cs.forEach(c => { byM[c.signDate.slice(0, 7)] = (byM[c.signDate.slice(0, 7)] || 0) + c.amount; });
         const mAmt = M.map(m => byM[m] || 0), mTgt = M.map(() => AN_TARGET_MONTH);
         const done = mAmt.reduce((a, b) => a + b, 0), tgt = mTgt.reduce((a, b) => a + b, 0);
@@ -3095,7 +3173,7 @@ const AnalyticsDetailPage = {
               { name: '合同签署金额', type: 'bar', barWidth: 18, itemStyle: { color: pal[0] }, data: mAmt.map(v => Math.round(v / 10000 * 10) / 10) },
               { name: '目标', type: 'line', smooth: true, symbol: 'circle', symbolSize: 7, itemStyle: { color: pal[3] }, data: mTgt.map(v => v / 10000) } ],
           },
-          note: '注：销售额 = 已签署（含履约中/已完成/已签署状态）合同金额；示例目标 60 万/月，可在系统管理中调整（原型为常量）。',
+          note: '注：销售额 = 已签署合同金额（履约中/生效/已完成/已到期状态）；示例目标 60 万/月，可在系统管理中调整（原型为常量）。',
           rows: M.map((m, i) => ({ m, amt: mAmt[i], target: mTgt[i], rate: mTgt[i] ? Math.round(mAmt[i] * 1000 / mTgt[i]) / 10 : 0, ok: mAmt[i] >= mTgt[i] })),
           cols: [{ p: 'm', l: '月份', w: 100, fmt: 'tag', tagMap: {} }, { p: 'amt', l: '已签金额', w: 120, fmt: 'money' }, { p: 'target', l: '目标', w: 120, fmt: 'money' },
             { p: 'rate', l: '达成率', w: 140, fmt: 'rate' }],
@@ -3115,16 +3193,16 @@ const AnalyticsDetailPage = {
           return s;
         };
         const rows0 = []; store.ext.contracts.forEach(c => (c.plans || []).forEach(p => {
-          if (!inM(p.date)) return; const got = recOf(c.no, p);
+          if (!inM(p.date) || !passO(c.owner) || !passC(c.customer)) return; const got = recOf(c.no, p);
           rows0.push({ no: c.no, customer: c.customer, stage: p.stage, date: p.date, amount: p.amount, got,
             status: p.status ? p.status : (got >= p.amount ? '已回款' : got > 0 ? '部分回款' : '未回款'), plan: p.id || c.no + '#' + p.stage });
         }));
         const perM = {}, gotM = {};
         rows0.forEach(r => { perM[r.date.slice(0, 7)] = (perM[r.date.slice(0, 7)] || 0) + r.amount; gotM[r.date.slice(0, 7)] = (gotM[r.date.slice(0, 7)] || 0) + r.got; });
         const planSum = rows0.reduce((a, r) => a + r.amount, 0), gotSum = rows0.reduce((a, r) => a + r.got, 0);
-        const overdue = rows0.filter(r => r.date < TODAY && r.got < r.amount).length;
+        const overdue = rows0.filter(r => r.date < TODAY && r.got < r.amount), overdueAmt = overdue.reduce((a, r) => a + (r.amount - r.got), 0);
         return {
-          stats: [['计划回款（区间）', wanT(planSum), ''], ['已回款（已确认）', wanT(gotSum), 'ok'], ['回款率', (planSum ? Math.round(gotSum * 1000 / planSum) / 10 : 0) + '%', gotSum >= planSum ? 'ok' : 'warn'], ['逾期未结份数', String(overdue), 'danger']],
+          stats: [['应收金额（区间）', wanT(planSum), ''], ['已收金额（已确认）', wanT(gotSum), 'ok'], ['回款率', (planSum ? Math.round(gotSum * 1000 / planSum) / 10 : 0) + '%', gotSum >= planSum ? 'ok' : 'warn'], ['逾期金额（' + overdue.length + ' 期）', wanT(overdueAmt), overdueAmt ? 'danger' : 'ok']],
           opt: {
             tooltip: { trigger: 'axis' }, legend: { data: ['计划回款', '已回款'], textStyle: { color: SUB }, right: 6, top: 0 },
             grid: { left: 8, right: 14, top: 30, bottom: 4, containLabel: true },
@@ -3133,7 +3211,7 @@ const AnalyticsDetailPage = {
               { name: '计划回款', type: 'bar', barWidth: 18, itemStyle: { color: mixHex(pal[0], '#ffffff', .35) }, data: M.map(m => Math.round((perM[m] || 0) / 10000 * 10) / 10) },
               { name: '已回款', type: 'line', smooth: true, symbol: 'circle', symbolSize: 7, itemStyle: { color: pal[0] }, areaStyle: { color: mixHex(pal[0], '#ffffff', .75) }, data: M.map(m => Math.round((gotM[m] || 0) / 10000 * 10) / 10) } ],
           },
-          note: '注：已回款 = 财务已确认到账金额（按核销匹配到计划期次）；根据合同回款计划的状态字段对未登记合同按状态折算。',
+          note: '注：应收金额 = 区间回款计划金额；已收金额 = 财务已确认到账金额（按核销匹配到计划期次），不含待核实/预收款；逾期金额与份数 = 计划日期早于今天且未结清的计划金额 − 已回款；根据合同回款计划的状态字段对未登记合同按状态折算。',
           rows: rows0.sort((a, b) => (a.date < b.date ? 1 : -1)),
           cols: [{ p: 'no', l: '合同编号', w: 130, fmt: 'link', to: 'contract' }, { p: 'customer', l: '客户', w: 180, fmt: 'custName' }, { p: 'stage', l: '计划期次', w: 100 },
             { p: 'date', l: '计划日期', w: 105 }, { p: 'amount', l: '计划金额', w: 110, fmt: 'money' }, { p: 'got', l: '已回款', w: 110, fmt: 'money' },
@@ -3142,13 +3220,13 @@ const AnalyticsDetailPage = {
       }
       /* --- 客户分析 --- */
       if (props.id === 'customer') {
-        const xs = store.customers.filter(c => inM(c.created) && (!hasO || c.owner === owf));
+        const xs = store.customers.filter(c => inM(c.created) && passO(c.owner) && passC(c.name));
         const byInd = {}, byLvl = {};
         xs.forEach(c => { byInd[c.industry] = (byInd[c.industry] || 0) + 1; byLvl[c.level] = (byLvl[c.level] || 0) + 1; });
         const allLvl = ['战略客户', '重点客户', '普通客户', '潜在客户'];
         const amt = xs.reduce((a, c) => a + (c.total || 0), 0);
         return {
-          stats: [['筛选客户数', String(xs.length), ''], ['累计成交额', wanT(amt), 'ok'], ['公海（无负责人）', String(xs.filter(c => !c.owner).length), 'warn'], ['战略/重点', String(xs.filter(c => c.level === '战略客户' || c.level === '重点客户').length), '']],
+          stats: [['客户数量', String(xs.length), ''], ['流失率', Math.round(xs.filter(c => c.status === '流失').length * 1000 / Math.max(1, xs.length)) / 10 + '%', xs.some(c => c.status === '流失') ? 'danger' : 'ok'], ['累计成交额', wanT(amt), 'ok'], ['公海（无负责人）', String(xs.filter(c => !c.owner).length), 'warn']],
           opt: {
             tooltip: { trigger: 'item', formatter: q => '<b>' + q.name + '</b><br/>客户数：' + q.value + ' 家（' + q.percent + '%）' },
             legend: { bottom: 0, textStyle: { color: SUB }, itemWidth: 12, type: 'scroll' },
@@ -3162,7 +3240,7 @@ const AnalyticsDetailPage = {
               itemStyle: { color: q => [pal[3], pal[0], pal[5], pal[2]][q.dataIndex % 4] }, data: allLvl.map(k => byLvl[k] || 0) }],
           },
           opt2Title: '客户等级分布',
-          note: '注：行业分布与等级结构按筛选区间内创建的客户档案统计；金额为档案中的累计成交额。',
+          note: '注：客户增长 = 筛选区间内新建档客户数（本表按创建日期筛选）；等级结构见下方「客户等级分布」；流失率 = 状态为「流失」的客户 ÷ 区间客户总数；金额为档案中的累计成交额。',
           rows: xs.slice().sort((a, b) => (b.total || 0) - (a.total || 0)),
           cols: [{ p: 'no', l: '客户编号', w: 130, fmt: 'mono' }, { p: 'name', l: '客户名称', w: 200, fmt: 'custName' }, { p: 'industry', l: '行业', w: 130 },
             { p: 'level', l: '等级', w: 90, fmt: 'tag', tagMap: { 战略客户: 'warning', 重点客户: 'primary', 普通客户: 'info', 潜在客户: 'success' } },
@@ -3171,12 +3249,13 @@ const AnalyticsDetailPage = {
       }
       /* --- 线索来源转化 --- */
       if (props.id === 'lead') {
-        const xs = store.leads.filter(l => inM(l.created) && (!hasO || l.owner === owf));
+        const xs = store.leads.filter(l => inM(l.created) && passO(l.owner) && passC(l.company));
         const bySrc = {}; xs.forEach(l => { bySrc[l.source] = bySrc[l.source] || { n: 0, cv: 0 }; bySrc[l.source].n++; if (l.status === '已转化') bySrc[l.source].cv++; });
         const srcs = Object.keys(bySrc);
         const cvSum = xs.filter(l => l.status === '已转化').length;
+        const eff = xs.length - xs.filter(l => l.status === '无效').length;
         return {
-          stats: [['线索总数', String(xs.length), ''], ['已转化', String(cvSum), 'ok'], ['整体转化率', (xs.length ? Math.round(cvSum * 1000 / xs.length) / 10 : 0) + '%', ''], ['未分配（公海）', String(xs.filter(l => !l.owner).length), 'warn']],
+          stats: [['线索量', String(xs.length), ''], ['有效率', Math.round(eff * 1000 / Math.max(1, xs.length)) / 10 + '%', 'ok'], ['整体转化率', (xs.length ? Math.round(cvSum * 1000 / xs.length) / 10 : 0) + '%', cvSum / Math.max(1, xs.length) >= .3 ? 'ok' : 'warn'], ['未分配（公海）', String(xs.filter(l => !l.owner).length), 'warn']],
           opt: {
             tooltip: { trigger: 'axis' }, legend: { data: ['线索数', '转化率'], textStyle: { color: SUB }, right: 6, top: 0 },
             grid: { left: 8, right: 14, top: 30, bottom: 4, containLabel: true },
@@ -3186,7 +3265,7 @@ const AnalyticsDetailPage = {
               { name: '线索数', type: 'bar', barWidth: 26, itemStyle: { color: pal[0] }, data: srcs.map(s => bySrc[s].n) },
               { name: '转化率', type: 'line', yAxisIndex: 1, symbol: 'circle', symbolSize: 7, itemStyle: { color: pal[3] }, data: srcs.map(s => bySrc[s].n ? Math.round(bySrc[s].cv * 1000 / bySrc[s].n) / 10 : 0) } ],
           },
-          note: '注：转化率 = 已转化线索 / 该来源线索总数；来源枚举为 官网 / 广告 / 活动 / 转介绍 / 渠道。',
+          note: '注：线索量 = 区间内新建档线索（按创建时间筛选）；有效率 =（线索量 − 无效线索）÷ 线索量；转化率 = 已转化线索 / 该来源线索总数；来源枚举为 官网 / 广告 / 活动 / 转介绍 / 渠道（可在系统管理·字典管理配置）。',
           rows: xs.slice().sort((a, b) => (a.created < b.created ? 1 : -1)),
           cols: [{ p: 'no', l: '线索编号', w: 130, fmt: 'mono' }, { p: 'company', l: '公司', w: 200 }, { p: 'source', l: '来源', w: 90, fmt: 'tag', tagMap: {} },
             { p: 'status', l: '状态', w: 90, fmt: 'tag', tagMap: { 新建: 'info', 跟进中: 'primary', 已转化: 'success', 无效: 'danger' } },
@@ -3195,12 +3274,13 @@ const AnalyticsDetailPage = {
       }
       /* --- 商机赢输单分析 --- */
       if (props.id === 'opps') {
-        const xs = store.opps.filter(o => o.stage === 'close' && inM(o.date) && (!hasO || o.owner === owf));
+        const xs = store.opps.filter(o => o.stage === 'close' && inM(o.date) && passO(o.owner) && passC(o.customer));
         const win = xs.filter(o => o.result === '赢单'), lose = xs.filter(o => o.result && o.result !== '赢单');
         const byReason = {}; lose.forEach(o => { const r = o.loseReason || '未填写'; byReason[r] = (byReason[r] || 0) + 1; });
         const winAmt = win.reduce((a, o) => a + o.amount, 0), loseAmt = lose.reduce((a, o) => a + o.amount, 0);
+        const stalledN = store.opps.filter(o => inM(o.date) && passO(o.owner) && passC(o.customer) && o.flags && o.flags.stalled).length;
         return {
-          stats: [['赢单数', String(win.length), 'ok'], ['赢单金额', wanT(winAmt), 'ok'], ['赢单率', (xs.length ? Math.round(win.length * 1000 / xs.length) / 10 : 0) + '%', ''], ['输单金额', wanT(loseAmt), 'danger']],
+          stats: [['商机总金额', wanT(winAmt + loseAmt), 'ok'], ['赢单率（赢单 ' + win.length + ' / 输单 ' + lose.length + '）', (xs.length ? Math.round(win.length * 1000 / xs.length) / 10 : 0) + '%', ''], ['停滞商机（自动提醒）', String(stalledN), stalledN ? 'danger' : 'ok'], ['输单金额', wanT(loseAmt), 'danger']],
           opt: {
             tooltip: { trigger: 'item', formatter: q => '<b>' + q.name + '</b><br/>' + q.value + ' 个（' + q.percent + '%）' },
             legend: { bottom: 0, textStyle: { color: SUB } },
@@ -3214,7 +3294,7 @@ const AnalyticsDetailPage = {
             series: [{ type: 'bar', barWidth: 26, itemStyle: { color: mixHex(pal[0], '#000000', .42) }, label: { show: true, position: 'top', color: SUB, fontSize: 11 }, data: Object.values(byReason) }],
           },
           opt2Title: '输单原因分布',
-          note: '注：赢单率 = 赢单 /（赢单 + 输单）；输单原因来自商机关闭时填写的信息。',
+          note: '注：赢单率 = 赢单 /（赢单 + 输单）；各阶段金额见「销售漏斗」报表；输单原因来自商机关闭时填写的信息；停滞商机在系统管理中设置停滞提醒天数，超期自动提醒（第十二章）。',
           rows: xs.slice().sort((a, b) => (a.date < b.date ? 1 : -1)),
           cols: [{ p: 'no', l: '商机编号', w: 130, fmt: 'mono' }, { p: 'name', l: '商机名称', w: 200, fmt: 'link', to: 'opp' },
             { p: 'customer', l: '客户', w: 180, fmt: 'custName' }, { p: 'result', l: '结果', w: 80, fmt: 'tag', tagMap: { 赢单: 'success', 输单: 'danger' } },
@@ -3223,7 +3303,7 @@ const AnalyticsDetailPage = {
       }
       /* --- 活动效率 --- */
       if (props.id === 'activity') {
-        const xs = store.ext.activities.filter(a => inM(a.time) && (!hasO || a.owner === owf));
+        const xs = store.ext.activities.filter(a => inM(a.time) && passO(a.owner) && passC(a.customer));
         const TYPES = ['电话', '微信', '拜访', '会议', '邮件'];
         const done = xs.filter(a => a.status === '已完成');
         const byT = t => TYPES.map(v => xs.filter(a => a.type === v && a.status === t).length);
@@ -3246,14 +3326,22 @@ const AnalyticsDetailPage = {
       }
       /* --- 服务工单分析 --- */
       if (props.id === 'ticket') {
-        const ownO = c => { const cu = custByName(String(c)); return !hasO || (cu && cu.owner === owf); };
+        const ownO = c => { const cu = custByName(String(c)); return passC(String(c)) && passO(cu ? cu.owner : ''); };
         const xs = store.ext.tickets.filter(t => inM(t.created) && ownO(t.customer));
         const TYPES = ['故障报修', '服务请求', '咨询', '投诉'];
         const STS = ['待受理', '待分派', '处理中', '待客户确认', '已解决', '已关闭', '已退回'];
-        const urgent = xs.filter(t => t.priority === '紧急' || t.priority === '高');
+        const SLA_H = { 紧急: 2, 高: 4, 中: 24, 低: 48 };
+        const nowT = new Date().toISOString().slice(0, 16).replace('T', ' ');
+        const solved = xs.filter(t => t.solvedTime && t.created);
+        const durH = t => Math.max(1, Math.round((new Date(t.solvedTime) - new Date(t.created)) / 3600000));
+        const avgDur = solved.length ? Math.round(solved.reduce((a, t) => a + durH(t), 0) / solved.length) : 0;
+        const overN = solved.filter(t => (new Date(t.solvedTime) - new Date(t.created)) > (SLA_H[t.priority] || 24) * 3600000).length + xs.filter(t => ['待受理', '待分派', '处理中', '待客户确认'].includes(t.status) && t.slaDeadline && t.slaDeadline < nowT).length;
+        const overRate = xs.length ? Math.round(overN * 1000 / xs.length) / 10 : 0;
+        const rated = xs.filter(t => t.rating);
+        const avgSat = rated.length ? Math.round(rated.reduce((a, t) => a + t.rating, 0) * 10 / rated.length) / 10 : 0;
         const byT2 = v => TYPES.map(x => xs.filter(t => t.type === x && t.status === v).length);
         return {
-          stats: [['工单总数', String(xs.length), ''], ['待处理', String(xs.filter(t => ['待受理', '待分派', '处理中', '已退回'].includes(t.status)).length), 'warn'], ['已关闭', String(xs.filter(t => t.status === '已关闭').length), 'ok'], ['紧急/高等级', String(urgent.length) + ('（' + Math.round(urgent.length * 1000 / Math.max(1, xs.length)) / 10 + '%）'), 'danger']],
+          stats: [['工单数量', String(xs.length), ''], ['平均处理时长', avgDur + ' 小时', ''], ['超时率（' + overN + ' 单）', overRate + '%', overRate > 20 ? 'danger' : 'ok'], ['平均满意度', avgSat ? avgSat + ' / 5' : '—', avgSat >= 4 ? 'ok' : 'warn']],
           opt: {
             tooltip: { trigger: 'item', formatter: q => '<b>' + q.name + '</b><br/>' + q.value + ' 单（' + q.percent + '%）' },
             legend: { bottom: 0, textStyle: { color: SUB } },
@@ -3267,12 +3355,106 @@ const AnalyticsDetailPage = {
             series: STS.map((s, i) => ({ name: s, type: 'bar', stack: 's', itemStyle: { color: [mixHex(pal[0], '#000000', .5), mixHex(pal[0], '#ffffff', .65), pal[0], mixHex(pal[0], '#000000', .25), mixHex(pal[0], '#ffffff', .3), mixHex(pal[0], '#000000', .1), '#cc7a7a'][i] }, data: byT2(s) })),
           },
           opt2Title: '各类型工单状态分布',
-          note: '注：待受理 / 待分派 / 处理中 / 已退回视为待处理；紧急 2h / 高 4h / 中 24h / 低 48h SLA。',
+          note: '注：处理时长 = 提交 → 解决的平均时长（样本：已解决/已关闭工单）；超时 = 未在紧急 2h / 高 4h / 中 24h / 低 48h SLA 内解决或关闭（含仍处理中且已过 SLA 时限）；满意度 = 客户评分（1–5 分）；待受理 / 待分派 / 处理中 / 已退回视为待处理。',
           rows: xs.slice().sort((a, b) => (a.created < b.created ? 1 : -1)),
           cols: [{ p: 'no', l: '工单编号', w: 130, fmt: 'mono' }, { p: 'customer', l: '客户', w: 170, fmt: 'custName' }, { p: 'type', l: '类型', w: 90, fmt: 'tag', tagMap: {} },
             { p: 'priority', l: '问题等级', w: 90, fmt: 'tag', tagMap: { 紧急: 'danger', 高: 'warning', 中: 'primary', 低: 'info' } },
             { p: 'status', l: '状态', w: 110, fmt: 'tag', tagMap: { 待受理: 'info', 待分派: 'info', 处理中: 'primary', 待客户确认: 'warning', 已解决: 'success', 已关闭: 'success', 已退回: 'danger' } },
             { p: 'handler', l: '处理人', w: 100 }, { p: 'created', l: '提交时间', w: 140 }],
+        };
+      }
+      /* --- 销售人员分析 --- */
+      if (props.id === 'staff') {
+        const rowsS = OWNERS.filter(n => passO(n)).map(n => {
+          const cts = store.ext.contracts.filter(c => c.owner === n && c.amount > 0 && SIGNED.includes(c.status) && inM(c.signDate) && passC(c.customer));
+          const ops = store.opps.filter(o => o.owner === n && inM(o.date) && passC(o.customer));
+          const closed = ops.filter(o => o.stage === 'close'), win = closed.filter(o => o.result === '赢单');
+          const acts = store.ext.activities.filter(a => a.owner === n && inM(a.time) && passC(a.customer));
+          return { owner: n, perf: cts.reduce((a, c) => a + c.amount, 0), ctSum: cts.length, oppN: ops.length, winN: win.length,
+            winRate: closed.length ? Math.round(win.length * 1000 / closed.length) / 10 : 0, followN: acts.length,
+            custN: new Set(store.customers.filter(c => c.owner === n && passC(c.name)).map(c => c.no)).size };
+        }).sort((a, b) => b.perf - a.perf);
+        rowsS.forEach((r, i) => { r.rank = String(i + 1); r.ok = r.winRate >= 30; });
+        const best = rowsS[0] || { owner: '—', perf: 0 };
+        return {
+          stats: [['上榜销售', String(rowsS.length), ''], ['业绩第一名', best.owner + '（' + wanT(best.perf) + '）', rowsS.length ? 'ok' : ''],
+            ['合计业绩', wanT(rowsS.reduce((a, b) => a + b.perf, 0)), 'ok'], ['合计跟进次数', String(rowsS.reduce((a, b) => a + b.followN, 0)), '']],
+          opt: {
+            tooltip: { trigger: 'axis' }, legend: { data: ['个人业绩', '赢单率'], textStyle: { color: SUB }, right: 6, top: 0 },
+            grid: { left: 8, right: 14, top: 30, bottom: 4, containLabel: true },
+            xAxis: { type: 'category', data: rowsS.map(r => r.owner), ...axis },
+            yAxis: [{ type: 'value', name: '万元', axisLabel: { color: SUB, fontSize: 11, formatter: v => v / 10000 }, splitLine: axis.splitLine }, { type: 'value', name: '赢单率 %', axisLabel: { color: SUB, fontSize: 11 }, splitLine: { show: false } }],
+            series: [
+              { name: '个人业绩', type: 'bar', barWidth: 30, itemStyle: { color: pal[0] }, data: rowsS.map(r => Math.round(r.perf / 10000 * 10) / 10) },
+              { name: '赢单率', type: 'line', yAxisIndex: 1, symbol: 'circle', symbolSize: 7, itemStyle: { color: pal[3] }, data: rowsS.map(r => r.winRate) } ],
+          },
+          note: '注：个人业绩 = 名下已签署合同金额（签于筛选区间）；商机转化 = 赢单 /（赢单 + 输单）；跟进次数 = 区间内本人名下跟进活动数；排名按个人业绩倒序。',
+          rows: rowsS,
+          cols: [{ p: 'rank', l: '排名', w: 70, fmt: 'tag', tagMap: {} }, { p: 'owner', l: '销售人员', w: 100 }, { p: 'ctSum', l: '签约合同', w: 90 },
+            { p: 'perf', l: '个人业绩', w: 120, fmt: 'money' }, { p: 'oppN', l: '商机数', w: 90 }, { p: 'winN', l: '赢单数', w: 90 },
+            { p: 'winRate', l: '赢单率', w: 110, fmt: 'rate' }, { p: 'followN', l: '跟进次数', w: 100 }, { p: 'custN', l: '负责客户', w: 100 }],
+        };
+      }
+      /* --- 合同分析 --- */
+      if (props.id === 'contract') {
+        const xs = store.ext.contracts.filter(c => c.amount > 0 && inM(c.signDate) && passO(c.owner) && passC(c.customer));
+        const amtSum = xs.reduce((a, c) => a + c.amount, 0);
+        const d30 = extAddDays(TODAY, 30);
+        const dueN = xs.filter(c => c.endDate && c.endDate <= d30 && c.status !== '已完成').length;
+        const STS_C = ['草稿', '待签署', '生效', '履约中', '已完成', '已到期'];
+        const perfN = xs.filter(c => c.status === '生效' || c.status === '履约中').length;
+        const bySign = {}; xs.forEach(c => { bySign[c.signDate.slice(0, 7)] = (bySign[c.signDate.slice(0, 7)] || 0) + c.amount; });
+        return {
+          stats: [['签署数量', String(xs.length), ''], ['合同总金额', wanT(amtSum), 'ok'], ['到期数量（30 天内含已到期）', String(dueN), dueN ? 'danger' : ''],
+            ['履约中（生效+履约中）', perfN + ' / ' + xs.length, perfN / Math.max(1, xs.length) >= .5 ? 'ok' : 'warn']],
+          opt: {
+            tooltip: { trigger: 'item', formatter: q => '<b>' + q.name + '</b><br/>' + q.value + ' 份（' + q.percent + '%）' },
+            legend: { bottom: 0, textStyle: { color: SUB }, itemWidth: 12, type: 'scroll' },
+            series: [{ type: 'pie', center: ['50%', '44%'], radius: ['34%', '66%'], label: { color: SUB, fontSize: 11, formatter: '{b} {d}%' }, itemStyle: { borderColor: cssVar('--card') || '#fff', borderWidth: 2 },
+              data: STS_C.map((k, i) => ({ name: k, value: xs.filter(c => c.status === k).length, itemStyle: { color: pal[i % pal.length] } })).filter(x => x.value) }],
+          },
+          opt2: {
+            tooltip: { trigger: 'axis' }, grid: { left: 6, right: 10, top: 14, bottom: 0, containLabel: true },
+            xAxis: { type: 'category', data: M, ...axis }, yAxis: { type: 'value', name: '万元', axisLabel: { color: SUB, fontSize: 11, formatter: v => v / 10000 }, splitLine: axis.splitLine },
+            series: [{ type: 'bar', barWidth: 22, itemStyle: { color: mixHex(pal[0], '#000000', .3) }, label: { show: true, position: 'top', color: SUB, fontSize: 11 }, data: M.map(m => Math.round((bySign[m] || 0) / 10000 * 10) / 10) }],
+          },
+          opt2Title: '月度签署金额',
+          note: '注：合同金额 = 含税合同金额，按签署日期归集；到期数量 = 到期日期在 30 天内（含已到期）且状态不是已完成；履约情况 = 生效/履约中合同份数；已到期合同状态由到期日期自动判定。',
+          rows: xs.slice().sort((a, b) => (a.signDate < b.signDate ? 1 : -1)),
+          cols: [{ p: 'no', l: '合同编号', w: 130, fmt: 'link', to: 'contract' }, { p: 'customer', l: '客户', w: 180, fmt: 'custName' }, { p: 'type', l: '合同类型', w: 100 },
+            { p: 'amount', l: '合同金额', w: 110, fmt: 'money' }, { p: 'signDate', l: '签署日期', w: 105 }, { p: 'endDate', l: '到期日期', w: 105 },
+            { p: 'status', l: '状态', w: 100, fmt: 'tag', tagMap: { 草稿: 'info', 待签署: 'info', 生效: 'primary', 履约中: 'warning', 已完成: 'success', 已到期: 'danger' } }],
+        };
+      }
+      /* --- 交付分析 --- */
+      if (props.id === 'delivery') {
+        const xs = store.ext.deliveries.filter(d => inM(d.planStart) && passC(d.customer) && passO(d.pm));
+        const done = xs.filter(d => d.status === '已完成' || d.progress >= 100);
+        const delay = xs.filter(d => d.status !== '已完成' && d.planEnd && d.planEnd < TODAY);
+        const acOk = xs.filter(d => d.ac === '已验收');
+        const rate = arr => xs.length ? Math.round(arr.length * 1000 / xs.length) / 10 : 0;
+        const STS_D = ['未启动', '实施中', '验收中', '已完成'];
+        return {
+          stats: [['项目数量', String(xs.length), ''], ['完成率', rate(done) + '%', 'ok'], ['延期率（' + delay.length + ' 个）', rate(delay) + '%', delay.length ? 'danger' : 'ok'], ['验收通过率', rate(acOk) + '%', rate(acOk) >= 30 ? 'ok' : 'crit']],
+          opt: {
+            tooltip: { trigger: 'item', formatter: q => '<b>' + q.name + '</b><br/>' + q.value + ' 个（' + q.percent + '%）' },
+            legend: { bottom: 0, textStyle: { color: SUB }, itemWidth: 12 },
+            series: [{ type: 'pie', center: ['50%', '44%'], radius: ['36%', '64%'], label: { color: SUB, fontSize: 11, formatter: '{b} {d}%' }, itemStyle: { borderColor: cssVar('--card') || '#fff', borderWidth: 2 },
+              data: STS_D.map((k, i) => ({ name: k, value: xs.filter(d => d.status === k).length, itemStyle: { color: pal[i % pal.length] } })).filter(x => x.value) }],
+          },
+          opt2: {
+            tooltip: { trigger: 'axis' }, grid: { left: 6, right: 10, top: 14, bottom: 0, containLabel: true },
+            xAxis: { type: 'category', data: ['已验收', '阶段验收中', '未验收'], ...axis }, yAxis: { type: 'value', ...axis },
+            series: [{ type: 'bar', barWidth: 34, itemStyle: { color: mixHex(pal[0], '#000000', .35) }, label: { show: true, position: 'top', color: SUB, fontSize: 11 },
+              data: [acOk.length, xs.filter(d => d.ac === '阶段验收中').length, xs.filter(d => d.ac === '未验收').length] }],
+          },
+          opt2Title: '验收情况',
+          note: '注：项目数量按计划开始日期统计；延期 = 计划结束日期早于今天且项目未完成（触发预警并记录延期原因，第十二章）；验收状态由项目里程碑完成情况推导；进度 = 已完成里程碑的估算进度。',
+          rows: xs.slice().sort((a, b) => (a.planEnd > b.planEnd ? 1 : -1)),
+          cols: [{ p: 'no', l: '项目编号', w: 130, fmt: 'mono' }, { p: 'name', l: '项目名称', w: 190 }, { p: 'customer', l: '客户', w: 170, fmt: 'custName' },
+            { p: 'status', l: '状态', w: 90, fmt: 'tag', tagMap: { 未启动: 'info', 实施中: 'primary', 验收中: 'warning', 已完成: 'success' } },
+            { p: 'progress', l: '进度（%）', w: 90 }, { p: 'planStart', l: '计划开始', w: 105 }, { p: 'planEnd', l: '计划结束', w: 105 },
+            { p: 'ac', l: '验收状态', w: 100, fmt: 'tag', tagMap: { 已验收: 'success', 阶段验收中: 'warning', 未验收: 'info' } }, { p: 'pm', l: '项目经理', w: 90 }],
         };
       }
       return { stats: [], opt: {}, rows: [], cols: [], note: '' };
@@ -3282,10 +3464,10 @@ const AnalyticsDetailPage = {
     const paged = computed(() => rowsF.value.slice((page.value - 1) * size.value, page.value * size.value));
     const tagType = (c, v) => (c.tagMap || {})[v] || 'info';
     const gotoCust = row => { const no = cno(row.customer); if (no && no !== 'NA') return go('/customer/' + no); ElMessage.info('该客户未建档（线索阶段）'); };
-    const goto = () => {};
     const cellLink = (row, c) => { if (c.to === 'contract') return go('/contract/' + row.no); if (row.no) return go('/opp/' + row.no); };
     const fmtMoney = v => typeof v === 'number' ? yuan(Math.round(v)) : (v || '¥0');
-    return { rep, period, owner, months, page, size, data, rowsF, paged, tagType, gotoCust, cellLink, fmtMoney, AN_REPORTS };
+    return { rep, period, owner, months, page, size, data, rowsF, paged, tagType, gotoCust, cellLink, fmtMoney, AN_REPORTS,
+      dept, ctype, csrc, cind, creg, anDepts, anCtypes, anCsrcs, anInds, anRegs, clearF };
   },
   template: `<div>
     <page-head :crumbs="[{t:'数据分析',to:'/analytics'},'报表详情 · ' + (rep ? rep.name : '')]" title="报表详情" :total="rep ? rep.metric : ''">
@@ -3293,6 +3475,17 @@ const AnalyticsDetailPage = {
       <el-select v-model="owner" clearable placeholder="全部负责人" style="width:130px;margin-right:8px"><el-option v-for="o in OWNERS" :key="o" :label="o" :value="o"/></el-select>
       <el-button icon="Download" @click="$msg.info('示例：导出报表（含明细）')">导出</el-button>
     </page-head>
+    <div class="card query" style="margin-bottom:14px">
+      <el-form inline>
+        <el-form-item label="部门"><el-select v-model="dept" clearable placeholder="全部" style="width:150px"><el-option v-for="d in anDepts" :key="d" :label="d" :value="d"/></el-select></el-form-item>
+        <el-form-item label="客户类型"><el-select v-model="ctype" clearable placeholder="全部" style="width:120px"><el-option v-for="t in anCtypes" :key="t" :label="t" :value="t"/></el-select></el-form-item>
+        <el-form-item label="客户来源"><el-select v-model="csrc" clearable filterable placeholder="全部" style="width:130px"><el-option v-for="t in anCsrcs" :key="t" :label="t" :value="t"/></el-select></el-form-item>
+        <el-form-item label="行业"><el-select v-model="cind" clearable filterable placeholder="全部" style="width:160px"><el-option v-for="t in anInds" :key="t" :label="t" :value="t"/></el-select></el-form-item>
+        <el-form-item label="区域"><el-select v-model="creg" clearable filterable placeholder="全部" style="width:150px"><el-option v-for="t in anRegs" :key="t" :label="t" :value="t"/></el-select></el-form-item>
+        <el-button icon="Refresh" style="margin-top:22px" @click="clearF">重置筛选</el-button>
+        <span class="muted" style="margin-left:12px;font-size:12px;line-height:2.2">统一筛选（5.14）：按单据关联客户的类型/来源/行业/区域与数据负责人的部门过滤；未建档客户（线索阶段）在启用客户维度筛选时不计入报表。</span>
+      </el-form>
+    </div>
     <div class="stat-row" style="grid-template-columns:repeat(4,1fr)">
       <div class="stat-card" v-for="s in data.stats" :key="s[0]" :class="s[2]"><span class="lb">{{ s[0] }}</span><span class="vl">{{ s[1] }}</span><span class="ft">随筛选实时计算</span></div>
     </div>
@@ -3383,6 +3576,23 @@ const AT_TEMPLATE_INIT = [
     nodes: [ { name: '财务负责人', type: '指定角色', role: '财务负责人', person: '', cond: '' },
       { name: '总经理', type: '指定人', role: '', person: '周总监', cond: '冲销金额 > 20 万元时加签' } ],
     cc: [], timeout: 12, reject: '自动驳回', on: true },
+  { name: '商机特殊折扣审批', desc: '商机折扣超出销售授权时进入审批（规划方案 7.2 商机特殊折扣）',
+    nodes: [ { name: '销售经理', type: '直属经理', role: '', person: '', cond: '' },
+      { name: '销售总监', type: '指定角色', role: '销售总监', person: '', cond: '折扣 > 10% 或预计金额 > 50 万元时加签' } ],
+    cc: ['李琴'], timeout: 48, reject: '退回修改', on: true },
+  { name: '低价报价审批', desc: '报价低于产品最低限价时进入总监或财务审批（规划方案 7.2 低价报价）',
+    nodes: [ { name: '销售总监', type: '指定角色', role: '销售总监', person: '', cond: '低于最低限价时触发' },
+      { name: '财务负责人', type: '指定角色', role: '财务负责人', person: '', cond: '低于最低限价 5% 以上或含税金额 > 30 万元时加签' } ],
+    cc: ['王芳'], timeout: 24, reject: '退回修改', on: true },
+  { name: '合同变更审批', desc: '合同金额、期限、范围变化时重新走相应审批（规划方案 7.2 合同变更）',
+    nodes: [ { name: '业务负责人', type: '直属经理', role: '', person: '', cond: '' },
+      { name: '法务', type: '指定角色', role: '法务', person: '', cond: '条款或范围变化时必审' },
+      { name: '财务', type: '指定人', role: '', person: '王芳', cond: '金额变化 > 10 万元时加签' } ],
+    cc: ['李琴'], timeout: 24, reject: '退回修改', on: true },
+  { name: '合同终止审批', desc: '合同提前终止或解除时进入指定负责人和管理层审批（规划方案 7.2 合同终止）',
+    nodes: [ { name: '指定负责人', type: '指定人', role: '', person: '李四', cond: '' },
+      { name: '管理层', type: '指定人', role: '', person: '周总监', cond: '合同金额 > 50 万元或提前终止时加签' } ],
+    cc: [], timeout: 48, reject: '自动驳回', on: true },
 ];
 function atRead() {
   let v = null;
@@ -3535,6 +3745,11 @@ const ApprovalStatsPage = {
       const a = rows.value; if (!a.length) return 0;
       return Math.round(a.filter(r0 => r0.status === '已通过').length * 1000 / a.length) / 10;
     });
+    const rejectRate = computed(() => {
+      const a = rows.value; if (!a.length) return 0;
+      return Math.round(a.filter(r0 => r0.status === '已驳回').length * 1000 / a.length) / 10;
+    });
+    const totalN = computed(() => rows.value.length);
     const otN = computed(() => (rows.value.filter(r0 => r0.ot)).length);
     const pal = AN_PAL();
     const optType = computed(() => {
@@ -3579,16 +3794,18 @@ const ApprovalStatsPage = {
     const otTag = r0 => r0.ot ? 'danger' : 'info';
     const stTag = r0 => r0.status === '已通过' ? 'success' : 'danger';
     const atTypes = [...new Set(AT.map(r0 => r0.type))];
-    return { fType, fOt, rows, paged, page, size, todoN, avgH, passRate, otN, optType, optMonth, optWho, otTag, stTag, atTypes };
+    return { fType, fOt, rows, paged, page, size, todoN, avgH, passRate, rejectRate, totalN, otN, optType, optMonth, optWho, otTag, stTag, atTypes };
   },
   template: `<div>
     <page-head :crumbs="['审批管理','审批统计']" title="审批统计" :total="'待办 '+todoN+' 项 · 历史 ' + rows.length + ' 条审批流水'">
       <el-button @click="$go('/approvals')">返回审批中心</el-button>
     </page-head>
-    <div class="stat-row" style="grid-template-columns:repeat(4,1fr)">
+    <div class="stat-row" style="grid-template-columns:repeat(6,1fr)">
       <div class="stat-card warn"><span class="lb">待我审批</span><span class="vl">{{ todoN }}</span><span class="ft">来自审批中心实时数据</span></div>
+      <div class="stat-card"><span class="lb">审批数量</span><span class="vl">{{ totalN }}</span><span class="ft">当前筛选历史流水</span></div>
       <div class="stat-card"><span class="lb">平均处理时长</span><span class="vl">{{ avgH }} 小时</span><span class="ft">历史审批流水均值</span></div>
       <div class="stat-card ok"><span class="lb">通过率</span><span class="vl">{{ passRate }}%</span><span class="ft">已通过 / 总数</span></div>
+      <div class="stat-card danger"><span class="lb">驳回率</span><span class="vl">{{ rejectRate }}%</span><span class="ft">已驳回 / 总数</span></div>
       <div class="stat-card danger"><span class="lb">超时数</span><span class="vl">{{ otN }}</span><span class="ft">处理时长 &gt; 48 小时</span></div>
     </div>
     <div class="card query">
@@ -3628,6 +3845,16 @@ const ApprovalsPage = {
     const list = computed(() => store.approvals.filter(a => a.tab === tab.value));
     const count = k => store.approvals.filter(a => a.tab === k).length;
     const cur = computed(() => store.approvals.find(a => a.id === sel.value));
+    const avgH = computed(() => {
+      const rows = typeof atStatRows === 'function' ? atStatRows() : [];
+      if (!rows.length) return '0.0';
+      return (rows.reduce((s, r) => s + r.hours, 0) / rows.length).toFixed(1);
+    });
+    const rejectRate = computed(() => {
+      const doneRows = store.approvals.filter(a => a.tab === 'done');
+      if (!doneRows.length) return '0.0';
+      return (doneRows.filter(a => a.result === '已拒绝' || a.result === '已退回修改').length * 100 / doneRows.length).toFixed(1);
+    });
     watch(tab, () => { const l = list.value; if (l.length && !l.find(a => a.id === sel.value)) sel.value = l[0].id; });
     const dlg = reactive({ show: false, kind: '', opinion: '', user: '' });
     const KIND = { approve: ['同意', 'success'], reject: ['拒绝', 'danger'], back: ['退回修改', 'warning'], transfer: ['转交', 'primary'], sign: ['加签', 'primary'], cc: ['抄送', 'info'] };
@@ -3654,7 +3881,7 @@ const ApprovalsPage = {
     };
     const resTag = a => (a.result || '').startsWith('已同意') ? 'success' : a.result ? 'danger' : 'warning';
     const nodeIcon = n => ({ done: '✓', cur: '●', rej: '✕', skip: '—', wait: '' }[n.st]);
-    return { tab, TABS, list, count, cur, sel, dlg, KIND, act, need, needUser, submit, resTag, nodeIcon, fmtC, canAct: computed(() => tab.value === 'todo' && cur.value && cur.value.tab === 'todo') };
+    return { tab, TABS, list, count, cur, sel, dlg, KIND, act, need, needUser, submit, resTag, nodeIcon, fmtC, avgH, rejectRate, canAct: computed(() => tab.value === 'todo' && cur.value && cur.value.tab === 'todo') };
   },
   template: `<div>
     <page-head :crumbs="['工作台', '审批中心']" title="审批中心" :total="'待我审批 '+count('todo')+' 项'"><el-button icon="Setting" @click="$go('/approvals/templates')">审批模板</el-button><el-button icon="DataLine" @click="$go('/approvals/stats')">审批统计</el-button></page-head>
@@ -3662,8 +3889,8 @@ const ApprovalsPage = {
       <div class="stat-card warn"><span class="lb">待我审批</span><span class="vl">{{ count('todo') }}</span><span class="ft">需及时处理</span></div>
       <div class="stat-card"><span class="lb">我发起的</span><span class="vl">{{ count('mine') }}</span><span class="ft">审批中 / 已完成</span></div>
       <div class="stat-card ok"><span class="lb">我已审批</span><span class="vl">{{ count('done') }}</span><span class="ft">本月累计</span></div>
-      <div class="stat-card"><span class="lb">平均审批用时</span><span class="vl">4.2 小时</span><span class="ft">近 30 天</span></div>
-      <div class="stat-card danger"><span class="lb">驳回率</span><span class="vl">12.5%</span><span class="ft">近 30 天</span></div>
+      <div class="stat-card"><span class="lb">平均审批用时</span><span class="vl">{{ avgH }} 小时</span><span class="ft">历史流水均值</span></div>
+      <div class="stat-card danger"><span class="lb">驳回率</span><span class="vl">{{ rejectRate }}%</span><span class="ft">已拒绝 / 已处理</span></div>
     </div>
     <div class="appr-wrap">
       <div class="card">
@@ -9406,7 +9633,8 @@ const TicketDetailPage = {
 registerRoute('/ticket/:no', TicketDetailPage, 'ticket-detail');
 
 /* ===== 第 6 阶段：系统管理（用户管理 / 角色权限 / 组织架构 / 操作日志） + 用户详情页 ===== */
-const SYS_PAGES = { users: '用户管理', roles: '角色权限', org: '组织架构', logs: '操作日志' };
+const SYS_PAGES = { users: '用户管理', roles: '角色权限', org: '组织架构', dict: '字典管理', num: '编号规则', notify: '通知与提醒', logs: '操作日志' };
+const SYS_TITLE = { users: '用户管理', roles: '角色权限', org: '组织架构', dict: '字典管理', num: '编号规则', notify: '通知与提醒', logs: '操作日志' };
 const SYS_DATA_SCOPE = ['本人', '本部门', '本部门及下级', '全部'];
 const SYS_MASK_OPTS = ['合同-成本价', '报价-毛利率', '回款-全部', '报价-折扣明细', '跟进-内容脱敏', '合同-金额明细', '回款-财务备注'];
 const SYS_BTN_OPTS = ['新增', '编辑', '删除', '导出', '导入', '作废', '记录跟进', '折扣审批', '合同审批', '回款确认', '客户转移', '线索分配', '全部'];
@@ -9543,25 +9771,111 @@ const SystemPage = {
     const actTag = act => ({ 新建: 'success', 编辑: 'primary', 登录: 'info', 作废: 'danger', 回收: 'warning' }[act] || 'warning');
 
     const crumbs = computed(() => ['系统管理', SYS_PAGES[props.tab] || '用户管理']);
-    const tabPath = { users: '/system', roles: '/system/roles', org: '/system/org', logs: '/system/logs' };
+    const tabPath = { users: '/system', roles: '/system/roles', org: '/system/org', dict: '/system/dict', num: '/system/numbers', notify: '/system/notice', logs: '/system/logs' };
     const onTab = t => { if (tabPath[t]) go(tabPath[t]); };
+
+    /* ---------- 字典管理（8.1 业务参数 / 第八章 字典管理） ---------- */
+    const SYS_DICT_BASE = {
+      线索来源: ['官网', '广告', '活动', '转介绍', '渠道'],
+      客户类型: ['企业客户', '个人客户', '渠道客户'],
+      客户等级: ['战略客户', '重点客户', '普通客户', '潜在客户'],
+      客户行业: [...new Set(store.customers.map(c => c.industry).filter(Boolean))],
+      客户状态: ['正常', '跟进中', '暂停合作', '流失'],
+      客户规模: ['大型', '中型', '小型'],
+      商机阶段: STAGES.map(s => s.name),
+    };
+    const dictCats = Object.keys(SYS_DICT_BASE);
+    const dictK = ref('线索来源');
+    const dictOff = reactive({});
+    const dictExtra = reactive({});
+    dictCats.forEach(k => { dictExtra[k] = []; SYS_DICT_BASE[k].forEach(v => { dictOff[k + '|' + v] = false; }); });
+    const dictRows = computed(() => {
+      const k = dictK.value, base = (SYS_DICT_BASE[k] || []).map(o => ({ val: o, base: true, prob: k === '商机阶段' ? ((STAGES.find(s => s.name === o) || {}).prob || 0) + '%' : '' }));
+      const extra = dictExtra[k].map(o => ({ val: o, base: false, prob: '' }));
+      return base.concat(extra);
+    });
+    const dictAddV = ref('');
+    const sysLog = (act, detail) => store.ext.logs.unshift({ time: sysNow(), who: '管理员', module: '系统', act, detail, ip: '10.20.0.5' });
+    const dictIsOff = row => !!dictOff[dictK.value + '|' + row.val];
+    const dictToggle = row => {
+      const k = dictK.value + '|' + row.val;
+      dictOff[k] = !dictOff[k];
+      sysLog('编辑', (dictOff[k] ? '停用' : '启用') + '字典「' + dictK.value + '」选项「' + row.val + '」');
+      ElMessage.success('已' + (dictOff[k] ? '停用' : '启用') + '选项「' + row.val + '」');
+    };
+    const dictDel = row => {
+      if (row.base) return ElMessage.warning('内置字典选项不可删除，正式版删除前将校验引用（先停用）');
+      dictExtra[dictK.value] = dictExtra[dictK.value].filter(o => o !== row.val);
+      sysLog('删除', '删除字典「' + dictK.value + '」新增选项「' + row.val + '」'); ElMessage.success('已删除「' + row.val + '」');
+    };
+    const dictAdd = () => {
+      const k = dictK.value, v = dictAddV.value.trim();
+      if (!v) return ElMessage.warning('请输入选项名称');
+      if ((SYS_DICT_BASE[k] || []).includes(v) || dictExtra[k].includes(v)) return ElMessage.warning('选项「' + v + '」已存在');
+      dictExtra[k].push(v); dictOff[k + '|' + v] = false; dictAddV.value = '';
+      sysLog('新建', '在字典「' + k + '」中新增选项「' + v + '」'); ElMessage.success('字典选项「' + v + '」已加入「' + k + '」');
+    };
+
+    /* ---------- 编号规则（第八章 编号规则 / 9.4 全局唯一编号） ---------- */
+    const ntfChOpts = ['站内消息', '邮件', '短信'];
+    const numRows = reactive([
+      { name: '客户编号', prefix: 'KH', fmt: 'YYYY-MM', digits: 4 },
+      { name: '联系人编号', prefix: 'LX', fmt: '无日期', digits: 6 },
+      { name: '线索编号', prefix: 'XS', fmt: 'YYYY-MM', digits: 4 },
+      { name: '商机编号', prefix: 'SJ', fmt: 'YYYY-MM', digits: 4 },
+      { name: '报价编号', prefix: 'BJ', fmt: 'YYYY-MM', digits: 4 },
+      { name: '合同编号', prefix: 'HT', fmt: 'YYYY-MM', digits: 4 },
+      { name: '订单编号', prefix: 'DD', fmt: 'YYYY-MM', digits: 4 },
+      { name: '工单编号', prefix: 'GD', fmt: 'YYYY-MM', digits: 4 },
+      { name: '项目编号', prefix: 'XM', fmt: 'YYYY-MM', digits: 4 },
+      { name: '活动编号', prefix: 'GJ', fmt: 'YYYYMMDD', digits: 3 },
+    ]);
+    const numEx = r => r.prefix + '-' + (r.fmt === 'YYYY-MM' ? TODAY.slice(0, 7) : r.fmt === 'YYYYMMDD' ? TODAY.replace(/-/g, '') : '') + '-' + extPad(1, r.digits);
+    const numFmts = ['YYYY-MM', 'YYYYMMDD', '无日期'];
+    const numSave = () => {
+      sysLog('编辑', '保存编号规则（' + numRows.map(r => r.name + ' ' + numEx(r)).join('；') + '）');
+      ElMessage.success('编号规则已保存，新单据按新规则取号（原型演示，写回正式编号服务）');
+    };
+
+    /* ---------- 通知与提醒（8.1 回款节点及逾期提醒 / 第十二章 自动提醒） ---------- */
+    const ntfRows = reactive([
+      { name: '客户超期未跟进提醒', on: true, days: 7, ch: ['站内消息', '邮件'], note: '超过天数无有效跟进时提醒客户负责人，与公海回收规则联动（公海规则页可配置回收阈值）' },
+      { name: '商机停滞提醒', on: true, days: 14, ch: ['站内消息', '邮件'], note: '商机超过天数未推进时自动提醒负责人，支持经理介入（商机分析报表中的「停滞商机」）' },
+      { name: '回款逾期提醒', on: true, days: 3, ch: ['站内消息', '邮件', '短信'], note: '计划回款日期前 N 天提醒客户负责人与财务，逾期后可配置升级提醒（回款管理 5.8）' },
+      { name: '到期合同提醒', on: true, days: 30, ch: ['站内消息', '邮件'], note: '合同到期前 N 天提醒负责人，数据同步到合同分析报表「到期数量」' },
+      { name: '工单 SLA 超时提醒', on: true, hours: 2, ch: ['站内消息'], note: '工单超过 SLA 剩余时限 N 小时提醒处理人，未处理升级通知主管（第十二章：客户投诉升级）' },
+    ]);
+    const ntfSave = () => {
+      const onN = ntfRows.filter(n => n.on).length;
+      sysLog('编辑', '保存通知与提醒规则：' + onN + ' 条启用 ' + ntfRows.map(n => n.name + (n.on ? '（' + (n.hours !== undefined ? 'SLA 前 ' + n.hours + ' 小时' : '提前 ' + n.days + ' 天') + '）' : '')).join('、'));
+      ElMessage.success('提醒规则已保存：' + onN + ' 条启用，渠道含站内消息/邮件/短信');
+    };
+
     return { crumbs, tabPath, onTab, SYS_MENU_TREE, SYS_BTN_OPTS, SYS_MASK_OPTS, SYS_DATA_SCOPE, store,
       uQ, uPage, uSize, uDepts, uRoles, uFiltered, uPaged, uStats, uDlg, uForm, uRef, uRules, uOpen, uSave, uToggle, uDrawer, uShow, uLogs, actTag,
       roleK, roleTree, role, rData, roleSave,
       orgT, oDlg, oForm, oSave,
-      lQ, lPage, lSize, lWho, lMod, lFiltered, lPaged, lStats };
+      lQ, lPage, lSize, lWho, lMod, lFiltered, lPaged, lStats,
+      dictCats, dictK, dictRows, dictIsOff, dictToggle, dictDel, dictAdd, dictAddV,
+      numRows, numEx, numFmts, numSave, extPad,
+      ntfRows, ntfChOpts, ntfSave, SYS_TITLE };
   },
   template: `<div>
-    <page-head :crumbs="crumbs" :title="tab==='users' ? '用户管理' : (tab==='roles' ? '角色权限' : tab==='org' ? '组织架构' : '操作日志')" :total="tab==='users' ? ('用户共 '+uFiltered.length+' 人（真实分页）') : (tab==='logs' ? ('日志共 '+lFiltered.length+' 条') : '')">
+    <page-head :crumbs="crumbs" :title="SYS_TITLE[tab] || '用户管理'" :total="tab==='users' ? ('用户共 '+uFiltered.length+' 人（真实分页）') : (tab==='logs' ? ('日志共 '+lFiltered.length+' 条') : '')">
       <el-button v-if="tab==='users'" type="primary" icon="Plus" @click="uOpen(null)">新增用户</el-button>
       <el-button v-if="tab==='org'" type="primary" icon="Plus" @click="oForm.parent='某某软件有限公司';oDlg=true">新增部门</el-button>
       <el-button v-if="tab==='logs'" icon="Download" @click="$msg.info('示例：导出操作日志（Excel）')">导出</el-button>
       <el-button v-if="tab==='roles'" type="primary" icon="Check" @click="roleSave">保存权限</el-button>
+      <el-button v-if="tab==='num'" type="primary" icon="Check" @click="numSave">保存编号规则</el-button>
+      <el-button v-if="tab==='notify'" type="primary" icon="Check" @click="ntfSave">保存提醒规则</el-button>
     </page-head>
     <el-tabs :model-value="tab" @tab-click="t => onTab(t.name)">
       <el-tab-pane name="users" label="用户管理"/>
       <el-tab-pane name="roles" label="角色权限"/>
       <el-tab-pane name="org" label="组织架构"/>
+      <el-tab-pane name="dict" label="字典管理"/>
+      <el-tab-pane name="num" label="编号规则"/>
+      <el-tab-pane name="notify" label="通知与提醒"/>
       <el-tab-pane name="logs" label="操作日志"/>
     </el-tabs>
 
@@ -9692,6 +10006,94 @@ const SystemPage = {
       </div>
     </template>
 
+    <!-- 字典管理（8.1 业务参数 / 第八章 字典管理） -->
+    <template v-else-if="tab==='dict'">
+      <div style="display:grid;grid-template-columns:220px minmax(0,1fr);gap:14px;align-items:start">
+        <div class="card">
+          <div v-for="k in dictCats" :key="k" @click="dictK=k"
+            style="padding:12px 14px;border-bottom:1px solid var(--line);cursor:pointer"
+            :style="dictK===k ? 'background:var(--el-color-primary-light-9);border-left:3px solid var(--el-color-primary)' : 'border-left:3px solid transparent'">
+            <b style="font-size:14px">{{ k }}</b>
+            <div class="muted" style="font-size:12px;margin-top:2px">{{ k === '商机阶段' ? '阶段与概率（8.1）' : '枚举选项配置' }}</div>
+          </div>
+        </div>
+        <div class="card table-card">
+          <div style="padding:12px 14px;display:flex;align-items:center;gap:10px">
+            <span class="sec-title" style="margin:0">「{{ dictK }}」选项</span>
+            <span class="muted" style="font-size:12px">停用的选项不再出现在相关表单中（原型演示，正式版同步新表表单与导入模板）；商机阶段概率需要在阶段配置中调整（8.1）。</span>
+          </div>
+          <div style="padding:0 14px 12px;display:flex;gap:8px">
+            <el-input v-model="dictAddV" placeholder="新增选项名称，如：抖音" style="width:220px" @keyup.enter="dictAdd"/>
+            <el-button type="primary" icon="Plus" @click="dictAdd">新增选项</el-button>
+          </div>
+          <el-table :data="dictRows" style="width:100%" :header-cell-style="{height:'42px'}" :empty-text="'「' + dictK + '」暂无选项'">
+            <el-table-column prop="val" label="选项值" min-width="180"/>
+            <el-table-column label="附加信息" min-width="110"><template #default="{row}"><span v-if="row.prob">阶段概率 {{ row.prob }}</span><span v-else class="muted">—</span></template></el-table-column>
+            <el-table-column label="状态" min-width="90"><template #default="{row}"><el-tag size="small" :type="dictIsOff(row)?'info':'success'" effect="light">{{ dictIsOff(row)?'停用':'启用' }}</el-tag></template></el-table-column>
+            <el-table-column label="操作" min-width="150">
+              <template #default="{row}">
+                <el-button link :type="dictIsOff(row)?'success':'warning'" @click="dictToggle(row)">{{ dictIsOff(row)?'启用':'停用' }}</el-button>
+                <el-button link type="danger" :disabled="row.base" @click="dictDel(row)">删除</el-button>
+                <span v-if="row.base" class="muted" style="font-size:12px;margin-left:6px">内置</span>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </div>
+    </template>
+
+    <!-- 编号规则（9.4 全局唯一编号） -->
+    <template v-else-if="tab==='num'">
+      <div class="card table-card">
+        <div style="padding:12px 14px">
+          <span class="sec-title" style="margin:0">编号规则</span>
+          <span class="muted" style="font-size:12px;margin-left:8px">客户、商机、合同、订单等对象全局唯一编号（9.4）；修改只影响之后的新单据，历史数据不变。</span>
+        </div>
+        <el-table :data="numRows" style="width:100%" :header-cell-style="{height:'42px'}">
+          <el-table-column prop="name" label="对象" min-width="120"/>
+          <el-table-column prop="prefix" label="前缀" min-width="80"><template #default="{row}"><span class="mono">{{ row.prefix }}</span></template></el-table-column>
+          <el-table-column label="日期格式" min-width="140">
+            <template #default="{row}">
+              <el-select v-model="row.fmt" style="width:120px" size="small"><el-option v-for="f in numFmts" :key="f" :label="f" :value="f"/></el-select>
+            </template>
+          </el-table-column>
+          <el-table-column label="序号位数" min-width="120">
+            <template #default="{row}">
+              <el-select v-model="row.digits" style="width:100px" size="small"><el-option :label="'3 位'" :value="3"/><el-option :label="'4 位'" :value="4"/><el-option :label="'6 位'" :value="6"/></el-select>
+            </template>
+          </el-table-column>
+          <el-table-column label="规则示例" min-width="180"><template #default="{row}"><span class="mono">{{ numEx(row) }}</span></template></el-table-column>
+          <el-table-column label="说明" min-width="220"><template #default="{row}"><span class="muted" style="font-size:12px">{{ {无日期: '连续序号，不分周期'}[row.fmt] || '按 ' + row.fmt + ' 月份重置序号' }}</span></template></el-table-column>
+        </el-table>
+      </div>
+      <el-alert type="info" show-icon :closable="false" style="margin-top:14px" title="说明" description="保存后新单据按新规则取号并保持全局唯一（原型演示由前端写示例日志；正式版编号在校验唯一后写入）。"/>
+    </template>
+
+    <!-- 通知与提醒（8.1 / 12 章 自动化提醒规则） -->
+    <template v-else-if="tab==='notify'">
+      <div class="card table-card">
+        <div style="padding:12px 14px">
+          <span class="sec-title" style="margin:0">自动化提醒规则</span>
+          <span class="muted" style="font-size:12px;margin-left:8px">每条规则支持启用/停用、阈值与通知渠道（站内消息 / 邮件 / 短信）；执行结果进入站内消息与操作日志。</span>
+        </div>
+        <el-table :data="ntfRows" style="width:100%" :header-cell-style="{height:'42px'}">
+          <el-table-column prop="name" label="提醒规则" min-width="170"/>
+          <el-table-column label="启用" width="80"><template #default="{row}"><el-switch v-model="row.on"/></template></el-table-column>
+          <el-table-column label="阈值" min-width="150">
+            <template #default="{row}">
+              <span v-if="row.hours !== undefined" style="display:flex;align-items:center;gap:6px"><el-input-number v-model="row.hours" :min="1" :max="72" size="small" style="width:100px"/>小时</span>
+              <span v-else style="display:flex;align-items:center;gap:6px"><el-input-number v-model="row.days" :min="1" :max="90" size="small" style="width:100px"/>天</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="通知渠道" min-width="200">
+            <template #default="{row}"><el-checkbox-group v-model="row.ch" size="small"><el-checkbox v-for="c in ntfChOpts" :key="c" :label="c">{{ c }}</el-checkbox></el-checkbox-group></template>
+          </el-table-column>
+          <el-table-column prop="note" label="规则说明" min-width="330" show-overflow-tooltip/>
+        </el-table>
+      </div>
+      <el-alert type="info" show-icon :closable="false" style="margin-top:14px" title="说明" description="客户/线索回收周期、商机阶段概率等业务参数在公海规则与字典管理中配置；本页规则触发后写入操作日志，超时升级按规则通知主管（第十二章）。"/>
+    </template>
+
     <!-- 操作日志 -->
     <template v-else-if="tab==='logs'">
       <div class="stat-row" style="grid-template-columns:repeat(4,1fr)">
@@ -9816,6 +10218,9 @@ const UserDetailPage = {
 registerRoute('/system', SystemPage, 'system', () => ({ tab: 'users' }));
 registerRoute('/system/roles', SystemPage, 'system', () => ({ tab: 'roles' }));
 registerRoute('/system/org', SystemPage, 'system', () => ({ tab: 'org' }));
+registerRoute('/system/dict', SystemPage, 'system', () => ({ tab: 'dict' }));
+registerRoute('/system/numbers', SystemPage, 'system', () => ({ tab: 'num' }));
+registerRoute('/system/notice', SystemPage, 'system', () => ({ tab: 'notify' }));
 registerRoute('/system/logs', SystemPage, 'system', () => ({ tab: 'logs' }));
 registerRoute('/system/user/:id', UserDetailPage, 'user-detail');
 
@@ -11370,120 +11775,375 @@ const PZ_DOC_PC_CFG = {
     ]
   },
 
+  'analytics': {
+    name: '经营报表', module: '数据分析',
+    goal: '按照「老板看经营、经理看团队、销售看个人、财务看回款、客服看服务」的原则提供经营报表入口：以卡片列出 12 张核心报表（销售总览 / 销售漏斗 / 业绩目标达成 / 商机分析 / 销售人员分析 / 客户分析 / 线索分析 / 合同分析 / 回款分析 / 活动效率 / 服务分析 / 交付分析），点击进入报表详情查看核心指标、统一筛选、统计口径与真实明细（5.14）。',
+    roles: [
+      '菜单：老板 / 企业负责人通过「数据分析 → 经营报表」查看全部报表，数据范围为全部数据（第三章）。',
+      '菜单：销售经理可查看销售漏斗、业绩目标、商机分析、销售人员分析、合同分析等销售类报表，数据范围为本部门及下级。',
+      '菜单：财务经查看回款分析并导出；客服经查看服务分析；管理层查看授权范围内经营报表。',
+      '按钮：导出按按钮权限控制，正式接口按当前筛选条件导出图表与明细并执行数据权限与字段脱敏。',
+      '数据：所有角色只能看到数据权限范围内客户、商机、合同、回款、线索、活动、工单、交付聚合后的结果，越权查询被拦截并记录安全日志（第十二章）。'
+    ],
+    enter: [
+      '入口：左侧导航「数据分析 → 经营报表」，路由 /analytics。',
+      '关联入口：工作台漏斗 / 业绩卡片中的「查看报表」链接、客户详情关联数据跳转。',
+      '跳转：报表卡片 → /analytics/:id（12 张报表 id：overview / funnel / target / opps / staff / customer / lead / contract / payment / activity / ticket / delivery）。',
+      '返回：详情页顶部面包屑「数据分析」或明细区「返回报表列表」回到本页。'
+    ],
+    layout: [
+      '顶部：面包屑「数据分析 / 经营报表」、页面标题、报表总数、导出按钮。',
+      '统计卡：可用报表、商机数、在护客户、服务工单四张卡，数字由真实数据计算。',
+      '查询区：关键词搜索（按报表名称 / 核心指标过滤卡片）。',
+      '报表区：12 张报表卡片按 4 列网格排布，每张卡包含图标、报表名、适用角色、核心指标、统计口径摘要与「查看报表 ›」及每日 06:00 更新标注。',
+      '底部：空状态提示（搜索没有匹配报表时显示 el-empty）。'
+    ],
+    fields: [
+      '报表名称｜类型：文本｜必填：是｜校验：与预置报表名单一致，系统本期不支持自定义报表｜说明：卡片标题，对应 /analytics/:id 的路由 id。',
+      '核心指标｜类型：文本｜必填：是｜校验：按 5.14 报表清单列示｜说明：卡片副标题，例如销售总览为「销售额、目标完成率、赢单率、平均成交周期」。',
+      '统计口径｜类型：文本｜必填：是｜校验：每张报表必须写明朝径（销售额按合同签署金额而非订单或收入，5.14）｜说明：卡片内摘要 + 详情页口径注释，禁止混用统计口径。',
+      '适用角色｜类型：枚举文本｜必填：是｜校验：按 5.14「老板看经营、经理看团队…」原则标注｜说明：卡片名称下方展示，如销售总览=老板/管理层。',
+      '更新时间｜类型：日期时间｜必填：是｜校验：离线原型固定 2026-11-02 06:00｜说明：正式版由后台任务按日刷新。'
+    ],
+    rules: [
+      '报表清单按 5.14 补齐为 12 张：销售总览（销售额/目标完成率/赢单率/平均成交周期）、线索分析（线索量/来源分布/有效率/转化率）、客户分析（客户数量/客户等级/客户增长/流失率）、商机分析（商机金额/各阶段金额/赢单率/输单原因）、销售人员分析（个人业绩/跟进次数/商机转化/排名）、合同分析（合同金额/签署数量/到期数量/履约情况）、回款分析（应收金额/已收金额/逾期金额/回款率）、服务分析（工单数量/处理时长/超时率/满意度）、交付分析（项目数量/完成率/延期率/验收通过率），活动效率、销售漏斗与业绩目标作为下钻补充报表。',
+      '所有报表必须说明统计口径且不得混用（5.14「注意」）：销售额按已签署合同金额（履约中/生效/已完成/已到期），已回款按财务已确认到账，卡片摘要与详情注释均写明口径。',
+      '报表数据均由 store 真实数据聚合，不使用写死的假数字；统计卡与明细总数随筛选实时计算。',
+      '报表筛选条件统一为：时间范围、部门、员工、客户类型、客户来源、行业、区域（5.14），在报表详情页统一提供。',
+      '主题切换后图表配色跟随主色变量派生，不写死颜色。'
+    ],
+    flow: [
+      '进入报表：报表卡片点击 → 报表详情（统一筛选 + 指标卡 + 图表 + 明细）→ 明细单据下钻 → 返回报表列表。',
+      '按角色动线：老板 → 销售总览 / 客户分析；经理 → 商机分析 / 销售人员分析；销售 → 个人业绩与漏斗；财务 → 回款分析；客服 → 服务分析；交付 → 交付分析（5.14）。'
+    ],
+    errors: [
+      '搜索没有匹配报表：卡片网格显示 el-empty「没有匹配的报表」，提示清空关键词。',
+      '报表 id 不存在或缺失：详情页统计卡为空、图表空轴，可通过面包屑返回列表（第十二章：异常不白屏）。',
+      '数据权限内无数据：报表显示 0 与空态，不欺骗性展示他人数据（第三章）。',
+      '导出失败：提示重试，不静默丢失数据（第十二章：数据反馈完整性）。'
+    ],
+    api: [
+      '报表聚合接口：按报表 id + 统一筛选条件（时间范围/部门/员工/客户类型/客户来源/行业/区域）返回指标卡数值与图表系列（示例）。',
+      '报表明细接口：返回过滤后明细和真实总条数，总分页（示例）。',
+      '报表导出接口：按当前筛选导出 Excel，服务端做数据权限与字段脱敏（示例）。',
+      '报表刷新任务接口：每日 06:00 重算预置报表（示例）。'
+    ],
+    accept: [
+      '第十四章「报表」：统计口径统一（页面明示销售额/已回款等口径），报表数据与明细可以核对——每张报表的指标卡数值都由明细行聚合且总额一致。',
+      '12 张报表卡片可点击进入对应详情，报表清单覆盖 5.14 表格中全部报表与指标项。',
+      '图表数据与明细总数一致且真实来自数据层，随统一筛选实时联动。',
+      '调整主题后图表配色正确跟随，无控制台报错。'
+    ]
+  },
+
   'analytics-detail': {
     name: '报表详情', module: '数据分析',
-    goal: '对单张经营报表做下钻分析：在统一页面内切换统计周期与负责人，查看核心指标、主题色图表、统计口径说明和真实明细，实现「先看指标、再追单据」的分析动线，覆盖销售漏斗、目标达成、回款、客户、线索、商机赢输、活动效率与服务工单八张预置报表。',
+    goal: '对单张经营报表做下钻分析：在统一页面内使用 5.14 统一筛选项（时间范围、部门、员工、客户类型、客户来源、行业、区域），查看核心指标、主题色图表、统计口径说明和真实明细，实现「先看指标、再追单据」的分析动线；报表 id 覆盖销售总览、销售漏斗、业绩目标、商机分析、销售人员分析、客户分析、线索分析、合同分析、回款分析、活动效率、服务分析、交付分析 12 种。',
     roles: [
-      '菜单：老板/总经理通过「数据分析 → 经营报表」进入全部八张报表详情，拥有全数据范围。',
-      '菜单：销售经理可查看销售漏斗、业绩目标、商机赢输、线索转化等销售类报表，数据范围为本部门及下级。',
-      '按钮：财务可查看回款分析并导出，客服可查看服务工单分析；导出按钮按角色字段权限输出。',
-      '数据：所有角色只能看到数据权限范围内客户、商机、合同、回款、线索、活动与工单聚合后的结果。',
+      '菜单：老板/总经理通过「数据分析 → 经营报表」进入全部报表详情，拥有全数据范围。',
+      '菜单：销售经理可查看销售漏斗、业绩目标、商机分析、销售人员分析等销售类报表，数据范围为本部门及下级（第三章）。',
+      '按钮：财务可查看回款分析并导出，客服可查看服务分析；导出按钮按角色字段权限输出。',
+      '数据：所有角色只能看到数据权限范围内数据聚合的结果；统一筛选中的部门/员工受数据权限约束，越权查询被拦截并记录安全日志（第十二章）。',
       '字段：合同成本价、报价毛利率、回款财务备注等敏感字段按角色脱敏，明细中不展示无权限字段。'
     ],
     enter: [
       '入口：左侧导航「数据分析 → 经营报表」，在报表卡片网格中点击任意卡片，跳转 /analytics/:id 并传入报表 id。',
-      '返回：点击顶部面包屑「数据分析」或页面右下「返回报表列表」回到 /analytics。',
-      '下钻：明细中的商机编号、合同编号、客户名称分别跳转 /opp/:no、/contract/:no、/customer/:no；线索阶段客户未建档时提示「该客户未建档」。'
+      '返回：点击顶部面包屑「数据分析」或明细区「返回报表列表」回到 /analytics。',
+      '下钻：明细中的商机编号、合同编号、客户名称分别跳转 /opp/:no、/contract/:no、/customer/:no；线索阶段客户未建档时提示「该客户未建档（线索阶段）」。'
     ],
     layout: [
-      '顶部：面包屑「数据分析 / 报表详情 · 报表名」、报表核心指标副标题，以及统计周期下拉、负责人下拉和导出按钮。',
-      '统计卡行：四张核心指标卡，随报表 id 与筛选条件实时变化，例如漏斗的商机总数/预计总金额/覆盖客户/报价后阶段占比。',
-      '图表区：左侧主图表（漏斗、柱线、饼图或堆叠柱），右侧辅助图表（如客户等级分布、输单原因、工单状态）或报表口径说明与数据说明提示。',
+      '顶部：面包屑「数据分析 / 报表详情 · 报表名」、报表核心指标副标题，以及统计周期下拉、负责人（员工）下拉和导出按钮。',
+      '统一筛选区：部门、客户类型、客户来源、行业、区域下拉与「重置筛选」按钮，下方文字说明筛选口径（5.14 统一筛选项）。',
+      '统计卡行：四张核心指标卡，随报表 id 与筛选条件实时变化。',
+      '图表区：左侧主图表（漏斗、柱线、饼图或堆叠柱），右侧辅助图表（如客户等级分布、输单原因、工单状态、月度签署金额、验收情况）或报表口径说明与数据说明提示。',
       '明细区：标题与统计口径注释、可横向滚动的业务明细表，底部为 10/20/50 条每页的真实分页器。'
     ],
     fields: [
-      '报表 ID｜类型：枚举｜必填：是｜校验：必须为 funnel/target/payment/customer/lead/opps/activity/ticket 之一｜说明：由路由参数决定报表类型，非法值页面展示空数据。',
-      '统计周期｜类型：枚举（近3个月/近6个月/本年）｜必填：是｜校验：仅允许 m3/m6/y｜说明：m3 固定 2026-09 至 2026-11，m6 为 2026-06 至 2026-11，本年为 2026-01 至 2026-11。',
-      '负责人｜类型：人员选择｜必填：否｜校验：必须为 OWNERS 中的有效人员｜说明：为空表示全部负责人，选择后只统计该负责人名下数据。',
-      '统计卡指标｜类型：文本/数值/百分比/金额｜必填：是｜校验：由明细实时聚合，不得写死｜说明：不同报表对应不同指标，金额统一以万元展示。',
-      '明细记录｜类型：对象数组｜必填：是｜校验：总数取筛选后的真实条数｜说明：漏斗取商机、目标取合同、回款取回款计划、客户取客户档案、线索取线索、赢输取已结束商机、活动取活动、工单取服务工单。',
+      '报表 ID｜类型：枚举｜必填：是｜校验：必须为 overview/funnel/target/opps/staff/customer/lead/contract/payment/ticket/delivery/activity 之一｜说明：由路由参数决定报表类型，非法值页面展示空数据。',
+      '统计周期（时间范围）｜类型：枚举（近3个月/近6个月/本年）｜必填：是｜校验：仅允许 m3/m6/y｜说明：m3 固定 2026-09 至 2026-11，m6 为 2026-06 至 2026-11，本年为 2026-01 至 2026-11；按各业务口径归集（商机按预计成交日期、合同按签署日期、客户/线索按创建日期、工单按提交时间、活动按活动时间、交付按计划开始日期、回款按计划日期）。',
+      '部门｜类型：下拉（部门树）｜必填：否｜校验：必须为有效部门｜说明：按数据负责人所属部门过滤；负责人为空（公海/未分派）的数据在启用部门筛选时不计入。',
+      '员工｜类型：人员选择｜必填：否｜校验：必须为 OWNERS 中的有效人员｜说明：为空表示全部负责人，选择后只统计该员工名下数据。',
+      '客户类型｜类型：下拉（企业客户/个人客户/渠道客户）｜必填：否｜校验：与客户档案客户类型一致｜说明：按单据关联客户过滤。',
+      '客户来源｜类型：下拉（来源字典）｜必填：否｜校验：与客户档案来源一致｜说明：按单据关联客户过滤。',
+      '行业｜类型：下拉（行业字典）｜必填：否｜校验：与客户档案行业一致｜说明：按单据关联客户过滤。',
+      '区域｜类型：下拉（所属区域）｜必填：否｜校验：与客户档案所属区域一致｜说明：按单据关联客户过滤。',
+      '统计卡指标｜类型：文本/数值/百分比/金额｜必填：是｜校验：由明细实时聚合，不得写死｜说明：不同报表对应 5.14 指标（如销售总览：销售额/目标完成率/赢单率/平均成交周期；服务分析：工单数量/处理时长/超时率/满意度），金额统一以万元展示。',
+      '明细记录｜类型：对象数组｜必填：是｜校验：总数取筛选后的真实条数｜说明：漏斗取商机、总览与目标取合同、销售人员取员工聚合行、回款取回款计划、客户取客户档案、线索取线索、合同分析取合同、交付取交付项目、活动取活动、工单取服务工单。',
       '商机/合同/客户编号｜类型：文本｜必填：是｜校验：单据必须存在｜说明：以链接方式提供详情下钻，编号列使用等宽字体。',
-      '金额｜类型：货币｜必填：是｜校验：原值除以 100 分转元后格式化｜说明：预计金额、已签金额、计划回款、已回款、累计成交额等均按分精确汇总。',
-      '比率｜类型：百分比｜必填：是｜校验：分母为 0 时返回 0，不出现 NaN｜说明：达成率、回款率、转化率、赢单率、完成率等保留一位小数。',
-      '状态/结果｜类型：枚举标签｜必填：否｜校验：必须命中各业务状态枚举｜说明：回款计划为已回款/部分回款/未回款，商机为赢单/输单，工单为待受理/待分派/处理中/待客户确认/已解决/已关闭/已退回。'
+      '金额｜类型：货币｜必填：是｜校验：按分精确汇总后格式化｜说明：预计金额、已签金额、合同金额、计划回款、已回款、个人业绩、累计成交额等。',
+      '比率｜类型：百分比｜必填：是｜校验：分母为 0 时返回 0，不出现 NaN｜说明：目标完成率、回款率、转化率、有效率、赢单率、完成率、延期率、验收通过率、超时率等保留一位小数。',
+      '状态/结果｜类型：枚举标签｜必填：否｜校验：必须命中各业务状态枚举｜说明：合同为草稿/待签署/生效/履约中/已完成/已到期，回款计划为已回款/部分回款/未回款，商机为赢单/输单，交付为未启动/实施中/验收中/已完成，工单为待受理/待分派/处理中/待客户确认/已解决/已关闭/已退回。'
     ],
     rules: [
-      '页面数据全部通过 computed 从 store 的客户、商机、合同、回款、线索、活动和工单实时聚合，不使用写死的统计数字。',
-      '切换统计周期或负责人时监听器立即把明细页码重置为第 1 页，统计卡、主图、辅助图和明细同步重算。',
-      '图表配色从当前主题 CSS 变量派生，切换粉/天蓝/白/灰主题后重新取值，不写死十六进制颜色。',
-      '统计周期筛选依据不同：商机按预计成交日期、合同按签署日期、客户按创建日期、线索按创建时间、工单按提交时间、活动按活动时间、回款按计划日期。',
-      '明细表先按报表规则排序（如金额倒序、日期倒序），再按当前页码与每页条数切片，总数为过滤后的真实行数。',
-      '点击「导出」仅给出示例提示，正式接口需按当前筛选条件导出图表与明细，并遵循字段权限。'
+      '页面数据全部通过 computed 从 store 的客户、商机、合同、回款、线索、活动、工单、交付实时聚合，不使用写死的统计数字。',
+      '切换统计周期、部门、员工或客户维度筛选时监听器立即把明细页码重置为第 1 页，统计卡、主图、辅助图和明细同步重算。',
+      '统一筛选口径：部门/员工按数据负责人所属部门过滤；客户类型/来源/行业/区域按单据关联客户过滤；未建档客户（线索阶段）在启用客户维度筛选时不计入报表，避免误把线索侧数据混入客户漏斗。'
+      ,
+      '图表配色从当前主题 CSS 变量派生，切换粉/天蓝/白/灰主题后重新取色，不写死十六进制颜色。',
+      '每张报表的口径注释固定展示：销售额按已签署合同金额（履约中/生效/已完成/已到期）、已回款按财务已确认到账、处理时长按提交→解决、超时按 SLA（紧急 2h/高 4h/中 24h/低 48h）、交付余延期按计划结束日期与完成状态、验收状态由里程碑完成情况推导（5.14、5.12、5.13）。',
+      '明细表先按报表规则排序（如个人业绩降序、金额倒序、日期倒序），再按当前页码与每页条数切片，总数为过滤后真实行数。',
+      '点击「导出」仅给出示例提示，正式接口需按当前筛选条件导出图表与明细，并遵循字段权限与数据权限。'
     ],
     flow: [
-      '分析主流程：进入报表详情 → 选择统计周期与负责人 → 四张指标卡和图表刷新 → 滚动或翻页查看明细 → 点击业务编号下钻到单据详情。',
-      '回款计划状态：未回款 → 部分回款 → 已回款；已回款指财务已确认到账并按核销结果匹配到该计划期次，计划日期早于今天且未结清计为逾期。',
-      '商机漏斗阶段顺序固定为初步接触 → 需求确认 → 方案沟通 → 报价谈判 → 商务审批 → 赢单/输单，漏斗宽度为示意值而非真实转化率。',
-      '商机赢输分析只统计阶段为 close 且预计成交日期落在所选周期的商机，结果为赢单或输单；输单原因缺失时归入「未填写」。',
-      '活动状态为已完成/计划中/已取消；服务工单状态为待受理/待分派/处理中/待客户确认/已解决/已关闭/已退回，待受理加待分派加处理中加已退回视为待处理。'
+      '分析主流程：进入报表详情 → 选择统计周期/部门/员工/客户维度 → 四张指标卡和图表刷新 → 滚动或翻页查看明细 → 点击业务编号下钻到单据详情。',
+      '回款计划状态：未回款 → 部分回款 → 已回款；已回款指财务已确认到账并按核销结果匹配到该计划期次，计划日期早于今天且未结清计为逾期（第十二章：回款录入错误走冲销，不计入已回款口径）。',
+      '商机漏斗阶段顺序固定为初步接触 → 需求确认 → 方案沟通 → 报价谈判 → 商务审批 → 赢单/输单，漏斗宽度为示意值而非真实转化率；停滞商机（flags.stalled）超过提醒阈值自动提醒并在商机分析中计数（第十二章）。',
+      '商机分析只统计阶段为 close 且日期落在所选周期的商机，结果为赢单或输单；输单原因缺失时归入「未填写」（商机关闭时必填原因）',
+      '销售人员分析按个人业绩降序排名；业绩口径与销售总览相同（已签署合同金额）。',
+      '交付分析：未启动/实施中/验收中/已完成；延期 = 计划结束日期早于今天且未完成（触发预警并记录延期原因，第十二章）；验收状态由里程碑推导。',
+      '服务分析：工单状态为待受理/待分派/处理中/待客户确认/已解决/已关闭/已退回，待受理+待分派+处理中+已退回视为待处理；处理时长为提交→解决的平均时长，满意度为客户评分（1–5）。'
     ],
     errors: [
       '非法或缺失报表 id：报表对象为空，统计卡、图表和明细均无数据，用户可通过顶部面包屑返回报表列表。',
-      '所选周期与负责人组合无数据：指标卡显示 0 或空值，图表保留空坐标轴，明细表显示「该筛选条件下暂无明细数据」，不伪造记录。',
-      '明细客户在客户表中不存在（仍处线索阶段）：点击客户名称提示「该客户未建档（线索阶段）」，不跳转到错误页面。',
-      '分母为 0 的比率：达成率、回款率、转化率、赢单率统一显示 0%，避免出现 NaN 或 Infinity。',
-      '导出或图表初始化失败：应在容器内提示重试，不得导致整页白屏或控制台异常。'
+      '所选筛选组合无数据：指标卡显示 0 或空值，图表保留空坐标轴，明细表显示「该筛选条件下暂无明细数据」，不伪造记录。',
+      '启用客户维度筛选时明细客户未建档（仍处线索阶段）：该记录不计入而不报错；点击未启用筛选时的客户名称提示「该客户未建档（线索阶段）」。',
+      '分母为 0 的比率：达成率、回款率、转化率、有效率、赢单率、完成率、延期率统一显示 0%，避免出现 NaN 或 Infinity。',
+      '导出或图表初始化失败：应在容器内提示重试，不得导致整页白屏或控制台异常（第十二章：数据反馈完整性）。'
     ],
     api: [
-      '报表聚合接口：按报表 id、统计周期与负责人返回指标卡数值和图表系列，正式版由服务端聚合以降低前端数据量。',
-      '报表明细分页接口：接收报表 id、周期、负责人、页码与每页条数，返回明细行和过滤后的总条数。',
+      '报表聚合接口：按报表 id 与统一筛选条件（时间范围/部门/员工/客户类型/客户来源/行业/区域）返回指标卡数值和图表系列，正式版由服务端聚合以降低前端数据量。',
+      '报表明细分页接口：接收报表 id、周期、筛选条件、页码与每页条数，返回明细行和过滤后总条数。',
       '业务单据详情接口：商机、合同、客户详情反查，用于编号链接下钻与名称展示。',
-      '导出接口：按当前筛选条件导出 Excel，服务端执行数据权限与字段脱敏。'
+      '导出接口：按当前筛选条件导出 Excel，服务端执行数据权限与字段脱敏（第十四章：导入导出/安全性验收）。'
     ],
     accept: [
-      '八张报表 id 均可通过经营报表卡片进入，页面标题和副标题与该报表名称、核心指标一致。',
-      '切换统计周期或负责人后，页码回到第 1 页，统计卡、两张图表和明细表在 200 毫秒内完成重绘且数值互相一致。',
-      '统计卡数字可由明细数据复算得出，分页总数等于筛选后的真实条数，不存在固定假总数。',
-      '点击商机、合同、客户链接能进入对应详情；未建档客户给出明确提示且不报错。',
-      '切换四种主题后图表配色跟随主色变化，页面无控制台报错或告警。'
+      '第十四章「报表：统计口径统一，数据与明细可以核对」：每张报表的统计卡数值等于明细行聚合结果，口径注释与 5.14 一致且不混用。',
+      '统一筛选 7 项（时间范围/部门/员工/客户类型/客户来源/行业/区域）全部生效：任一筛选变化指标卡、图表、明细分页与总数同步重算，重置筛选恢复默认。',
+      '12 个报表 id 均可正常渲染指标卡、主图与明细；非法 id 不白屏并有返回路径。',
+      '未建档客户在启用客户维度筛选时正确排除；比率分母为 0 时显示 0%。',
+      '明细分页真实（10/20/50 每页），页码随筛选重置；导出为示例提示不报错。'
+    ]
+  },
+
+  'system': {
+    name: '系统管理', module: '系统管理',
+    goal: '按第八章「系统管理与后台配置」提供后台管理统一入口：用户管理、角色权限（含数据权限与字段脱敏）、组织架构、字典管理、编号规则、通知与提醒、操作日志七个二级页签，保证「人 - 角色 - 数据范围」的权限模型可配置、可追溯；系统能配置的不改代码（8.1）。',
+    roles: [
+      '菜单：系统管理员通过「系统管理」进入全部七个页签，拥有组织、用户、角色、数据权限全部配置权（第三章）。',
+      '菜单：销售经理/管理层可查看组织架构与团队成员，但无配置按钮；普通用户无本页菜单。',
+      '按钮：新增用户、新增部门、保存权限、新增/停用字典选项、保存编号规则、保存提醒规则、导出日志等按钮按按钮权限控制，仅管理员可用（第三章按钮权限）。',
+      '数据：数据权限（本人/本部门/本部门及下级/全部数据）与字段脱敏在角色权限页配置，变更写操作日志（第八章 数据权限、字段管理）。',
+      '安全：非管理员访问或修改本页任何配置被拦截并记录安全日志（第三章、第十二章：用户越权操作，后端拦截）。'
+    ],
+    enter: [
+      '入口：左侧导航「系统管理」，七个页签路由分别为 /system（用户）、/system/roles（角色）、/system/org（组织架构）、/system/dict（字典）、/system/numbers（编号规则）、/system/notice（通知与提醒）、/system/logs（操作日志），切换页签同步 hash。',
+      '关联入口：公海规则（/system/pool-rules）、审批模板（/approvals/templates）由相邻菜单进入，共同覆盖 8.1 业务参数配置。',
+      '跳转：用户列表点击姓名进入 /system/user/:id（用户详情）；用户管理抽屉可进入完整详情页。'
+    ],
+    layout: [
+      '顶部：面包屑「系统管理 / 当前页签」+ 页面标题 + 页签级操作按钮（新增用户/新增部门/保存权限/保存编号规则/保存提醒规则/导出日志）。',
+      '二级页签：用户管理 / 角色权限 / 组织架构 / 字典管理 / 编号规则 / 通知与提醒 / 操作日志（点击切换并同步路径）。',
+      '用户管理页签：统计卡（用户总数/启用/已停用/角色数）+ 搜索筛选（关键词/部门/角色/状态）+ 表格（账号/姓名/部门/角色/电话/最近登录/状态/操作）+ 真分页。',
+      '角色权限页签：左侧角色列表 + 右侧配置卡（菜单权限树勾选、数据权限单选、按钮权限多选、字段脱敏多选、角色说明）。',
+      '组织架构页签：部门树（可新增子部门，每节点显示人数）+ 部门概览。',
+      '字典管理页签：左侧字典分类（线索来源/客户类型/客户等级/客户行业/客户状态/客户规模/商机阶段）+ 右侧选项表（选项值/附加信息/状态/操作）+ 新增选项输入。',
+      '编号规则页签：规则表（对象/前缀/日期格式/序号位数/规则示例/说明）+ 保存按钮。',
+      '通知与提醒页签：提醒规则表（规则/启用开关/阈值/通知渠道/说明）+ 保存按钮。',
+      '操作日志页签：统计卡（日志总数/今日操作/系统模块操作/涉及操作人）+ 筛选（关键词/操作人/模块）+ 表格（时间/操作人/模块/动作/操作内容/来源 IP）+ 真分页。'
+    ],
+    fields: [
+      '账号｜类型：文本｜必填：是｜校验：用户表内唯一，重复保存被拦截并提示｜说明：登录标识，编辑时不可修改。',
+      '姓名｜类型：文本｜必填：是｜校验：非空｜说明：操作日志按姓名匹配操作人。',
+      '所属部门｜类型：下拉（部门树）｜必填：是｜校验：必须为有效部门｜说明：决定数据权限范围计算与组织树挂载（第八章 用户管理·所属部门）。',
+      '用户角色｜类型：下拉（管理员/销售经理/销售/售前/财务/交付客服）｜必填：是｜校验：必须为角色库有效角色｜说明：决定菜单/按钮/数据权限/字段脱敏。',
+      '状态｜类型：枚举（启用/停用）｜必填：是｜校验：标签绿/灰，停用二次确认｜说明：停用立即失去登录权限，进行中的审批不受影响（用户管理·停用）。',
+      '最近登录｜类型：日期时间｜必填：否｜校验：无｜说明：登录安全审计参考（第八章 登录安全，原型展示字段）。',
+      '数据权限｜类型：单选（本人/本部门/本部门及下级/全部）｜必填：是｜校验：四选一（第八章 数据权限）｜说明：按角色配置，保存后对该角色全部成员立即生效。',
+      '按钮权限｜类型：多选（新增/编辑/删除/导出/导入/作废/审批等）｜必填：是｜校验：至少一项或「全部」｜说明：第八章 角色管理·按钮权限。',
+      '字段脱敏｜类型：多选（合同-成本价/报价-毛利率/回款-全部等）｜必填：否｜校验：无｜说明：对应第八章 字段管理（必填/隐藏/脱敏）中的脱敏配置。',
+      '字典选项｜类型：分类下的选项列表｜必填：是｜校验：选项名称非空且不重复；内置选项不可删除仅可停用｜说明：覆盖 8.1 线索来源、客户类型/等级/行业/区域、客户状态等枚举。',
+      '编号格式｜类型：前缀+日期格式+序号位数｜必填：是｜校验：日期格式（YYYY-MM/YYYYMMDD/无日期）与序号位数（3/4/6 位）｜说明：客户/联系人/线索/商机/报价/合同/订单/工单/项目/活动全局唯一编号（9.4）。',
+      '提醒阈值｜类型：整数（天或小时）｜必填：是｜校验：天数 1–90，SLA 小时 1–72｜说明：客户超期未跟进、商机停滞、回款逾期、到期合同、工单 SLA 超时五类自动化提醒。',
+      '通知渠道｜类型：多选（站内消息/邮件/短信）｜必填：是｜校验：至少一项｜说明：第八章 通知管理。',
+      '操作日志记录｜类型：对象数组｜必填：是｜校验：时间倒序、真实写入｜说明：新增/编辑/删除/审批/导出记录含时间、操作人、模块、动作、内容、IP（第九章 sys_operation_log）。'
+    ],
+    rules: [
+      '停用用户立即失去登录权限（原型提示正式版在鉴权层生效），进行中的审批不受影响；启用恢复正常，全部写操作日志。',
+      '角色权限保存即时写回角色配置：菜单树勾选（父级自动包含子菜单）、数据权限、按钮权限、字段脱敏，并写入操作日志（谁改的、改了什么可追溯）。',
+      '数据权限只能按第三章四档配置：本人、本部门、本部门及下属（下级）、全部；客户/商机/合同的数据权限在服务端校验，不能只在前端隐藏按钮（9.4），越权访问被拦截并记录安全日志（第三章、第十二章）。',
+      '字典停用的选项不再出现在相关表单中；删除仅对新增选项开放，内置选项只能停用，与历史数据兼容。',
+      '编号规则只影响保存后新开单据，历史编号不变；示例按（前缀-年月-序号）实时预览。',
+      '提醒规则保存后按阈值与渠道触发，执行写入操作日志；公海回收周期由公海规则页配置并与本页联动。',
+      '所有配置变更（用户、部门、角色、字典、编号、提醒）都写操作日志，满足第十四章「操作日志：重要操作可以查询到操作人和时间」。'
+    ],
+    flow: [
+      '用户状态流转：启用 ↔ 停用（二次确认 + 操作日志）；用户不物理删除，离职停用后其客户与待办转移由客户转移/离职交接处理（第十二章：客户负责人离职转交）。',
+      '角色配置流转：修改菜单/按钮/数据范围/字段脱敏 → 保存 → 对该角色全部成员立即生效 → 写日志。',
+      '字典流转：内置选项 启用 ↔ 停用；新增选项直接启用；删除仅限新增选项。',
+      '编号规则流转：调整日期格式/序号位数 → 保存 → 新单据按新规则取号。',
+      '提醒规则流转：开启 → 达到阈值触发站内消息/邮件/短信并升级（工单 SLA 超时通知主管）。'
+    ],
+    errors: [
+      '账号重复：保存被拦截并提示「账号已存在（账号需唯一）」。',
+      '账号/姓名为空或部门/角色未选：表单校验拦截，提示对应字段。',
+      '部门名称为空或与现有部门重名：提示后不创建。',
+      '内置字典选项删除：拦截并提示内置选项不可删除（先停用）。',
+      '提醒阈值越界（天数>90、小时>72）：输入组件限制范围。',
+      '非管理员实施配置修改：页面按钮只对管理员展示，越权请求被后端拦截并记录安全日志（第十二章：用户越权操作）。',
+      '日志接口异常：显示空态与重试，不伪造记录（第十二章：数据反馈完整性）。'
+    ],
+    api: [
+      '用户/角色/部门/日志 CRUD 接口（示例）：新增、编辑、停用、启用、重置密码。',
+      '角色权限保存接口：菜单/按钮/数据权限/字段脱敏一次性保存并广播生效。',
+      '字典读取与保存接口：校验重复与停用态并写变更日志（8.1 业务参数）。',
+      '编号规则保存接口：保存后由取号服务按新规则发放全局唯一编号（9.4）。',
+      '通知规则保存与触发接口：按阈值/渠道推送站内消息、邮件、短信并写执行记录（第八章 通知管理）。',
+      '操作日志查询接口：按操作人/模块/时间过滤，分页倒序返回（含来源 IP）。'
+    ],
+    accept: [
+      '第十四章「登录权限：不同角色登录后仅能访问授权数据」：数据权限与字段脱敏修改后立即在角色范围内生效；用户停用后失去登录权限。',
+      '七个页签可切换且地址同步为 /system* 对应路径；每页签的数据、筛选、分页可用。',
+      '第十四章「操作日志：重要操作可以查询到操作人和时间」：本页所有配置变更与用户操作都出现时间、操作人、模块与动作的日志记录（含 IP）。',
+      '字典管理可新增/停用/删除（仅新增项）选项并写日志；编号规则保存后示例与新规则一致；提醒规则可调阈值、开关与渠道。',
+      '用户列表真分页、增改停用可交互且无控制台报错；统计卡数字由真实数据计算。'
+    ]
+  },
+
+  'approvals': {
+    name: '审批中心', module: '审批管理',
+    goal: '按规划方案 7.1 建立统一审批中心：以待我审批、我发起的、我已审批、抄送我的四个视图集中处理全公司各类审批；审批详情完整呈现申请人、申请部门、申请时间、业务单据摘要、审批流程图、当前审批节点、历史审批意见与业务附件，并按授权提供同意、拒绝、退回修改、转交、加签、抄送等动作，避免审批分散在报价、合同、客户等业务页面。',
+    roles: [
+      '菜单：审批人（销售经理 / 销售总监 / 法务 / 财务负责人等）通过左侧导航「审批管理 → 审批中心」进入待我审批；申请人查看我发起的；所有被抄送人查看抄送我的；管理员可查看全部审批流水（第三章菜单权限）。',
+      '按钮：同意、拒绝、退回修改、转交、加签按按钮权限启用；只有「待我审批」且当前节点轮到我时才可操作，其他角色与已处理记录只读；抄送我的视图不提供审批动作（第三章按钮权限、7.1）。',
+      '数据：销售只能看到本人发起、本人待审或本人被抄送的审批；销售经理/总监按本人及下属、所属部门范围查看；管理员看全部单据（第三章数据权限）。',
+      '字段：申请人、申请部门、金额、业务附件等按字段权限展示；合同成本价、报价毛利率、回款金额等敏感字段按角色脱敏或隐藏（第三章字段权限）。',
+      '安全：越权访问他人审批或提交非当前节点动作由后端拦截并记录安全日志，页面按钮同步禁用（第三章、第十二章「用户越权操作」）。'
+    ],
+    enter: [
+      '入口：左侧导航「审批管理 → 审批中心」，路由 /approvals。',
+      '关联入口：顶部栏待办/审批图标（带数量角标）进入本页；报价详情、合同详情等业务页面的「前往审批中心」链接进入本页。',
+      '子页入口：页面顶部「审批模板」进入 /approvals/templates 配置审批类型与节点；「审批统计」进入 /approvals/stats 查看审批数量、用时与驳回率（7.1）。',
+      '跳转：报价类审批详情可点击「查看报价单」进入 /quote/:no；面包屑返回工作台。'
+    ],
+    layout: [
+      '顶部：面包屑「工作台 / 审批中心」、页面标题与待我审批数量，右侧为「审批模板」「审批统计」按钮。',
+      '统计卡：待我审批、我发起的、我已审批、平均审批用时、驳回率五张卡；待办与各视图数量取 store.approvals 实时条数，平均用时与驳回率由审批流水计算。',
+      '视图页签：待我审批 / 我发起的 / 我已审批 / 抄送我的四个页签，页签标签带该视图真实数量徽标。',
+      '左侧列表：每条展示标题、审批类型、申请人、提交时间、金额与状态标签，选中项高亮；无数据时显示空态。',
+      '右侧详情：申请人 / 申请部门 / 申请时间描述栏 → 业务单据摘要 → 审批流程图（当前节点高亮，已跳过节点置灰）→ 历史审批意见 → 业务附件 → 底部动作按钮（同意、拒绝、退回修改、转交、加签、抄送）。',
+      '操作弹窗：选择人员（转交 / 加签 / 抄送时显示）与审批意见文本框；拒绝 / 退回时意见必填，同意时选填。'
+    ],
+    fields: [
+      '审批单号｜类型：自动编号｜必填：是｜校验：格式 SP-年月-四位序号且全局唯一｜说明：审批单唯一标识，详情右上角展示。',
+      '审批类型｜类型：枚举｜必填：是｜校验：必须命中审批模板类型｜说明：覆盖规划方案 7.2 的客户转移、线索批量分配、商机特殊折扣、低价报价、合同审批、合同变更、合同终止、应收冲销，以及报价折扣、回款核销、客户合并、商机赢单等模板。',
+      '审批标题｜类型：文本｜必填：是｜校验：非空，包含业务单据编号或对象名称｜说明：列表主标题，如「合同 HT-202611-0006 新建合同审批」。',
+      '申请人｜类型：人员｜必填：是｜校验：必须为启用用户｜说明：提交审批的业务人员，7.1「申请人」。',
+      '申请部门｜类型：部门｜必填：是｜校验：取自申请人所属组织｜说明：7.1「申请部门」，用于部门数据权限过滤。',
+      '申请时间｜类型：日期时间｜必填：是｜校验：不晚于当前时间｜说明：7.1「申请时间」，列表按该时间倒序。',
+      '业务单据摘要｜类型：键值对列表｜必填：是｜校验：至少包含客户/单据编号、金额或变更事项｜说明：7.1「业务单据摘要」，如客户、关联商机、折扣、合同金额、变更内容。',
+      '金额｜类型：货币｜必填：否｜校验：与关联业务单据金额一致，无金额单据显示「－」｜说明：列表右侧与摘要区展示，用于按金额阈值路由审批。',
+      '审批流程图｜类型：节点数组｜必填：是｜校验：节点状态必须为 done/cur/wait/rej/skip 之一｜说明：7.1「审批流程图」，顺序展示发起、各级审批与完成节点，当前节点高亮。',
+      '当前审批节点｜类型：流程节点｜必填：是｜校验：待我审批单据必须有且仅有一个 cur 节点｜说明：7.1「当前审批节点」，决定谁可处理及可执行动作。',
+      '历史审批意见｜类型：对象数组（操作人/动作/意见/时间）｜必填：是｜校验：已处理动作必须留痕，时间倒序可查｜说明：7.1「历史审批意见」，提交、同意、拒绝、退回、转交、加签、抄送均写入。',
+      '业务附件｜类型：文件列表｜必填：否｜校验：按字段权限查看与下载｜说明：7.1「业务附件」，如报价单、折扣申请说明；原型以标签占位展示。',
+      '审批意见｜类型：长文本｜必填：拒绝/退回时必填，同意时选填｜校验：拒绝/退回为空时拦截并提示｜说明：保存到历史审批意见并通知申请人，7.2「报价审批拒绝保存拒绝原因」。',
+      '转交/加签/抄送人员｜类型：人员选择｜必填：转交、加签、抄送时必填｜校验：必须为启用人员，不能为空｜说明：转交替换当前节点处理人，加签在当前节点后插入新节点，抄送仅通知不改变流程。',
+      '审批状态｜类型：枚举（待审批/已同意/已拒绝/已退回修改）｜必填：是｜校验：由视图页签与处理结果推导｜说明：待我审批与我发起的未完成单据为待审批；我已审批按结果展示已同意/已拒绝/已退回修改；抄送我的为知悉状态。',
+      '审批结果｜类型：枚举（已同意/已拒绝/已退回修改）｜必填：否｜校验：仅在审批结束后写入｜说明：写入历史并进入我已审批视图，同时向申请人发送结果通知。'
+    ],
+    rules: [
+      '四个视图口径互斥：待我审批取 tab=todo（等待当前用户处理的审批）；我发起的取 tab=mine（当前用户提交的审批）；我已审批取 tab=done（已同意、已拒绝、已退回修改的记录）；抄送我的取 tab=cc（需要知悉的审批）（7.1）。',
+      '同意：当前 cur 节点置为 done 并写入处理时间，若存在后续 wait 节点则流转为 cur，否则流程结束，单据进入我已审批并记录 result=已同意。',
+      '拒绝 / 退回修改：审批意见必填，当前节点置为 rej，单据进入我已审批并记录 result=已拒绝/已退回修改；退回后申请人可修改单据后重新提交，重新生成待审批实例（7.2、第十二章「报价审批拒绝」）。',
+      '转交：必须选择人员，仅替换当前节点处理人，审批单仍留在待我审批；加签：必须选择人员，在当前节点后插入新审批节点；抄送：必须选择人员，仅发送知悉通知，不改变流程状态（7.1）。',
+      '操作权限：只有待我审批视图、当前节点为 cur 且轮到我处理时可同意/拒绝/退回/转交/加签；已处理视图、我发起的、抄送我的均为只读；允许对任意审批执行抄送。',
+      '审批触发条件按规划方案 7.2 执行：重点客户变更负责人触发客户转移审批；超出普通销售权限的线索批量分配触发销售经理审批；商机折扣超出授权触发销售经理/总监；报价低于最低限价触发总监或财务负责人；新建正式合同触发业务负责人/法务/财务审批；合同金额、期限、范围变化重新走合同变更审批；提前终止或解除触发指定负责人和管理层审批；回款冲销、退款触发财务负责人审批。',
+      '审批人和节点支持按组织、金额、折扣、客户等级等条件动态配置，具体节点与启用条件由审批模板维护，条件不满足的节点自动跳过（7.2）。',
+      '自动化提醒按 7.3 执行：审批节点待处理时通知审批人（报价审批提醒），工单超时通知处理人及主管，回款逾期提醒财务与销售负责人；提醒的启用、阈值和执行日志在后台配置，审批处理结果同步通知申请人。',
+      '审批动作全部写入历史审批意见与操作日志，记录操作人、时间、意见与动作；业务状态不能绕过审批直接修改（4.3 状态变化规则）。',
+      '合同审批后修改必须按合同变更规则重新审批；已审批报价修改生成新版本，不覆盖原批准内容；回款录入错误走冲销或更正流程并保留记录（第十二章）。'
+    ],
+    flow: [
+      '视图状态：待我审批（tab=todo）→ 同意 / 拒绝 / 退回修改 / 转交 / 加签 → 我已审批（tab=done，result=已同意/已拒绝/已退回修改）；抄送我的（tab=cc）只读知悉。',
+      '流程节点状态：发起申请 done → 当前审批节点 cur → 后续节点 wait；同意后 cur→done 且下一 wait→cur；拒绝或退回后 cur→rej、流程终止；条件不满足的节点 skip；加签插入 wait 节点。',
+      '审批结果：已同意（流程流转至下一节点或结束）、已拒绝（流程终止）、已退回修改（申请人可修改后重新提交）；重新提交生成新的审批实例，历史审批意见保留。',
+      '审批触发生命周期：业务单据提交 → 按审批模板匹配类型与条件生成审批实例 → 逐节点审批 → 最后节点同意后回写业务单据状态并通知申请人；模板停用只影响后续新提交的审批。',
+      '自动化提醒生命周期：节点进入待处理 → 按模板超时阈值提醒审批人 → 超过阈值升级提醒；处理完成后停止提醒并记录执行日志（7.3）。'
+    ],
+    errors: [
+      '拒绝或退回未填写审批意见：前端拦截并提示「请填写审批意见（必填）」，不提交动作（7.2）。',
+      '转交、加签或抄送未选择人员：前端拦截并提示「请选择人员」，不改变流程。',
+      '非当前节点或非待我审批单据点击审批按钮：按钮禁用并提示仅当前处理人可操作，后端越权请求被拦截并记录安全日志（第三章、第十二章「用户越权操作」）。',
+      '同一审批被他人先行处理：详情刷新为只读并给出「仅可查看」提示，避免重复审批。',
+      '关联业务单据已作废或不存在：详情区显示警示，审批动作按授权禁用，不产生孤立审批。',
+      '报价审批被拒绝：必须保存拒绝原因，申请人修改后重新提交生成新版本，不覆盖原审批记录（第十二章「报价审批拒绝」「已审批报价修改」）。',
+      '合同审批后修改：按合同变更规则重新提交审批，已签署版本保留历史（第十二章「合同审批后修改」）。',
+      '回款录入错误：走冲销或更正审批，保留原记录，不允许直接删除已入账回款（第十二章「回款录入错误」）。',
+      '重复点击提交：提交成功后关闭弹窗并刷新列表，不重复写入审批意见或重复流转节点。',
+      '审批数据缺失（标题、节点或结果异常）：列表以「－」占位并可只读打开，不导致整页渲染失败，正式版记录数据质量告警。'
+    ],
+    api: [
+      '审批列表查询接口：按待我审批 / 我发起的 / 我已审批 / 抄送我的与分页参数返回列表，字段含单号、类型、标题、申请人、部门、时间、金额、状态。',
+      '审批详情接口：返回业务单据摘要、流程节点、当前节点、历史审批意见与业务附件，并校验数据权限。',
+      '审批动作接口：同意 / 拒绝 / 退回修改 / 转交 / 加签 / 抄送，服务端校验当前节点与按钮权限并写操作日志（7.1）。',
+      '审批模板接口：按业务事项、组织、金额、折扣、客户等级匹配启用模板并生成流程节点（7.2）。',
+      '审批统计接口：返回审批数量、平均用时、驳回率与审批流水明细，供 /approvals/stats 展示（7.1）。',
+      '消息通知接口：审批待办提醒、审批结果通知与超时升级提醒（7.3）。'
+    ],
+    accept: [
+      '第十四章「报价：金额计算正确，审批和版本记录完整」「合同：审批、签署、状态变更符合规则」：提交报价/合同审批后进入待我审批，同意/拒绝后业务单据状态与审批历史一致，修改已审批内容生成新版本而非覆盖。',
+      '四个视图页签齐全且口径互斥：待我审批=当前用户待处理，我发起的=当前用户提交，我已审批=已同意/已拒绝/已退回修改，抄送我的=需知悉；页签徽标数量与过滤后列表条数一致。',
+      '审批详情包含 7.1 全部元素：申请人、申请部门、申请时间、业务单据摘要、审批流程图、当前审批节点、历史审批意见、业务附件，以及同意、拒绝、退回修改、转交、加签、抄送按钮。',
+      '同意后当前节点完成并流转/结束，待我审批减少且我已审批增加；拒绝/退回不填意见被拦截，转交/加签/抄送不选人员被拦截；转交后单据仍在待我审批，加签插入新节点，抄送不改变流程。',
+      '7.2 八类推荐审批触发条件均可在审批模板中找到对应配置：客户转移、线索批量分配、商机特殊折扣、低价报价、合同审批、合同变更、合同终止、应收冲销；金额/折扣/客户等级条件满足时按模板加签或跳过。',
+      '第十四章「操作日志：重要操作可以查询到操作人和时间」：每次同意/拒绝/退回/转交/加签/抄送均写历史意见与操作日志。',
+      '第十四章「安全性：越权访问被拦截，敏感字段按权限展示」：非当前处理人无法操作，金额与附件按字段权限展示。'
     ]
   },
 
   'approval-templates': {
     name: '审批模板', module: '审批管理',
-    goal: '集中配置八类业务审批的流程模板：维护模板名称、用途说明、审批节点顺序与类型、节点启用条件、抄送人、超时提醒和驳回规则。配置保存到本地存储后，对后续新提交的审批生效，使折扣、合同、客户转移、商机赢单、回款核销、客户合并、线索批量分配和应收冲销的审批路径可管理、可解释。',
+    goal: '按规划方案 7.2 集中配置审批类型与审批节点：维护业务事项、触发条件、推荐审批、审批节点顺序与类型、节点启用条件、抄送人、超时提醒和驳回规则，并支持按组织、金额、折扣、客户等级等条件动态配置。配置保存到本地存储后对后续新提交的审批生效，使客户转移、线索批量分配、商机特殊折扣、低价报价、合同审批/变更/终止、应收冲销等审批路径可管理、可解释（7.2、7.3）。',
     roles: [
-      '菜单：系统管理员可通过「审批管理 → 审批模板」进入并看到全部八个模板。',
-      '菜单：业务负责人可查看模板列表与节点摘要，但不能修改。',
-      '按钮：管理员拥有配置审批流、新增节点、删除节点、保存模板和启用/停用开关；业务负责人相关按钮只读或隐藏。',
-      '数据：模板配置属于全局基础数据，所有业务角色提交审批时都受同一模板约束，个人不能绕过。',
-      '字段：审批角色、指定审批人、抄送人列表来自系统人员与角色枚举，仅管理员可编辑。'
+      '菜单：系统管理员通过「审批管理 → 审批模板」进入并看到全部业务模板；业务负责人可查看模板列表与节点摘要，但不能修改。',
+      '按钮：管理员拥有配置审批流、新增节点、删除节点、保存模板和启用/停用开关；业务负责人相关按钮只读或隐藏（第三章按钮权限）。',
+      '数据：模板配置属于全局基础数据，所有业务角色提交审批时都受同一模板约束，个人不能绕过；模板变更记录操作人、时间与变更内容。',
+      '字段：审批角色、指定审批人、抄送人列表来自系统人员与角色枚举，仅管理员可编辑；敏感金额条件按字段权限展示。',
+      '安全：非管理员修改模板由后端拦截并记录安全日志，页面按钮同步隐藏（第三章、第十二章「用户越权操作」）。'
     ],
     enter: [
       '入口：左侧导航「审批管理 → 审批模板」，对应路由 /approvals/templates。',
       '关联入口：审批中心顶部「审批模板」按钮，用于从日常审批处理切换到流程配置。',
-      '配置完成后返回审批中心 /approvals，新提交的报价、合同、转移等单据按最新模板路由。'
+      '配置完成后返回审批中心 /approvals，新提交的报价、合同、客户转移等单据按最新模板路由。'
     ],
     layout: [
       '顶部：面包屑「审批管理 / 审批模板」、模板总数，以及「恢复默认」示例按钮。',
-      '说明卡：提示模板定义节点类型与启用条件、抄送、超时提醒与驳回规则，保存后对后续新提交的审批生效。',
+      '说明卡：提示模板定义业务事项、触发条件、节点类型与启用条件、抄送、超时提醒与驳回规则，保存后对后续新提交的审批生效。',
       '模板卡片区：两列网格，每张卡片显示模板图标、名称、用途说明、启用开关、节点标签、启用条件、抄送、超时提醒与驳回规则，底部为「配置审批流」按钮。',
       '配置抽屉：宽 640 像素，包含模板名称、用途说明、可增删排序的节点列表、抄送多选、超时提醒小时数、驳回规则单选，以及保存/取消操作。'
     ],
     fields: [
+      '业务事项｜类型：枚举｜必填：是｜校验：必须命中规划方案 7.2 八类推荐审批或补充模板｜说明：客户转移、线索批量分配、商机特殊折扣、低价报价、合同审批、合同变更、合同终止、应收冲销，另含报价折扣、回款核销、客户合并、商机赢单等补充事项。',
+      '触发条件｜类型：文本表达式描述｜必填：是｜校验：非空，需写明组织/金额/折扣/客户等级等条件｜说明：如重点客户变更负责人、折扣超出授权、低于最低限价、合同金额/期限/范围变化、提前终止或解除、回款冲销或退款（7.2）。',
+      '推荐审批｜类型：文本/节点数组｜必填：是｜校验：至少一个审批节点｜说明：客户转移由原负责人直属经理或指定管理人审批；线索批量分配由销售经理审批；商机特殊折扣由销售经理、总监审批；低价报价由总监或财务负责人审批；合同审批由业务负责人、法务、财务等按企业要求审批；合同变更重新走相应审批；合同终止由指定负责人和管理层审批；应收冲销由财务负责人审批（7.2）。',
       '模板名称｜类型：文本｜必填：是｜校验：去空格后非空｜说明：用于审批中心与统计中识别流程类型。',
       '用途说明｜类型：多行文本｜必填：否｜校验：保存时去首尾空格｜说明：解释该模板适用的业务场景。',
       '节点名称｜类型：文本｜必填：是｜校验：每个节点均不能为空｜说明：展示在模板卡片与审批流的节点标签上。',
-      '审批人类型｜类型：枚举（直属经理/指定角色/指定人）｜必填：是｜校验：新增节点默认指定人｜说明：决定审批人如何解析。',
+      '审批人类型｜类型：枚举（直属经理/指定角色/指定人）｜必填：是｜校验：新增节点默认指定人｜说明：决定审批人如何按组织或角色解析。',
       '审批角色｜类型：枚举（销售经理/销售总监/财务负责人/法务/售前主管）｜必填：类型为指定角色时必填｜校验：不能为空｜说明：按角色匹配审批人。',
-      '指定审批人｜类型：人员选择（可搜索）｜必填：类型为指定人时必填｜校验：不能为空｜说明：从张三、李四、王五、赵六、周总监、王芳、陈法务、李琴、管理员中选择。',
-      '启用条件｜类型：文本表达式描述｜必填：否｜校验：为空表示始终启用｜说明：如折扣 > 10%、金额 > 50 万、重点客户转移，条件不满足时自动跳过该节点。',
-      '抄送｜类型：人员多选｜必填：否｜校验：可多选并折叠标签｜说明：审批流转过程中向抄送人发送通知。',
-      '超时提醒｜类型：整数（小时）｜必填：是｜校验：1 至 168｜说明：超过时限后通过企业微信和邮件提醒审批人。',
-      '驳回规则｜类型：枚举（退回修改/自动驳回/仅提醒）｜必填：是｜校验：三选一｜说明：退回修改可重新提交，自动驳回终止流程，仅提醒不改变流程状态。'
+      '指定审批人｜类型：人员选择（可搜索）｜必填：类型为指定人时必填｜校验：必须为启用人员｜说明：从张三、李四、王五、赵六、周总监、王芳、陈法务、李琴、管理员中选择。',
+      '启用条件｜类型：文本表达式描述｜必填：否｜校验：为空表示始终启用｜说明：如折扣 > 10%、金额 > 50 万、重点客户转移、低于最低限价，条件不满足时自动跳过该节点（7.2）。',
+      '抄送｜类型：人员多选｜必填：否｜校验：可多选并折叠标签｜说明：审批流转过程中向抄送人发送知悉通知。',
+      '超时提醒｜类型：整数（小时）｜必填：是｜校验：1 至 168｜说明：超过时限后通过企业微信和邮件提醒审批人，对应 7.3 报价审批提醒的阈值配置。',
+      '驳回规则｜类型：枚举（退回修改/自动驳回/仅提醒）｜必填：是｜校验：三选一｜说明：退回修改可重新提交，自动驳回终止流程，仅提醒不改变流程状态。',
+      '模板启用状态｜类型：布尔（启用/停用）｜必填：是｜校验：默认启用｜说明：停用只影响后续新提交的审批，不回溯在途单据（7.2）。'
     ],
     rules: [
-      '节点自上而下依次审批，条件不满足的节点自动跳过；新增节点默认类型为指定人，删除节点前必须至少保留一个。',
+      '模板必须覆盖规划方案 7.2 八类推荐审批：客户转移、线索批量分配、商机特殊折扣、低价报价、合同审批、合同变更、合同终止、应收冲销；客户合并、回款核销、商机赢单、报价折扣作为补充模板保留。',
+      '审批人和节点支持按组织、金额、折扣、客户等级等条件动态配置：节点类型可选直属经理（按组织解析）、指定角色、指定人；启用条件为空始终执行，条件不满足自动跳过（7.2）。',
+      '节点自上而下依次审批，新增节点默认类型为指定人，删除节点前必须至少保留一个；打开配置抽屉时深拷贝当前模板节点，取消不会污染原模板。',
       '保存前逐项校验：模板名称非空、节点数量大于零、每个节点名称非空、指定角色节点必须选择角色、指定人节点必须选择审批人，任一不满足即拦截并提示具体节点序号。',
       '保存成功后写回模板数组并持久化到 localStorage 的 crm_appr_templates_v1，然后追加一条系统操作日志并提示「后续新提交的审批将按模板路由」。',
       '启用开关即时切换并持久化；停用只影响后续新提交的审批，不回溯已在进行中的单据。',
-      '打开配置抽屉时深拷贝当前模板节点，取消不会污染原模板；保存时再整体覆盖节点数组。',
+      '自动化提醒按 7.3 在后台支持启用、停用、阈值设置和执行日志查询：模板超时提醒小时数即审批节点待处理提醒阈值，超时后通知审批人并升级；页面保留超时配置与操作日志，规则执行日志在正式版接入。',
+      '合同审批后修改、已审批报价修改必须按模板重新生成审批实例或新版本，不覆盖原批准内容（第十二章）。',
       '恢复默认按钮当前为示例提示，正式版应支持单模板或全部模板恢复初始配置，并记录操作日志。'
     ],
     flow: [
-      '模板状态：启用 → 停用；启用表示新提交的对应业务审批会按该模板节点路由，停用表示新提交不再进入该模板。',
+      '模板状态：启用 → 停用；启用表示新提交的对应业务审批会按该模板节点路由，停用表示新提交不再进入该模板（在途单据继续按提交时快照走完）。',
       '模板变更生命周期：编辑草稿 → 保存写本地存储并记录日志 → 对后续新提交的审批生效；已提交且在途的单据继续按提交时的模板版本走完。',
       '节点执行顺序：按节点数组顺序逐级审批，条件为空始终执行，条件不满足则跳过，直到所有节点完成或触发驳回。',
+      '审批实例状态：待审批（节点 wait/cur）→ 同意（cur→done，下一 wait→cur）→ 已同意；或拒绝/退回 → 已拒绝/已退回修改；退回后申请人修改并重新提交生成新实例。',
       '驳回结果：退回修改后申请人可修改并重新提交；自动驳回则流程终止并通知申请人；仅提醒不影响流程继续。'
     ],
     errors: [
@@ -11491,32 +12151,40 @@ const PZ_DOC_PC_CFG = {
       '模板名称为空或节点名称为空：保存被拦截，并指出第几个节点需要补全。',
       '指定角色未选角色或指定人未选审批人：保存被拦截并提示具体节点类型。',
       '本地存储写入失败（隐私模式或配额不足）：页面不应崩溃，应提示保存失败并允许用户重试。',
-      '审批人已停用或离职：正式版保存时需校验人员启用状态，原型仅提示补全审批人。'
+      '审批人已停用或离职：正式版保存时需校验人员启用状态，原型仅提示补全审批人。',
+      '报价审批被拒绝：保存拒绝原因，申请人修改后重新提交，原审批记录不覆盖（第十二章「报价审批拒绝」）。',
+      '已审批报价修改：生成新版本并重新走审批，不覆盖原批准内容（第十二章「已审批报价修改」）。',
+      '合同审批后修改：按合同变更模板重新审批，已签署版本保留历史（第十二章「合同审批后修改」）。',
+      '回款冲销或退款：必须走应收冲销审批，不得直接修改已入账记录（第十二章「回款录入错误」）。',
+      '非管理员修改模板：页面按钮只对管理员展示，越权请求被后端拦截并记录安全日志（第十二章「用户越权操作」）。'
     ],
     api: [
-      '审批模板列表与详情查询接口，返回模板基础信息、节点列表、抄送、超时与驳回规则。',
+      '审批模板列表与详情查询接口，返回业务事项、触发条件、推荐审批、节点列表、抄送、超时与驳回规则。',
       '模板保存接口：校验节点完整性与审批人有效性，成功后生成新版本并记录变更日志。',
       '模板启停接口：切换状态并通知相关业务方，不修改历史审批实例。',
-      '审批流程启动接口：提交业务单据时读取启用模板快照，按节点与条件生成审批实例。'
+      '审批流程启动接口：提交业务单据时按业务事项、组织、金额、折扣、客户等级匹配启用模板快照，按节点与条件生成审批实例（7.2）。',
+      '自动化提醒配置接口：保存启用状态、阈值并返回执行日志（7.3）。'
     ],
     accept: [
-      '八个模板卡片全部展示，名称、用途、节点标签、条件、抄送、超时与驳回规则均来自数据且可读。',
+      '模板覆盖规划方案 7.2 八类推荐审批：客户转移、线索批量分配、商机特殊折扣、低价报价、合同审批、合同变更、合同终止、应收冲销均可找到对应模板与触发条件。',
+      '模板卡片全部展示，名称、用途、节点标签、触发条件、抄送、超时与驳回规则均来自数据且可读；节点条件按组织/金额/折扣/客户等级配置后可在审批实例中跳过或加签。',
       '打开任意模板配置抽屉，可新增、删除、编辑节点并保存，刷新页面后修改仍然存在。',
       '模板名称为空、节点为空、指定角色未选角色、指定人未选审批人四类校验均能拦截并给出明确提示。',
-      '删除最后一个节点被阻止，节点顺序与类型切换正常，启用开关状态会持久化。',
-      '保存后生成系统操作日志，页面无控制台报错。'
+      '删除最后一个节点被阻止，节点顺序与类型切换正常，启用/停用开关状态会持久化且停用不回溯在途单据。',
+      '第十四章「报价：审批和版本记录完整」「合同：审批、签署、状态变更符合规则」：报价/合同修改后按模板重新审批并保留版本，不覆盖原批准内容。',
+      '保存后生成系统操作日志（操作人、时间、变更内容），页面无控制台报错。'
     ]
   },
 
   'approval-stats': {
     name: '审批统计', module: '审批管理',
-    goal: '分析审批运行效率与瓶颈：以待我审批、平均处理时长、通过率、超时数四张统计卡为核心，配合按审批类型的数量分布、按月数量与平均时长趋势、各审批人平均处理时长三张图表，以及可按类型和时效筛选的审批流水明细，定位慢审批、高驳回和超时集中环节。',
+    goal: '按规划方案 7.1 分析审批运行效率与瓶颈：以待我审批、审批数量、平均处理时长、通过率、驳回率、超时数六张统计卡为核心，配合按审批类型的数量分布、按月数量与平均时长趋势、各审批人平均处理时长三张图表，以及可按类型和时效筛选的审批流水明细，定位慢审批、高驳回、超时集中环节。',
     roles: [
       '菜单：管理员与管理层可进入「审批管理 → 审批统计」查看全部审批流水和统计。',
       '菜单：审批人可查看与本人相关的审批统计，正式版按审批人字段过滤，原型提供类型与时效筛选。',
-      '按钮：所有有菜单权限的角色可使用类型筛选、时效筛选、分页和「返回审批中心」按钮。',
-      '数据：统计范围受角色数据权限约束，部门经理仅能查看本部门及下级提交或审批的流水。',
-      '字段：申请人、审批人姓名可见，金额与业务摘要按字段权限脱敏，普通审批人不可见全公司金额明细。'
+      '按钮：所有有菜单权限的角色可使用类型筛选、时效筛选、分页和「返回审批中心」按钮（第三章按钮权限）。',
+      '数据：统计范围受角色数据权限约束，部门经理仅能查看本部门及下级提交或审批的流水（第三章数据权限）。',
+      '字段：申请人、审批人姓名可见，金额与业务摘要按字段权限脱敏，普通审批人不可见全公司金额明细（第三章字段权限）。'
     ],
     enter: [
       '入口：左侧导航「审批管理 → 审批统计」，路由 /approvals/stats。',
@@ -11525,139 +12193,63 @@ const PZ_DOC_PC_CFG = {
     ],
     layout: [
       '顶部：面包屑「审批管理 / 审批统计」、副标题显示待办数量和当前筛选下的历史流水条数。',
-      '统计卡行：待我审批、平均处理时长、通过率、超时数四张卡，分别标注数据来源与超时阈值。',
+      '统计卡行：待我审批、审批数量、平均处理时长、通过率、驳回率、超时数六张卡，分别标注数据来源、计算口径与超时阈值（7.1「审批数量、用时、驳回率」）。',
       '筛选区：审批类型下拉与时效下拉（仅超时大于 48 小时/仅未超时），变更后立即重算。',
       '图表区：第一行按审批类型数量分布与按月趋势双图，第二行各审批人平均处理时长柱状图。',
       '明细区：审批流水表展示流水号、类型、标题、申请人、审批人、提交日期、处理时长、结果与超时标记，底部 10/20/50 条每页分页。'
     ],
     fields: [
       '流水号｜类型：文本｜必填：是｜校验：全局唯一，格式 AP-四位序号｜说明：标识每条历史审批流水。',
-      '审批类型｜类型：枚举｜必填：是｜校验：来自模板类型集合｜说明：报价折扣、合同、客户转移、商机赢单、回款核销、客户合并、线索批量分配、应收冲销。',
+      '审批类型｜类型：枚举｜必填：是｜校验：来自模板类型集合｜说明：报价折扣、合同审批、合同变更、合同终止、客户转移、商机特殊折扣、低价报价、回款核销、客户合并、线索批量分配、应收冲销等。',
       '标题示例｜类型：文本｜必填：是｜校验：非空｜说明：由审批类型与示例业务对象拼接，用于快速识别单据。',
       '申请人｜类型：人员｜必填：是｜校验：必须为启用用户｜说明：提交审批的业务人员。',
       '审批人｜类型：人员｜必填：是｜校验：必须为有效审批角色人员｜说明：用于统计各审批人的平均处理时长。',
       '提交日期｜类型：日期｜必填：是｜校验：不晚于当前日期｜说明：按月趋势按该日期所在月份归集。',
-      '处理时长｜类型：小数（小时）｜必填：是｜校验：大于等于 0｜说明：末节点处理时间减提交时间，统计卡与明细共用同一口径。',
-      '结果｜类型：枚举（已通过/已驳回）｜必填：是｜校验：二选一｜说明：通过率等于已通过条数除以总条数。',
+      '处理时长｜类型：小数（小时）｜必填：是｜校验：大于等于 0｜说明：末节点处理时间减提交时间，统计卡与明细共用同一口径（7.1「用时」）。',
+      '结果｜类型：枚举（已通过/已驳回）｜必填：是｜校验：二选一｜说明：通过率等于已通过条数除以总条数，驳回率等于已驳回条数除以总条数。',
+      '通过率｜类型：百分比｜必填：是｜校验：分母为 0 时返回 0，保留一位小数｜说明：已通过条数 ÷ 当前筛选历史流水总数（7.1）。',
+      '驳回率｜类型：百分比｜必填：是｜校验：分母为 0 时返回 0，保留一位小数｜说明：已驳回条数 ÷ 当前筛选历史流水总数，与审批中心统计卡口径一致（7.1「驳回率」）。',
+      '审批数量｜类型：整数｜必填：是｜校验：等于当前筛选后的真实流水条数｜说明：统计卡与明细总数一致，不写死（7.1）。',
       '超时｜类型：布尔｜必填：是｜校验：处理时长大于 48 小时为超时｜说明：与模板超时提醒阈值呼应，明细以红色标签标记。',
       '时效筛选｜类型：枚举（仅超时/仅未超时）｜必填：否｜校验：清空表示全部｜说明：与审批类型筛选同时生效。'
     ],
     rules: [
-      '待我审批数字实时取自 store.approvals 中 tab 为 todo 的记录，与审批中心保持一致；其余统计卡基于当前筛选后的历史流水计算。',
-      '切换审批类型或时效筛选时，明细页码立即回到第 1 页，平均处理时长、通过率、超时数同步刷新。',
+      '待我审批数字实时取自 store.approvals 中 tab 为 todo 的记录，与审批中心保持一致；审批数量、平均处理时长、通过率、驳回率、超时数均基于当前筛选后的历史流水计算（7.1）。',
+      '驳回率 = 已驳回条数 ÷ 当前筛选总数 × 100%，保留一位小数；通过率 = 已通过条数 ÷ 当前筛选总数 × 100%；两者与明细结果可逐行复算。',
+      '切换审批类型或时效筛选时，明细页码立即回到第 1 页，审批数量、平均处理时长、通过率、驳回率、超时数同步刷新。',
       '按月趋势展示完整自然月，当前仍在进行中的 2026-11 月不参与平均时长计算，避免进行中月份拉低均值。',
       '三张图表分别按类型、月份、审批人聚合，颜色由主题主色派生，主题切换后跟随变化。',
       '历史流水原型使用固定随机种子生成，保证每次打开顺序、数量、时长稳定，便于演示与验收；正式版接真实审批流水接口。',
       '明细表按提交日期倒序排列，总数取筛选后的真实条数，分页器支持 10/20/50 条每页切换。'
     ],
     flow: [
-      '统计主流程：进入页面 → 查看四张效率卡 → 按类型或时效筛选 → 观察三张图表 → 在明细表定位具体慢单或超时单 → 返回审批中心处理。',
-      '审批结果状态：已通过 / 已驳回；通过率等于已通过数除以已通过加已驳回总数，不包含待处理中的待办。',
-      '超时判定：处理时长大于 48 小时标记为超时，反之正常；48 小时阈值与审批模板默认超时提醒保持一致。',
+      '统计主流程：进入页面 → 查看六张效率卡 → 按类型或时效筛选 → 观察三张图表 → 在明细表定位具体慢单、高驳回或超时单 → 返回审批中心处理。',
+      '审批结果状态：已通过 / 已驳回；通过率等于已通过数除以总数，驳回率等于已驳回数除以总数，均不包含待处理中的待办。',
+      '超时判定：处理时长大于 48 小时标记为超时，反之正常；48 小时阈值与审批模板默认超时提醒保持一致（7.3）。',
       '月度趋势：按提交日期月份归集数量，平均时长为该月所有已完成流水的处理时长算术平均，进行中月份排除。',
       '审批人维度：按审批人分组计算平均处理时长，用于识别审批负荷与响应差异。'
     ],
     errors: [
-      '筛选组合无匹配流水：明细表显示「没有符合条件的审批流水」，统计卡归零，图表仍按全量数据展示类型和月度分布。',
+      '筛选组合无匹配流水：明细表显示「没有符合条件的审批流水」，审批数量、通过率、驳回率、超时数归零，图表仍按全量数据展示类型和月度分布。',
       '某月没有已完成流水：该月平均时长按 0 处理，不显示 NaN，图表保持空点而非伪造数据。',
       '待我审批为 0：统计卡显示 0，不弹出错误，用户仍可查看历史统计。',
-      '历史流水缺少审批人或结果字段：正式版需以「未知」占位并在数据质量报告中标记，不得导致整表渲染失败。'
+      '历史流水缺少审批人或结果字段：正式版需以「未知」占位并在数据质量报告中标记，不得导致整表渲染失败。',
+      '回款冲销等审批数据与业务单据不一致：以审批流水为准并提示核对，冲销/更正记录保留，不直接删除（第十二章「回款录入错误」）。',
+      '越权查看他人审批统计：后端按数据权限过滤并拦截越权请求，记录安全日志（第三章、第十二章「用户越权操作」）。'
     ],
     api: [
       '审批流水分页查询接口：接收审批类型、超时状态、页码与每页条数，返回明细和过滤后总数。',
-      '审批效率聚合接口：返回待办数、平均处理时长、通过率、超时数四项指标。',
+      '审批效率聚合接口：返回待办数、审批数量、平均处理时长、通过率、驳回率、超时数六项指标（7.1）。',
       '审批维度统计接口：按类型、月份、审批人分别返回数量与平均时长系列。',
       '审批待办查询接口：与审批中心共享待办数据源，保证待我审批数字一致。'
     ],
     accept: [
-      '四张统计卡与明细数据可复算一致：通过率等于已通过条数除以总数，超时数等于处理时长大于 48 小时的条数。',
-      '切换审批类型或时效筛选后页码回到第 1 页，统计卡、明细与筛选条件同步变化，无残留旧数据。',
+      '第十四章「报表：统计口径统一，数据与明细可以核对」：六张统计卡与明细数据可复算一致，审批数量等于明细总数，通过率等于已通过条数除以总数，驳回率等于已驳回条数除以总数，超时数等于处理时长大于 48 小时的条数。',
+      '切换审批类型或时效筛选后页码回到第 1 页，审批数量、平均处理时长、通过率、驳回率、超时数与明细同步变化，无残留旧数据。',
       '三张图表在页面加载后正常渲染，按月趋势排除当前进行中的 2026-11 月。',
       '分页器可切换 10/20/50 条每页，明细总数等于筛选后的真实行数。',
-      '从审批统计点击返回审批中心可正常跳转，页面无控制台报错。'
-    ]
-  },
-
-  contacts: {
-    name: '联系人列表', module: '联系人管理',
-    goal: '统一管理全部客户联系人档案：按所属客户、联系人角色、影响力、对我方态度和关键联系人筛选，查看姓名、电话、邮箱、部门、职务与决策链信息，并支持新增、编辑、删除和跳转详情，为销售维护客户组织关系与决策链提供基础数据（规划方案 5.4 联系人管理）。',
-    roles: [
-      '菜单：销售、销售经理、管理员均可通过「联系人管理 → 联系人列表」进入本页，市场/客服等角色按授权查看。',
-      '按钮：新增、编辑、删除、导入、导出按按钮权限控制；销售可维护本人权限范围内客户联系人，销售经理可维护团队联系人，管理员拥有全量操作（第三章）。',
-      '数据：销售仅能看到本人负责客户及协同客户下的联系人，经理看到本部门及下级，总监看所辖部门，管理员看到全部；跨部门越权查询被拦截并记录安全日志（第三章、第十二章）。',
-      '字段：联系电话默认脱敏展示，完整号码需在详情页按字段权限查看并记录访问日志；邮箱与生日按字段权限控制（第三章）。',
-      '数据：删除联系人属于数据维护操作，仅本人或有管理权限的角色可执行，且必须二次确认并写入操作日志；重要数据优先作废/归档而不是物理删除（4.3）。'
-    ],
-    enter: [
-      '入口：左侧导航「联系人管理 → 联系人列表」，路由 /contacts。',
-      '关联入口：客户详情「联系人」Tab 中点击联系人姓名或查看按钮，进入 /contact/:no。',
-      '详情跳转：列表点击联系人姓名进入 /contact/:no；点击所属客户进入 /customer/:no。'
-    ],
-    layout: [
-      '顶部：面包屑「联系人管理 / 联系人列表」、联系人总数与来源说明。',
-      '统计卡：联系人总数（标注来自多少家客户）、关键联系人、支持者、反对者四张卡，数字由 store.ext.contacts 实时计算。',
-      '筛选区：关键词、所属客户、联系人角色、影响力、对我方态度、关键联系人六个条件，支持查询与重置。',
-      '操作区与表格：新增联系人、导入、导出按钮；表格含联系人姓名、所属客户、联系电话、电子邮箱、部门、职务、联系人角色、影响力、对我方态度、联系偏好、关键联系人及编辑/详情/删除操作。',
-      '详情抽屉与新增编辑弹窗：抽屉快速查看字段，弹窗分两列维护联系人完整档案，底部显示最近操作日志。'
-    ],
-    fields: [
-      '联系人姓名｜类型：文本｜必填：是｜校验：非空，失焦触发｜说明：联系人主标识，列表与详情标题展示（5.4 联系人姓名）。',
-      '所属客户｜类型：客户选择（可搜索）｜必填：是｜校验：必须选择有效客户，变更触发校验｜说明：关联客户，决定联系人归属与数据权限（5.4 所属客户）。',
-      '联系电话｜类型：文本（手机或座机）｜必填：是｜校验：以数字开头且仅允许数字、星号和短横线，手机或座机均可｜说明：列表默认脱敏，详情按字段权限查看完整号码（5.4 联系电话）。',
-      '电子邮箱｜类型：文本｜必填：否｜校验：符合邮箱格式｜说明：用于邮件触达与通知（5.4 电子邮箱）。',
-      '部门｜类型：文本｜必填：否｜校验：长度不超过 50 字｜说明：所属部门，关系图与决策链判断依据（5.4 部门）。',
-      '职务｜类型：文本｜必填：否｜校验：长度不超过 50 字｜说明：岗位，列表与关系图节点展示（5.4 职务）。',
-      '联系人角色｜类型：枚举（决策人/使用人/采购人/财务/技术）｜必填：是｜校验：五选一，与规划方案枚举一致｜说明：决策人标签在列表以红色强调，并决定决策链位置（5.4 联系人角色）。',
-      '影响力｜类型：枚举（高/中/低）｜必填：是｜校验：三选一｜说明：关系图中高影响力节点更大（5.4 影响力）。',
-      '联系偏好｜类型：枚举（电话/微信/邮件）｜必填：否｜校验：三选一，后续可扩展更多渠道｜说明：指导销售选择触达方式（5.4 联系偏好）。',
-      '关键联系人｜类型：布尔开关｜必填：是｜校验：是/否｜说明：是否为关键决策联系人，统计卡与关系图决策链的核心依据（5.4 关键联系人）。',
-      '备注｜类型：多行文本｜必填：否｜校验：长度不超过 500 字｜说明：其他信息、沟通禁忌与关系备注（5.4 备注）。',
-      '对我方态度｜类型：枚举（支持者/中立/反对者）｜必填：是｜校验：三选一｜说明：关系图按态度着色，支持者绿色、中立蓝色、反对者红色（5.4 关系图要求）。',
-      '汇报对象｜类型：客户内联系人选择｜必填：否｜校验：只能选择同客户其他联系人｜说明：用于生成客户内部决策链与组织关系树（5.4 关系图要求）。',
-      '负责人｜类型：人员选择｜必填：否｜校验：必须为有效销售人员｜说明：联系人协同维护责任人，默认张三；与客户主负责人配合防止重复联系（第十二章「同一客户多人跟进」）。',
-      '其他任职关系｜类型：动态列表（客户或组织 + 部门 + 职务）｜必填：否｜校验：同一联系人可关联多个客户或组织，但每条任职关系必须记录具体客户/组织、部门与职务｜说明：规划方案 5.4 要求支持一个联系人服务多个客户；原型当前以所属客户为主关联，多任职关系见本节「未实现」说明。'
-    ],
-    rules: [
-      '列表由通用 ListPage 渲染，筛选为前端即时过滤：关键词在整行字符串中模糊匹配，其余条件精确匹配，点击查询后回到第 1 页，分页为真实切片（4.2）。',
-      '新增与编辑共用同一表单与校验规则，必填项标星，保存前校验格式及必填项，保存成功后直接写回 store.ext.contacts，并立即反映到列表、所属客户详情联系人和客户关系图（4.3）。',
-      '新增时自动生成 LX 开头六位联系人编号；编辑时保留原编号、创建信息与汇报关系。',
-      '同一个联系人可关联多个客户或组织，但必须记录具体任职关系；客户内部关系图标注决策链、支持者、反对者和实际使用者（5.4）。',
-      '删除前弹出确认框，说明会同步清理其汇报关系并记录日志；确认后从联系人数组移除，并把其他联系人的汇报对象指向该编号的字段清空；重要业务对象优先作废/归档并保留历史（4.3）。',
-      '每次新增、编辑、删除都会写入操作日志 store.ext.logs（模块：联系人），展示操作时间、操作人、操作类型和联系人加客户名称，联系人详情与系统日志均可查询。',
-      '导入与导出当前为示例提示，正式版导入需按手机号和姓名查重，返回错误行号、字段和原因，不静默丢数据；导出需按字段权限脱敏（第十二章「数据导入失败」、第十四章「导入导出」）。'
-    ],
-    flow: [
-      '联系人角色：决策人、使用人、采购人、财务、技术；角色决定其在决策链中的位置，决策人可拥有多个下属联系人，实际使用者单独标注（5.4）。',
-      '对我方态度流转：中立 → 沟通推进 → 支持者或反对者；态度变化直接影响关系图节点颜色与支持者、反对者统计。',
-      '关键联系人标记：否 → 是；标记后参与统计卡与决策链生成，取消后从关键联系人名单移除。',
-      '组织关系流转：通过汇报对象建立父子关系，顶层联系人无汇报对象，客户详情组织关系树和关系图据此生成；支持者/反对者/实际使用者按态度与角色标注。',
-      '联系人所属客户变更时保留原任职关系与历史沟通记录，新客户联系人列表和关系图即时刷新。'
-    ],
-    errors: [
-      '姓名、所属客户、联系电话或联系人角色未填：表单校验拦截并提示对应字段，弹窗保持打开（4.3）。',
-      '电话格式不符合数字、星号、短横线规则或邮箱格式错误：阻止保存并在字段下方提示。',
-      '重复录入联系人（同一客户下姓名/手机号重复）：提示关联已有联系人、合并或确认新建，不静默产生重复档案（第十二章「重复录入客户」同类场景）。',
-      '同一客户多人跟进：以客户主负责人 + 协同负责人约束联系人维护，列表与详情展示负责人，避免重复联系（第十二章「同一客户多人跟进」）。',
-      '删除联系人时用户取消：不执行删除，汇报关系与日志均不变化。',
-      '联系人已被其他页面删除或编号不存在：详情页显示「未找到该联系人」空态并提供返回列表按钮。',
-      '无权限维护他人客户联系人：编辑和删除按钮应置灰并提示联系管理员，越权操作后端拦截并记录安全日志（第三章、第十二章「用户越权操作」）。',
-      '导入文件字段缺失或格式错误：返回错误行号、字段和原因，已成功行不受影响，不静默丢数据（第十二章「数据导入失败」）。'
-    ],
-    api: [
-      '联系人分页查询接口：支持关键词、客户、角色、影响力、态度、关键联系人筛选并返回真实总数。',
-      '联系人新增、编辑、删除接口：删除时在同一事务中清理汇报关系并写入审计日志。',
-      '联系人详情与关系图查询接口：返回个人信息、所属客户、任职关系、关联商机、历史沟通、关系备注、关系节点边和操作日志。',
-      '操作日志查询接口：按联系人编号或客户名称反查最近的维护记录。',
-      '联系人导入接口：返回成功条数以及失败行的行号、字段与原因（示例）。'
-    ],
-    accept: [
-      '第十四章「联系人：联系人能关联客户并查看互动历史」：新增联系人可选择所属客户，保存后可在联系人列表与所属客户详情中看到，且互动历史可查询。',
-      '六个筛选条件均可用，查询与重置后列表、统计卡和分页总数同步变化，单页行数不超过总数，无假总数。',
-      '联系人角色仅能选择决策人/使用人/采购人/财务/技术，影响力仅能选择高/中/低，联系偏好仅能选择电话/微信/邮件；关键联系人开关可在列表与详情正确展示。',
-      '手机号/座机格式、邮箱、必填项校验均能拦截非法输入，合法数据可正常保存。',
-      '删除联系人后列表不再显示，原下属联系人的汇报对象被清空，并新增一条可查询的操作日志。',
-      '点击姓名、所属客户、详情和编辑按钮均能正确跳转或打开弹窗，页面无控制台报错。',
-      '第十四章重点场景「从新增线索开始，完整转化为客户、联系人和商机」：线索转化生成的联系人能在本列表按所属客户检索到，并可进入详情查看互动历史。'
+      '统计卡包含规划方案 7.1 要求的审批数量、用时、驳回率三项指标，且待我审批数字与审批中心一致。',
+      '从审批统计点击返回审批中心可正常跳转，页面无控制台报错；审批统计按角色数据权限隔离。'
     ]
   },
 
@@ -12776,17 +13368,17 @@ const PZ_DOC_PC_CFG = {
 
   'user-detail': {
     name: '用户详情', module: '系统管理',
-    goal: '全景查看单个用户：账号信息（账号/姓名/部门/角色/联系方式/状态/最近登录）、所属角色的权限摘要（数据权限/菜单权限/按钮权限/字段脱敏），以及该用户本人的操作日志（最多 12 条倒序），为权限排查、安全审计与账号维护提供入口。',
+    goal: '全景查看单个用户：账号信息（账号/姓名/部门/角色/联系方式/状态/最近登录）、所属角色的权限摘要（数据权限/菜单权限/按钮权限/字段脱敏），以及该用户本人的操作日志（最多 12 条倒序），为权限排查、安全审计与账号维护提供入口（第八章 用户管理、第三章权限体系）。',
     roles: [
       '菜单：系统管理员通过「系统管理 → 用户管理」点击用户姓名进入本页，路由 /system/user/:id。',
-      '按钮：管理员拥有「编辑」「重置密码」按钮（当前为示例提示，编辑在用户管理内完成）；部门负责人可查看本部门成员详情但无编辑按钮。',
-      '数据：管理员可查看全部用户；部门负责人仅可查看本部门及下级成员的角色与权限摘要；普通用户无本页菜单。',
-      '字段：手机号、邮箱、最近登录时间按角色字段权限展示，非管理员对他人详情敏感字段脱敏；操作日志仅展示该用户相关的模块、动作、内容与来源 IP。',
-      '数据：用户不物理删除，停用为状态流转；角色决定的菜单/按钮/数据范围/脱敏配置变更全部留痕。'
+      '按钮：管理员拥有「编辑」「重置密码」按钮（当前为示例提示，编辑在用户管理内完成，重置密码需二次确认并邮件通知——第八章 用户管理：重置密码）；部门负责人可查看本部门成员详情但无编辑按钮。',
+      '数据：管理员可查看全部用户；部门负责人仅可查看本部门及下级成员的角色与权限摘要（第三章 数据权限：本部门及下属）；普通用户无本页菜单。',
+      '字段：手机号、邮箱、最近登录时间按角色字段权限展示，非管理员对他人详情敏感字段脱敏（第三章 字段权限）；操作日志仅展示该用户相关的模块、动作、内容与来源 IP。',
+      '数据：用户不物理删除，停用为状态流转并写日志；角色决定的菜单/按钮/数据范围/脱敏配置变更全部留痕（14 章：操作日志可查询到操作人和时间）。'
     ],
     enter: [
       '入口：系统管理用户列表点击用户姓名进入 /system/user/:id。',
-      '关联入口：组织架构树点击部门成员（原型链路）。',
+      '关联入口：用户管理详情抽屉右侧「进入完整详情页」按钮、组织架构树点击部门成员（原型链路）。',
       '跳转：页头「返回用户管理」与空态按钮回到 /system（用户管理页签）；面包屑「系统管理」可返回含二级页签的系统管理。'
     ],
     layout: [
@@ -12797,46 +13389,49 @@ const PZ_DOC_PC_CFG = {
       '底部卡「本人的操作日志」：操作时间、模块、动作标签、操作内容、来源 IP 列表，按时间倒序最多 12 条，无日志时显示「暂无相关日志」。'
     ],
     fields: [
-      '账号｜类型：文本｜必填：是｜校验：用户列表内唯一｜说明：登录标识，只读展示。',
-      '姓名｜类型：文本｜必填：是｜校验：非空｜说明：头部标题与日志检索（who）依据。',
-      '所属部门｜类型：枚举（部门选择）｜必填：是｜校验：必须为有效部门｜说明：决定数据权限范围计算与组织树挂载。',
-      '角色｜类型：枚举（管理员/销售经理/销售/财务/客服等）｜必填：是｜校验：必须为角色库有效角色｜说明：权限摘要卡按角色配置渲染，角色变更需在用户管理中完成。',
-      '联系电话 / 邮箱｜类型：文本｜必填：否｜校验：电话号码、邮箱格式（用户管理编辑表单校验）｜说明：敏感字段按字段权限脱敏后展示。',
-      '状态｜类型：枚举（启用/停用）｜必填：是｜校验：标签绿/灰｜说明：停用用户失去登录与菜单权限，状态流转在用户管理变更。',
-      '最近登录｜类型：日期时间｜必填：否｜校验：无｜说明：安全审计参考，为空显示 —。',
-      '数据权限｜类型：枚举文本｜必填：是｜校验：来自角色 dataScope 配置｜说明：如全部数据/本部门及下级/仅本人。',
-      '菜单/按钮权限｜类型：列表｜必填：是｜校验：来自角色 menus/buttons 配置｜说明：本页只读展示，汇总卡统计菜单数量。',
-      '操作日志记录｜类型：对象数组｜必填：是｜校验：按操作人过滤并按时间倒序截取前 12 条｜说明：字段含操作时间、模块、动作、操作内容、来源 IP。'
+      '账号｜类型：文本｜必填：是｜校验：用户列表内唯一，重复账号在用户管理保存时被拦截｜说明：登录标识，只读展示（第八章 用户管理）。',
+      '姓名｜类型：文本｜必填：是｜校验：非空｜说明：头部标题与操作日志检索（who）依据。',
+      '所属部门｜类型：枚举（部门选择）｜必填：是｜校验：必须为有效部门｜说明：决定数据权限范围计算与组织树挂载（第八章 组织管理：公司/事业部/部门/团队/岗位）。',
+      '用户角色｜类型：枚举（管理员/销售经理/销售/售前/财务/客服等）｜必填：是｜校验：必须为角色库有效角色｜说明：权限摘要卡按角色配置渲染，角色变更需在用户管理中完成并写日志。',
+      '联系电话 / 邮箱｜类型：文本｜必填：否｜校验：电话号码、邮箱格式（用户管理编辑表单校验，9.4 格式校验）｜说明：敏感字段按字段权限脱敏后展示。',
+      '状态｜类型：枚举（启用/停用）｜必填：是｜校验：标签绿/灰｜说明：停用用户立即失去登录与菜单权限，进行中的审批不受影响；状态变更在用户管理执行并写日志。',
+      '最近登录｜类型：日期时间｜必填：否｜校验：无｜说明：登录安全审计参考（第八章 登录安全：登录日志/会话管理），为空显示 —。',
+      '数据权限｜类型：枚举文本｜必填：是｜校验：来自角色 dataScope 配置（本人/本部门/本部门及下级/全部，第三章）｜说明：决定该用户可访问的数据范围，在服务端校验（9.4）。',
+      '菜单/按钮权限｜类型：列表｜必填：是｜校验：来自角色 menus/buttons 配置（第三章 菜单权限/按钮权限）｜说明：本页只读展示，汇总卡统计菜单数量。',
+      '字段脱敏｜类型：列表｜必填：否｜校验：来自角色 fieldMask 配置（第三章 字段权限）｜说明：如「合同-成本价」「报价-毛利率」，无配置显示「无」。',
+      '操作日志记录｜类型：对象数组｜必填：是｜校验：按操作人过滤并按时间倒序截取前 12 条｜说明：字段含操作时间、模块、动作、操作内容、来源 IP（第九章 sys_operation_log）。'
     ],
     rules: [
       '页面数据只按路由 id 从 store.ext.users 检索：每个用户详情只展示本人的信息、角色和日志，不做数据共用。',
-      '角色权限摘要实时联动角色配置：menus、buttons、dataScope、fieldMask 直接读取角色库，任何角色修改后该页重启即刷新。',
-      '操作日志按 user.name 精确匹配操作人字段，倒序展示最近 12 条；每条含时间、模块、动作标签与内容，支持「暂无相关日志」空态。',
-      '编辑与重置密码当前为示例提示：正式版编辑跳回用户管理弹窗（账号/姓名/部门/角色/状态可改），重置密码需二次确认并通过邮件通知。',
+      '角色权限摘要实时联动角色配置：menus、buttons、dataScope、fieldMask 直接读取角色库，任何角色修改后该页重启即刷新（14 章：检查历史配置可追溯）。',
+      '操作日志按 user.name 精确匹配操作人字段，倒序展示最近 12 条；每条含时间、模块、动作标签与内容，支持「暂无相关日志」空态（14 章：操作日志可查询操作人和时间）。',
+      '编辑与重置密码当前为示例提示：正式版编辑跳回用户管理弹窗（账号/姓名/部门/角色/状态可改），重置密码需二次确认并通过邮件通知（第八章）。',
       '用户不存在（id 无效或已删除）：整页以 el-empty 展示「用户不存在（可能已被删除）」并引导返回用户管理，不渲染残缺卡片。',
-      '本页无任何写操作，所有状态变更（启用/停用）必须在用户管理执行并写操作日志。'
+      '本页无任何写操作，所有状态变更（启用/停用）必须在用户管理执行并写操作日志；用户停用后立即失去登录权限，其名下客户与待办由客户转移/离职交接处理（第十二章：客户负责人离职转交未完成客户和待办，历史记录不变）。'
     ],
     flow: [
-      '用户状态：启用 ↔ 停用；停用立即失去登录权限与菜单入口，启用后恢复，全部留痕。',
+      '用户状态：启用 ↔ 停用；停用立即失去登录权限与菜单入口，启用后恢复，全部留痕；用户不物理删除（逻辑删除/停用，9.4）。',
+      '负责人离职链路：停用用户（用户管理）→ 名下未完成客户与待办转交其他人员（客户转移）→ 历史跟进/审批记录保持不变（第十二章）。',
       '权限生效链路：角色配置（数据权限/菜单/按钮/字段脱敏）变更 → 该角色的所有用户详情摘要同步变化 → 用户重建登录后按新配置生效。',
       '审计链路：用户的每次新增/编辑/删除等操作 → 写入系统操作日志（含 IP）→ 本页按操作人倒序反查展示。'
     ],
     errors: [
       '路由 id 无效或用户已删除：空态页 + 返回按钮，避免白屏。',
       '用户未配置角色：权限摘要显示「—」占位，菜单数量按 0 计算。',
-      '字段脱敏未配置：显示「无」，不得隐藏整卡。',
+      '字段脱敏未配置：显示「无」，不得隐藏整卡（第十四章 安全性：敏感字段按权限展示）。',
+      '敏感字段越权查看：正式版对他人手机号/邮箱按字段权限脱敏或隐藏，越权请求被拦截并记录安全日志（第十二章：用户越权操作）。',
       '日志数据缺失：显示空态而不伪造记录，日志接口不可用时由正式版提示刷新。'
     ],
     api: [
-      '用户详情查询接口：按用户 id 返回账号信息与状态。',
+      '用户详情查询接口：按用户 id 返回账号信息与状态（第九章：用户 sys_user）。',
       '角色权限查询接口：按角色名返回数据权限、菜单、按钮与字段脱敏配置。',
       '用户操作日志接口：按操作人过滤，分页倒序返回（本页取前 12 条）。',
-      '重置密码 / 停用接口：二次确认后生效并以邮件/消息通知（示例）。'
+      '重置密码 / 停用接口：二次确认后生效并以邮件/消息通知，写操作日志（第八章）。'
     ],
     accept: [
-      '进入详情展示的数据与用户 id 一一对应，切换不同用户 id 页面正确重建。',
-      '角色权限摘要四项（数据权限/菜单/按钮/脱敏）与角色配置一致，菜单数量可复算。',
-      '操作日志最多 12 条、倒序、动作标签清晰，无日志时显示空态文案。',
+      '进入详情展示的数据与用户 id 一一对应，切换不同用户 id 页面正确重建（14 章：不同角色访问授权数据）。',
+      '角色权限摘要四项（数据权限/菜单/按钮/字段脱敏）与角色配置一致且实时联动，菜单数量可复算。',
+      '操作日志最多 12 条、倒序、含操作人与时间与 IP，无日志时显示空态文案。',
       '两个返回入口（按钮与面包屑）都能回到用户管理，「用户不存在」空态正确展示。',
       '页面无控制台报错。'
     ]
@@ -12844,65 +13439,85 @@ const PZ_DOC_PC_CFG = {
 
   mobile: {
     name: '移动端预览', module: '移动端',
-    goal: '以手机框高保真预览 CRM 移动端（H5/企业微信/App）五个主屏——首页、客户、日程、待办、我的：外勤打卡、拜访签到、跟进录入、移动审批、工单处理等场景；右侧展示功能清单、屏幕跳转下拉与授权隐私提示；切换屏时右侧需求文档同步切换（docState.override）。',
+    goal: '按规划方案第十一章以手机框高保真预览 CRM 移动端（H5/企业微信/App）五个主屏——首页、客户、日程、待办、我的：覆盖线索查看/创建/分配/跟进、客户查询与画像、拜访日程与签到、商机查看与阶段更新、跟进记录、审批查看/同意/拒绝/退回、回款计划与实际到账、服务工单接单处理、通知提醒等外勤高频能力；右侧展示功能清单、屏幕跳转下拉与授权隐私提示，切换屏时右侧需求文档同步切换（docState.override）。',
     roles: [
       '菜单：全角色（销售/销售经理/管理员）通过顶部栏「移动端预览」进入本页，路由 /mobile；直接访问 #/m 也可脱离 PC 外壳全屏体验。',
-      '按钮：手机框内按钮与真实数据交互（写跟进、新建商机、签到、完成待办）；右侧「跳转到屏幕」下拉与屏幕说明为演示辅助，不做业务写入。',
-      '数据：手机端操作会真实修改演示数据（leads/customers/opps/todos 等共享 store），切屏不清空；授权提示仅文案，不调用真实定位/拍照能力。',
-      '字段：手机端默认展示本人数据；客户电话、金额等敏感字段按角色字段权限脱敏；定位、通讯录等隐私能力需明确授权后可用。',
-      '数据：移动端不提供删除类操作，工单与审批历史只读留痕。'
+      '按钮：手机框内按钮与真实数据交互（写跟进、新建线索/商机、阶段更新、拜访签到、完成待办、审批同意/拒绝/退回、工单接单处理）；右侧「跳转到屏幕」下拉与屏幕说明为演示辅助，不做业务写入。',
+      '数据：手机端操作会真实修改演示数据（leads/customers/opps/activities/todos/approvals/payments/tickets 等共享 store），切屏不清空，PC 端同源可见；移动端不提供删除类操作，审批与工单历史只读留痕。',
+      '字段：手机端默认展示本人数据；客户电话、金额等敏感字段按角色字段权限脱敏；定位、录音、拍照、通讯录等隐私能力需明确授权后可用（第十一章末段）。',
+      '安全：跨角色查看他人客户/审批由正式版后端按数据权限拦截并记录安全日志；授权提示仅文案，不调用真实定位/拍照能力。'
     ],
     enter: [
       '入口：PC 顶部栏「移动端预览」按钮 → /mobile。',
       '独立访问：浏览器输入 #/m（或 #/m/:screen）进入全屏移动端外壳 MobileStandalone，同样使用本 docKey。',
-      '屏内跳转：底部导航（首页/客户/日程/待办/我的）与业务卡片点击在屏间切换；右侧「跳转到屏幕」下拉可直达任一屏（mgo）。'
+      '屏内跳转：底部导航（首页/客户/日程/待办/我的）与业务卡片点击在屏间切换；右侧「跳转到屏幕」下拉可直达任一屏（mgo）。',
+      '关联入口：消息通知点击按类型跳转审批详情、回款查询、线索列表或首页；我的页「我的审批」进入移动审批中心。'
     ],
     layout: [
-      '左区：手机框（含刘海）内 MobileApp 渲染当前屏，sync-doc 开启文档同步。',
-      '右区「移动端功能清单」：五屏能力表（首页：问候/待办/快捷操作；客户：搜索筛选/详情含联系人、跟进、商机、合同回款、工单；日程：周历/新建日程/拜访签到/拜访记录；待办：待审批/待跟进/待回款/工单分段处理；我的：个人信息/业绩进度/消息/隐私与授权/退出登录）。',
+      '左区：手机框（含刘海）内 MobileApp 渲染当前屏，sync-doc 开启文档同步；底部导航固定为首页 · 客户 · 日程 · 待办 · 我的，二级页面保留底部栏。',
+      '右区「移动端功能清单」：五屏能力表（首页：问候/今日待办、待审批、逾期回款/快捷操作/今日日程/最近客户；客户：搜索与等级筛选/客户详情含联系人、跟进、商机、合同回款、工单；日程：周历/新建日程/拜访签到/拜访记录/活动详情；待办：待审批/待跟进/待回款/工单分段处理；我的：个人信息/业绩进度/消息通知/业务入口/隐私与授权/退出登录）。',
       '右区「跳转到屏幕」工具条：下拉列出全部屏幕（标题 + key + 文档 key），选中即 mgo 切换，并实时显示当前屏与其文档 key。',
       '右区提示：授权与隐私 Alert（定位/拍照/通讯录需明确授权）、说明手机内操作会真实修改演示数据、底部导航结构与 #/m 全屏访问说明。',
-      '移动端内实际布局由 comp-mobile.js 渲染：benv 底部导航固定不动、内容区切换，每个屏有对应 m-xxx 文档。'
+      '移动端内实际布局由 comp-mobile.js 渲染：状态栏 + 导航栏 + 内容区 + 底部导航，每个屏有对应 m-xxx 文档；本页文档只描述移动端整体预览与第十一章能力口径。'
     ],
     fields: [
       '当前屏幕｜类型：枚举（home/cust/sched/todo/me 及二级屏）｜必填：是｜校验：mcur.key 必须命中 MSCREENS｜说明：决定手机内容与右侧文档（docState.override = s.doc）。',
-      '跳转目标屏｜类型：枚举下拉｜必填：否｜校验：清空不跳转｜说明：演示直达，valid 值为 MSCREENS key。',
+      '跳转目标屏｜类型：枚举下拉｜必填：否｜校验：清空不跳转｜说明：演示直达，有效值为 MSCREENS key。',
+      '移动端能力项｜类型：枚举（线索管理/客户管理/拜访管理/商机管理/跟进记录/审批/回款/服务工单/通知）｜必填：是｜校验：按第十一章功能表全量展示｜说明：线索查看、创建、分配、跟进；客户查询、详情、画像；创建日程、拜访签到、拜访记录；查看商机、更新销售阶段；电话/拜访/沟通内容；查看、同意、拒绝、退回；查询计划和实际到账；查看、接单、处理、上传现场图片；跟进提醒、审批提醒、逾期提醒。',
       '功能清单条目｜类型：固定二维表｜必填：是｜校验：五屏全量展示｜说明：描述各屏移动端能力，与 comp-mobile.js 实际渲染一致。',
-      '待办/审批条目｜类型：动态列表｜必填：否｜校验：来自 store 待办数据｜说明：手机端可同意/拒绝（拒绝需原因提示）并真实写回。',
+      '待办/审批条目｜类型：动态列表｜必填：否｜校验：来自 store.approvals 与待办数据｜说明：手机端可同意/拒绝/退回（拒绝与退回需原因），处理结果写回并同步 PC 审批中心。',
+      '跟进记录｜类型：对象（客户/方式/内容/下次跟进）｜必填：是（保存时）｜校验：客户必选、跟进内容非空｜说明：电话、拜访、沟通内容统一写入活动与跟进记录，PC 端同源可查。',
+      '拜访签到｜类型：对象（地址/时间/坐标/照片）｜必填：否｜校验：需定位授权，坐标在客户允许范围内｜说明：创建日程、拜访签到、拜访记录三件套；无授权时提示手动确认，不伪造定位。',
+      '回款查询｜类型：对象（计划金额/已收金额/计划日期/到账记录）｜必填：否｜校验：金额与合同计划一致｜说明：查询计划和实际到账情况，逾期由计划日期与当前日期比较得出。',
+      '服务工单处理｜类型：对象（工单/处理记录/现场图片）｜必填：是（接单后处理时）｜校验：接单后必须填写处理记录｜说明：查看、接单、处理、上传现场图片，超时按 SLA 通知处理人及主管（7.3）。',
+      '通知类型｜类型：枚举（跟进提醒/审批提醒/逾期提醒）｜必填：是｜校验：来自消息数据｜说明：点击按类型跳转对应业务屏，处理完成后置为已读（第十一章功能表「通知」）。',
       '定位授权状态｜类型：模拟｜必填：否｜校验：无真实调用｜说明：签到与拜访功能以提示文案演示授权流程，无 GPS 实动。'
     ],
     rules: [
+      '第十一章能力口径：移动端至少支持线索管理（查看、创建、分配、跟进）、客户管理（查询、详情、画像）、拜访管理（创建日程、签到、拜访记录）、商机管理（查看、更新阶段）、跟进记录（电话、拜访、沟通内容）、审批（查看、同意、拒绝、退回）、回款（查询计划和实际到账）、服务工单（查看、接单、处理、上传现场图片）、通知（跟进提醒、审批提醒、逾期提醒）。',
       '切屏与文档联动：watch mcur.key 变化时把 docState.override 置为当前屏的文档 key，回到 PC 路由或离开页面时清空 override，不污染本页文档。',
-      '手机内交互真实写数据：写跟进、新建商机、签到、完成待办都会更新 store；手机端与 PC 端数据一致（同源）。',
+      '手机内交互真实写数据：写跟进、新建线索/商机、阶段更新、签到、完成待办、审批处理、工单处理都会更新 store；手机端与 PC 端数据一致（同源），审批与工单历史只读留痕。',
       '底部导航不动、内容区切换；二级页面也保留底部栏，跳转统一走 mgo；「跳转到屏幕」下拉选中后立即切换并显示当前文档 key。',
       '离开页面执行 onBeforeUnmount：清空手机操作按钮注册（mSetActions）与文档 override，保证 PC 面板恢复正常文档。',
-      '授权类能力（定位/拍照/通讯录）仅展示授权提示，不真实调用系统能力，避免浏览器权限弹窗。'
+      '授权类能力（定位/录音/拍照/通讯录）仅展示授权提示，不真实调用系统能力；未授权时相关按钮提示授权，不降级为伪造数据（第十一章隐私规则）。',
+      '移动端审批与 PC 同源：待我审批取 tab=todo，同意后进入已处理，拒绝/退回必须填写原因，处理结果即时同步 PC 审批中心计数。',
+      '移动端工单按 SLA 处理：接单后进入处理中，处理完成上传现场图片并填写处理记录；超出 SLA 通知处理人及主管（7.3）。'
     ],
     flow: [
-      '移动端主流程：登录 → 首页（今日待办/待审批/快捷操作）→ 跳客户或日程执行跟进/拜访签到 → 待办审批处理（同意/拒绝，拒绝需原因）→「我的」查看业绩与设置。',
-      '审批流转：待办 → 同意（直接通过）/ 拒绝（填原因）→ 审批中心同步可见，待办条目消失。',
-      '拜访流转：日程屏选择当日拜访 → 签到（授权提示模拟范围校验）→ 填写跟进记录 → 活动状态更新。',
+      '移动端主流程：登录 → 首页（今日待办/待审批/逾期回款/快捷操作）→ 跳客户或日程执行跟进/拜访签到 → 待办中处理审批、跟进、回款与工单 →「我的」查看业绩、消息与授权设置。',
+      '线索流转：新建线索 → 未联系 → 跟进中 → 分配/领取 → 转化为客户/联系人/商机；原始线索与跟进历史保留（第十一章线索管理）。',
+      '审批流转：待办 → 审批详情 → 同意（直接通过）/ 拒绝或退回（填原因）→ 审批中心同步可见，待办条目消失。',
+      '拜访流转：日程屏选择当日拜访 → 签到（授权提示模拟范围校验）→ 填写跟进记录 → 活动状态更新并生成下次跟进待办。',
+      '工单流转：待受理 → 接单（待分派/处理中）→ 处理并上传现场图片 → 待客户确认/已解决/已关闭；超时按 SLA 升级提醒。',
+      '通知流转：跟进提醒、审批提醒、逾期提醒进入消息列表 → 点击按类型跳转 → 处理后置为已读。',
       '文档切换流：屏切换 → docState.override = m-xxx → 右侧面板展示该屏文档；离开页面清空。'
     ],
     errors: [
       '直接访问未定义屏幕（#/m/xxx）：按外壳缺省屏渲染或返回首页，不白屏。',
       '手机内示例操作未命中真实数据（如已处理待办重复点击）：给出提示且不重复写数据。',
-      'EMBEDDED 模式无 auth时：仍可浏览演示屏，仅提示登录场景。',
-      '定位失败/超范围签到：显示「定位失败请手动确认」类提示，不绑定流程。',
+      'EMBEDDED 模式无 auth 时：仍可浏览演示屏，仅提示登录场景。',
+      '定位失败/超范围签到：显示「定位失败请手动确认」类提示，不绑定流程，不伪造坐标。',
+      '相机/相册/通讯录授权被拒绝：提示需在系统设置中开启授权，工单现场图片可暂存草稿，不静默丢失。',
+      '弱网或离线：列表展示缓存并提示可能非最新，恢复网络后静默刷新；无缓存时显示空态与重试。',
+      '审批被他人先行处理：详情动作区消失并提示「仅可查看」，不重复提交。',
       '页面切走再切回：手机屏回 home 且文档 override 清空，无残留告警或控制台报错。'
     ],
     api: [
-      '移动端工作台汇总接口：首页待办/待审批/逾期回款计数（示例）。',
-      '拜访签到与定位校验接口：坐标范围检查（原型为提示演示）。',
-      '移动端待办/待审批查询与处理接口：同意/拒绝写入并同步审批中心。',
-      '推送与授权接口：消息推送、通讯录与相机授权（示例，需用户明示同意）。'
+      '移动端工作台汇总接口：首页待办、待审批、逾期回款计数与快捷入口（第十一章首页）。',
+      '线索/客户/商机/跟进接口：列表、详情、新建、分配、阶段更新与跟进写入（原型共享 store）。',
+      '拜访签到与定位校验接口：坐标范围检查与签到记录（原型为提示演示），录音/拍照需用户明示授权。',
+      '移动端审批查询与处理接口：同意/拒绝/退回写入并同步审批中心（与 PC 同源）。',
+      '回款计划与实际到账查询接口：按合同/计划返回计划金额、已收金额与逾期状态。',
+      '服务工单接口：查看、接单、处理、上传现场图片与 SLA 超时提醒。',
+      '消息通知接口：跟进提醒、审批提醒、逾期提醒推送与已读状态。'
     ],
     accept: [
-      '五屏可通过底部导航与「跳转到屏幕」下拉自由切换，切换过程中不报错。',
-      '切换屏后右侧需求文档正确切换为对应 m-xxx 文档，离开页面恢复 PC 文档。',
-      '手机内跟进/签到/审批操作真实写回 store，PC 端对应页面数据同步可见。',
-      '底部导航固定，二级页面保留；#/m 全屏访问可用。',
-      '授权与隐私提示展示完整，手机内操作不触发真实浏览器权限弹窗；页面无控制台报错。'
+      '第十一章五个底部导航（首页/客户/日程/待办/我的）齐全且可切换；「跳转到屏幕」下拉可直达任一屏，切换过程中不报错。',
+      '第十一章九类移动能力可验证：线索查看/创建/分配/跟进、客户查询/详情/画像、日程创建/拜访签到/拜访记录、商机查看/阶段更新、跟进记录、审批查看/同意/拒绝/退回、回款计划与实际到账查询、工单查看/接单/处理/上传现场图片、三类通知提醒。',
+      '移动审批同意后待我审批减少、已处理增加，拒绝/退回必须填原因；处理结果与 PC 审批中心计数一致。',
+      '手机内跟进/签到/商机阶段/工单处理真实写回 store，PC 端对应页面数据同步可见；审批与工单历史只读留痕。',
+      '切换屏后右侧需求文档正确切换为对应 m-xxx 文档，离开页面恢复 PC 文档；授权与隐私提示展示完整，手机内操作不触发真实浏览器权限弹窗。',
+      '回款查询显示计划与实际到账，逾期状态正确；通知按类型跳转对应业务屏；页面无控制台报错。'
     ]
   }
 };
