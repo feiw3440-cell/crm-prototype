@@ -214,10 +214,10 @@ a:hover{text-decoration:underline}
 .opinion{padding:10px 14px;background:var(--soft);border-radius:8px;border:1px solid var(--line);margin-bottom:8px}
 /* mobile preview */
 .mob-wrap{display:flex;gap:48px;justify-content:center;align-items:flex-start;padding:10px 0}
-.phone{width:370px;height:730px;border-radius:46px;background:#181b20;padding:12px;box-shadow:0 20px 50px rgba(15,40,80,.3),inset 0 0 0 2px #3a3f47;flex:none}
+.phone{width:370px;height:730px;border-radius:46px;background:linear-gradient(150deg,var(--navy3),var(--navy));padding:12px;box-shadow:0 20px 50px rgba(15,40,80,.3),inset 0 0 0 2px var(--navy2);flex:none}
 .screen{width:100%;height:100%;border-radius:36px;background:var(--bg);overflow:hidden;display:flex;flex-direction:column;position:relative}
 .m-status{height:34px;display:flex;justify-content:space-between;align-items:center;padding:6px 22px 0;font-size:12px;font-weight:600;background:transparent}
-.m-notch{position:absolute;left:50%;top:8px;transform:translateX(-50%);width:96px;height:22px;background:#111;border-radius:12px}
+.m-notch{position:absolute;left:50%;top:8px;transform:translateX(-50%);width:96px;height:22px;background:var(--navy3);border-radius:12px;z-index:5}
 .m-body{flex:1;overflow-y:auto;padding:0 14px 14px}
 .m-body::-webkit-scrollbar{width:0}
 .m-hero{background:linear-gradient(135deg,var(--navy2),var(--el-color-primary));color:#fff;border-radius:16px;padding:16px;margin:4px 0 12px}
@@ -287,6 +287,143 @@ a:hover{text-decoration:underline}
 .dup-tag{cursor:pointer}
 .row-overdue td.el-table__cell{background:var(--el-color-danger-light-9,#fff6f5)!important}
 .left-num .el-input__inner{text-align:left!important}
+
+/* ================= 第 7 阶段：移动端框架与屏幕 ================= */
+.layout.standalone{min-width:0;height:100vh;background:var(--bg)}
+.layout.standalone .body{height:100vh}
+.layout.standalone .main.mfull{padding:0;overflow:hidden;background:var(--bg)}
+.m-standalone{height:100vh;width:100%;display:flex;justify-content:center;background:var(--bg)}
+.m-standalone .m-app{width:100%;max-width:520px;height:100vh;border-left:1px solid var(--line);border-right:1px solid var(--line);background:var(--bg)}
+.m-app{flex:1;display:flex;flex-direction:column;min-height:0;height:100%;background:var(--bg);color:var(--text)}
+.m-app .m-status{flex:none;color:var(--text)}
+.m-nav{height:46px;flex:none;display:flex;align-items:center;padding:0 8px;background:var(--card);border-bottom:1px solid var(--line)}
+.m-nav-back{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--text);font-size:19px;cursor:pointer}
+.m-nav-back:hover{background:var(--el-color-primary-light-9);color:var(--el-color-primary)}
+.m-nav-back.hide{visibility:hidden}
+.m-nav-title{flex:1;text-align:center;font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-nav-right{min-width:36px;display:flex;justify-content:flex-end;gap:2px}
+.m-nav-act{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--sub);font-size:18px;cursor:pointer}
+.m-nav-act:hover{background:var(--el-color-primary-light-9);color:var(--el-color-primary)}
+.m-page{padding:2px 0 14px}
+.m-ellipsis{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-card{color:var(--text);border:1px solid var(--line);box-shadow:0 1px 2px rgba(15,40,80,.03)}
+.m-card.nopad{padding:0}
+.m-card h4{display:flex;align-items:center;gap:6px}
+.m-card h4:before{content:"";width:3px;height:13px;border-radius:2px;background:var(--el-color-primary)}
+.m-card .m-card{padding:0;border:0;box-shadow:none;margin:0}
+.m-cell{display:flex;align-items:center;gap:8px;padding:11px 0;border-bottom:1px solid var(--line);font-size:13px;cursor:pointer}
+.m-cell:last-child{border-bottom:0}
+.m-cell-ic{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:var(--el-color-primary-light-9);color:var(--el-color-primary);font-size:16px;flex:none}
+.m-cell-lb{color:var(--text);flex:none}
+.m-cell-v{margin-left:auto;color:var(--sub);text-align:right;min-width:0;word-break:break-all;display:flex;align-items:center;justify-content:flex-end;gap:4px}
+.m-cell-ar{color:var(--sub);font-size:14px;flex:none}
+.m-tag{display:inline-flex;align-items:center;border-radius:6px;font-size:11px;line-height:20px;padding:0 6px;white-space:nowrap;border:1px solid transparent}
+.m-tag.t-info{background:var(--el-color-primary-light-9);color:var(--el-color-primary);border-color:var(--el-color-primary-light-8)}
+.m-tag.t-success{background:var(--el-color-success-light-9,#eaf7f0);color:var(--ok);border-color:var(--el-color-success-light-8,#cdecd9)}
+.m-tag.t-warning{background:var(--el-color-warning-light-9,#fdf6ec);color:var(--warn);border-color:var(--el-color-warning-light-8,#f8e3c2)}
+.m-tag.t-danger{background:var(--el-color-danger-light-9,#fef0f0);color:var(--danger);border-color:var(--el-color-danger-light-8,#f9d4d4)}
+.m-search{margin:2px 0 10px}
+.m-chip-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.m-chip{font-size:12px;padding:5px 10px;border-radius:16px;background:var(--card);border:1px solid var(--line);color:var(--sub);cursor:pointer}
+.m-chip.on{background:var(--el-color-primary);border-color:var(--el-color-primary);color:#fff;font-weight:600}
+.m-result-tip{font-size:12px;color:var(--sub);margin:2px 2px 8px}
+.m-loadmore{text-align:center;margin:4px 0 10px;font-size:12px}
+.m-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:34px 10px;color:var(--sub);font-size:13px}
+.m-empty .el-icon{font-size:34px;color:var(--el-color-primary-light-5)}
+.m-list-item{cursor:pointer;border-radius:8px;padding-left:4px;padding-right:4px}
+.m-list-item:hover{background:var(--el-color-primary-light-9)}
+.m-hero .m-stats>div{cursor:pointer}
+.m-hero .m-stats>div:hover{background:rgba(255,255,255,.24)}
+.m-form .m-field{padding:8px 0;border-bottom:1px solid var(--line)}
+.m-form .m-field:last-child{border-bottom:0}
+.m-field-lb{font-size:13px;font-weight:600;margin-bottom:6px}
+.m-field-lb i{color:var(--danger);font-style:normal;margin-left:2px}
+.m-field-ctl .el-select,.m-field-ctl .el-date-editor{width:100%}
+.m-field-hint{font-size:11px;color:var(--sub);margin-top:4px}
+.m-cust-head{display:flex;gap:12px;align-items:flex-start}
+.m-cust-logo{width:52px;height:52px;border-radius:14px;background:var(--el-color-primary-light-8);color:var(--el-color-primary);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;flex:none}
+.m-cust-name{font-size:16px;font-weight:700;line-height:1.35}
+.m-cust-meta{color:var(--sub);font-size:12px;margin-top:3px}
+.m-action-row{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+.m-action-row .el-button{margin-left:0}
+.m-seg{display:flex;gap:4px;background:var(--tint);border-radius:12px;padding:4px;margin-bottom:12px}
+.m-seg>span{flex:1;text-align:center;font-size:13px;color:var(--sub);padding:7px 4px;border-radius:9px;cursor:pointer;white-space:nowrap;position:relative}
+.m-seg>span.on{background:var(--card);color:var(--el-color-primary);font-weight:600;box-shadow:0 1px 4px rgba(15,40,80,.08)}
+.m-seg>span i{font-style:normal;font-size:10px;background:var(--danger);color:#fff;border-radius:8px;padding:0 4px;margin-left:2px}
+.m-seg-scroll{overflow-x:auto}
+.m-seg-scroll::-webkit-scrollbar{height:0}
+.m-money{color:var(--el-color-primary);font-weight:600;font-variant-numeric:tabular-nums}
+.m-week{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px 6px;margin-bottom:12px}
+.m-week-d{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;border-radius:10px;cursor:pointer;color:var(--sub)}
+.m-week-d .wd{font-size:11px}
+.m-week-d b{font-size:16px;font-weight:600;color:var(--text)}
+.m-week-d i{position:absolute;right:6px;top:5px;font-style:normal;width:14px;height:14px;line-height:14px;border-radius:50%;background:var(--el-color-primary);color:#fff;font-size:9px;text-align:center}
+.m-week-d.on{background:var(--el-color-primary);color:#fff}
+.m-week-d.on b{color:#fff}
+.m-week-d.on i{background:#fff;color:var(--el-color-primary)}
+.m-week-d.today:not(.on) b{color:var(--el-color-primary)}
+.m-section-h{display:flex;align-items:baseline;gap:8px;margin:2px 2px 10px}
+.m-section-h b{font-size:15px}
+.m-section-h .muted{font-size:12px}
+.m-contract{border-bottom:1px dashed var(--line);padding:8px 0}
+.m-contract:first-child{padding-top:0}
+.m-contract:last-child{border-bottom:0;padding-bottom:0}
+.m-contract-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:2px}
+.m-plan-row{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--sub);padding:4px 0}
+.m-plan-row span:first-child{flex:1;min-width:0}
+.m-plan-row .m-tag{margin-left:auto}
+.m-text{font-size:13px;line-height:1.7;color:var(--text);white-space:pre-wrap}
+.m-note{display:flex;gap:8px;align-items:flex-start;background:var(--el-color-primary-light-9);color:var(--el-color-primary);border:1px solid var(--el-color-primary-light-8);border-radius:12px;padding:10px 12px;font-size:12px;line-height:1.6;margin-bottom:12px}
+.m-note .el-icon{font-size:16px;flex:none;margin-top:1px}
+.m-map{height:110px;border-radius:12px;border:1px dashed var(--el-color-primary-light-5);background:var(--tint);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--sub);margin-bottom:6px;position:relative;overflow:hidden}
+.m-map-pin{font-size:30px;color:var(--el-color-primary)}
+.m-map-pin.off{color:var(--sub);opacity:.5}
+.m-map-tip{font-size:12px}
+.m-photo-box{height:92px;border:1px dashed var(--line);border-radius:12px;background:var(--soft);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--sub);font-size:12px;cursor:pointer}
+.m-photo-box:hover{border-color:var(--el-color-primary);color:var(--el-color-primary)}
+.m-photo-box .el-icon{font-size:26px}
+.m-photo{font-size:12px;color:var(--sub);margin-top:6px}
+.m-todo-wrap{align-items:flex-start!important;cursor:pointer;border-radius:8px;padding-left:3px;padding-right:3px}
+.m-todo-wrap:hover{background:var(--el-color-primary-light-9)}
+.m-todo-wrap .tm{width:44px}
+.m-sum-row{display:flex;gap:12px;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px dashed var(--line)}
+.m-sum-row:last-child{border-bottom:0}
+.m-sum-row span:last-child{text-align:right}
+.m-flow-row{display:flex;gap:10px;align-items:flex-start;padding:7px 0}
+.m-flow-dot{width:10px;height:10px;border-radius:50%;background:var(--el-color-primary);margin-top:6px;flex:none;box-shadow:0 0 0 3px var(--el-color-primary-light-8)}
+.m-flow-dot.cur{background:var(--warn);box-shadow:0 0 0 3px var(--el-color-warning-light-8,#f8e3c2)}
+.m-flow-dot.done{background:var(--ok);box-shadow:0 0 0 3px var(--el-color-success-light-8,#cdecd9)}
+.m-flow-dot.wait,.m-flow-dot.skip{background:var(--line);box-shadow:none}
+.m-flow-dot.rej{background:var(--danger);box-shadow:0 0 0 3px var(--el-color-danger-light-8,#f9d4d4)}
+.m-me-hero{display:flex;align-items:center;gap:12px}
+.m-me-ava{width:54px;height:54px;border-radius:16px;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-size:23px;font-weight:700;flex:none}
+.m-perf-top{display:flex;align-items:baseline;gap:8px;margin-bottom:10px}
+.m-perf-top b{font-size:22px;color:var(--el-color-primary);font-variant-numeric:tabular-nums}
+.m-auth-row{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line)}
+.m-auth-row:last-of-type{border-bottom:0}
+.m-msg-dot{width:8px;height:8px;border-radius:50%;background:var(--danger);flex:none}
+.m-msg-dot.read{background:transparent}
+.m-sheet-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;display:flex;align-items:flex-end;justify-content:center}
+.m-sheet{width:100%;max-width:520px;background:var(--card);border-radius:16px 16px 0 0;padding:8px 12px 14px;animation:mSheetUp .18s ease}
+.m-sheet-tt{text-align:center;color:var(--sub);font-size:12px;padding:10px 0}
+.m-sheet-it{text-align:center;padding:13px;font-size:15px;border-top:1px solid var(--line);cursor:pointer;color:var(--text)}
+.m-sheet-it:hover{background:var(--el-color-primary-light-9)}
+.m-sheet-it.danger{color:var(--danger)}
+.m-sheet-cancel{text-align:center;padding:13px;margin-top:8px;border-radius:10px;background:var(--soft);cursor:pointer;color:var(--sub)}
+.m-toast{position:fixed;left:50%;bottom:88px;transform:translateX(-50%);background:var(--navy3);color:#fff;font-size:13px;padding:9px 16px;border-radius:20px;z-index:300;max-width:320px;text-align:center;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.m-toast.t-success{background:var(--ok)}
+.m-toast.t-warning{background:var(--warn)}
+.m-toast.t-error{background:var(--danger)}
+.m-fade-enter-active,.m-fade-leave-active{transition:opacity .16s}
+.m-fade-enter-from,.m-fade-leave-to{opacity:0}
+@keyframes mSheetUp{from{transform:translateY(20px);opacity:.6}to{transform:translateY(0);opacity:1}}
+.m-demo-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.m-demo-tools>span:first-child{font-size:13px;font-weight:600}
+.mob-side code{background:var(--tint);border-radius:4px;padding:1px 5px;font-size:12px}
+@media (max-width:900px){
+  .mob-wrap{flex-direction:column;align-items:center;gap:18px}
+  .mob-side{max-width:100%}
+}
 
 </style>
 </head>
@@ -2070,6 +2207,147 @@ const DocPanel = {
       </div>
     </div>
   </div>`,
+};
+
+/* ===== 第 7 阶段：移动端框架（屏幕注册表 / 导航栈 / 通用组件） ===== */
+const MSCREENS = {};
+const registerMScreen = (key, comp, meta) => {
+  meta = meta || {};
+  MSCREENS[key] = { key, comp, title: meta.title || key, doc: meta.doc || ('m-' + key), tab: meta.tab || '' };
+};
+
+const mnav = reactive({ stack: [{ key: 'home', params: {} }], actions: [] });
+const mcur = computed(() => mnav.stack[mnav.stack.length - 1] || { key: 'home', params: {} });
+const mcurScreen = computed(() => MSCREENS[mcur.value.key] || MSCREENS.home || null);
+const mgo = (key, params) => {
+  if (!MSCREENS[key]) { ElMessage.warning('该功能将在后续阶段开放'); return false; }
+  mnav.stack = [{ key, params: params || {} }];
+  return true;
+};
+const mpush = (key, params) => {
+  if (!MSCREENS[key]) { ElMessage.warning('该功能将在后续阶段开放'); return false; }
+  mnav.stack.push({ key, params: params || {} });
+  return true;
+};
+const mback = () => {
+  if (mnav.stack.length > 1) mnav.stack.pop();
+  else mgo('home');
+};
+const mSetActions = arr => { mnav.actions.splice(0, mnav.actions.length, ...(arr || [])); };
+
+const M_TABS = [
+  { key: 'home', label: '首页', icon: 'HomeFilled', screen: 'home' },
+  { key: 'cust', label: '客户', icon: 'OfficeBuilding', screen: 'customers' },
+  { key: 'sched', label: '日程', icon: 'Calendar', screen: 'schedule' },
+  { key: 'todo', label: '待办', icon: 'List', screen: 'todo' },
+  { key: 'me', label: '我的', icon: 'User', screen: 'me' },
+];
+
+/* ---------- 通用小组件 ---------- */
+const MCard = {
+  props: { title: String, noPad: Boolean },
+  template: `<div class="m-card" :class="{nopad:noPad}"><h4 v-if="title">{{ title }}</h4><slot/></div>`,
+};
+const MCell = {
+  props: { label: String, value: [String, Number], icon: String, arrow: { type: Boolean, default: true } },
+  emits: ['click'],
+  template: `<div class="m-cell" @click="$emit('click')">
+    <span v-if="icon" class="m-cell-ic"><el-icon><component :is="icon"/></el-icon></span>
+    <span class="m-cell-lb">{{ label }}</span>
+    <span class="m-cell-v"><slot>{{ value }}</slot></span>
+    <el-icon v-if="arrow" class="m-cell-ar"><arrow-right/></el-icon>
+  </div>`,
+};
+const MTag = {
+  props: { type: String, text: String },
+  template: `<span class="m-tag" :class="'t-' + (type || 'info')">{{ text }}<slot/></span>`,
+};
+const MSearch = {
+  props: { modelValue: String, placeholder: { type: String, default: '搜索' } },
+  emits: ['update:modelValue'],
+  template: `<div class="m-search"><el-input :model-value="modelValue" :placeholder="placeholder" prefix-icon="Search" clearable @update:model-value="v => $emit('update:modelValue', v)"/></div>`,
+};
+const MEmpty = {
+  props: { text: { type: String, default: '暂无数据' }, icon: { type: String, default: 'Box' } },
+  template: `<div class="m-empty"><el-icon><component :is="icon"/></el-icon><span>{{ text }}</span></div>`,
+};
+const MForm = { template: `<div class="m-form"><slot/></div>` };
+const MField = {
+  props: { label: String, required: Boolean, hint: String },
+  template: `<div class="m-field"><div class="m-field-lb">{{ label }}<i v-if="required">*</i></div><div class="m-field-ctl"><slot/><div v-if="hint" class="m-field-hint">{{ hint }}</div></div></div>`,
+};
+const MActionSheet = {
+  props: { modelValue: Boolean, title: String, actions: { type: Array, default: () => [] } },
+  emits: ['update:modelValue', 'select'],
+  template: `<transition name="m-fade"><div v-if="modelValue" class="m-sheet-mask" @click.self="$emit('update:modelValue', false)">
+    <div class="m-sheet"><div class="m-sheet-tt">{{ title }}</div>
+      <div v-for="(a, i) in actions" :key="i" class="m-sheet-it" :class="{danger:a.danger}" @click="$emit('select', a); $emit('update:modelValue', false)">{{ a.label }}</div>
+      <div class="m-sheet-cancel" @click="$emit('update:modelValue', false)">取消</div>
+    </div></div></transition>`,
+};
+
+/* ---------- 手机内轻提示 ---------- */
+const mToastState = reactive({ show: false, msg: '', type: 'info', timer: null });
+const mToast = (msg, type) => {
+  mToastState.msg = msg; mToastState.type = type || 'info'; mToastState.show = true;
+  if (mToastState.timer) clearTimeout(mToastState.timer);
+  mToastState.timer = setTimeout(() => { mToastState.show = false; }, 2200);
+};
+const MToastHost = {
+  setup() { return { mToastState }; },
+  template: `<transition name="m-fade"><div v-if="mToastState.show" class="m-toast" :class="'t-' + mToastState.type">{{ mToastState.msg }}</div></transition>`,
+};
+
+/* ---------- 手机外壳：状态栏 + 导航栏 + 屏幕容器 + 底部 tabbar ---------- */
+const MobileApp = {
+  components: { MToastHost },
+  props: { syncDoc: Boolean, initialScreen: String },
+  setup(props) {
+    const screen = computed(() => MSCREENS[mcur.value.key] || MSCREENS.home || { title: 'CRM', tab: 'home', comp: { template: '<div/>' } });
+    const curTab = computed(() => screen.value.tab || 'home');
+    const title = computed(() => screen.value.title || 'CRM 移动端');
+    const clock = ref('9:41');
+    onMounted(() => {
+      if (props.initialScreen) mgo(props.initialScreen);
+      const tick = () => { const d = new Date(); clock.value = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
+      tick();
+    });
+    watch(() => mcur.value.key, () => { mnav.actions.splice(0, mnav.actions.length); }, { flush: 'pre' });
+    watch(() => screen.value.doc, d => { if (props.syncDoc) docState.override = d || ''; }, { immediate: true });
+    onBeforeUnmount(() => { if (props.syncDoc) docState.override = ''; });
+    const tabGo = k => { mgo(k); };
+    return { mnav, mcur, screen, curTab, title, clock, M_TABS, mback, tabGo, mgo, mpush };
+  },
+  template: `<div class="m-app">
+    <div class="m-status"><span>{{ clock }}</span><span>5G ▮▮▮ 86%</span></div>
+    <div class="m-nav">
+      <div class="m-nav-back" :class="{hide:mnav.stack.length<=1}" @click="mback"><el-icon><arrow-left/></el-icon></div>
+      <div class="m-nav-title">{{ title }}</div>
+      <div class="m-nav-right">
+        <span v-for="(a, i) in mnav.actions" :key="i" class="m-nav-act" :title="a.title" @click="a.on && a.on()"><el-icon><component :is="a.icon"/></el-icon></span>
+      </div>
+    </div>
+    <div class="m-body">
+      <component :is="screen.comp" v-bind="mcur.params" :key="mnav.stack.length + '-' + mcur.key"/>
+    </div>
+    <div class="m-tabbar">
+      <div v-for="t in M_TABS" :key="t.key" :class="{on:curTab===t.key}" @click="tabGo(t.screen)">
+        <el-icon><component :is="t.icon"/></el-icon>{{ t.label }}
+      </div>
+    </div>
+    <m-toast-host/>
+  </div>`,
+};
+
+/* 浏览器窄屏直开 #/m 时使用：脱离 PC 外壳，全屏显示手机界面 */
+const MobileStandalone = {
+  components: { MobileApp },
+  props: { screen: String },
+  setup(props) {
+    watch(() => props.screen, s => { mgo(s || 'home'); }, { immediate: true });
+    return {};
+  },
+  template: `<div class="m-standalone"><mobile-app :sync-doc="false"/></div>`,
 };
 
 /* ===== 第 3 阶段：客户内部关系图（全局组件 RelationGraph，props: customer 客户名称） =====
@@ -4801,54 +5079,887 @@ registerRoute('/leads/my', LeadsPage, 'leads', () => ({ tab: 'my' }));
 registerRoute('/leads/pool', LeadsPage, 'lead-pool', () => ({ tab: 'pool' }));
 registerRoute('/leads/records', LeadsPage, 'lead-records', () => ({ tab: 'records' }));
 
+/* ===== 移动端预览页：左侧手机框渲染 MobileApp，右侧功能清单与屏幕跳转 ===== */
 const MobilePage = {
-  components: { PageHead },
+  components: { PageHead, MobileApp },
   setup() {
-    const tab = ref('home');
-    const tabs = [['home', '首页', 'HomeFilled'], ['cust', '客户', 'OfficeBuilding'], ['sched', '日程', 'Calendar'], ['todo', '待办', 'List'], ['me', '我的', 'User']];
-    // 手机端切屏时联动需求文档
-    watch(tab, v => { docState.override = 'm-' + v; }, { immediate: true });
-    onBeforeUnmount(() => { docState.override = ''; });
-    const todos = [{ t: '09:30', c: '南京某某科技', a: '电话跟进', done: true }, { t: '14:00', c: '江苏某某集团', a: '客户拜访', done: false }];
-    const appr = ref([{ id: 1, t: '报价 BJ-202611-0008 折扣审批', s: '张三 · 南京某某科技 · ¥334,977.20' }, { id: 2, t: '合同 HT-202611-0006 审批', s: '李四 · 苏州某某汽配 · ¥420,000.00' }, { id: 3, t: '客户转移 · 苏州某某汽配', s: '李四 → 王五' }]);
-    const act = (a, ok) => { appr.value = appr.value.filter(x => x.id !== a.id); ElMessage[ok ? 'success' : 'warning'](ok ? '已同意' : '已拒绝（需填写原因）'); };
-    const quick = [['新增线索', 'Aim', 'var(--el-color-primary-light-9)', 'var(--el-color-primary)'], ['新增客户', 'OfficeBuilding', '#e6f6ee', '#2e9e6a'], ['新增商机', 'TrendCharts', '#fff3e0', '#e08a00'], ['安排拜访', 'Location', '#f3e8fb', '#8a4fc7']];
-    const custs = [['南', '南京某某科技有限公司', '重点客户 · 张三'], ['江', '江苏某某集团', '战略客户 · 李四'], ['安', '安徽某某连锁有限公司', '重点客户 · 张三'], ['上', '上海某某信息技术有限公司', '普通客户 · 王五']];
-    const feats = [['线索管理', '查看、创建、分配、跟进'], ['客户管理', '客户查询、客户详情、客户画像'], ['拜访管理', '创建日程、拜访签到、拜访记录'], ['商机管理', '查看商机、更新销售阶段'], ['跟进记录', '电话、拜访、沟通内容'], ['审批', '查看、同意、拒绝、退回'], ['回款', '查询计划和实际到账情况'], ['服务工单', '查看、接单、处理、上传现场图片'], ['通知', '跟进提醒、审批提醒、逾期提醒']];
-    return { tab, tabs, todos, appr, act, quick, custs, feats };
+    const jumpTo = ref('');
+    const feats = [
+      ['首页', '问候、今日待办 / 待审批 / 逾期回款、快捷操作、今日日程、最近客户'],
+      ['客户', '搜索与等级筛选、我的客户、分页加载；客户详情含联系人 / 跟进 / 商机 / 合同回款 / 工单'],
+      ['日程', '周历条、当日活动、新建日程、拜访签到、拜访记录、活动详情'],
+      ['待办', '待审批 / 待跟进 / 待回款 / 工单分段，支持完成与快捷处理'],
+      ['我的', '个人信息、本月业绩进度、消息通知、业务入口、隐私与授权、退出登录'],
+    ];
+    const screenOptions = computed(() => Object.values(MSCREENS).map(s => ({ key: s.key, title: s.title, doc: s.doc })));
+    const jump = k => { if (k) mgo(k); jumpTo.value = ''; };
+    watch(() => mcur.value.key, k => { const s = MSCREENS[k]; if (s) docState.override = s.doc; }, { immediate: true });
+    onMounted(() => { mgo('home'); });
+    onBeforeUnmount(() => { mSetActions([]); docState.override = ''; });
+    return { jumpTo, jump, feats, screenOptions, mnav, mcurScreen };
   },
   template: `<div>
-    <page-head :crumbs="['工作台', '移动端预览']" title="移动端工作台预览" total="H5 / 企业微信 · 外勤、拜访、审批、工单场景"/>
+    <page-head :crumbs="['工作台', '移动端预览']" title="移动端工作台" total="H5 / 企业微信 · 外勤、拜访、签到、审批、工单场景">
+      <el-tag type="info" effect="plain">第 7 阶段 · 首页 / 客户 / 日程 / 待办 / 我的</el-tag>
+    </page-head>
     <div class="mob-wrap">
       <div class="phone"><div class="screen">
         <div class="m-notch"></div>
-        <div class="m-status"><span>9:41</span><span>5G ▮▮▮ 86%</span></div>
-        <div class="m-body">
-          <template v-if="tab==='home'">
-            <div style="font-size:13px;font-weight:600;padding:6px 2px 8px;color:var(--text)">CRM 工作台</div>
-            <div class="m-hero"><h3>早上好，张三</h3><p>今天还有 8 项工作需要处理</p>
-              <div class="m-stats"><div><b>5</b><span>待跟进</span></div><div @click="tab='todo'" style="cursor:pointer"><b>{{ appr.length }}</b><span>待审批</span></div></div></div>
-            <div class="m-card"><h4>快捷操作</h4><div class="m-quick"><div class="qi" v-for="q in quick" :key="q[0]" @click="$msg.info('示例：'+q[0])"><i :style="{background:q[2],color:q[3]}"><el-icon><component :is="q[1]"/></el-icon></i>{{ q[0] }}</div></div></div>
-            <div class="m-card"><h4>最近待办</h4>
-              <div class="m-todo" v-for="t in todos" :key="t.t"><span class="tm">{{ t.t }}</span><div style="flex:1"><div style="font-size:14px">{{ t.c }}</div><div class="muted" style="font-size:12px">{{ t.a }}</div></div><el-tag size="small" :type="t.done?'success':'primary'">{{ t.done?'已完成':'去拜访' }}</el-tag></div></div>
-          </template>
-          <template v-else-if="tab==='cust'"><div style="font-weight:600;font-size:17px;padding:8px 2px">客户</div><el-input prefix-icon="Search" placeholder="搜索客户 / 电话" style="margin-bottom:10px"/><div class="m-card"><div class="m-list-item" v-for="c in custs" :key="c[1]"><div class="m-ava">{{ c[0] }}</div><div><div style="font-size:14px;font-weight:600">{{ c[1] }}</div><div class="muted" style="font-size:12px">{{ c[2] }}</div></div><el-icon style="margin-left:auto;color:var(--sub)"><arrow-right/></el-icon></div></div></template>
-          <template v-else-if="tab==='sched'"><div style="font-weight:600;font-size:17px;padding:8px 2px">日程 · 11月2日</div><div class="m-card"><div class="m-todo"><span class="tm">09:30</span><div style="flex:1">南京某某科技 · 电话跟进</div></div><div class="m-todo"><span class="tm">14:00</span><div style="flex:1">江苏某某集团 · 客户拜访<div class="muted" style="font-size:12px">可拜访签到（需授权定位）</div></div><el-button size="small" type="primary" @click="$msg.success('已签到（示例）')">签到</el-button></div><div class="m-todo"><span class="tm">16:00</span><div style="flex:1">周例会</div></div></div></template>
-          <template v-else-if="tab==='todo'"><div style="font-weight:600;font-size:17px;padding:8px 2px">待办 · 待审批 {{ appr.length }}</div><div class="m-card" v-for="a in appr" :key="a.id"><div style="font-weight:600">{{ a.t }}</div><div class="muted" style="font-size:12px;margin:4px 0 10px">{{ a.s }}</div><el-button size="small" type="success" @click="act(a,true)">同意</el-button><el-button size="small" type="danger" plain @click="act(a,false)">拒绝</el-button><el-button size="small" plain @click="$msg.info('示例：退回修改')">退回</el-button></div><el-empty v-if="!appr.length" description="审批已处理完" :image-size="70"/></template>
-          <template v-else><div class="m-hero"><h3>张三</h3><p>华东销售一部 · 销售经理</p></div><div class="m-card"><div class="m-list-item">我的业绩<span class="muted" style="margin-left:auto">本月 78.6%</span></div><div class="m-list-item">消息通知<el-badge value="3" style="margin-left:auto"/></div><div class="m-list-item">隐私与授权<span class="muted" style="margin-left:auto;font-size:12px">定位 / 录音 / 通讯录</span></div></div></template>
-        </div>
-        <div class="m-tabbar"><div v-for="t in tabs" :key="t[0]" :class="{on:tab===t[0]}" @click="tab=t[0]"><el-icon><component :is="t[2]"/></el-icon>{{ t[1] }}</div></div>
+        <mobile-app :sync-doc="true"/>
       </div></div>
       <div class="mob-side">
-        <h3>移动端优先支持的功能（方案第十一章）</h3>
-        <table><tr><th>功能</th><th>移动端能力</th></tr><tr v-for="f in feats" :key="f[0]"><td>{{ f[0] }}</td><td>{{ f[1] }}</td></tr></table>
-        <el-alert type="info" :closable="false" show-icon style="margin-top:14px" title="快速录入 / 拍照上传 / 语音转文字" description="录音、定位、客户联系方式等数据需设置明确的授权与隐私规则。"/>
-        <p class="muted" style="font-size:13px">底部导航：首页 · 客户 · 日程 · 待办 · 我的。左侧手机内可点击切换并操作（如在「待办」中审批）。</p>
+        <h3>移动端功能清单</h3>
+        <div class="m-demo-tools">
+          <span>跳转到屏幕</span>
+          <el-select v-model="jumpTo" placeholder="选择要演示的屏幕" size="small" style="width:210px" @change="jump">
+            <el-option v-for="s in screenOptions" :key="s.key" :label="s.title + '（' + s.key + '）'" :value="s.key"/>
+          </el-select>
+          <span class="muted" style="font-size:12px">当前：{{ mcurScreen ? mcurScreen.title : '-' }} · 文档 {{ mcurScreen ? mcurScreen.doc : '-' }}</span>
+        </div>
+        <table><tr><th>屏 / 功能</th><th>移动端能力</th></tr><tr v-for="f in feats" :key="f[0]"><td>{{ f[0] }}</td><td>{{ f[1] }}</td></tr></table>
+        <el-alert type="info" :closable="false" show-icon style="margin-top:14px" title="定位 / 拍照 / 通讯录需明确授权" description="手机内操作会真实修改演示数据（写跟进、新建商机、签到、完成待办等），切换屏幕时右侧需求文档同步切换。"/>
+        <p class="muted" style="font-size:13px">底部导航：首页 · 客户 · 日程 · 待办 · 我的；二级页面也保留底部栏。浏览器直接访问 <code>#/m</code> 可脱离 PC 外壳全屏体验。</p>
       </div>
     </div>
   </div>`,
 };
 registerRoute('/mobile', MobilePage, 'mobile');
+registerRoute('/m', MobileStandalone, 'mobile');
+registerRoute('/m/:screen', MobileStandalone, 'mobile');
+
+/* ===== 第 7 阶段：移动端屏幕（首页 / 客户 / 日程 / 待办 / 我的） ===== */
+const MSA_OWNER = '张三';
+const MSA_LEVEL_TAG = { 战略客户: 'danger', 重点客户: 'warning', 普通客户: 'info', 潜在客户: 'info' };
+const msaYmd = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const msaNowTime = () => { const d = new Date(); return TODAY + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
+const msaMoney = n => '¥' + fmtY(Math.round(n || 0));
+const msaMoneyC = c => '¥' + fmtC(c || 0);
+const msaActNo = () => {
+  let mx = 99;
+  store.ext.activities.forEach(x => { const n = Number(String(x.no).split('-')[1]); if (n > mx) mx = n; });
+  return 'HD-' + String(mx + 1).padStart(6, '0');
+};
+const msaOppNo = () => {
+  let mx = 99;
+  store.opps.forEach(x => { const n = Number(String(x.no).split('-').pop()); if (n > mx) mx = n; });
+  return 'SJ-' + TODAY.slice(0, 7).replace('-', '') + '-' + String(mx + 1).padStart(4, '0');
+};
+const msaLog = (module, act, detail) => { store.ext.logs.unshift({ time: msaNowTime() + ':00', who: MSA_OWNER, module, act, detail, ip: '10.20.8.21' }); };
+/* 为移动端演示补充两条「今天」的活动（仅在当天没有本人活动时注入，不覆盖已有数据） */
+(function msaSeedToday() {
+  if (store.ext.activities.some(a => a.owner === MSA_OWNER && a.time.slice(0, 10) === TODAY)) return;
+  store.ext.activities.unshift({ no: msaActNo(), type: '拜访', customer: '江苏某某集团', contact: '周主任', opp: 'SJ-202610-0018', owner: MSA_OWNER, time: TODAY + ' 14:00', content: '上门拜访，沟通协议客户平台实施排期', feedback: '', next: '', status: '计划中', checkin: null });
+  store.ext.activities.unshift({ no: msaActNo(), type: '电话', customer: '南京某某科技有限公司', contact: '陈总监', opp: 'SJ-202609-0012', owner: MSA_OWNER, time: TODAY + ' 09:30', content: '电话跟进 ERP 升级项目报价与审批进度', feedback: '客户希望本周内确认方案', next: TODAY + ' 17:00', status: '已完成', checkin: null });
+})();
+const msaOverduePlans = () => {
+  const out = [];
+  store.pay.contracts.forEach(c => {
+    c.plans.forEach(p => {
+      if (p.date >= TODAY) return;
+      let paid = 0;
+      store.pay.records.forEach(r => { if (r.contract === c.no) (r.alloc || []).forEach(a => { if (a.plan === p.id) paid += a.amt; }); });
+      const due = p.amount - paid;
+      if (due > 0) out.push({ contract: c.no, customer: c.customer, owner: c.owner, stage: p.stage, planId: p.id, date: p.date, amount: due });
+    });
+  });
+  return out.sort((a, b) => (a.date < b.date ? -1 : 1));
+};
+
+/* ========== 1. 首页 home ========== */
+const MHomeScreen = {
+  components: { MCard, MCell, MTag, MEmpty },
+  setup() {
+    const todayActs = computed(() => store.ext.activities.filter(a => a.owner === MSA_OWNER && a.time.slice(0, 10) === TODAY).sort((a, b) => (a.time < b.time ? -1 : 1)));
+    const todoCount = computed(() => todayActs.value.filter(a => a.status === '计划中').length);
+    const apprCount = computed(() => store.approvals.filter(a => a.tab === 'todo').length);
+    const overdue = computed(() => msaOverduePlans());
+    const overdueCount = computed(() => overdue.value.length);
+    const recent = computed(() => store.customers.filter(c => c.owner === MSA_OWNER).slice().sort((a, b) => (a.lastFollow < b.lastFollow ? 1 : -1)).slice(0, 4));
+    const greet = computed(() => { const h = new Date().getHours(); return h < 12 ? '上午好' : h < 18 ? '下午好' : '晚上好'; });
+    const todayLabel = computed(() => { const d = new Date(TODAY + 'T00:00:00'); return (d.getMonth() + 1) + ' 月 ' + d.getDate() + ' 日 · 星期' + '日一二三四五六'[d.getDay()]; });
+    const quick = [
+      { k: 'lead', t: '新增线索', i: 'Aim', c: 'var(--el-color-primary)' },
+      { k: 'cust', t: '新增客户', i: 'OfficeBuilding', c: 'var(--ok)' },
+      { k: 'opp', t: '新增商机', i: 'TrendCharts', c: 'var(--warn)' },
+      { k: 'checkin', t: '拜访签到', i: 'Location', c: 'var(--el-color-primary)' },
+      { k: 'follow', t: '写跟进', i: 'ChatDotRound', c: 'var(--ok)' },
+      { k: 'scan', t: '扫码 / 拍照', i: 'Camera', c: 'var(--sub)' },
+    ];
+    const doQuick = q => {
+      if (q.k === 'checkin') return mgo('visit-checkin');
+      if (q.k === 'follow') return mgo('customers');
+      if (q.k === 'cust') return mgo('customers');
+      mToast(q.t + '：该功能将在后续阶段开放', 'warning');
+    };
+    onMounted(() => mSetActions([{ icon: 'Bell', title: '消息通知', on: () => mpush('notices') }]));
+    onBeforeUnmount(() => mSetActions([]));
+    return { todayActs, todoCount, apprCount, overdueCount, recent, greet, todayLabel, quick, doQuick, mgo, mpush, mToast, levelTag: l => MSA_LEVEL_TAG[l] || 'info' };
+  },
+  template: `<div class="m-page">
+    <div class="m-hero">
+      <h3>{{ greet }}，张三</h3>
+      <p>{{ todayLabel }} · 华东销售一部 · 销售经理</p>
+      <div class="m-stats">
+        <div @click="mgo('todo')"><b>{{ todoCount }}</b><span>今日待办</span></div>
+        <div @click="mgo('todo', {seg:'approval'})"><b>{{ apprCount }}</b><span>待审批</span></div>
+        <div @click="mgo('todo', {seg:'payment'})"><b>{{ overdueCount }}</b><span>逾期回款</span></div>
+      </div>
+    </div>
+    <m-card title="快捷操作">
+      <div class="m-quick">
+        <div class="qi" v-for="q in quick" :key="q.k" @click="doQuick(q)"><i :style="{background:'var(--tint)',color:q.c}"><el-icon><component :is="q.i"/></el-icon></i>{{ q.t }}</div>
+      </div>
+    </m-card>
+    <m-card title="今日日程">
+      <m-empty v-if="!todayActs.length" text="今天暂无日程安排" icon="Calendar"/>
+      <div v-for="a in todayActs" :key="a.no" class="m-todo" @click="mpush('visit-detail', {no:a.no})">
+        <span class="tm">{{ a.time.slice(11, 16) }}</span>
+        <div style="flex:1;min-width:0"><div class="m-ellipsis">{{ a.customer }}</div><div class="muted m-ellipsis" style="font-size:12px">{{ a.type }} · {{ a.content }}</div></div>
+        <m-tag :type="a.status==='已完成'?'success':(a.status==='计划中'?'warning':'info')" :text="a.status"/>
+      </div>
+    </m-card>
+    <m-card title="最近客户">
+      <div class="m-list-item" v-for="c in recent" :key="c.no" @click="mpush('customer-detail', {no:c.no})">
+        <div class="m-ava">{{ c.name.slice(0, 1) }}</div>
+        <div style="flex:1;min-width:0"><div class="m-ellipsis" style="font-weight:600">{{ c.name }}</div><div class="muted m-ellipsis" style="font-size:12px">{{ c.region }} · 最近跟进 {{ c.lastFollow }}</div></div>
+        <m-tag :type="levelTag(c.level)" :text="c.level"/>
+      </div>
+    </m-card>
+  </div>`,
+};
+
+/* ========== 2. 客户列表 / 客户详情 ========== */
+const MCustomersScreen = {
+  components: { MSearch, MTag, MEmpty, MCard },
+  setup() {
+    const kw = ref(''); const level = ref(''); const mine = ref(false); const limit = ref(8);
+    const levels = ['全部', '战略客户', '重点客户', '普通客户', '潜在客户'];
+    const filtered = computed(() => {
+      let a = store.customers.slice();
+      if (kw.value.trim()) { const k = kw.value.trim(); a = a.filter(c => c.name.includes(k) || c.no.includes(k) || (c.phone || '').includes(k)); }
+      if (level.value) a = a.filter(c => c.level === level.value);
+      if (mine.value) a = a.filter(c => c.owner === MSA_OWNER);
+      return a.sort((x, y) => (x.lastFollow < y.lastFollow ? 1 : -1));
+    });
+    const shown = computed(() => filtered.value.slice(0, limit.value));
+    watch([kw, level, mine], () => { limit.value = 8; });
+    const more = () => { limit.value += 8; };
+    const pickLevel = l => { level.value = l === '全部' ? '' : l; };
+    return { kw, level, mine, limit, levels, filtered, shown, more, pickLevel, mgo, mpush, mToast, levelTag: l => MSA_LEVEL_TAG[l] || 'info' };
+  },
+  template: `<div class="m-page">
+    <m-search v-model="kw" placeholder="搜索客户名称 / 编号 / 电话"/>
+    <div class="m-chip-row">
+      <span v-for="l in levels" :key="l" class="m-chip" :class="{on:(l==='全部'&&!level)||level===l}" @click="pickLevel(l)">{{ l }}</span>
+      <span class="m-chip" :class="{on:mine}" @click="mine=!mine">我的客户</span>
+    </div>
+    <div class="m-result-tip">共 {{ filtered.length }} 家客户<template v-if="mine"> · 负责人：张三</template></div>
+    <m-empty v-if="!shown.length" text="没有匹配的客户，试试调整筛选条件"/>
+    <div class="m-card" v-else>
+      <div class="m-list-item" v-for="c in shown" :key="c.no" @click="mpush('customer-detail', {no:c.no})">
+        <div class="m-ava">{{ c.name.slice(0, 1) }}</div>
+        <div style="flex:1;min-width:0">
+          <div class="m-ellipsis" style="font-weight:600">{{ c.name }}</div>
+          <div class="muted m-ellipsis" style="font-size:12px">{{ c.region }} · {{ c.owner || '公海' }} · 最近跟进 {{ c.lastFollow }}</div>
+        </div>
+        <m-tag :type="levelTag(c.level)" :text="c.level"/>
+      </div>
+    </div>
+    <div class="m-loadmore" v-if="shown.length < filtered.length">
+      <el-button size="small" round @click="more">加载更多（已显示 {{ shown.length }} / {{ filtered.length }}）</el-button>
+    </div>
+    <div class="m-loadmore muted" v-else-if="filtered.length > 8">已加载全部 {{ filtered.length }} 家</div>
+  </div>`,
+};
+
+const MCustomerDetailScreen = {
+  components: { MCard, MTag, MEmpty, MCell },
+  props: { no: String },
+  setup(props) {
+    const no = props.no || (store.customers[0] || {}).no;
+    const cust = computed(() => store.customers.find(c => c.no === no));
+    const bundle = computed(() => (cust.value ? custBundle(cust.value.name) : null));
+    const tab = ref('overview');
+    const tabs = [['overview', '概况'], ['contacts', '联系人'], ['activities', '跟进'], ['opps', '商机'], ['pay', '合同回款'], ['tickets', '工单']];
+    const levelTag = l => MSA_LEVEL_TAG[l] || 'info';
+    const dial = phone => mToast('正在拨打 ' + (phone || '客户电话') + '（演示）', 'success');
+    const writeFollow = () => {
+      if (!cust.value) return;
+      const c = bundle.value.contacts[0];
+      const noAct = msaActNo();
+      store.ext.activities.unshift({ no: noAct, type: '电话', customer: cust.value.name, contact: c ? c.name : '', opp: '', owner: MSA_OWNER, time: msaNowTime(), content: '移动端快速跟进：与客户确认近期需求与下一步安排', feedback: '客户表示继续推进', next: '', status: '已完成', checkin: null });
+      msaLog('客户', '跟进', '移动端新增电话跟进（客户：' + cust.value.name + '）');
+      mToast('跟进记录已保存（已完成）', 'success');
+    };
+    const newOpp = () => {
+      if (!cust.value) return;
+      ElMessageBox.prompt('请输入商机名称：', '新建商机', { confirmButtonText: '保存', cancelButtonText: '取消', inputValue: cust.value.name.replace(/(有限公司|集团)$/g, '') + ' 移动端新建商机', inputPattern: /\S+/, inputErrorMessage: '商机名称不能为空' })
+        .then(({ value }) => {
+          const on = msaOppNo();
+          store.opps.push({ no: on, name: value.trim(), customer: cust.value.name, amount: 100000, date: TODAY, owner: MSA_OWNER, stage: 'contact', prob: 10, info: {}, flags: {} });
+          msaLog('商机', '新建', '移动端新建商机 ' + on + '（客户：' + cust.value.name + '）');
+          mToast('商机已创建：' + on, 'success');
+          tab.value = 'opps';
+        }).catch(() => {});
+    };
+    onMounted(() => mSetActions([{ icon: 'Phone', title: '一键拨号', on: () => dial(cust.value && cust.value.phone) }]));
+    onBeforeUnmount(() => mSetActions([]));
+    return { cust, bundle, tab, tabs, STAGES, STAGE_IDX, levelTag, dial, writeFollow, newOpp, mgo, mpush, mToast, money: msaMoney, moneyC: msaMoneyC };
+  },
+  template: `<div class="m-page">
+    <m-empty v-if="!cust" text="客户不存在或已被合并" icon="OfficeBuilding"/>
+    <template v-else>
+      <div class="m-card m-cust-head">
+        <div class="m-cust-logo">{{ cust.name.slice(0, 1) }}</div>
+        <div style="flex:1;min-width:0">
+          <div class="m-cust-name">{{ cust.name }}</div>
+          <div class="m-cust-meta">{{ cust.no }} · {{ cust.industry }}</div>
+          <div style="display:flex;gap:6px;margin-top:6px"><m-tag :type="levelTag(cust.level)" :text="cust.level"/><m-tag :type="cust.status==='正常'?'success':'warning'" :text="cust.status"/><m-tag type="info" :text="cust.owner || '公海'"/></div>
+        </div>
+      </div>
+      <div class="m-action-row">
+        <el-button size="small" icon="Phone" @click="dial(cust.phone)">一键拨号</el-button>
+        <el-button size="small" type="primary" icon="EditPen" @click="writeFollow">写跟进</el-button>
+        <el-button size="small" icon="TrendCharts" @click="newOpp">新建商机</el-button>
+      </div>
+      <div class="m-seg m-seg-scroll">
+        <span v-for="t in tabs" :key="t[0]" :class="{on:tab===t[0]}" @click="tab=t[0]">{{ t[1] }}</span>
+      </div>
+      <m-card v-if="tab==='overview'">
+        <m-cell label="客户编号" :value="cust.no" :arrow="false"/>
+        <m-cell label="客户类型" :value="cust.type" :arrow="false"/>
+        <m-cell label="所在地区" :value="cust.region" :arrow="false"/>
+        <m-cell label="客户规模" :value="cust.scale" :arrow="false"/>
+        <m-cell label="线索来源" :value="cust.source" :arrow="false"/>
+        <m-cell label="累计成交" :value="money(cust.total)" :arrow="false"/>
+        <m-cell label="最近跟进" :value="cust.lastFollow" :arrow="false"/>
+      </m-card>
+      <m-card v-else-if="tab==='contacts'" title="联系人">
+        <m-empty v-if="!bundle.contacts.length" text="暂无联系人"/>
+        <div v-for="c in bundle.contacts" :key="c.no" class="m-list-item" @click="dial(c.phone)">
+          <div class="m-ava">{{ c.name.slice(0, 1) }}</div>
+          <div style="flex:1;min-width:0"><div style="font-weight:600">{{ c.name }} <span class="muted" style="font-weight:400;font-size:12px">{{ c.title }}</span></div><div class="muted m-ellipsis" style="font-size:12px">{{ c.dept }} · {{ c.phone }}</div></div>
+          <m-tag :type="c.role==='决策人'?'danger':'info'" :text="c.role"/>
+        </div>
+      </m-card>
+      <m-card v-else-if="tab==='activities'" title="跟进记录">
+        <m-empty v-if="!bundle.activities.length" text="暂无跟进记录"/>
+        <div v-for="a in bundle.activities" :key="a.no" class="m-list-item" @click="mpush('visit-detail', {no:a.no})">
+          <div style="flex:1;min-width:0"><div style="font-weight:600">{{ a.type }} · {{ a.time.slice(5, 16) }}</div><div class="muted m-ellipsis" style="font-size:12px">{{ a.content }}</div></div>
+          <m-tag :type="a.status==='已完成'?'success':'warning'" :text="a.status"/>
+        </div>
+      </m-card>
+      <m-card v-else-if="tab==='opps'" title="商机">
+        <m-empty v-if="!bundle.opps.length" text="暂无商机"/>
+        <div v-for="o in bundle.opps" :key="o.no" class="m-list-item">
+          <div style="flex:1;min-width:0"><div style="font-weight:600">{{ o.name }}</div><div class="muted" style="font-size:12px">{{ o.no }} · {{ o.date }}</div></div>
+          <div style="text-align:right"><div class="m-money">{{ money(o.amount) }}</div><m-tag type="info" :text="(STAGES[STAGE_IDX[o.stage]] || {}).name || o.stage"/></div>
+        </div>
+      </m-card>
+      <m-card v-else-if="tab==='pay'" title="合同与回款">
+        <m-empty v-if="!bundle.contracts.length" text="暂无合同"/>
+        <div v-for="c in bundle.contracts" :key="c.no" class="m-contract">
+          <div class="m-contract-h"><b>{{ c.no }}</b><m-tag :type="c.status==='履约中'?'success':'info'" :text="c.status"/></div>
+          <div class="muted" style="font-size:12px">{{ c.name }}</div>
+          <div class="m-money" style="margin:4px 0 6px">{{ money(c.amount) }}</div>
+          <div v-for="(p, i) in c.plans" :key="i" class="m-plan-row"><span>{{ p.stage }} · {{ p.date }}</span><span>{{ money(p.amount) }}</span><m-tag :type="p.status==='已回款'?'success':(p.status==='部分回款'?'warning':'info')" :text="p.status"/></div>
+        </div>
+        <div v-if="bundle.quotes.length" class="muted" style="font-size:12px;margin-top:8px">关联报价 {{ bundle.quotes.length }} 份</div>
+      </m-card>
+      <m-card v-else title="服务工单">
+        <m-empty v-if="!bundle.tickets.length" text="暂无工单"/>
+        <div v-for="t in bundle.tickets" :key="t.no" class="m-list-item">
+          <div style="flex:1;min-width:0"><div style="font-weight:600">{{ t.type }} · {{ t.no }}</div><div class="muted m-ellipsis" style="font-size:12px">{{ t.desc }}</div></div>
+          <m-tag :type="t.status==='已关闭'?'success':(t.priority==='紧急'?'danger':'warning')" :text="t.status"/>
+        </div>
+      </m-card>
+    </template>
+  </div>`,
+};
+
+/* ========== 3. 日程 / 拜访 ========== */
+const MScheduleScreen = {
+  components: { MCard, MTag, MEmpty },
+  setup() {
+    const sel = ref(TODAY);
+    const weekLabels = ['一', '二', '三', '四', '五', '六', '日'];
+    const week = computed(() => {
+      const base = new Date(TODAY + 'T00:00:00');
+      const off = (base.getDay() + 6) % 7;
+      const mon = new Date(base.getTime() - off * 86400000);
+      return weekLabels.map((lb, i) => {
+        const d = new Date(mon.getTime() + i * 86400000);
+        const ds = msaYmd(d);
+        return { d: ds, day: d.getDate(), label: '周' + lb, count: store.ext.activities.filter(a => a.owner === MSA_OWNER && a.time.slice(0, 10) === ds).length };
+      });
+    });
+    const acts = computed(() => store.ext.activities.filter(a => a.owner === MSA_OWNER && a.time.slice(0, 10) === sel.value).sort((a, b) => (a.time < b.time ? -1 : 1)));
+    const dayText = computed(() => { const d = new Date(sel.value + 'T00:00:00'); return (d.getMonth() + 1) + ' 月 ' + d.getDate() + ' 日 · 星期' + '日一二三四五六'[d.getDay()]; });
+    onMounted(() => mSetActions([{ icon: 'Plus', title: '新建日程', on: () => mpush('schedule-new') }]));
+    onBeforeUnmount(() => mSetActions([]));
+    return { sel, week, acts, dayText, mgo, mpush, mToast };
+  },
+  template: `<div class="m-page">
+    <div class="m-week">
+      <div v-for="d in week" :key="d.d" class="m-week-d" :class="{on:sel===d.d,today:d.d===TODAY}" @click="sel=d.d">
+        <span class="wd">{{ d.label }}</span><b>{{ d.day }}</b><i v-if="d.count">{{ d.count }}</i>
+      </div>
+    </div>
+    <div class="m-section-h"><b>{{ dayText }}</b><span class="muted">{{ acts.length }} 项安排</span></div>
+    <div class="m-action-row">
+      <el-button size="small" type="primary" icon="Plus" @click="mpush('schedule-new')">新建日程</el-button>
+      <el-button size="small" icon="Location" @click="mpush('visit-checkin')">拜访签到</el-button>
+      <el-button size="small" icon="Tickets" @click="mpush('visit-records')">拜访记录</el-button>
+    </div>
+    <m-empty v-if="!acts.length" text="当天暂无安排，可新建日程或发起拜访" icon="Calendar"/>
+    <div class="m-card" v-else>
+      <div v-for="a in acts" :key="a.no" class="m-todo" @click="mpush('visit-detail', {no:a.no})">
+        <span class="tm">{{ a.time.slice(11, 16) }}</span>
+        <div style="flex:1;min-width:0"><div class="m-ellipsis" style="font-weight:600">{{ a.customer }}</div><div class="muted m-ellipsis" style="font-size:12px">{{ a.type }} · {{ a.content }}</div></div>
+        <m-tag :type="a.status==='已完成'?'success':(a.status==='计划中'?'warning':'info')" :text="a.status"/>
+      </div>
+    </div>
+  </div>`,
+};
+
+const MVisitDetailScreen = {
+  components: { MCard, MTag, MEmpty, MCell },
+  props: { no: String },
+  setup(props) {
+    const act = computed(() => store.ext.activities.find(a => a.no === props.no));
+    const complete = () => {
+      if (!act.value) return;
+      act.value.status = '已完成';
+      if (!act.value.feedback) act.value.feedback = '移动端标记完成，客户沟通正常';
+      msaLog('活动', '完成', '移动端标记活动完成（' + act.value.no + '）');
+      mToast('活动已标记完成', 'success');
+    };
+    return { act, complete, mgo, mpush, mToast };
+  },
+  template: `<div class="m-page">
+    <m-empty v-if="!act" text="活动不存在或已被删除" icon="Calendar"/>
+    <template v-else>
+      <m-card>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><b style="font-size:16px">{{ act.type }} · {{ act.no }}</b><m-tag :type="act.status==='已完成'?'success':(act.status==='计划中'?'warning':'info')" :text="act.status"/></div>
+        <m-cell label="客户" :value="act.customer" :arrow="false"/>
+        <m-cell label="联系人" :value="act.contact || '-'" :arrow="false"/>
+        <m-cell label="时间" :value="act.time" :arrow="false"/>
+        <m-cell label="负责人" :value="act.owner" :arrow="false"/>
+      </m-card>
+      <m-card title="跟进内容"><div class="m-text">{{ act.content }}</div></m-card>
+      <m-card title="客户反馈" v-if="act.feedback"><div class="m-text">{{ act.feedback }}</div></m-card>
+      <m-card title="签到信息" v-if="act.checkin">
+        <m-cell label="签到地址" :value="act.checkin.addr" :arrow="false"/>
+        <m-cell label="签到时间" :value="act.checkin.time" :arrow="false"/>
+        <m-cell label="坐标" :value="act.checkin.lat + ', ' + act.checkin.lng" :arrow="false"/>
+        <div class="m-photo">现场照片：{{ act.checkin.photo || '未上传（占位）' }}</div>
+      </m-card>
+      <div class="m-action-row" style="margin-top:4px">
+        <el-button v-if="act.status==='计划中' && act.type==='拜访'" type="primary" icon="Location" @click="mpush('visit-checkin', {no:act.no})">拜访签到</el-button>
+        <el-button v-else-if="act.status==='计划中'" type="primary" icon="Check" @click="complete">标记完成</el-button>
+        <el-button icon="Tickets" @click="mpush('visit-records')">拜访记录</el-button>
+      </div>
+    </template>
+  </div>`,
+};
+
+const MVisitCheckinScreen = {
+  components: { MCard, MField, MEmpty, MCell, MForm },
+  props: { no: String },
+  setup(props) {
+    const findAct = () => {
+      let a = props.no ? store.ext.activities.find(x => x.no === props.no) : null;
+      if (!a) a = store.ext.activities.filter(x => x.owner === MSA_OWNER && x.type === '拜访' && x.status === '计划中').sort((x, y) => (x.time < y.time ? -1 : 1))[0];
+      if (!a) a = store.ext.activities.filter(x => x.type === '拜访' && x.status === '计划中').sort((x, y) => (x.time < y.time ? -1 : 1))[0];
+      if (!a) {
+        const c = store.customers[0];
+        a = { no: msaActNo(), type: '拜访', customer: c ? c.name : '示例客户', contact: '', opp: '', owner: MSA_OWNER, time: TODAY + ' 15:00', content: '移动端发起的临时拜访', feedback: '', next: '', status: '计划中', checkin: null };
+        store.ext.activities.unshift(a);
+      }
+      return a;
+    };
+    const act = ref(findAct());
+    const loc = ref(null); const photo = ref(''); const busy = ref(false); const submitting = ref(false);
+    const getLoc = () => {
+      if (busy.value) return;
+      busy.value = true;
+      setTimeout(() => {
+        const cust = store.customers.find(c => c.name === (act.value || {}).customer);
+        const seq = Number(String((act.value || {}).no || '0').replace(/\D/g, '')) % 100;
+        loc.value = { addr: (cust ? cust.region : '江苏省南京市') + '某某路' + (88 + seq) + '号', time: msaNowTime(), lat: 32.0603, lng: 118.7969 };
+        busy.value = false;
+        mToast('定位成功（模拟授权）', 'success');
+      }, 400);
+    };
+    const takePhoto = () => { photo.value = 'checkin-' + (act.value ? act.value.no : 'temp') + '.jpg'; mToast('照片已上传（占位）', 'success'); };
+    const submit = () => {
+      if (!act.value) { mToast('未找到待签到的拜访活动', 'error'); return; }
+      if (!loc.value) { mToast('请先获取定位后再签到', 'warning'); return; }
+      submitting.value = true;
+      act.value.status = '已完成';
+      act.value.checkin = { addr: loc.value.addr, time: msaNowTime(), lat: loc.value.lat, lng: loc.value.lng, photo: photo.value || '（未拍照，占位）' };
+      act.value.feedback = act.value.feedback || '现场签到完成，客户沟通正常';
+      msaLog('活动', '签到', '移动端拜访签到成功（' + act.value.no + '，地址：' + loc.value.addr + '）');
+      mToast('签到成功，活动已完成', 'success');
+      setTimeout(() => { submitting.value = false; mback(); }, 700);
+    };
+    onMounted(() => mSetActions([{ icon: 'Tickets', title: '拜访记录', on: () => mgo('visit-records') }]));
+    onBeforeUnmount(() => mSetActions([]));
+    return { act, loc, photo, busy, submitting, getLoc, takePhoto, submit, mgo, mback, mToast };
+  },
+  template: `<div class="m-page">
+    <m-empty v-if="!act" text="暂无可签到的拜访活动" icon="Location"/>
+    <template v-else>
+      <div class="m-note"><el-icon><InfoFilled/></el-icon><span>签到需要获取您的定位信息，仅用于记录拜访地点与时间；可在「我的 → 隐私与授权」中管理。</span></div>
+      <m-card title="拜访信息">
+        <m-cell label="活动编号" :value="act.no" :arrow="false"/>
+        <m-cell label="客户" :value="act.customer" :arrow="false"/>
+        <m-cell label="计划时间" :value="act.time" :arrow="false"/>
+        <m-cell label="当前状态" :value="act.status" :arrow="false"/>
+      </m-card>
+      <m-card title="定位信息">
+        <div class="m-map">
+          <div class="m-map-pin" :class="{off:!loc}"><el-icon><LocationFilled/></el-icon></div>
+          <div class="m-map-tip">{{ loc ? '已获取当前位置' : '尚未获取定位' }}</div>
+        </div>
+        <m-cell v-if="loc" label="签到地址" :value="loc.addr" :arrow="false"/>
+        <m-cell v-if="loc" label="定位时间" :value="loc.time" :arrow="false"/>
+        <div class="m-action-row"><el-button size="small" type="primary" :loading="busy" icon="Location" @click="getLoc">{{ loc ? '重新定位' : '获取定位（模拟）' }}</el-button></div>
+      </m-card>
+      <m-card title="现场拍照">
+        <div class="m-photo-box" @click="takePhoto">
+          <el-icon><Camera/></el-icon>
+          <span>{{ photo || '点击拍照上传（占位）' }}</span>
+        </div>
+      </m-card>
+      <el-button type="primary" style="width:100%;margin-top:4px" :loading="submitting" @click="submit">提交签到并完成拜访</el-button>
+    </template>
+  </div>`,
+};
+
+const MVisitRecordsScreen = {
+  components: { MSearch, MCard, MTag, MEmpty },
+  setup() {
+    const kw = ref('');
+    const rows = computed(() => {
+      let a = store.ext.activities.filter(x => x.type === '拜访' && x.status === '已完成');
+      if (kw.value.trim()) a = a.filter(x => x.customer.includes(kw.value.trim()));
+      return a.slice().sort((x, y) => (x.time < y.time ? 1 : -1));
+    });
+    return { kw, rows, mpush };
+  },
+  template: `<div class="m-page">
+    <m-search v-model="kw" placeholder="按客户名称搜索拜访记录"/>
+    <div class="m-result-tip">历史拜访 {{ rows.length }} 条</div>
+    <m-empty v-if="!rows.length" text="暂无拜访记录" icon="Tickets"/>
+    <div class="m-card" v-else>
+      <div v-for="a in rows" :key="a.no" class="m-list-item" @click="mpush('visit-detail', {no:a.no})">
+        <div class="m-ava"><el-icon><Location/></el-icon></div>
+        <div style="flex:1;min-width:0"><div class="m-ellipsis" style="font-weight:600">{{ a.customer }}</div><div class="muted m-ellipsis" style="font-size:12px">{{ a.time.slice(5, 16) }} · {{ a.checkin ? a.checkin.addr : '未记录地址' }}</div></div>
+        <m-tag type="success" text="已签到"/>
+      </div>
+    </div>
+  </div>`,
+};
+
+const MScheduleNewScreen = {
+  components: { MForm, MField, MCard },
+  setup() {
+    const draft = reactive({ customer: '', contact: '', time: TODAY + ' 15:00', type: '拜访', remark: '' });
+    const customers = computed(() => store.customers.filter(c => c.status !== '流失'));
+    const contacts = computed(() => draft.customer ? (store.ext.contacts || []).filter(c => c.customer === draft.customer) : []);
+    const save = () => {
+      if (!draft.customer) { mToast('请选择客户', 'warning'); return; }
+      if (!draft.time) { mToast('请选择时间', 'warning'); return; }
+      const no = msaActNo();
+      store.ext.activities.unshift({ no, type: draft.type, customer: draft.customer, contact: draft.contact, opp: '', owner: MSA_OWNER, time: draft.time, content: draft.remark || ('移动端新建' + draft.type + '日程'), feedback: '', next: '', status: '计划中', checkin: null });
+      msaLog('活动', '新建', '移动端新建' + draft.type + '日程（' + draft.customer + '，' + draft.time + '）');
+      mToast('日程已创建：' + no, 'success');
+      setTimeout(() => mback(), 400);
+    };
+    return { draft, customers, contacts, save, mback, mToast };
+  },
+  template: `<div class="m-page">
+    <m-card title="新建日程">
+      <m-form>
+        <m-field label="客户" required>
+          <el-select v-model="draft.customer" filterable placeholder="选择客户" style="width:100%" @change="draft.contact=''">
+            <el-option v-for="c in customers" :key="c.no" :label="c.name" :value="c.name"/>
+          </el-select>
+        </m-field>
+        <m-field label="联系人">
+          <el-select v-model="draft.contact" clearable placeholder="可选" style="width:100%">
+            <el-option v-for="c in contacts" :key="c.no" :label="c.name + ' · ' + c.title" :value="c.name"/>
+          </el-select>
+        </m-field>
+        <m-field label="时间" required>
+          <el-date-picker v-model="draft.time" type="datetime" value-format="YYYY-MM-DD HH:mm" placeholder="选择时间" style="width:100%"/>
+        </m-field>
+        <m-field label="类型">
+          <el-select v-model="draft.type" style="width:100%"><el-option v-for="t in ['拜访','电话','微信','会议','邮件']" :key="t" :value="t"/></el-select>
+        </m-field>
+        <m-field label="备注">
+          <el-input v-model="draft.remark" type="textarea" :rows="3" placeholder="填写日程目的与准备事项"/>
+        </m-field>
+      </m-form>
+    </m-card>
+    <el-button type="primary" style="width:100%" @click="save">保存日程</el-button>
+  </div>`,
+};
+
+/* ========== 4. 待办 todo ========== */
+const MTodoScreen = {
+  components: { MCard, MTag, MEmpty },
+  setup() {
+    const seg = ref('all');
+    const segs = [['all', '全部'], ['approval', '待审批'], ['follow', '待跟进'], ['payment', '待回款'], ['ticket', '工单']];
+    const approvals = computed(() => store.approvals.filter(a => a.tab === 'todo'));
+    const follows = computed(() => store.ext.activities.filter(a => a.owner === MSA_OWNER && a.status === '计划中').sort((a, b) => (a.time < b.time ? -1 : 1)));
+    const payments = computed(() => msaOverduePlans());
+    const tickets = computed(() => store.ext.tickets.filter(t => t.status !== '已关闭').slice().sort((a, b) => (a.created < b.created ? 1 : -1)));
+    const items = computed(() => {
+      const out = [];
+      if (seg.value === 'all' || seg.value === 'approval') approvals.value.forEach(a => out.push({ kind: 'approval', id: a.id, title: a.title, sub: a.applicant + ' · ' + a.dept, tag: a.type, extra: msaMoneyC(a.amount), status: '待审批' }));
+      if (seg.value === 'all' || seg.value === 'follow') follows.value.forEach(a => out.push({ kind: 'follow', id: a.no, title: a.customer, sub: a.type + ' · ' + a.content, tag: a.type, extra: a.time.slice(5, 16), status: '待跟进' }));
+      if (seg.value === 'all' || seg.value === 'payment') payments.value.forEach(p => out.push({ kind: 'payment', id: p.contract, title: p.customer, sub: p.stage + ' · 计划 ' + p.date, tag: '逾期回款', extra: msaMoney(p.amount / 100), status: '待回款' }));
+      if (seg.value === 'all' || seg.value === 'ticket') tickets.value.forEach(t => out.push({ kind: 'ticket', id: t.no, title: t.customer, sub: t.type + ' · ' + t.desc, tag: t.priority, extra: t.status, status: t.status }));
+      return out;
+    });
+    const open = it => {
+      if (it.kind === 'approval') return mpush('approval-detail', { id: it.id });
+      if (it.kind === 'follow') return mpush('visit-detail', { no: it.id });
+      if (it.kind === 'payment') return mToast('回款详情将在后续阶段开放，可先联系财务确认', 'warning');
+      return mToast('工单处理将在后续阶段开放', 'warning');
+    };
+    const finish = it => {
+      if (it.kind === 'follow') {
+        const a = store.ext.activities.find(x => x.no === it.id);
+        if (a) { a.status = '已完成'; a.feedback = a.feedback || '移动端标记完成'; msaLog('活动', '完成', '移动端完成待跟进（' + a.no + '）'); mToast('已完成该跟进', 'success'); }
+      } else if (it.kind === 'approval') {
+        mpush('approval-detail', { id: it.id });
+      } else if (it.kind === 'payment') {
+        mToast('已发送催收提醒（演示）', 'success');
+      } else {
+        mToast('已提醒处理人（演示）', 'success');
+      }
+    };
+    const actionText = it => it.kind === 'approval' ? '去审批' : it.kind === 'follow' ? '完成' : it.kind === 'payment' ? '催收' : '处理';
+    const counts = computed(() => ({ all: approvals.value.length + follows.value.length + payments.value.length + tickets.value.length, approval: approvals.value.length, follow: follows.value.length, payment: payments.value.length, ticket: tickets.value.length }));
+    return { seg, segs, items, counts, open, finish, actionText, mpush, mToast };
+  },
+  template: `<div class="m-page">
+    <div class="m-seg m-seg-scroll">
+      <span v-for="s in segs" :key="s[0]" :class="{on:seg===s[0]}" @click="seg=s[0]">{{ s[1] }}<i v-if="counts[s[0]]">{{ counts[s[0]] }}</i></span>
+    </div>
+    <m-empty v-if="!items.length" text="当前分类下没有待办事项" icon="CircleCheck"/>
+    <div class="m-card" v-else>
+      <div v-for="it in items" :key="it.kind + it.id" class="m-todo m-todo-wrap" @click="open(it)">
+        <div style="flex:1;min-width:0">
+          <div class="m-ellipsis" style="font-weight:600">{{ it.title }}</div>
+          <div class="muted m-ellipsis" style="font-size:12px">{{ it.sub }}</div>
+          <div style="display:flex;gap:6px;margin-top:4px"><m-tag type="info" :text="it.tag"/><span class="muted" style="font-size:12px">{{ it.status }}</span></div>
+        </div>
+        <div style="text-align:right;flex:none"><div class="m-money" style="font-size:12px">{{ it.extra }}</div><el-button size="small" type="primary" plain style="margin-top:6px" @click.stop="finish(it)">{{ actionText(it) }}</el-button></div>
+      </div>
+    </div>
+  </div>`,
+};
+
+const MApprovalDetailScreen = {
+  components: { MCard, MTag, MEmpty, MCell },
+  props: { id: String },
+  setup(props) {
+    const a = computed(() => store.approvals.find(x => x.id === props.id));
+    const act = ok => {
+      if (!a.value) return;
+      const done = () => {
+        a.value.tab = 'done';
+        a.value.result = ok ? '已同意' : '已拒绝';
+        a.value.history.push({ who: MSA_OWNER, act: ok ? '同意' : '拒绝', op: ok ? '移动端同意。' : '移动端拒绝（需填写原因）。', t: msaNowTime() });
+        msaLog('审批', ok ? '同意' : '拒绝', '移动端处理审批 ' + a.value.id);
+        mToast(ok ? '已同意该审批' : '已拒绝该审批', ok ? 'success' : 'warning');
+        setTimeout(() => mback(), 400);
+      };
+      if (ok) return done();
+      ElMessageBox.prompt('请填写拒绝原因（必填）：', '拒绝审批', { confirmButtonText: '确认拒绝', cancelButtonText: '取消', inputPattern: /\S+/, inputErrorMessage: '拒绝原因不能为空' }).then(() => done()).catch(() => {});
+    };
+    return { a, act, mback, mToast, moneyC: msaMoneyC };
+  },
+  template: `<div class="m-page">
+    <m-empty v-if="!a" text="审批单不存在或已处理" icon="Finished"/>
+    <template v-else>
+      <m-card>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px"><b style="font-size:16px">{{ a.type }}</b><m-tag type="warning" :text="a.tab==='todo'?'待审批':(a.result||'已处理')"/></div>
+        <div style="font-weight:600;margin-bottom:8px">{{ a.title }}</div>
+        <m-cell label="申请人" :value="a.applicant + ' · ' + a.dept" :arrow="false"/>
+        <m-cell label="业务对象" :value="a.biz" :arrow="false"/>
+        <m-cell label="金额" :value="moneyC(a.amount)" :arrow="false"/>
+        <m-cell label="提交时间" :value="a.time" :arrow="false"/>
+      </m-card>
+      <m-card title="审批摘要">
+        <div v-for="(s, i) in a.summary" :key="i" class="m-sum-row"><span class="muted">{{ s[0] }}</span><span>{{ s[1] }}</span></div>
+      </m-card>
+      <m-card title="流程节点">
+        <div v-for="(n, i) in a.nodes" :key="i" class="m-flow-row"><span class="m-flow-dot" :class="n.st"></span><div style="flex:1"><div>{{ n.n }}</div><div class="muted" style="font-size:12px">{{ n.p || '-' }}<template v-if="n.t"> · {{ n.t }}</template></div></div></div>
+      </m-card>
+      <div class="m-action-row" v-if="a.tab==='todo'">
+        <el-button type="success" style="flex:1" @click="act(true)">同意</el-button>
+        <el-button type="danger" plain style="flex:1" @click="act(false)">拒绝</el-button>
+      </div>
+      <div v-else class="m-note"><el-icon><InfoFilled/></el-icon><span>该审批已处理，仅可查看。</span></div>
+    </template>
+  </div>`,
+};
+
+/* ========== 5. 我的 me ========== */
+const MMeScreen = {
+  components: { MCard, MCell, MTag },
+  setup() {
+    const unread = computed(() => store.messages.filter(m => !m.read).length);
+    const myContracts = computed(() => store.ext.contracts.filter(c => c.owner === MSA_OWNER && (c.signDate || '').slice(0, 7) === TODAY.slice(0, 7)));
+    const achieved = computed(() => myContracts.value.reduce((s, c) => s + (c.amount || 0), 0));
+    const myCount = computed(() => myContracts.value.length);
+    const target = 500000;
+    const percent = computed(() => Math.min(100, Math.round(achieved.value * 100 / target)));
+    const privacy = reactive(Object.assign({ location: true, album: false, contacts: false }, (() => { try { return JSON.parse(localStorage.getItem('crm_m_auth') || '{}') || {}; } catch (e) { return {}; } })()));
+    watch(privacy, v => { try { localStorage.setItem('crm_m_auth', JSON.stringify(v)); } catch (e) {} }, { deep: true });
+    const entries = [
+      { k: 'my-leads', t: '我的线索', i: 'Aim', c: 'var(--el-color-primary)' },
+      { k: 'my-opps', t: '我的商机', i: 'TrendCharts', c: 'var(--warn)' },
+      { k: 'my-approvals', t: '我的审批', i: 'Finished', c: 'var(--ok)' },
+      { k: 'my-payments', t: '我的回款', i: 'Wallet', c: 'var(--el-color-primary)' },
+      { k: 'my-tickets', t: '我的工单', i: 'Headset', c: 'var(--danger)' },
+    ];
+    const goEntry = e => {
+      if (MSCREENS[e.k]) mgo(e.k);
+      else ElMessage.warning('「' + e.t + '」将在后续阶段开放');
+    };
+    const logout = () => {
+      ElMessageBox.confirm('退出登录后将返回登录页（原型演示，不会真的退出）。', '退出登录', { confirmButtonText: '退出', cancelButtonText: '取消', type: 'warning' })
+        .then(() => mToast('已退出登录（演示）', 'success')).catch(() => {});
+    };
+    onMounted(() => mSetActions([{ icon: 'Bell', title: '消息通知', on: () => mpush('notices') }]));
+    onBeforeUnmount(() => mSetActions([]));
+    return { unread, achieved, myCount, target, percent, privacy, entries, goEntry, logout, mgo, mpush, mToast, money: msaMoney };
+  },
+  template: `<div class="m-page">
+    <div class="m-hero m-me-hero">
+      <div class="m-me-ava">张</div>
+      <div><h3 style="margin:0">张三</h3><p>华东销售一部 · 销售经理 · zhangsan@example.com</p></div>
+    </div>
+    <m-card title="本月业绩进度">
+      <div class="m-perf-top"><b>{{ money(achieved) }}</b><span class="muted">目标 {{ money(target) }}</span></div>
+      <el-progress :percentage="percent" :stroke-width="10" :show-text="false"/>
+      <div class="muted" style="font-size:12px;margin-top:6px">本月签约合同 {{ percent }}% · 签约 {{ myCount }} 份</div>
+    </m-card>
+    <m-card>
+      <m-cell label="消息通知" icon="Bell" @click="mpush('notices')"><m-tag v-if="unread" type="danger" :text="unread + ' 条未读'"/><span v-else class="muted">暂无未读</span></m-cell>
+      <m-cell v-for="e in entries" :key="e.k" :label="e.t" :icon="e.i" @click="goEntry(e)"/>
+    </m-card>
+    <m-card title="隐私与授权">
+      <div class="m-auth-row"><div><div>定位权限</div><div class="muted" style="font-size:12px">用于拜访签到与轨迹记录</div></div><el-switch v-model="privacy.location" size="small"/></div>
+      <div class="m-auth-row"><div><div>相册 / 拍照</div><div class="muted" style="font-size:12px">用于上传现场照片与附件</div></div><el-switch v-model="privacy.album" size="small"/></div>
+      <div class="m-auth-row"><div><div>通讯录</div><div class="muted" style="font-size:12px">用于快速添加联系人（需单独授权）</div></div><el-switch v-model="privacy.contacts" size="small"/></div>
+      <div class="muted" style="font-size:12px;margin-top:6px">授权状态保存在本机，可随时关闭；关闭后对应功能将不可用。</div>
+    </m-card>
+    <el-button style="width:100%" @click="logout">退出登录</el-button>
+  </div>`,
+};
+
+const MNoticesScreen = {
+  components: { MCard, MTag, MEmpty },
+  setup() {
+    const rows = computed(() => store.messages);
+    const readAll = () => { rows.value.forEach(m => m.read = true); mToast('已全部标记为已读', 'success'); };
+    return { rows, readAll, mToast };
+  },
+  template: `<div class="m-page">
+    <div class="m-action-row"><el-button size="small" @click="readAll">全部已读</el-button></div>
+    <m-empty v-if="!rows.length" text="暂无通知" icon="Bell"/>
+    <div class="m-card" v-else>
+      <div v-for="m in rows" :key="m.id" class="m-list-item" @click="m.read=true">
+        <span class="m-msg-dot" :class="{read:m.read}"></span>
+        <div style="flex:1;min-width:0"><div :class="{muted:m.read}" style="font-weight:600">{{ m.title }}</div><div class="muted" style="font-size:12px">{{ m.type }} · {{ m.time }}</div></div>
+        <m-tag v-if="!m.read" type="danger" text="未读"/>
+      </div>
+    </div>
+  </div>`,
+};
+
+/* ========== 需求文档（12 要素） ========== */
+const MSA_DOC_PAGES = {
+  'm-home': {
+    name: '移动端 · 首页', module: '移动端',
+    goal: '作为移动端登录后的首屏，汇总今日待办、待审批、逾期回款三个关键数字，并提供快捷操作、今日日程与最近客户，帮助外勤销售快速进入工作。',
+    roles: ['销售：查看本人待办、日程与客户', '销售经理：可查看本人及下级的待办摘要', '其他角色：按菜单权限进入'],
+    enter: ['移动端登录后默认进入首页', '底部导航「首页」', 'PC 端「移动端预览」中的手机内首页'],
+    layout: ['顶部问候横幅：问候语 + 日期 + 岗位 + 三个可点击统计数字', '快捷操作九宫格：新增线索 / 新增客户 / 新增商机 / 拜访签到 / 写跟进 / 扫码拍照', '今日日程列表（按时间排序）', '最近客户列表（按最近跟进时间倒序）'],
+    fields: ['今日待办数｜整数｜实时计算｜说明：负责人为张三且当天计划中的活动数', '待审批数｜整数｜实时计算｜说明：审批中心待办 Tab 条数', '逾期回款数｜整数｜实时计算｜说明：回款计划日期早于今天且未结清的数量', '快捷操作｜按钮组｜说明：拜访签到进入签到屏，未开放功能给出提示'],
+    rules: ['所有数字实时取自 store / store.ext，不使用写死假数字', '统计数字点击后跳转到待办对应分段', '今日日程与最近客户均只展示当前登录用户的数据'],
+    flow: ['首页 → 待办 / 日程详情 / 客户详情；签到完成返回后首页统计同步刷新'],
+    errors: ['今日无日程：显示空态引导新建日程', '未开放功能：轻提示「将在后续阶段开放」，不跳空白页'],
+    api: ['移动端工作台汇总接口、今日日程查询、最近客户查询（示例）'],
+    accept: ['三个统计数字与明细一致且可点击跳转', '快捷操作可触发签到或给出明确提示', '无控制台报错'],
+  },
+  'm-customers': {
+    name: '移动端 · 客户列表', module: '移动端',
+    goal: '在移动端快速检索客户：支持名称 / 编号 / 电话搜索、按客户等级与「我的客户」筛选，并分页加载，帮助外勤人员现场找到客户并进入详情。',
+    roles: ['销售：查看权限范围内客户', '销售经理：查看团队客户'],
+    enter: ['底部导航「客户」', '首页最近客户列表的「更多」入口'],
+    layout: ['顶部搜索框', '两行筛选 chips：全部 / 战略 / 重点 / 普通 / 潜在 + 我的客户', '结果计数 + 客户卡片列表（头像、名称、地区、负责人、最近跟进、等级标签）', '底部「加载更多」按钮，每页 8 条'],
+    fields: ['搜索关键字｜文本｜说明：名称 / 编号 / 电话模糊匹配', '客户等级｜枚举｜说明：全部 / 战略客户 / 重点客户 / 普通客户 / 潜在客户', '我的客户｜开关｜说明：仅显示负责人为张三的客户'],
+    rules: ['筛选条件变化后重置为 8 条并回到顶部逻辑', '列表按最近跟进时间倒序', '点击客户进入客户详情屏，并保留底部客户 Tab 高亮'],
+    flow: ['搜索 / 筛选 → 加载更多 → 进入客户详情 → 返回保留筛选条件'],
+    errors: ['无匹配结果：显示空态提示', '已加载全部：显示「已加载全部」而非继续出现按钮'],
+    api: ['移动端客户分页查询、按等级 / 负责人筛选接口（示例）'],
+    accept: ['搜索与 chips 筛选即时生效，加载更多每次追加 8 条', '不同客户进入详情后数据各自独立', '无控制台报错'],
+  },
+  'm-customer-detail': {
+    name: '移动端 · 客户详情', module: '移动端',
+    goal: '移动端全景查看单个客户：基础信息、联系人、跟进、商机、合同回款与工单，并提供一键拨号、写跟进、新建商机三个高频操作。',
+    roles: ['负责人销售：查看并写跟进 / 新建商机', '销售经理：查看团队客户', '其他角色：只读'],
+    enter: ['客户列表点击客户卡片', '首页最近客户点击进入'],
+    layout: ['头部客户信息卡：首字头像、名称、编号、行业、等级 / 状态 / 负责人标签', '操作行：一键拨号 / 写跟进 / 新建商机', '分段 Tab：概况 / 联系人 / 跟进 / 商机 / 合同回款 / 工单', '各 Tab 使用该客户自己的 custBundle 数据渲染'],
+    fields: ['客户编号｜只读｜格式 KH-年月-序号', '联系人｜列表｜点击可拨号（占位）', '商机金额 / 合同金额 / 回款计划｜货币｜只读', '工单状态 / 优先级｜枚举｜只读'],
+    rules: ['详情数据必须使用该客户自己的联系人、跟进、商机、合同、工单，不与其他客户串用', '写跟进会真实新增一条已完成电话跟进并写入操作日志', '新建商机会真实写入 store.opps 并切换到商机 Tab'],
+    flow: ['客户详情 → 写跟进（新增记录）→ 跟进 Tab 即时刷新', '客户详情 → 新建商机 → 商机 Tab 出现新记录'],
+    errors: ['客户不存在（被合并）：显示空态并提示', '无联系人：联系人 Tab 显示空态', '新建商机名称为空：弹窗校验拦截'],
+    api: ['客户 360 查询、联系人 / 跟进 / 商机 / 合同 / 工单子查询、新增跟进、新建商机（示例）'],
+    accept: ['不同客户详情数据各不相同', '拨号、写跟进、新建商机均有明确反馈且写操作真实生效', '无控制台报错'],
+  },
+  'm-schedule': {
+    name: '移动端 · 日程', module: '移动端',
+    goal: '以周历条展示本周安排，按天查看负责人张三的活动，并提供新建日程、拜访签到、拜访记录三个入口，服务外勤拜访场景。',
+    roles: ['销售：查看与新建本人日程', '销售经理：查看本人日程'],
+    enter: ['底部导航「日程」', '首页今日日程的「查看全部」'],
+    layout: ['顶部周历条：周一至周日，显示日期与当天活动数，今天与选中日高亮', '日期标题 + 活动数', '操作行：新建日程 / 拜访签到 / 拜访记录', '当日活动列表（时间、客户、类型、内容、状态）'],
+    fields: ['日期｜日期｜必填：是｜说明：默认今天，可点周历切换', '活动类型｜枚举｜说明：拜访 / 电话 / 微信 / 会议 / 邮件', '活动状态｜枚举｜说明：计划中 / 已完成 / 已取消'],
+    rules: ['周历固定以今天所在周展示，活动数为张三当天活动数', '点击活动进入活动详情，可继续签到或标记完成', '无活动时显示空态并引导新建日程'],
+    flow: ['计划中 → 签到完成 / 标记完成 → 已完成；已取消活动不在签到候选内'],
+    errors: ['当天无安排：空态提示', '活动不存在：详情屏显示空态'],
+    api: ['移动端日程按周 / 按日查询、新建日程接口（示例）'],
+    accept: ['周历切换与当日列表联动正确', '三个入口可正常跳转', '无控制台报错'],
+  },
+  'm-visit-detail': {
+    name: '移动端 · 活动详情', module: '移动端',
+    goal: '查看单条跟进 / 拜访活动的完整信息：客户、联系人、时间、跟进内容、客户反馈与签到信息，并作为签到与完成操作的落点。',
+    roles: ['负责人销售：查看、签到、标记完成', '销售经理：查看团队活动'],
+    enter: ['日程活动列表点击', '客户详情跟进 Tab 点击', '待办「待跟进」点击', '拜访记录点击'],
+    layout: ['活动信息卡（编号 / 类型 / 状态 / 客户 / 联系人 / 时间 / 负责人）', '跟进内容卡', '客户反馈卡（有反馈时显示）', '签到信息卡（已签到时显示地址 / 时间 / 坐标 / 照片）', '底部操作：拜访签到 / 标记完成 / 拜访记录'],
+    fields: ['活动编号｜只读｜格式 HD-6 位序号', '签到地址 / 时间 / 坐标｜只读｜签到后生成', '客户反馈｜长文本｜只读展示（本屏）'],
+    rules: ['计划中的拜访活动显示「拜访签到」，其他计划中活动显示「标记完成」', '标记完成会写入客户反馈与操作日志', '已完成活动不显示签到 / 完成按钮'],
+    flow: ['计划中 → 拜访签到 / 标记完成 → 已完成'],
+    errors: ['活动编号不存在：空态提示', '重复点击完成：按钮随状态消失'],
+    api: ['活动详情查询、标记完成接口（示例）'],
+    accept: ['各卡片数据与该活动自身数据一致', '签到后返回本屏状态与签到信息即时更新', '无控制台报错'],
+  },
+  'm-visit-checkin': {
+    name: '移动端 · 拜访签到', module: '移动端',
+    goal: '完成外勤拜访签到：提示定位授权、模拟获取定位地址与时间、拍照上传占位，提交后把拜访活动置为已完成并生成签到信息。',
+    roles: ['销售：签到自己负责的拜访活动', '销售经理：可代签（原型不做校验）'],
+    enter: ['日程页「拜访签到」', '活动详情页「拜访签到」', '首页快捷操作「拜访签到」'],
+    layout: ['顶部定位授权说明条', '拜访信息卡（活动编号 / 客户 / 计划时间 / 当前状态）', '定位卡：模拟地图 + 获取定位按钮 + 地址 / 时间', '拍照卡：点击上传占位', '底部提交按钮'],
+    fields: ['定位地址｜文本｜必填：是｜说明：获取后显示，模拟生成', '定位时间｜日期时间｜必填：是', '现场照片｜图片｜选填｜说明：原型为文件名占位', '签到状态｜枚举｜提交后活动状态变为已完成'],
+    rules: ['未获取定位不允许提交', '无指定活动时自动选择张三最近一条计划中的拜访活动', '提交后写入活动签到信息、客户反馈并记录操作日志'],
+    flow: ['计划中拜访 → 获取定位 → 拍照 → 提交 → 已完成（生成签到记录）'],
+    errors: ['未定位提交：轻提示拦截', '无待签到活动：自动创建一条临时拜访，保证流程可演示'],
+    api: ['定位获取、照片上传、签到提交接口（示例，原型为模拟）'],
+    accept: ['模拟定位与拍照反馈明确', '提交后活动状态变为已完成且签到信息可见', '无控制台报错'],
+  },
+  'm-visit-records': {
+    name: '移动端 · 拜访记录', module: '移动端',
+    goal: '集中查看历史已完成的拜访记录，支持按客户名称搜索，并可进入活动详情查看签到地址与跟进内容。',
+    roles: ['销售：查看本人及团队拜访记录（原型展示全部已完成拜访）'],
+    enter: ['日程页「拜访记录」', '活动详情页「拜访记录」', '我的页后续入口'],
+    layout: ['顶部搜索框', '记录计数', '拜访列表：客户、时间、签到地址、已签到标签'],
+    fields: ['搜索关键字｜文本｜说明：按客户名称模糊匹配', '签到地址｜文本｜只读｜来自活动签到信息'],
+    rules: ['仅展示类型为拜访且状态为已完成的记录', '按拜访时间倒序排列', '点击记录进入活动详情'],
+    flow: ['签到完成 → 出现在拜访记录列表 → 点击查看详情'],
+    errors: ['无记录：空态提示', '搜索无结果：空态提示'],
+    api: ['拜访记录查询、按客户搜索接口（示例）'],
+    accept: ['签到后的记录会出现在列表顶部', '搜索可用，点击可进入详情', '无控制台报错'],
+  },
+  'm-schedule-new': {
+    name: '移动端 · 新建日程', module: '移动端',
+    goal: '在移动端快速创建一条日程 / 拜访计划：选择客户、联系人、时间、类型并填写备注，保存后成为计划中活动。',
+    roles: ['销售：为自己新建日程'],
+    enter: ['日程页「新建日程」', '日程页右上角加号'],
+    layout: ['表单卡：客户 / 联系人 / 时间 / 类型 / 备注', '底部保存按钮'],
+    fields: ['客户｜选择｜必填：是｜校验：必须选择有效客户', '联系人｜选择｜选填｜选项随客户联动', '时间｜日期时间｜必填：是｜默认今天 15:00', '类型｜枚举｜必填：是｜默认拜访', '备注｜长文本｜选填｜作为跟进内容'],
+    rules: ['未选客户或时间为空时不允许保存并给出轻提示', '保存后新增活动状态为「计划中」，负责人为张三', '新增成功后返回上一屏，日程列表刷新'],
+    flow: ['填写 → 保存 → 新增计划中活动 → 返回日程'],
+    errors: ['客户 / 时间缺失：轻提示拦截', '保存成功后自动返回，避免重复提交'],
+    api: ['移动端新建活动接口（示例）'],
+    accept: ['表单校验生效', '保存后活动出现在对应日期日程中', '无控制台报错'],
+  },
+  'm-todo': {
+    name: '移动端 · 待办', module: '移动端',
+    goal: '集中处理移动端待审批、待跟进、待回款与工单：按分段筛选，点击进入对应详情，并支持快捷完成 / 审批 / 催收操作。',
+    roles: ['审批人：处理待审批', '销售：处理待跟进与待回款', '交付 / 客服：处理工单'],
+    enter: ['底部导航「待办」', '首页三个统计数字点击进入对应分段'],
+    layout: ['分段栏：全部 / 待审批 / 待跟进 / 待回款 / 工单（带数量）', '待办列表：标题、摘要、标签、状态、金额 / 时间', '每项右侧操作按钮（去审批 / 完成 / 催收 / 处理）'],
+    fields: ['待办类型｜枚举｜说明：审批 / 跟进 / 回款 / 工单', '状态｜文本｜说明：待审批 / 待跟进 / 待回款 / 工单状态', '金额｜货币｜说明：审批金额或逾期回款金额'],
+    rules: ['待审批来自 store.approvals 中 tab=todo', '待跟进来自负责人张三、状态计划中的活动', '待回款为逾期未结清的回款计划', '完成待跟进后状态变为已完成并从列表消失'],
+    flow: ['待处理 → 去审批 / 完成 / 催收 / 处理 → 列表刷新'],
+    errors: ['无待办：空态提示', '审批拒绝未填原因：弹窗拦截', '未开放详情：轻提示'],
+    api: ['移动端待办汇总、审批处理、活动完成、回款催收接口（示例）'],
+    accept: ['分段数量与列表一致', '完成跟进后条目消失且活动状态更新', '审批可同意 / 拒绝并回到列表', '无控制台报错'],
+  },
+  'm-me': {
+    name: '移动端 · 我的', module: '移动端',
+    goal: '展示个人信息、本月业绩进度、通知入口、业务功能入口与隐私授权开关，并提供退出登录占位。',
+    roles: ['全体移动端用户'],
+    enter: ['底部导航「我的」'],
+    layout: ['个人信息横幅：头像、姓名、部门 / 岗位 / 邮箱', '本月业绩进度：实际签约金额 / 目标、进度条', '消息通知入口（未读数）', '业务入口：我的线索 / 商机 / 审批 / 回款 / 工单', '隐私与授权：定位 / 相册 / 通讯录开关', '退出登录按钮'],
+    fields: ['本月业绩｜货币｜实时计算｜说明：本月本人签约合同金额汇总', '业绩目标｜货币｜说明：示例目标 500,000', '通知未读数｜整数｜实时计算', '授权开关｜布尔｜说明：定位 / 相册 / 通讯录，存 localStorage'],
+    rules: ['业绩进度由本月本人合同实时汇总，不写死', '未注册的业务入口给出「后续阶段开放」提示', '隐私开关状态写入 localStorage（crm_m_auth）并在刷新后恢复', '退出登录为原型演示，需二次确认'],
+    flow: ['我的 → 通知 / 业务入口 / 授权设置 → 返回'],
+    errors: ['无本月签约：进度 0% 且显示 ¥0', '未开放入口：轻提示不跳空白页'],
+    api: ['个人资料、本月业绩汇总、通知未读数、授权状态接口（示例）'],
+    accept: ['业绩进度与本月合同数据一致', '通知未读数与消息数据一致', '授权开关刷新后保持', '无控制台报错'],
+  },
+  'm-approval-detail': {
+    name: '移动端 · 审批详情', module: '移动端',
+    goal: '本阶段提供移动端审批详情占位：展示审批单基本信息、摘要和流程节点，支持同意 / 拒绝，后续阶段再补齐完整审批能力。',
+    roles: ['审批人：同意 / 拒绝', '申请人：查看进度'],
+    enter: ['待办列表「待审批」点击', '待办项「去审批」'],
+    layout: ['审批信息卡（类型 / 标题 / 申请人 / 业务对象 / 金额 / 时间）', '审批摘要列表', '流程节点列表', '底部同意 / 拒绝按钮（仅待审批可见）'],
+    fields: ['审批单号｜只读', '审批类型 / 状态｜只读', '审批意见｜文本｜拒绝时必填'],
+    rules: ['仅 tab=todo 的审批可操作', '同意 / 拒绝后审批移入已处理，待办列表即时移除', '拒绝必须填写原因'],
+    flow: ['待审批 → 同意 / 拒绝 → 已处理'],
+    errors: ['审批不存在：空态提示', '拒绝原因为空：弹窗校验拦截'],
+    api: ['移动端审批详情、审批动作接口（示例；下阶段完善）'],
+    accept: ['审批详情数据正确', '同意 / 拒绝后待办状态更新', '无控制台报错'],
+  },
+  'm-notices': {
+    name: '移动端 · 消息通知', module: '移动端',
+    goal: '本阶段提供消息通知占位屏：展示跟进、审批、逾期等通知列表，支持标记已读，完整能力由下一阶段完成。',
+    roles: ['全体移动端用户'],
+    enter: ['首页右上角铃铛', '我的页消息通知入口'],
+    layout: ['顶部「全部已读」操作', '通知列表：标题、类型、时间、未读标识'],
+    fields: ['通知标题｜文本｜只读', '通知类型｜枚举｜说明：分配 / 审批 / 逾期 / 到期 / 结果', '已读状态｜布尔｜点击后置为已读'],
+    rules: ['点击通知置为已读', '全部已读一次更新所有消息'],
+    flow: ['未读 → 点击 / 全部已读 → 已读'],
+    errors: ['无通知：空态提示'],
+    api: ['通知列表、已读接口（示例；下阶段完善）'],
+    accept: ['未读数随已读操作变化', '我的页未读角标同步', '无控制台报错'],
+  },
+};
+Object.entries(MSA_DOC_PAGES).forEach(([k, c]) => { DOCS_DEFAULT[k] = mkDoc(k, c); });
+
+/* ========== 注册屏幕 ========== */
+registerMScreen('home', MHomeScreen, { title: '首页', doc: 'm-home', tab: 'home' });
+registerMScreen('customers', MCustomersScreen, { title: '客户', doc: 'm-customers', tab: 'cust' });
+registerMScreen('customer-detail', MCustomerDetailScreen, { title: '客户详情', doc: 'm-customer-detail', tab: 'cust' });
+registerMScreen('schedule', MScheduleScreen, { title: '日程', doc: 'm-schedule', tab: 'sched' });
+registerMScreen('visit-detail', MVisitDetailScreen, { title: '活动详情', doc: 'm-visit-detail', tab: 'sched' });
+registerMScreen('visit-checkin', MVisitCheckinScreen, { title: '拜访签到', doc: 'm-visit-checkin', tab: 'sched' });
+registerMScreen('visit-records', MVisitRecordsScreen, { title: '拜访记录', doc: 'm-visit-records', tab: 'sched' });
+registerMScreen('schedule-new', MScheduleNewScreen, { title: '新建日程', doc: 'm-schedule-new', tab: 'sched' });
+registerMScreen('todo', MTodoScreen, { title: '待办', doc: 'm-todo', tab: 'todo' });
+registerMScreen('approval-detail', MApprovalDetailScreen, { title: '审批详情', doc: 'm-approval-detail', tab: 'todo' });
+registerMScreen('me', MMeScreen, { title: '我的', doc: 'm-me', tab: 'me' });
+registerMScreen('notices', MNoticesScreen, { title: '消息通知', doc: 'm-notices', tab: 'me' });
 
 /* ===== 商机详情（/opp/:no）===== */
 DOCS_DEFAULT['opp-detail'] = mkDoc('opp-detail', {
@@ -7060,6 +8171,7 @@ const App = {
       if (p.startsWith('/approvals/')) return '/approvals/templates';
       return p;
     });
+    const standalone = computed(() => path.value === '/m' || path.value.indexOf('/m/') === 0);
     const menu = ref(null);
     const opened = computed(() => { const n = NAV.find(n => n.children && n.children.some(c => c.path === active.value)); return n ? [n.key] : []; });
     watch(opened, v => { v.length && menu.value && menu.value.open(v[0]); });
@@ -7078,10 +8190,10 @@ const App = {
     const unread = computed(() => store.messages.filter(m => !m.read).length);
     const todoCount = computed(() => store.approvals.filter(a => a.tab === 'todo').length + 8);
     const readAll = () => store.messages.forEach(m => m.read = true);
-    return { path, view, active, menu, opened, NAV, kw, searchFn, selectSearch, unread, todoCount, store, go, readAll, THEMES, theme, applyTheme };
+    return { path, view, active, standalone, menu, opened, NAV, kw, searchFn, selectSearch, unread, todoCount, store, go, readAll, THEMES, theme, applyTheme };
   },
-  template: `<div class="layout">
-    <div class="topbar">
+  template: `<div class="layout" :class="{standalone}">
+    <div class="topbar" v-if="!standalone">
       <div class="brand"><div class="logo">C</div>CRM 客户管理系统</div>
       <el-autocomplete v-model="kw" class="top-search" :fetch-suggestions="searchFn" placeholder="全局搜索：客户 / 线索 / 商机 / 联系人" prefix-icon="Search" clearable @select="selectSearch" :trigger-on-focus="false">
         <template #default="{item}"><el-tag size="small" effect="plain" style="margin-right:8px">{{ item.tag }}</el-tag>{{ item.value }}</template></el-autocomplete>
@@ -7107,7 +8219,7 @@ const App = {
       </div>
     </div>
     <div class="body">
-      <div class="sidebar">
+      <div class="sidebar" v-if="!standalone">
         <el-menu ref="menu" :default-active="active" :default-openeds="opened" unique-opened @select="p => go(p)">
           <template v-for="n in NAV" :key="n.key">
             <el-sub-menu v-if="n.children" :index="n.key"><template #title><el-icon><component :is="n.icon"/></el-icon><span>{{ n.title }}</span></template>
@@ -7116,8 +8228,8 @@ const App = {
           </template>
         </el-menu>
       </div>
-      <div class="main"><component :is="view.comp" :key="path" v-bind="view.props"/></div>
-      <doc-panel/>
+      <div class="main" :class="{mfull:standalone}"><component :is="view.comp" :key="path" v-bind="view.props"/></div>
+      <doc-panel v-if="!standalone"/>
     </div>
   </div>`,
 };
