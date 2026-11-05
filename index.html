@@ -16832,7 +16832,19 @@ const App = {
   setup() {
     const parse = () => { const h = (location.hash || '#login').slice(1); return h || '/login'; };
     const path = ref(parse());
-    const notLogged = computed(() => !AUTH.authLoggedIn());
+    const authRev = ref(0);
+    // wrap AUTH methods to trigger recomputation
+    const _login = AUTH.authLogin.bind(AUTH);
+    AUTH.authLogin = function(...a){ const r=_login(...a); if(r&&r.ok) authRev.value++; return r; };
+    const _logout = AUTH.authLogout.bind(AUTH);
+    AUTH.authLogout = function(...a){ const r=_logout(...a); authRev.value++; return r; };
+    const _switch = AUTH.authSwitchRole.bind(AUTH);
+    AUTH.authSwitchRole = function(...a){ const r=_switch(...a); authRev.value++; return r; };
+    const _reset = AUTH.authResetDemo.bind(AUTH);
+    AUTH.authResetDemo = function(...a){ const r=_reset(...a); authRev.value++; return r; };
+    const _save = AUTH.save.bind(AUTH);
+    AUTH.save = function(...a){ const r=_save(...a); authRev.value++; return r; };
+    const notLogged = computed(() => { authRev.value; return !AUTH.authLoggedIn(); });
     const isMobile = computed(() => path.value === '/m' || path.value.indexOf('/m/') === 0);
     const redirectTo = ref(null);
     window.addEventListener('hashchange', () => {
@@ -16898,8 +16910,8 @@ const App = {
     const todoCount = computed(() => store.approvals.filter(a => a.tab === 'todo').length + (store.ext ? store.ext.activities.filter(a => a.owner === '张三' && a.status === '计划中').length : 0));
     const readAll = () => store.messages.forEach(m => m.read = true);
     onMounted(() => { if (!isMobile.value) AUTH.authGuardInstall(); });
-    const currentUser = computed(() => AUTH.authUser());
-    const currentRole = computed(() => AUTH.authRole());
+    const currentUser = computed(() => { authRev.value; return AUTH.authUser(); });
+    const currentRole = computed(() => { authRev.value; return AUTH.authRole(); });
     const handleRoleSwitch = key => { if (!key) return; AUTH.authSwitchRole(key); };
     const handleUserCmd = cmd => { if (cmd === 'changepwd') go('/change-password'); else if (cmd === 'logout') AUTH.authLogout(); };
     const themeRef = ref(localStorage.getItem('crm_theme') || 'sky');
@@ -16933,9 +16945,7 @@ const App = {
       if (!kind) return true;
       return false;
     };
-    const filteredNAV = computed(() => {
-      return NAV.filter(n => authCanMenu(n.title));
-    });
+    const filteredNAV = computed(() => { authRev.value; return NAV.filter(n => authCanMenu(n.title)); });
     return { path, view, active, standalone, menu, opened, NAV, filteredNAV, kw, searchFn, selectSearch, unread, todoCount, store, go, readAll, theme, applyTheme, notLogged, isMobile, authRowVisibleAuth, authCanMenu, authCanBtn, fmtY, yuan, fmtC, TODAY, daysBetween, go, cno, currentUser, currentRole, handleRoleSwitch, handleUserCmd, redirectTo, AUTH };
   },
   template: `<div class="layout" :class="{standalone}">
