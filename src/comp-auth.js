@@ -129,6 +129,16 @@ const AUTH = {
     return false;
   },
 
+  // 确保销售人员无“分配”按钮权限
+  authCanBtnAllocate() {
+    const user = this.authUser();
+    if (!user) return false;
+    const role = this.roles[user.role || ''];
+    if (!role) return false;
+    if (user.role === 'sales') return false;
+    return this.authCanBtn('分配');
+  },
+
   authScope() {
     const user = this.authUser();
     if (!user) return '全部';
@@ -141,9 +151,7 @@ const AUTH = {
     const user = this.authUser();
     if (!user) return new Set();
     if (user.role === 'finance') {
-      const result = new Set();
-      result.add(user.name);
-      return result;
+      return null;
     }
     const role = this.roles[user.role] || { scope: '全部' };
     const scope = role.scope;
@@ -158,7 +166,7 @@ const AUTH = {
       } else if (scope === '本部门') {
         if (u.id === user.id) result.add(u.name);
         else if (deptId && u.dept === deptId) result.add(u.name);
-      } else if (scope === '本部门及下级') {
+      } else if (scope === '本部门及下级' || scope === '本部门及下属') {
         if (u.id === user.id) result.add(u.name);
         else if (deptId && u.dept === deptId) result.add(u.name);
         else if (deptId) {
@@ -188,16 +196,18 @@ const AUTH = {
   authRowVisible(row) {
     const owners = this.authVisibleOwners();
     if (owners === null) return true;
-    if (!row || !row.owner) return true;
+    if (!row || !row.owner) {
+      const user = this.authUser();
+      return user && (user.role === 'admin' || user.role === 'finance');
+    }
     return owners.has(row.owner);
   },
 
-  authFilter(rows) {
+authFilter(rows) {
     if (!rows || rows.length === 0) return rows;
-    const filtered = rows.filter(r => this.authRowVisible(r));
-    const hasOwner = rows.some(r => r && r.owner);
-    return hasOwner ? filtered : rows;
-  },
+    if (!rows.some(r => r && 'owner' in r)) return rows;
+    return rows.filter(r => this.authRowVisible(r));
+},
 
   // ===== 手机号脱敏 =====
   authMaskPhone(p) {

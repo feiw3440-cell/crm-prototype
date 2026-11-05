@@ -3,8 +3,8 @@ const ApprovalsPage = {
   setup() {
     const tab = ref('todo'); const sel = ref('SP-202611-0042');
     const TABS = { todo: '待我审批', mine: '我发起的', done: '我已审批', cc: '抄送我的' };
-    const list = computed(() => store.approvals.filter(a => a.tab === tab.value));
-    const count = k => store.approvals.filter(a => a.tab === k).length;
+    const list = computed(() => (store.approvals || []).filter(a => a.tab === tab.value));
+    const count = k => (store.approvals || []).filter(a => a.tab === k).length;
     const cur = computed(() => store.approvals.find(a => a.id === sel.value));
     const avgH = computed(() => {
       const rows = typeof atStatRows === 'function' ? atStatRows() : [];
@@ -12,7 +12,7 @@ const ApprovalsPage = {
       return (rows.reduce((s, r) => s + r.hours, 0) / rows.length).toFixed(1);
     });
     const rejectRate = computed(() => {
-      const doneRows = store.approvals.filter(a => a.tab === 'done');
+      const doneRows = (store.approvals || []).filter(a => a.tab === 'done');
       if (!doneRows.length) return '0.0';
       return (doneRows.filter(a => a.result === '已拒绝' || a.result === '已退回修改').length * 100 / doneRows.length).toFixed(1);
     });

@@ -94,6 +94,7 @@ const AuthUsersPage = {
         <el-button type="primary" @click="addDialogVisible = true">新增用户</el-button>
       </el-form-item>
     </el-form>
+    <el-table :data="filteredUsers">
       <el-table-column prop="account" label="账号" width="120" />
       <el-table-column prop="name" label="姓名" width="100" />
       <el-table-column prop="phone" label="手机号" width="130" align="center">
@@ -117,24 +118,24 @@ const AuthUsersPage = {
       </el-table-column>
 </el-table>
     <div style="margin-top:24px">
-      <el-dialog title="停用用户" :visible="dialogVisible" width="400">
+      <el-dialog title="停用用户" v-model="dialogVisible" width="400">
         <p>用户：{{ dialogName }}（{{ dialogDeptName }}）</p>
         <p v-if="hasCustomers > 0">该用户下有 {{ hasCustomers }} 个客户，<el-button type="primary" @click="selectReceiver">指定接收人</el-button> 后才能停用</p>
         <p v-else>确定要停用该用户吗？</p>
-        <div style="margin-top:24px">
+        <template #footer>
           <el-button @click="dialogVisible = false">取消</el-button>
           <el-button type="primary" @click="confirmDisable">确定停用</el-button>
-        </div>
+        </template>
       </el-dialog>
-      <el-dialog title="重置密码" :visible="pwdDialogVisible" width="400">
+      <el-dialog title="重置密码" v-model="pwdDialogVisible" width="400">
         <p>生成临时密码：Rst@{{ pwdSuffix }}</p>
         <p>该用户将首次登录时被强制改密</p>
-        <div style="margin-top:24px">
+        <template #footer>
           <el-button @click="pwdDialogVisible = false">关闭</el-button>
           <el-button type="primary" @click="confirmResetPwd">确定重置</el-button>
-        </div>
+        </template>
       </el-dialog>
-      <el-dialog title="新增用户" :visible="addDialogVisible" width="460px" destroy-on-close>
+      <el-dialog title="新增用户" v-model="addDialogVisible" width="460px" destroy-on-close>
         <el-form :model="addForm" label-width="100px">
           <el-row :gutter="12">
             <el-col :span="12"><el-form-item label="账号" prop="acc"><el-input v-model="addForm.acc" placeholder="登录账号（唯一）"/></el-form-item></el-col>

@@ -9,7 +9,7 @@ const WorkbenchPage = {
       const fd = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
       const from = p => (p === 'month' ? fd(new Date(y, m, 1)) : p === 'quarter' ? fd(new Date(y, m - (m % 3), 1)) : fd(new Date(y, 0, 1)));
       const to = p => (p === 'month' ? fd(new Date(y, m + 1, 1)) : p === 'quarter' ? fd(new Date(y, m - (m % 3) + 3, 1)) : fd(new Date(y + 1, 0, 1)));
-      return store.opps.filter(o => o.date >= from(period.value) && o.date < to(period.value));
+      return (store.opps || []).filter(o => o.date >= from(period.value) && o.date < to(period.value));
     });
     const funnelC = computed(() => STAGES.slice(0, 5).map(s => periodOpps.value.filter(o => o.stage === s.key).length));
     const funnelA = computed(() => STAGES.slice(0, 5).map(s => Math.round(periodOpps.value.filter(o => o.stage === s.key).reduce((x, o) => x + o.amount, 0) / 10000)));
@@ -34,7 +34,7 @@ const WorkbenchPage = {
     const authUser = computed(() => AUTH.authUser());
     const authRole = computed(() => AUTH.authRole());
     const msgs = computed(() => store.messages);
-    const unread = computed(() => store.messages.filter(m => !m.read).length);
+    const unread = computed(() => (store.messages || []).filter(m => !m.read).length);
     // 我的待办（5.1：待跟进、待审批、待处理任务），数字由真实数据实算，点击进入具体业务
     const toDo = [
       { t: '待跟进客户', icon: 'PhoneFilled', bg: 'var(--el-color-primary-light-9)', c: 'var(--el-color-primary)', to: '/activities',
@@ -47,7 +47,7 @@ const WorkbenchPage = {
         n: () => store.ext.tickets.filter(t => t.type === '投诉' && !['已解决', '已关闭'].includes(t.status)).length },
     ];
     const todos = computed(() => toDo.map(t => ({ ...t, n: t.n() })));
-    const plannedActs = computed(() => store.ext.activities.filter(a => a.owner === '张三' && a.status === '计划中').length);
+    const plannedActs = computed(() => (store.ext.activities || []).filter(a => a.owner === '张三' && a.status === '计划中').length);
     const recent = [
       { t: '今天 10:00', c: '南京某某科技', a: '方案沟通', cno: 'KH-202611-0001' },
       { t: '今天 14:30', c: '江苏某某集团', a: '商务拜访', cno: 'KH-202611-0002' },
@@ -60,10 +60,10 @@ const WorkbenchPage = {
       { tm: '16:00', t: '周例会 · 销售团队会议', s: '待开始', c: '#e08a00' },
     ];
     const quick = [['新建线索', 'Aim', '/leads'], ['新建客户', 'OfficeBuilding', '/customers'], ['新建商机', 'TrendCharts', '/opps'], ['记录跟进', 'EditPen', '/activities']];
-    const myCusts = computed(() => store.customers.filter(c => c.owner === '张三'));
+    const myCusts = computed(() => (store.customers || []).filter(c => c.owner === '张三'));
     const myNewCusts = computed(() => myCusts.value.filter(c => c.created && c.created.startsWith('2026-11')).length);
-    const txnAmt = computed(() => wan(store.opps.filter(o => o.stage !== 'close' && o.date >= '2026-11-01' && o.date < '2026-12-01').reduce((s, o) => s + o.amount, 0)));
-    const paidMonth = computed(() => wan(store.pay.records.filter(r => r.date >= '2026-11-01' && r.date < '2026-12-01').reduce((s, r) => s + (r.confirm === '财务已确认' ? r.amount : 0), 0) / 100));
+    const txnAmt = computed(() => wan((store.opps || []).filter(o => o.stage !== 'close' && o.date >= '2026-11-01' && o.date < '2026-12-01').reduce((s, o) => s + o.amount, 0)));
+    const paidMonth = computed(() => wan((store.pay.records || []).filter(r => r.date >= '2026-11-01' && r.date < '2026-12-01').reduce((s, r) => s + (r.confirm === '财务已确认' ? r.amount : 0), 0) / 100));
     const readMsg = m => { m.read = true; };
     const readAll = () => store.messages.forEach(m => m.read = true);
     return { period, funnelOpt, funnelC, funnelA, funnelW, perfColor, perfPeriod, perf, msgs, unread, todos, recent, sched, quick, readMsg, readAll, myCusts, myNewCusts, txnAmt, paidMonth, plannedActs, yuan, fmtY, authUser, authRole, store };

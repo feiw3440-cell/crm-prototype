@@ -2332,6 +2332,16 @@ const AUTH = {
     return false;
   },
 
+  // 确保销售人员无“分配”按钮权限
+  authCanBtnAllocate() {
+    const user = this.authUser();
+    if (!user) return false;
+    const role = this.roles[user.role || ''];
+    if (!role) return false;
+    if (user.role === 'sales') return false;
+    return this.authCanBtn('分配');
+  },
+
   authScope() {
     const user = this.authUser();
     if (!user) return '全部';
@@ -2344,9 +2354,7 @@ const AUTH = {
     const user = this.authUser();
     if (!user) return new Set();
     if (user.role === 'finance') {
-      const result = new Set();
-      result.add(user.name);
-      return result;
+      return null;
     }
     const role = this.roles[user.role] || { scope: '全部' };
     const scope = role.scope;
@@ -2361,7 +2369,7 @@ const AUTH = {
       } else if (scope === '本部门') {
         if (u.id === user.id) result.add(u.name);
         else if (deptId && u.dept === deptId) result.add(u.name);
-      } else if (scope === '本部门及下级') {
+      } else if (scope === '本部门及下级' || scope === '本部门及下属') {
         if (u.id === user.id) result.add(u.name);
         else if (deptId && u.dept === deptId) result.add(u.name);
         else if (deptId) {
@@ -2391,16 +2399,18 @@ const AUTH = {
   authRowVisible(row) {
     const owners = this.authVisibleOwners();
     if (owners === null) return true;
-    if (!row || !row.owner) return true;
+    if (!row || !row.owner) {
+      const user = this.authUser();
+      return user && (user.role === 'admin' || user.role === 'finance');
+    }
     return owners.has(row.owner);
   },
 
-  authFilter(rows) {
+authFilter(rows) {
     if (!rows || rows.length === 0) return rows;
-    const filtered = rows.filter(r => this.authRowVisible(r));
-    const hasOwner = rows.some(r => r && r.owner);
-    return hasOwner ? filtered : rows;
-  },
+    if (!rows.some(r => r && 'owner' in r)) return rows;
+    return rows.filter(r => this.authRowVisible(r));
+},
 
   // ===== 手机号脱敏 =====
   authMaskPhone(p) {
@@ -4173,8 +4183,8 @@ const ApprovalsPage = {
   setup() {
     const tab = ref('todo'); const sel = ref('SP-202611-0042');
     const TABS = { todo: '待我审批', mine: '我发起的', done: '我已审批', cc: '抄送我的' };
-    const list = computed(() => store.approvals.filter(a => a.tab === tab.value));
-    const count = k => store.approvals.filter(a => a.tab === k).length;
+    const list = computed(() => (store.approvals || []).filter(a => a.tab === tab.value));
+    const count = k => (store.approvals || []).filter(a => a.tab === k).length;
     const cur = computed(() => store.approvals.find(a => a.id === sel.value));
     const avgH = computed(() => {
       const rows = typeof atStatRows === 'function' ? atStatRows() : [];
@@ -4182,7 +4192,7 @@ const ApprovalsPage = {
       return (rows.reduce((s, r) => s + r.hours, 0) / rows.length).toFixed(1);
     });
     const rejectRate = computed(() => {
-      const doneRows = store.approvals.filter(a => a.tab === 'done');
+      const doneRows = (store.approvals || []).filter(a => a.tab === 'done');
       if (!doneRows.length) return '0.0';
       return (doneRows.filter(a => a.result === '已拒绝' || a.result === '已退回修改').length * 100 / doneRows.length).toFixed(1);
     });
@@ -4355,6 +4365,7 @@ const AuthUsersPage = {
         <el-button type="primary" @click="addDialogVisible = true">新增用户</el-button>
       </el-form-item>
     </el-form>
+    <el-table :data="filteredUsers">
       <el-table-column prop="account" label="账号" width="120" />
       <el-table-column prop="name" label="姓名" width="100" />
       <el-table-column prop="phone" label="手机号" width="130" align="center">
@@ -4378,24 +4389,24 @@ const AuthUsersPage = {
       </el-table-column>
 </el-table>
     <div style="margin-top:24px">
-      <el-dialog title="停用用户" :visible="dialogVisible" width="400">
+      <el-dialog title="停用用户" v-model="dialogVisible" width="400">
         <p>用户：{{ dialogName }}（{{ dialogDeptName }}）</p>
         <p v-if="hasCustomers > 0">该用户下有 {{ hasCustomers }} 个客户，<el-button type="primary" @click="selectReceiver">指定接收人</el-button> 后才能停用</p>
         <p v-else>确定要停用该用户吗？</p>
-        <div style="margin-top:24px">
+        <template #footer>
           <el-button @click="dialogVisible = false">取消</el-button>
           <el-button type="primary" @click="confirmDisable">确定停用</el-button>
-        </div>
+        </template>
       </el-dialog>
-      <el-dialog title="重置密码" :visible="pwdDialogVisible" width="400">
+      <el-dialog title="重置密码" v-model="pwdDialogVisible" width="400">
         <p>生成临时密码：Rst@{{ pwdSuffix }}</p>
         <p>该用户将首次登录时被强制改密</p>
-        <div style="margin-top:24px">
+        <template #footer>
           <el-button @click="pwdDialogVisible = false">关闭</el-button>
           <el-button type="primary" @click="confirmResetPwd">确定重置</el-button>
-        </div>
+        </template>
       </el-dialog>
-      <el-dialog title="新增用户" :visible="addDialogVisible" width="460px" destroy-on-close>
+      <el-dialog title="新增用户" v-model="addDialogVisible" width="460px" destroy-on-close>
         <el-form :model="addForm" label-width="100px">
           <el-row :gutter="12">
             <el-col :span="12"><el-form-item label="账号" prop="acc"><el-input v-model="addForm.acc" placeholder="登录账号（唯一）"/></el-form-item></el-col>
@@ -4673,7 +4684,12 @@ const ChangePwdPage = {
       <template v-if="mustChange"><p style="color:#e96e00;margin:16px 0;font-size:13px">当前为强制改密状态，请务必修改密码</p></template>
     </el-form>
   </div>`,
-  data() { return { pwdForm: { old: '', neu: '', neuConfirm: '' }, pwdRules: { old: { required: true, message: '旧密码不能为空' }, neu: { required: true, message: '新密码不能为空' }, neuConfirm: { required: true, message: '请再次输入新密码' } }, mustChange: false, _dummy: [] }},
+  data() { return { pwdForm: { old: '', neu: '', neuConfirm: '' }, pwdRules: { old: { required: true, message: '旧密码不能为空' }, neu: { required: true, message: '新密码不能为空' }, neuConfirm: { required: true, message: '请再次输入新密码' } }, _dummy: [] }},
+  computed: {
+    mustChange() {
+      return AUTH.authUser() && AUTH.authUser().mustChange === true;
+    }
+  },
   methods: { changePwd() { this.$refs.pwdForm.validate((valid) => { if (valid) { if (this.pwdForm.neu !== this.pwdForm.neuConfirm) { ElMessage.error('两次输入的密码不一致'); return; } const r = AUTH.authChangePwd(this.pwdForm.old, this.pwdForm.neu); if (!r.ok) { ElMessage.error(r.msg); return; } ElMessage.success(r.msg); location.hash = '#/workbench'; } else { ElMessage.error('请填写完整表单'); } }); }, goBack() { if (!this.mustChange) { location.hash = '#/workbench'; } } }
 };
 registerRoute('/change-password', ChangePwdPage, 'auth-changepw');
@@ -8966,7 +8982,7 @@ const OrdersPage = {
   setup() {
     const totalText = computed(() => '销售订单共 ' + store.ext.orders.length + ' 笔');
     const stats = computed(() => {
-      const a = store.ext.orders;
+      const a = store.ext.orders || [];
       return [
         ['订单总数', String(a.length), ''],
         ['待处理', String(a.filter(o => ['待确认', '已确认', '待交付'].includes(o.status)).length), 'warn'],
@@ -11176,7 +11192,7 @@ const WorkbenchPage = {
       const fd = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
       const from = p => (p === 'month' ? fd(new Date(y, m, 1)) : p === 'quarter' ? fd(new Date(y, m - (m % 3), 1)) : fd(new Date(y, 0, 1)));
       const to = p => (p === 'month' ? fd(new Date(y, m + 1, 1)) : p === 'quarter' ? fd(new Date(y, m - (m % 3) + 3, 1)) : fd(new Date(y + 1, 0, 1)));
-      return store.opps.filter(o => o.date >= from(period.value) && o.date < to(period.value));
+      return (store.opps || []).filter(o => o.date >= from(period.value) && o.date < to(period.value));
     });
     const funnelC = computed(() => STAGES.slice(0, 5).map(s => periodOpps.value.filter(o => o.stage === s.key).length));
     const funnelA = computed(() => STAGES.slice(0, 5).map(s => Math.round(periodOpps.value.filter(o => o.stage === s.key).reduce((x, o) => x + o.amount, 0) / 10000)));
@@ -11201,7 +11217,7 @@ const WorkbenchPage = {
     const authUser = computed(() => AUTH.authUser());
     const authRole = computed(() => AUTH.authRole());
     const msgs = computed(() => store.messages);
-    const unread = computed(() => store.messages.filter(m => !m.read).length);
+    const unread = computed(() => (store.messages || []).filter(m => !m.read).length);
     // 我的待办（5.1：待跟进、待审批、待处理任务），数字由真实数据实算，点击进入具体业务
     const toDo = [
       { t: '待跟进客户', icon: 'PhoneFilled', bg: 'var(--el-color-primary-light-9)', c: 'var(--el-color-primary)', to: '/activities',
@@ -11214,7 +11230,7 @@ const WorkbenchPage = {
         n: () => store.ext.tickets.filter(t => t.type === '投诉' && !['已解决', '已关闭'].includes(t.status)).length },
     ];
     const todos = computed(() => toDo.map(t => ({ ...t, n: t.n() })));
-    const plannedActs = computed(() => store.ext.activities.filter(a => a.owner === '张三' && a.status === '计划中').length);
+    const plannedActs = computed(() => (store.ext.activities || []).filter(a => a.owner === '张三' && a.status === '计划中').length);
     const recent = [
       { t: '今天 10:00', c: '南京某某科技', a: '方案沟通', cno: 'KH-202611-0001' },
       { t: '今天 14:30', c: '江苏某某集团', a: '商务拜访', cno: 'KH-202611-0002' },
@@ -11227,10 +11243,10 @@ const WorkbenchPage = {
       { tm: '16:00', t: '周例会 · 销售团队会议', s: '待开始', c: '#e08a00' },
     ];
     const quick = [['新建线索', 'Aim', '/leads'], ['新建客户', 'OfficeBuilding', '/customers'], ['新建商机', 'TrendCharts', '/opps'], ['记录跟进', 'EditPen', '/activities']];
-    const myCusts = computed(() => store.customers.filter(c => c.owner === '张三'));
+    const myCusts = computed(() => (store.customers || []).filter(c => c.owner === '张三'));
     const myNewCusts = computed(() => myCusts.value.filter(c => c.created && c.created.startsWith('2026-11')).length);
-    const txnAmt = computed(() => wan(store.opps.filter(o => o.stage !== 'close' && o.date >= '2026-11-01' && o.date < '2026-12-01').reduce((s, o) => s + o.amount, 0)));
-    const paidMonth = computed(() => wan(store.pay.records.filter(r => r.date >= '2026-11-01' && r.date < '2026-12-01').reduce((s, r) => s + (r.confirm === '财务已确认' ? r.amount : 0), 0) / 100));
+    const txnAmt = computed(() => wan((store.opps || []).filter(o => o.stage !== 'close' && o.date >= '2026-11-01' && o.date < '2026-12-01').reduce((s, o) => s + o.amount, 0)));
+    const paidMonth = computed(() => wan((store.pay.records || []).filter(r => r.date >= '2026-11-01' && r.date < '2026-12-01').reduce((s, r) => s + (r.confirm === '财务已确认' ? r.amount : 0), 0) / 100));
     const readMsg = m => { m.read = true; };
     const readAll = () => store.messages.forEach(m => m.read = true);
     return { period, funnelOpt, funnelC, funnelA, funnelW, perfColor, perfPeriod, perf, msgs, unread, todos, recent, sched, quick, readMsg, readAll, myCusts, myNewCusts, txnAmt, paidMonth, plannedActs, yuan, fmtY, authUser, authRole, store };

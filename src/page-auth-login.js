@@ -50,7 +50,12 @@ const ChangePwdPage = {
       <template v-if="mustChange"><p style="color:#e96e00;margin:16px 0;font-size:13px">当前为强制改密状态，请务必修改密码</p></template>
     </el-form>
   </div>`,
-  data() { return { pwdForm: { old: '', neu: '', neuConfirm: '' }, pwdRules: { old: { required: true, message: '旧密码不能为空' }, neu: { required: true, message: '新密码不能为空' }, neuConfirm: { required: true, message: '请再次输入新密码' } }, mustChange: false, _dummy: [] }},
+  data() { return { pwdForm: { old: '', neu: '', neuConfirm: '' }, pwdRules: { old: { required: true, message: '旧密码不能为空' }, neu: { required: true, message: '新密码不能为空' }, neuConfirm: { required: true, message: '请再次输入新密码' } }, _dummy: [] }},
+  computed: {
+    mustChange() {
+      return AUTH.authUser() && AUTH.authUser().mustChange === true;
+    }
+  },
   methods: { changePwd() { this.$refs.pwdForm.validate((valid) => { if (valid) { if (this.pwdForm.neu !== this.pwdForm.neuConfirm) { ElMessage.error('两次输入的密码不一致'); return; } const r = AUTH.authChangePwd(this.pwdForm.old, this.pwdForm.neu); if (!r.ok) { ElMessage.error(r.msg); return; } ElMessage.success(r.msg); location.hash = '#/workbench'; } else { ElMessage.error('请填写完整表单'); } }); }, goBack() { if (!this.mustChange) { location.hash = '#/workbench'; } } }
 };
 registerRoute('/change-password', ChangePwdPage, 'auth-changepw');

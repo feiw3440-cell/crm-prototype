@@ -76,7 +76,7 @@ const OrdersPage = {
   setup() {
     const totalText = computed(() => '销售订单共 ' + store.ext.orders.length + ' 笔');
     const stats = computed(() => {
-      const a = store.ext.orders;
+      const a = store.ext.orders || [];
       return [
         ['订单总数', String(a.length), ''],
         ['待处理', String(a.filter(o => ['待确认', '已确认', '待交付'].includes(o.status)).length), 'warn'],
