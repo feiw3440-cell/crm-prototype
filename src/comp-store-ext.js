@@ -3,6 +3,7 @@ store.customers.push(...extraCustomers(29));
 store.leads.push(...extraLeads());
 store.opps.push(...extraOpps());
 store.ext = reactive(buildExt(store.customers, store.leads, store.opps));
+store.ext.orders = EXT_ORDERS_PRES || [];
 
 /* 5.14 销售总览口径：商机补 created（创建日期），用于平均成交周期 = 赢单日期 − 创建日期（确定性派生） */
 store.opps.forEach(o => { if (!o.created && o.date) o.created = extAddDays(o.date, -(15 + extRint(extRng(extHash(o.no + '|cd')), 5, 45))); });

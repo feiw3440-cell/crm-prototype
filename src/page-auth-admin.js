@@ -118,13 +118,44 @@ const AuthUsersPage = {
       </el-table-column>
 </el-table>
     <div style="margin-top:24px">
-      <el-dialog title="停用用户" v-model="dialogVisible" width="400">
-        <p>用户：{{ dialogName }}（{{ dialogDeptName }}）</p>
-        <p v-if="hasCustomers > 0">该用户下有 {{ hasCustomers }} 个客户，<el-button type="primary" @click="selectReceiver">指定接收人</el-button> 后才能停用</p>
-        <p v-else>确定要停用该用户吗？</p>
+      <el-dialog :title="dialogMode === 'edit' ? '编辑用户' : '停用用户'" v-model="dialogVisible" width="460px" destroy-on-close>
+        <template v-if="dialogMode === 'edit'">
+          <el-form :model="editForm" label-width="100px">
+            <el-form-item label="部门" prop="dept">
+              <el-select v-model="editForm.dept" style="width:100%">
+                <el-option label="全部" value="" />
+                <el-option label="某某软件有限公司" value="D00" />
+                <el-option label="总经办" value="D01" />
+                <el-option label="华东销售中心" value="D02" />
+                <el-option label="华东销售一部" value="D03" />
+                <el-option label="华东销售二部" value="D04" />
+                <el-option label="财务部" value="D06" />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="直属上级" prop="manager">
+              <el-input v-model="editForm.manager" />
+            </el-form-item>
+            <el-form-item label="角色" prop="role">
+              <el-select v-model="editForm.role" style="width:100%">
+<el-option v-for="r in Object.values(AUTH.roles||{})" :key="r.key" :label="r.name" :value="r.key"/>
+              </el-select>
+            </el-form-item>
+          </el-form>
+        </template>
+        <template v-else>
+          <p>用户：{{ dialogName }}（{{ dialogDeptName }}）</p>
+          <p v-if="hasCustomers > 0">该用户下有 {{ hasCustomers }} 个客户，指定接收人：<el-select v-model="receiverName" style="width:100%"><el-option v-for="o in receiverOptions" :key="o" :label="o" :value="o"/></el-select> 后才能停用</p>
+          <p v-else>确定要停用该用户吗？</p>
+        </template>
         <template #footer>
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="confirmDisable">确定停用</el-button>
+          <template v-if="dialogMode === 'edit'">
+            <el-button @click="dialogVisible = false">取消</el-button>
+            <el-button type="primary" @click="saveEditUser">保存</el-button>
+          </template>
+          <template v-else>
+            <el-button @click="dialogVisible = false">取消</el-button>
+            <el-button type="primary" @click="confirmDisable">确定停用</el-button>
+          </template>
         </template>
       </el-dialog>
       <el-dialog title="重置密码" v-model="pwdDialogVisible" width="400">
@@ -146,7 +177,7 @@ const AuthUsersPage = {
             <el-col :span="12"><el-form-item label="直属上级" prop="manager"><el-input v-model="addForm.manager"/></el-form-item></el-col>
           </el-row>
           <el-row :gutter="12">
-            <el-col :span="12"><el-form-item label="角色" prop="role"><el-select v-model="addForm.role" style="width:100%"><el-option v-for="r in Object.values(AUTH.roles||{})" :key="r.key" :label="r.name" :value="r.name"/></el-select></el-form-item></el-col>
+            <el-col :span="12"><el-form-item label="角色" prop="role"><el-select v-model="addForm.role" style="width:100%"><el-option v-for="r in Object.values(AUTH.roles||{})" :key="r.key" :label="r.name" :value="r.key"/></el-select></el-form-item></el-col>
           </el-row>
           <el-row :gutter="12">
             <el-col :span="12"><el-form-item label="联系电话" prop="phone"><el-input v-model="addForm.phone"/></el-form-item></el-col>
@@ -161,8 +192,8 @@ data() { return {
     queryKey: '', queryDept: '', queryRole: '', queryStatus: '',
     dialogVisible: false, dialogName: '', dialogDeptName: '',
     dialogId: '', hasCustomers: 0, pwdDialogVisible: false, pwdSuffix: '4',
-    addDialogVisible: false, addForm: { acc: '', name: '', phone: '', dept: '', manager: '', role: '' }, AUTH
-  };
+    dialogMode: 'disable', editForm: { dept: '', manager: '', role: '' }, addDialogVisible: false, addForm: { acc: '', name: '', phone: '', dept: '', manager: '', role: '' }, receiverName: '', AUTH
+};
 },
   computed: {
     filteredUsers() {
@@ -175,6 +206,13 @@ data() { return {
       if (this.queryRole) res = res.filter(u => u.role === this.queryRole);
       if (this.queryStatus) res = res.filter(u => u.status === this.queryStatus);
       return res;
+    },
+    receiverOptions() {
+      const u = this.dialogId ? AUTH.users[this.dialogId] : null;
+      const currentName = u ? u.name : '';
+      return Object.values(AUTH.users || {}).filter(
+        u => u.status === '启用' && u.id !== this.dialogId && u.name !== currentName
+      ).map(u => u.name);
     }
   },
   methods: {
@@ -191,34 +229,68 @@ data() { return {
     editUser(u) {
       this.dialogName = u.name;
       this.dialogId = u.id;
-      this.dialogDeptName = u.dept ? (this.depts[u.dept] ? this.depts[u.dept].name : '') : '';
+      this.dialogDeptName = u.dept ? (AUTH.depts && AUTH.depts[u.dept] ? AUTH.depts[u.dept].name : '') : '';
+      this.dialogMode = 'edit';
+      this.editForm = {
+        dept: u.dept || 'D00',
+        manager: u.manager || '',
+        role: u.role || 'sales'
+      };
+      this.dialogVisible = true;
+    },
+    doDisable(u) {
+      this.receiverName = '';
+      this.dialogName = u.name;
+      this.dialogId = u.id;
+      this.dialogDeptName = u.dept ? (AUTH.depts && AUTH.depts[u.dept] ? AUTH.depts[u.dept].name : '') : '';
       this.hasCustomers = this.hasCustomerCount(u.id);
+      this.dialogMode = 'disable';
       this.dialogVisible = true;
     },
     confirmDisable() {
       const u = AUTH.users ? AUTH.users[this.dialogId] : undefined;
       const adminCount = Object.values(AUTH.users || {}).filter(u => u.role === 'admin' && u.status === '启用').length;
-      if (this.hasCustomers > 0) {
-        ElMessage.warning('该用户下有客户，需指定接收人后才能停用');
-      } else if (u && u.role === 'admin' && adminCount <= 1) {
-        ElMessage.warning('系统至少保留一个管理员账号，不能停用最后一位管理员');
-      } else {
-        if (u) u.status = '停用';
-        this.dialogVisible = false;
-        ElMessage.success('用户已停用');
+      if (this.hasCustomers > 0 && !this.receiverName) {
+        ElMessage.warning('请先选择接收人');
+        return;
       }
+      if (this.hasCustomers > 0 && this.receiverName) {
+        for (const c of Object.values(store.customers || {})) {
+          if (c.owner === u.name) c.owner = this.receiverName;
+        }
+      }
+      if (u && u.role === 'admin' && adminCount <= 1) {
+        ElMessage.warning('系统至少保留一个管理员账号，不能停用最后一位管理员');
+        return;
+      }
+      if (u) { u.status = '停用'; AUTH.save(); }
+      this.dialogVisible = false;
+      ElMessage.success('用户已停用');
+    },
+    saveEditUser() {
+      const u = AUTH.users ? AUTH.users[this.dialogId] : undefined;
+      if (!u) return;
+      u.dept = this.editForm.dept || 'D00';
+      u.manager = this.editForm.manager || '';
+      u.role = this.editForm.role || 'sales';
+      AUTH.save();
+      this.dialogVisible = false;
+      ElMessage.success('用户已更新');
+      this.search();
     },
     resetPwd(u) {
       this.dialogName = u.name;
-      this.dialogDeptName = u.dept ? (this.depts[u.dept] ? this.depts[u.dept].name : '') : '';
+      this.dialogId = u.id;
+      this.dialogDeptName = u.dept ? (AUTH.depts && AUTH.depts[u.dept] ? AUTH.depts[u.dept].name : '') : '';
       this.pwdSuffix = '4';
       this.pwdDialogVisible = true;
     },
     confirmResetPwd() {
-      const u = AUTH.users ? AUTH.users[this.dialogName || ''] : undefined;
+      const u = AUTH.users ? AUTH.users[this.dialogId || ''] : undefined;
       if (!u) return;
       u.pwd = 'Rst@' + this.pwdSuffix;
       u.mustChange = true;
+      AUTH.save();
       this.pwdDialogVisible = false;
       ElMessage.success('密码已重置，临时密码为 Rst@' + this.pwdSuffix + '，请下次登录时修改');
     },
@@ -272,6 +344,7 @@ data() { return {
       store.ext.users.push(newUser);
       AUTH.users[newUser.id] = newUser;
       store.ext.logs.unshift({ time: '2026-11-05 10:00', who: '管理员', module: '系统', act: '新建', detail: '新增用户「' + newUser.name + '」（账号：' + newUser.acc + '，角色：' + newUser.role + '）', ip: '10.20.0.5' });
+      AUTH.save();
       this.addDialogVisible = false;
       ElMessage.success('用户已新增');
       this.search();
@@ -287,14 +360,23 @@ const AuthRolesPage = {
       <el-form-item label="角色名称" prop="name">
         <el-input v-model="roleForm.name" disabled />
       </el-form-item>
+      <el-form-item label="角色" prop="name">
+        <el-select v-model="selectedKey" style="width:100%">
+          <el-option v-for="r in Object.values(AUTH.roles||{})" :key="r.key" :label="r.name" :value="r.key" />
+        </el-select>
+      </el-form-item>
       <el-form-item label="说明" prop="desc">
         <el-input v-model="roleForm.desc" disabled />
       </el-form-item>
       <el-form-item label="菜单权限" prop="menus">
-        <el-checkbox-group :options="menuOptions" v-model="roleForm.menus" />
+        <el-checkbox-group v-model="roleForm.menus">
+          <el-checkbox :value="option" v-for="option in menuOptions" :key="option">{{ option }}</el-checkbox>
+        </el-checkbox-group>
       </el-form-item>
       <el-form-item label="按钮权限" prop="buttons">
-        <el-checkbox-group :options="buttonOptions" v-model="roleForm.buttons" />
+        <el-checkbox-group v-model="roleForm.buttons">
+          <el-checkbox :value="option" v-for="option in buttonOptions" :key="option">{{ option }}</el-checkbox>
+        </el-checkbox-group>
       </el-form-item>
       <el-form-item label="数据范围" prop="scope">
         <el-radio-group v-model="roleForm.scope">
@@ -321,7 +403,9 @@ const AuthRolesPage = {
   data() { return { 
     roleForm: { name: '', desc: '', menus: [], buttons: [], scope: '全部', phoneFull: true },
     menuOptions: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析', '系统管理'],
-    buttonOptions: ['新增', '编辑', '删除', '导出', '分配'], AUTH
+    buttonOptions: ['新增', '编辑', '删除', '导出', '分配'],
+    selectedKey: 'sales',
+    AUTH
   }; },
   computed: {
     currentRole() {
@@ -331,29 +415,24 @@ const AuthRolesPage = {
     }
   },
   mounted() {
-    if (this.currentRole) {
-      this.roleForm = {
-        name: this.currentRole.name,
-        desc: this.currentRole.desc,
-        menus: [...this.currentRole.menus],
-        buttons: [...this.currentRole.buttons],
-        scope: this.currentRole.scope,
-        phoneFull: this.currentRole.phoneFull
-      };
-    }
+    this.roleForm = {
+      name: AUTH.roles[this.selectedKey] ? AUTH.roles[this.selectedKey].name : '',
+      desc: AUTH.roles[this.selectedKey] ? AUTH.roles[this.selectedKey].desc : '',
+      menus: [...(AUTH.roles[this.selectedKey] ? AUTH.roles[this.selectedKey].menus : [])],
+      buttons: [...(AUTH.roles[this.selectedKey] ? AUTH.roles[this.selectedKey].buttons : [])],
+      scope: AUTH.roles[this.selectedKey] ? AUTH.roles[this.selectedKey].scope : '全部',
+      phoneFull: AUTH.roles[this.selectedKey] ? AUTH.roles[this.selectedKey].phoneFull : true
+    };
   },
   methods: {
     roleSave() {
-      const r = this.currentRole;
+      const r = AUTH.roles[this.selectedKey];
       if (!r) return;
       r.menus = [...new Set(this.roleForm.menus)];
       r.desc = this.roleForm.desc;
       r.scope = this.roleForm.scope;
       r.buttons = [...this.roleForm.buttons];
       r.phoneFull = this.roleForm.phoneFull;
-      if (AUTH.roles[r.key]) {
-        Object.assign(AUTH.roles[r.key], { menus: r.menus, desc: r.desc, dataScope: r.scope, buttons: r.buttons, phoneFull: r.phoneFull });
-      }
       AUTH.save();
       ElMessage.success('角色「' + r.name + '」权限已保存并生效');
     },

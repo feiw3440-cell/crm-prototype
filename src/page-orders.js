@@ -74,9 +74,10 @@ const odCapOf = ct => Math.max(0, (ct.amount || 0) - store.ext.orders.filter(o =
 const OrdersPage = {
   components: { ListPage },
   setup() {
-    const totalText = computed(() => '销售订单共 ' + store.ext.orders.length + ' 笔');
+    const filteredOrders = computed(() => AUTH.authFilter(store.ext.orders));
+    const totalText = computed(() => '销售订单共 ' + filteredOrders.value.length + ' 笔');
     const stats = computed(() => {
-      const a = store.ext.orders || [];
+      const a = filteredOrders.value;
       return [
         ['订单总数', String(a.length), ''],
         ['待处理', String(a.filter(o => ['待确认', '已确认', '待交付'].includes(o.status)).length), 'warn'],
@@ -135,7 +136,7 @@ const OrdersPage = {
       dlg.value = false; ElMessage.success('订单已创建，可在详情页推进状态');
       go('/order/' + no);
     });
-    return { totalText, stats, cols, filters, store, dlg, fref, draft, rule, ctOpts, selCt, cap, save, onLink, transit, cancel, fmtY };
+    return { totalText, stats, rows, cols, filters, store, dlg, fref, draft, rule, ctOpts, selCt, cap, save, onLink, transit, cancel, fmtY };
   },
   template: `<div>
     <list-page :crumbs="['订单管理','销售订单']" title="销售订单" :total-text="totalText" :stats="stats" :filters="filters" :rows="rows" :cols="cols" :action-width="200" note-tag="真实数据 · 点击订单编号进入详情"

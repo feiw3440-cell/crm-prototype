@@ -18,7 +18,7 @@ const PaymentsPage = {
       }));
       return out;
     });
-    const rows = computed(() => planRows.value.filter(r => (!kw.value || (r.contract + r.customer + r.stage).includes(kw.value)) && (!fst.value || r.status.includes(fst.value))));
+    const rows = computed(() => AUTH.authFilter(planRows.value.filter(r => (!kw.value || (r.contract + r.customer + r.stage).includes(kw.value)) && (!fst.value || r.status.includes(fst.value)))));
     const sum = computed(() => { const a = planRows.value; const S = f => a.reduce((s, r) => s + f(r), 0);
       return { due: S(r => r.due ? r.plan : 0), got: S(r => r.got), rest: S(r => r.rest), overdue: S(r => r.overdue ? r.rest : 0), n: a.filter(r => r.overdue).length, all: S(r => r.plan) }; });
     const stTag = s => s === '已核销' ? 'success' : s.includes('逾期') ? 'danger' : s === '部分核销' ? 'warning' : 'info';

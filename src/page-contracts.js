@@ -86,9 +86,10 @@ const ctRecvOf = (ct, plan) => {
 const ContractsPage = {
   components: { ListPage },
   setup() {
-    const totalText = computed(() => '合同台账共 ' + store.ext.contracts.length + ' 份');
+    const filteredContracts = computed(() => AUTH.authFilter(store.ext.contracts));
+    const totalText = computed(() => '合同台账共 ' + filteredContracts.value.length + ' 份');
     const stats = computed(() => {
-      const a = store.ext.contracts;
+      const a = filteredContracts.value;
       const expiring = a.filter(ct => ct.status === '履约中' && ct.endDate && daysBetween(TODAY, ct.endDate) >= 0 && daysBetween(TODAY, ct.endDate) <= 30).length;
       return [
         ['合同总数', String(a.length), ''],
