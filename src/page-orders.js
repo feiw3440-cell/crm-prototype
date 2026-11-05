@@ -85,6 +85,7 @@ const OrdersPage = {
         ['异常', String(a.filter(o => ['已取消', '已关闭', '暂停执行'].includes(o.status)).length), 'danger'],
       ];
     });
+    const rows = computed(() => AUTH.authFilter(store.ext.orders));
     const cols = [
       { p: 'no', l: '订单编号', w: 150, link: true }, { p: 'customer', l: '客户', w: 200, link: 'cust' }, { p: 'contract', l: '合同', w: 160, link: true },
       { p: 'opp', l: '商机', w: 150, link: true }, { p: 'amount', l: '订单金额', w: 130, money: true }, { p: 'date', l: '订单日期', w: 110 }, { p: 'dlv', l: '交付日期', w: 110 },
@@ -137,7 +138,7 @@ const OrdersPage = {
     return { totalText, stats, cols, filters, store, dlg, fref, draft, rule, ctOpts, selCt, cap, save, onLink, transit, cancel, fmtY };
   },
   template: `<div>
-    <list-page :crumbs="['订单管理','销售订单']" title="销售订单" :total-text="totalText" :stats="stats" :filters="filters" :rows="store.ext.orders" :cols="cols" :action-width="200" note-tag="真实数据 · 点击订单编号进入详情"
+    <list-page :crumbs="['订单管理','销售订单']" title="销售订单" :total-text="totalText" :stats="stats" :filters="filters" :rows="rows" :cols="cols" :action-width="200" note-tag="真实数据 · 点击订单编号进入详情"
       @link="onLink">
       <template #ops>
         <el-button type="primary" icon="Plus" @click="dlg=true">新建订单</el-button>

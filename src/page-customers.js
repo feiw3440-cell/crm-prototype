@@ -8,7 +8,7 @@ const CustomersPage = {
     const cat = ref('');
     const rows = computed(() => {
       let list = store.customers;
-      if (props.tab === 'my') list = list.filter(c => c.owner === '张三');
+      if (props.tab === 'my') list = list.filter(c => c.owner === (AUTH.authUser() ? AUTH.authUser().name : ''));
       else if (props.tab === 'pool') list = list.filter(c => !c.owner);
       else if (props.tab === 'key') list = list.filter(c => c.key);
       else if (props.tab === 'recycle') list = list.filter(c => c.status === '流失' || c.status === '已合并' || c.archived);
@@ -16,7 +16,7 @@ const CustomersPage = {
         if (cat.value) list = list.filter(c => c.industry === cat.value);
         return list.slice().sort((a, b) => String(a.industry || '').localeCompare(String(b.industry || ''), 'zh') || String(a.level || '').localeCompare(String(b.level || ''), 'zh'));
       }
-      return list;
+      return AUTH.authFilter(list);
     });
     const t = computed(() => TABS[props.tab]);
     const totalText = computed(() => t.value + '共 ' + rows.value.length + ' 家');

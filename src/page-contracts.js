@@ -99,7 +99,7 @@ const ContractsPage = {
     });
     /* 签署日期区间（ListPage 只支持精确匹配，区间先在父组件过滤） */
     const dr = reactive({ from: '', to: '' });
-    const rows = computed(() => store.ext.contracts.filter(ct => (!dr.from || (ct.signDate || '') >= dr.from) && (!dr.to || (ct.signDate || '') <= dr.to)));
+    const rows = computed(() => AUTH.authFilter(store.ext.contracts.filter(ct => (!dr.from || (ct.signDate || '') >= dr.from) && (!dr.to || (ct.signDate || '') <= dr.to))));
     const customerOpts = computed(() => [...new Set(store.ext.contracts.map(ct => ct.customer).filter(Boolean))].sort());
     const ownerOpts = computed(() => [...new Set(store.ext.contracts.map(ct => ct.owner).filter(Boolean))]);
     const statusOpts = CT_STATUS_ALL;

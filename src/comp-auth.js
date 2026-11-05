@@ -41,11 +41,11 @@ const AUTH = {
     };
     this.users = users;
     const roles = {
-      admin: { key: 'admin', name: '系统管理员', desc: '', menus: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析', '系统管理'], buttons: ['新增', '编辑', '删除', '导出', '分配'], scope: '全部', phoneFull: true, noFollowUp: false, home: '/system/auth/users', demoUid: 'u01' },
-      director: { key: 'director', name: '销售总监', desc: '', menus: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析'], buttons: ['新增', '编辑', '删除', '导出', '分配'], scope: '本部门及下属', phoneFull: true, noFollowUp: false, home: '/workbench', demoUid: 'u02' },
-      manager: { key: 'manager', name: '销售经理', desc: '', menus: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析'], buttons: ['新增', '编辑', '导出', '分配'], scope: '本部门', phoneFull: true, noFollowUp: false, home: '/workbench', demoUid: 'u03' },
-      sales: { key: 'sales', name: '销售人员', desc: '', menus: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '报价管理', '活动管理', '服务管理'], buttons: ['新增', '编辑'], scope: '本人', phoneFull: true, noFollowUp: false, home: '/workbench', demoUid: 'u05' },
-      finance: { key: 'finance', name: '财务人员', desc: '', menus: ['工作台', '合同管理', '订单管理', '回款管理', '数据分析'], buttons: ['导出'], scope: '全部', phoneFull: false, noFollowUp: true, home: '/payments', demoUid: 'u07' },
+      admin: { key: 'admin', name: '系统管理员', desc: '', menus: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析', '系统管理', '审批中心'], buttons: ['新增', '编辑', '删除', '导出', '分配'], scope: '全部', phoneFull: true, noFollowUp: false, home: '/system/auth/users', demoUid: 'u01' },
+      director: { key: 'director', name: '销售总监', desc: '', menus: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析', '审批中心'], buttons: ['新增', '编辑', '删除', '导出', '分配'], scope: '本部门及下属', phoneFull: true, noFollowUp: false, home: '/workbench', demoUid: 'u02' },
+      manager: { key: 'manager', name: '销售经理', desc: '', menus: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析', '审批中心'], buttons: ['新增', '编辑', '导出', '分配'], scope: '本部门', phoneFull: true, noFollowUp: false, home: '/workbench', demoUid: 'u03' },
+      sales: { key: 'sales', name: '销售人员', desc: '', menus: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '报价管理', '活动管理', '服务管理', '审批中心'], buttons: ['新增', '编辑'], scope: '本人', phoneFull: true, noFollowUp: false, home: '/workbench', demoUid: 'u05' },
+      finance: { key: 'finance', name: '财务人员', desc: '', menus: ['工作台', '合同管理', '订单管理', '回款管理', '数据分析', '审批中心'], buttons: ['导出'], scope: '全部', phoneFull: false, noFollowUp: true, home: '/payments', demoUid: 'u07' },
     };
     this.roles = roles;
     this.save();
@@ -248,7 +248,8 @@ const AUTH = {
       '导出': '导出',
       '分配': '分配', '转移': '分配', '指派': '分配',
     };
-    const kind = kindMap[label];
+    const parts = label.split('/').map(s => s.trim());
+    const kind = parts.reduce((acc, part) => acc || kindMap[part], null);
     if (kind) {
       if (kind === '分配') {
         const user = this.authUser();

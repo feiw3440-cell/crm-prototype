@@ -57,7 +57,7 @@ const ActivitiesPage = {
       if (d1.value && d2.value && d1.value > d2.value) { const t = d1.value; d1.value = d2.value; d2.value = t; }
       if (d1.value) a = a.filter(x => x.time.slice(0, 10) >= d1.value);
       if (d2.value) a = a.filter(x => x.time.slice(0, 10) <= d2.value);
-      return a;
+      return AUTH.authFilter(a);
     });
     const totalText = computed(() => '跟进活动共 ' + rows.value.length + ' 条');
     const monthStr = computed(() => { let c = 0; store.ext.activities.forEach(x => { if (x.time.slice(0, 7) === TODAY.slice(0, 7)) c++; }); return c; });

@@ -2244,11 +2244,11 @@ const AUTH = {
     };
     this.users = users;
     const roles = {
-      admin: { key: 'admin', name: '系统管理员', desc: '', menus: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析', '系统管理'], buttons: ['新增', '编辑', '删除', '导出', '分配'], scope: '全部', phoneFull: true, noFollowUp: false, home: '/system/auth/users', demoUid: 'u01' },
-      director: { key: 'director', name: '销售总监', desc: '', menus: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析'], buttons: ['新增', '编辑', '删除', '导出', '分配'], scope: '本部门及下属', phoneFull: true, noFollowUp: false, home: '/workbench', demoUid: 'u02' },
-      manager: { key: 'manager', name: '销售经理', desc: '', menus: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析'], buttons: ['新增', '编辑', '导出', '分配'], scope: '本部门', phoneFull: true, noFollowUp: false, home: '/workbench', demoUid: 'u03' },
-      sales: { key: 'sales', name: '销售人员', desc: '', menus: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '报价管理', '活动管理', '服务管理'], buttons: ['新增', '编辑'], scope: '本人', phoneFull: true, noFollowUp: false, home: '/workbench', demoUid: 'u05' },
-      finance: { key: 'finance', name: '财务人员', desc: '', menus: ['工作台', '合同管理', '订单管理', '回款管理', '数据分析'], buttons: ['导出'], scope: '全部', phoneFull: false, noFollowUp: true, home: '/payments', demoUid: 'u07' },
+      admin: { key: 'admin', name: '系统管理员', desc: '', menus: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析', '系统管理', '审批中心'], buttons: ['新增', '编辑', '删除', '导出', '分配'], scope: '全部', phoneFull: true, noFollowUp: false, home: '/system/auth/users', demoUid: 'u01' },
+      director: { key: 'director', name: '销售总监', desc: '', menus: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析', '审批中心'], buttons: ['新增', '编辑', '删除', '导出', '分配'], scope: '本部门及下属', phoneFull: true, noFollowUp: false, home: '/workbench', demoUid: 'u02' },
+      manager: { key: 'manager', name: '销售经理', desc: '', menus: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析', '审批中心'], buttons: ['新增', '编辑', '导出', '分配'], scope: '本部门', phoneFull: true, noFollowUp: false, home: '/workbench', demoUid: 'u03' },
+      sales: { key: 'sales', name: '销售人员', desc: '', menus: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '报价管理', '活动管理', '服务管理', '审批中心'], buttons: ['新增', '编辑'], scope: '本人', phoneFull: true, noFollowUp: false, home: '/workbench', demoUid: 'u05' },
+      finance: { key: 'finance', name: '财务人员', desc: '', menus: ['工作台', '合同管理', '订单管理', '回款管理', '数据分析', '审批中心'], buttons: ['导出'], scope: '全部', phoneFull: false, noFollowUp: true, home: '/payments', demoUid: 'u07' },
     };
     this.roles = roles;
     this.save();
@@ -2451,7 +2451,8 @@ const AUTH = {
       '导出': '导出',
       '分配': '分配', '转移': '分配', '指派': '分配',
     };
-    const kind = kindMap[label];
+    const parts = label.split('/').map(s => s.trim());
+    const kind = parts.reduce((acc, part) => acc || kindMap[part], null);
     if (kind) {
       if (kind === '分配') {
         const user = this.authUser();
@@ -3003,7 +3004,7 @@ const ActivitiesPage = {
       if (d1.value && d2.value && d1.value > d2.value) { const t = d1.value; d1.value = d2.value; d2.value = t; }
       if (d1.value) a = a.filter(x => x.time.slice(0, 10) >= d1.value);
       if (d2.value) a = a.filter(x => x.time.slice(0, 10) <= d2.value);
-      return a;
+      return AUTH.authFilter(a);
     });
     const totalText = computed(() => '跟进活动共 ' + rows.value.length + ' 条');
     const monthStr = computed(() => { let c = 0; store.ext.activities.forEach(x => { if (x.time.slice(0, 7) === TODAY.slice(0, 7)) c++; }); return c; });
@@ -4280,15 +4281,22 @@ const AuthDeptsPage = {
   </div>`,
   data() { return { depts: {}, form: { name: '', parentId: 'D00' } }; },
   mounted() {
-    this.depts = {
-      D00: { id: 'D00', name: '某某软件有限公司', parent: '', level: '公司', children: [
-        { id: 'D01', name: '总经办', parent: 'D00', level: '部门', children: [] },
-        { id: 'D02', name: '华东销售中心', parent: 'D00', level: '部门', children: [
-          { id: 'D03', name: '华东销售一部', parent: 'D02', level: '团队', children: [] },
-          { id: 'D04', name: '华东销售二部', parent: 'D02', level: '团队', children: [] }
-        ]}
-      ]}
-    };
+    const depts = AUTH.depts || {};
+    const nodeMap = {};
+    const roots = [];
+    for (const k of Object.keys(depts)) {
+      const d = { id: k, name: depts[k].name, level: depts[k].level, children: [] };
+      nodeMap[k] = d;
+      if (depts[k].parent === '') {
+        roots.push(d);
+      } else if (nodeMap[depts[k].parent]) {
+        nodeMap[depts[k].parent].children.push(d);
+      } else {
+        roots.push(d);
+      }
+    }
+    this.depts = roots;
+    this.form.parentId = 'D00';
     this.$nextTick(() => {});
   }
 };
@@ -4353,6 +4361,7 @@ const AuthUsersPage = {
         <template #default="{ row }">
           <el-button size="small" @click="editUser(row)" v-if="AUTH.authCanBtn('编辑')">编辑</el-button>
           <el-button size="small" type="danger" @click="doDisable(row)">停用</el-button>
+          <el-button size="small" @click="resetPwd(row)">重置密码</el-button>
     </el-table>
     <div style="margin-top:24px">
       <el-dialog title="停用用户" :visible="dialogVisible" width="400">
@@ -4369,6 +4378,7 @@ const AuthUsersPage = {
         <p>该用户将首次登录时被强制改密</p>
         <div style="margin-top:24px">
           <el-button @click="pwdDialogVisible = false">关闭</el-button>
+          <el-button type="primary" @click="confirmResetPwd">确定重置</el-button>
         </div>
       </el-dialog>
     </div>
@@ -4376,7 +4386,7 @@ const AuthUsersPage = {
   data() { return { 
     queryKey: '', queryDept: '', queryRole: '', queryStatus: '',
     dialogVisible: false, dialogName: '', dialogDeptName: '',
-    hasCustomers: 0, pwdDialogVisible: false, pwdSuffix: ''
+    hasCustomers: 0, pwdDialogVisible: false, pwdSuffix: '4'
   }; },
   mounted() {
   },
@@ -4412,12 +4422,30 @@ const AuthUsersPage = {
     },
     confirmDisable() {
       const u = AUTH.users ? AUTH.users[this.dialogName || ''] : undefined;
+      const adminCount = Object.values(AUTH.users || {}).filter(u => u.role === 'admin' && u.status === '启用').length;
       if (this.hasCustomers > 0) {
         ElMessage.warning('该用户下有客户，需指定接收人后才能停用');
+      } else if (u && u.role === 'admin' && adminCount <= 1) {
+        ElMessage.warning('系统至少保留一个管理员账号，不能停用最后一位管理员');
       } else {
+        if (u) u.status = '停用';
         this.dialogVisible = false;
         ElMessage.success('用户已停用');
       }
+    },
+    resetPwd(u) {
+      this.dialogName = u.name;
+      this.dialogDeptName = u.dept ? (this.depts[u.dept] ? this.depts[u.dept].name : '') : '';
+      this.pwdSuffix = '4';
+      this.pwdDialogVisible = true;
+    },
+    confirmResetPwd() {
+      const u = AUTH.users ? AUTH.users[this.dialogName || ''] : undefined;
+      if (!u) return;
+      u.pwd = 'Rst@' + this.pwdSuffix;
+      u.mustChange = true;
+      this.pwdDialogVisible = false;
+      ElMessage.success('密码已重置，临时密码为 Rst@' + this.pwdSuffix + '，请下次登录时修改');
     },
     selectReceiver() { this.dialogVisible = false; ElMessage.info('请在对话框中指定接收人'); },
     authResetDemo() { AUTH.authResetDemo(); this.search(); }
@@ -4499,7 +4527,7 @@ const LoginPage = {
     </div>
   </div>`,
   data() { return { loginForm: { account: '', pwd: '' }, loginRules: { account: { required: true, message: '账号或手机号不能为空' }, pwd: { required: true, message: '密码不能为空' } }, demoAccounts: [{ id: 'u01', account: 'admin', pwd: 'Crm@2026', role: '系统管理员', mustChange: false }, { id: 'u02', account: 'zhouzj', pwd: 'Crm@2026', role: '销售总监', mustChange: false }, { id: 'u03', account: 'zhangsan', pwd: 'Crm@2026', role: '销售经理', mustChange: false }, { id: 'u04', account: 'lisi', pwd: 'Crm@2026', role: '销售经理', mustChange: false }, { id: 'u05', account: 'wangwu', pwd: 'Crm@2026', role: '销售人员', mustChange: false }, { id: 'u06', account: 'zhaoliu', pwd: 'Crm@2026', role: '销售人员', mustChange: false }, { id: 'u07', account: 'wangfang', pwd: 'Crm@2026', role: '财务人员', mustChange: false }, { id: 'u08', account: 'chenyue', pwd: 'Crm@2026', role: '销售人员', mustChange: false, status: '停用' }, { id: 'u09', account: 'newbie', pwd: 'Init@1234', role: '销售人员', mustChange: true }], _dummy: [] }},
-  methods: { login() { const r = AUTH.authLogin(this.loginForm.account, this.loginForm.pwd); if (!r.ok) { ElMessage.error(r.msg); return; } if (r.user.mustChange) { location.hash = '#/change-password'; } else { location.hash = r.user.home || '/workbench'; } }, fillAccount(acc) { this.loginForm.account = acc.account; this.loginForm.pwd = acc.pwd; } }
+  methods: { login() { const r = AUTH.authLogin(this.loginForm.account, this.loginForm.pwd); if (!r.ok) { ElMessage.error(r.msg); return; } if (r.user.mustChange) { location.hash = '#/change-password'; } else { location.hash = AUTH.roles[r.user.role]?.home || '/workbench'; } }, fillAccount(acc) { this.loginForm.account = acc.account; this.loginForm.pwd = acc.pwd; } }
 };
 registerRoute('/login', LoginPage, 'auth-login');
 
@@ -4524,7 +4552,7 @@ const ChangePwdPage = {
     </el-form>
   </div>`,
   data() { return { pwdForm: { old: '', neu: '', neuConfirm: '' }, pwdRules: { old: { required: true, message: '旧密码不能为空' }, neu: { required: true, message: '新密码不能为空' }, neuConfirm: { required: true, message: '请再次输入新密码' } }, mustChange: false, _dummy: [] }},
-  methods: { changePwd() { this.$refs.pwdForm.validate((valid) => { if (valid) { const r = AUTH.authChangePwd(this.pwdForm.old, this.pwdForm.neu); if (!r.ok) { ElMessage.error(r.msg); return; } ElMessage.success(r.msg); location.hash = '#/workbench'; } else { ElMessage.error('请填写完整表单'); } }); }, goBack() { if (!this.mustChange) { location.hash = '#/workbench'; } } }
+  methods: { changePwd() { this.$refs.pwdForm.validate((valid) => { if (valid) { if (this.pwdForm.neu !== this.pwdForm.neuConfirm) { ElMessage.error('两次输入的密码不一致'); return; } const r = AUTH.authChangePwd(this.pwdForm.old, this.pwdForm.neu); if (!r.ok) { ElMessage.error(r.msg); return; } ElMessage.success(r.msg); location.hash = '#/workbench'; } else { ElMessage.error('请填写完整表单'); } }); }, goBack() { if (!this.mustChange) { location.hash = '#/workbench'; } } }
 };
 registerRoute('/change-password', ChangePwdPage, 'auth-changepw');
 
@@ -4813,7 +4841,7 @@ const ContractsPage = {
     });
     /* 签署日期区间（ListPage 只支持精确匹配，区间先在父组件过滤） */
     const dr = reactive({ from: '', to: '' });
-    const rows = computed(() => store.ext.contracts.filter(ct => (!dr.from || (ct.signDate || '') >= dr.from) && (!dr.to || (ct.signDate || '') <= dr.to)));
+    const rows = computed(() => AUTH.authFilter(store.ext.contracts.filter(ct => (!dr.from || (ct.signDate || '') >= dr.from) && (!dr.to || (ct.signDate || '') <= dr.to))));
     const customerOpts = computed(() => [...new Set(store.ext.contracts.map(ct => ct.customer).filter(Boolean))].sort());
     const ownerOpts = computed(() => [...new Set(store.ext.contracts.map(ct => ct.owner).filter(Boolean))]);
     const statusOpts = CT_STATUS_ALL;
@@ -5340,7 +5368,7 @@ const CustomersPage = {
     const cat = ref('');
     const rows = computed(() => {
       let list = store.customers;
-      if (props.tab === 'my') list = list.filter(c => c.owner === '张三');
+      if (props.tab === 'my') list = list.filter(c => c.owner === (AUTH.authUser() ? AUTH.authUser().name : ''));
       else if (props.tab === 'pool') list = list.filter(c => !c.owner);
       else if (props.tab === 'key') list = list.filter(c => c.key);
       else if (props.tab === 'recycle') list = list.filter(c => c.status === '流失' || c.status === '已合并' || c.archived);
@@ -5348,7 +5376,7 @@ const CustomersPage = {
         if (cat.value) list = list.filter(c => c.industry === cat.value);
         return list.slice().sort((a, b) => String(a.industry || '').localeCompare(String(b.industry || ''), 'zh') || String(a.level || '').localeCompare(String(b.level || ''), 'zh'));
       }
-      return list;
+      return AUTH.authFilter(list);
     });
     const t = computed(() => TABS[props.tab]);
     const totalText = computed(() => t.value + '共 ' + rows.value.length + ' 家');
@@ -8825,6 +8853,7 @@ const OrdersPage = {
         ['异常', String(a.filter(o => ['已取消', '已关闭', '暂停执行'].includes(o.status)).length), 'danger'],
       ];
     });
+    const rows = computed(() => AUTH.authFilter(store.ext.orders));
     const cols = [
       { p: 'no', l: '订单编号', w: 150, link: true }, { p: 'customer', l: '客户', w: 200, link: 'cust' }, { p: 'contract', l: '合同', w: 160, link: true },
       { p: 'opp', l: '商机', w: 150, link: true }, { p: 'amount', l: '订单金额', w: 130, money: true }, { p: 'date', l: '订单日期', w: 110 }, { p: 'dlv', l: '交付日期', w: 110 },
@@ -8877,7 +8906,7 @@ const OrdersPage = {
     return { totalText, stats, cols, filters, store, dlg, fref, draft, rule, ctOpts, selCt, cap, save, onLink, transit, cancel, fmtY };
   },
   template: `<div>
-    <list-page :crumbs="['订单管理','销售订单']" title="销售订单" :total-text="totalText" :stats="stats" :filters="filters" :rows="store.ext.orders" :cols="cols" :action-width="200" note-tag="真实数据 · 点击订单编号进入详情"
+    <list-page :crumbs="['订单管理','销售订单']" title="销售订单" :total-text="totalText" :stats="stats" :filters="filters" :rows="rows" :cols="cols" :action-width="200" note-tag="真实数据 · 点击订单编号进入详情"
       @link="onLink">
       <template #ops>
         <el-button type="primary" icon="Plus" @click="dlg=true">新建订单</el-button>
@@ -10425,16 +10454,17 @@ const SystemPage = {
         ['已停用', String(us.filter(u => u.status === '停用').length), 'warn'], ['角色数', String(store.ext.roles.length), '']];
     });
     const uDlg = reactive({ show: false, edit: '' });
-    const uForm = reactive({ id: '', acc: '', name: '', dept: '', role: '', phone: '', email: '', status: '启用' });
+    const uForm = reactive({ id: '', acc: '', name: '', dept: '', role: '', phone: '', email: '', status: '启用', manager: '' });
     const uRules = {
       acc: [{ required: true, message: '请输入账号', trigger: 'blur' }],
       name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
       dept: [{ required: true, message: '请选择部门', trigger: 'change' }],
       role: [{ required: true, message: '请选择角色', trigger: 'change' }],
+      manager: [{ required: false, message: '请输入直属上级' }],
     };
     const uRef = ref(null);
     const uOpen = row => {
-      Object.assign(uForm, row || { id: '', acc: '', name: '', dept: '', role: '', phone: '', email: '', status: '启用' }, { id: row ? row.id : '', status: row ? row.status : '启用' });
+      Object.assign(uForm, row || { id: '', acc: '', name: '', dept: '', role: '', phone: '', email: '', status: '启用', manager: '' }, { id: row ? row.id : '', status: row ? row.status : '启用' });
       uDlg.edit = row ? row.id : ''; uDlg.show = true;
     };
     const uSave = () => uRef.value.validate(ok => {
@@ -10444,22 +10474,40 @@ const SystemPage = {
       if (uForm.id) {
         const t = store.ext.users.find(u => u.id === uForm.id);
         Object.assign(t, { acc: uForm.acc, name: uForm.name, dept: uForm.dept, role: uForm.role, phone: uForm.phone, email: uForm.email, status: uForm.status });
+        // Sync to AUTH.users
+        if (AUTH.users && AUTH.users[uForm.id]) {
+          Object.assign(AUTH.users[uForm.id], { acc: uForm.acc, name: uForm.name, dept: uForm.dept, role: uForm.role, phone: uForm.phone, email: uForm.email, status: uForm.status, manager: uForm.manager });
+        }
         store.ext.logs.unshift({ time: sysNow(), who: '管理员', module: '系统', act: '编辑', detail: '编辑用户「' + uForm.name + '」（账号：' + uForm.acc + '）', ip: '10.20.0.5' });
       } else {
         let n = 1;
         store.ext.users.forEach(u => { const k = Number(String(u.id).slice(1)); if (k >= n) n = k + 1; });
-        store.ext.users.push({ id: 'u' + String(n).padStart(2, '0'), acc: uForm.acc, name: uForm.name, dept: uForm.dept, role: uForm.role, phone: uForm.phone, email: uForm.email, status: uForm.status, lastLogin: '—' });
+        const newUser = { id: 'u' + String(n).padStart(2, '0'), acc: uForm.acc, name: uForm.name, dept: uForm.dept, role: uForm.role, phone: uForm.phone, email: uForm.email, status: uForm.status, manager: uForm.manager, lastLogin: '—' };
+        store.ext.users.push(newUser);
+        // Sync to AUTH.users
+        AUTH.users[uForm.id || 'u' + String(n).padStart(2, '0')] = newUser;
         store.ext.logs.unshift({ time: sysNow(), who: '管理员', module: '系统', act: '新建', detail: '新增用户「' + uForm.name + '」（账号：' + uForm.acc + '，角色：' + uForm.role + '）', ip: '10.20.0.5' });
       }
       uDlg.show = false; ElMessage.success('已保存并写回用户列表');
     });
-    const uToggle = row => ElMessageBox.confirm(
-      row.status === '启用' ? '停用后「' + row.name + '」将立即失去登录权限，进行中的审批不受影响。' : '启用后该用户恢复登录与数据访问权限。',
-      row.status === '启用' ? '停用确认' : '启用确认', { type: 'warning', confirmButtonText: '确认', cancelButtonText: '取消' }).then(() => {
-      row.status = row.status === '启用' ? '停用' : '启用';
-      store.ext.logs.unshift({ time: sysNow(), who: '管理员', module: '系统', act: row.status === '停用' ? '停用' : '启用', detail: (row.status === '停用' ? '停用' : '启用') + '用户「' + row.name + '」', ip: '10.20.0.5' });
-      ElMessage.success('已' + (row.status === '停用' ? '停用' : '启用') + '：' + row.name);
-    }).catch(() => {});
+    const uToggle = row => {
+      const isLastAdmin = () => {
+        const admins = Object.values(AUTH.users || {}).filter(u => u.role === 'admin' && u.status === '启用');
+        return admins.length <= 1 && row.status === '启用' && row.role === 'admin';
+      };
+      if (isLastAdmin()) return ElMessage.warning('系统至少保留一个管理员账号');
+      ElMessageBox.confirm(
+        row.status === '启用' ? '停用后「' + row.name + '」将立即失去登录权限，进行中的审批不受影响。' : '启用后该用户恢复登录与数据访问权限。',
+        row.status === '启用' ? '停用确认' : '启用确认', { type: 'warning', confirmButtonText: '确认', cancelButtonText: '取消' }).then(() => {
+          row.status = row.status === '启用' ? '停用' : '启用';
+          // Sync to AUTH.users
+          if (AUTH.users && AUTH.users[row.id]) {
+            AUTH.users[row.id].status = row.status;
+          }
+          store.ext.logs.unshift({ time: sysNow(), who: '管理员', module: '系统', act: row.status === '停用' ? '停用' : '启用', detail: (row.status === '停用' ? '停用' : '启用') + '用户「' + row.name + '」', ip: '10.20.0.5' });
+          ElMessage.success('已' + (row.status === '停用' ? '停用' : '启用') + '：' + row.name);
+        }).catch(() => {});
+    };
     const uDrawer = reactive({ show: false, cur: null });
     const uShow = row => { uDrawer.cur = row; uDrawer.show = true; };
     const uLogs = computed(() => uDrawer.cur ? store.ext.logs.filter(l => l.who === uDrawer.cur.name).slice(0, 6) : []);
@@ -10490,6 +10538,10 @@ const SystemPage = {
       const r = role.value;
       r.menus = [...new Set(ck)];
       r.desc = rData.desc; r.dataScope = rData.scope; r.buttons = [...rData.btns]; r.fieldMask = [...rData.masks];
+      // Sync to AUTH.roles
+      if (AUTH.roles[r.key]) {
+        Object.assign(AUTH.roles[r.key], { menus: r.menus, desc: r.desc, dataScope: r.dataScope, buttons: r.buttons, fieldMask: r.fieldMask });
+      }
       store.ext.logs.unshift({ time: sysNow(), who: '管理员', module: '系统', act: '编辑', detail: '保存角色权限「' + r.name + '」（菜单 ' + r.menus.length + ' 项 · 数据范围：' + r.dataScope + '）', ip: '10.20.0.5' });
       ElMessage.success('角色「' + r.name + '」权限已保存并生效');
     };
@@ -10906,7 +10958,10 @@ const SystemPage = {
           <el-col :span="12"><el-form-item label="角色" prop="role"><el-select v-model="uForm.role" style="width:100%"><el-option v-for="r in store.ext.roles" :key="r.key" :label="r.name" :value="r.name"/></el-select></el-form-item></el-col>
         </el-row>
         <el-row :gutter="12">
+          <el-col :span="12"><el-form-item label="直属上级" prop="manager"><el-input v-model="uForm.manager"/></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="联系电话"><el-input v-model="uForm.phone"/></el-form-item></el-col>
+        </el-row>
+        <el-row :gutter="12">
           <el-col :span="12"><el-form-item label="邮箱"><el-input v-model="uForm.email"/></el-form-item></el-col>
         </el-row>
         <el-form-item label="状态"><el-radio-group v-model="uForm.status"><el-radio label="启用"/><el-radio label="停用"/></el-radio-group></el-form-item>
@@ -11021,6 +11076,8 @@ const WorkbenchPage = {
     const perfPeriod = ref('month');
     const perfData = { month: { target: 1000000, done: 786000, label: '本月' }, quarter: { target: 3000000, done: 2460000, label: '本季度' }, year: { target: 12000000, done: 8160000, label: '本年' } };
     const perf = computed(() => { const p = perfData[perfPeriod.value]; return { ...p, rate: Math.round(p.done * 1000 / p.target) / 10 }; });
+    const authUser = computed(() => AUTH.authUser());
+    const authRole = computed(() => AUTH.authRole());
     const msgs = computed(() => store.messages);
     const unread = computed(() => store.messages.filter(m => !m.read).length);
     // 我的待办（5.1：待跟进、待审批、待处理任务），数字由真实数据实算，点击进入具体业务
@@ -11059,7 +11116,7 @@ const WorkbenchPage = {
   template: `<div>
     <el-breadcrumb separator="/" class="crumb"><el-breadcrumb-item>工作台</el-breadcrumb-item><el-breadcrumb-item>个人工作台</el-breadcrumb-item></el-breadcrumb>
     <div class="wb-hello">
-      <div><h2>欢迎回来，张三</h2><div class="d">2026年11月2日 星期一 · 华东销售一部 · 销售经理（数据范围：本部门及下属）</div></div>
+      <div><h2>欢迎回来，{{ authUser.name }}</h2><div class="d">{{ TODAY }} {{ authRole?.name }}{{ authUser?.role === 'admin' ? '' : '（数据范围：' + authRole?.scope + '）' }}</div></div>
       <div class="seg"><div><b>{{ plannedActs }}</b><span>待跟进</span></div><div><b>{{ todos[1].n }}</b><span>待审批报价</span></div><div><b>{{ unread }}</b><span>未读消息</span></div></div>
     </div>
     <div class="wb-grid">

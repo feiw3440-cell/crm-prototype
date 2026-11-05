@@ -31,6 +31,8 @@ const WorkbenchPage = {
     const perfPeriod = ref('month');
     const perfData = { month: { target: 1000000, done: 786000, label: '本月' }, quarter: { target: 3000000, done: 2460000, label: '本季度' }, year: { target: 12000000, done: 8160000, label: '本年' } };
     const perf = computed(() => { const p = perfData[perfPeriod.value]; return { ...p, rate: Math.round(p.done * 1000 / p.target) / 10 }; });
+    const authUser = computed(() => AUTH.authUser());
+    const authRole = computed(() => AUTH.authRole());
     const msgs = computed(() => store.messages);
     const unread = computed(() => store.messages.filter(m => !m.read).length);
     // 我的待办（5.1：待跟进、待审批、待处理任务），数字由真实数据实算，点击进入具体业务
@@ -69,7 +71,7 @@ const WorkbenchPage = {
   template: `<div>
     <el-breadcrumb separator="/" class="crumb"><el-breadcrumb-item>工作台</el-breadcrumb-item><el-breadcrumb-item>个人工作台</el-breadcrumb-item></el-breadcrumb>
     <div class="wb-hello">
-      <div><h2>欢迎回来，张三</h2><div class="d">2026年11月2日 星期一 · 华东销售一部 · 销售经理（数据范围：本部门及下属）</div></div>
+      <div><h2>欢迎回来，{{ authUser.name }}</h2><div class="d">{{ TODAY }} {{ authRole?.name }}{{ authUser?.role === 'admin' ? '' : '（数据范围：' + authRole?.scope + '）' }}</div></div>
       <div class="seg"><div><b>{{ plannedActs }}</b><span>待跟进</span></div><div><b>{{ todos[1].n }}</b><span>待审批报价</span></div><div><b>{{ unread }}</b><span>未读消息</span></div></div>
     </div>
     <div class="wb-grid">

@@ -27,16 +27,17 @@ const SystemPage = {
         ['已停用', String(us.filter(u => u.status === '停用').length), 'warn'], ['角色数', String(store.ext.roles.length), '']];
     });
     const uDlg = reactive({ show: false, edit: '' });
-    const uForm = reactive({ id: '', acc: '', name: '', dept: '', role: '', phone: '', email: '', status: '启用' });
+    const uForm = reactive({ id: '', acc: '', name: '', dept: '', role: '', phone: '', email: '', status: '启用', manager: '' });
     const uRules = {
       acc: [{ required: true, message: '请输入账号', trigger: 'blur' }],
       name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
       dept: [{ required: true, message: '请选择部门', trigger: 'change' }],
       role: [{ required: true, message: '请选择角色', trigger: 'change' }],
+      manager: [{ required: false, message: '请输入直属上级' }],
     };
     const uRef = ref(null);
     const uOpen = row => {
-      Object.assign(uForm, row || { id: '', acc: '', name: '', dept: '', role: '', phone: '', email: '', status: '启用' }, { id: row ? row.id : '', status: row ? row.status : '启用' });
+      Object.assign(uForm, row || { id: '', acc: '', name: '', dept: '', role: '', phone: '', email: '', status: '启用', manager: '' }, { id: row ? row.id : '', status: row ? row.status : '启用' });
       uDlg.edit = row ? row.id : ''; uDlg.show = true;
     };
     const uSave = () => uRef.value.validate(ok => {
@@ -46,22 +47,40 @@ const SystemPage = {
       if (uForm.id) {
         const t = store.ext.users.find(u => u.id === uForm.id);
         Object.assign(t, { acc: uForm.acc, name: uForm.name, dept: uForm.dept, role: uForm.role, phone: uForm.phone, email: uForm.email, status: uForm.status });
+        // Sync to AUTH.users
+        if (AUTH.users && AUTH.users[uForm.id]) {
+          Object.assign(AUTH.users[uForm.id], { acc: uForm.acc, name: uForm.name, dept: uForm.dept, role: uForm.role, phone: uForm.phone, email: uForm.email, status: uForm.status, manager: uForm.manager });
+        }
         store.ext.logs.unshift({ time: sysNow(), who: '管理员', module: '系统', act: '编辑', detail: '编辑用户「' + uForm.name + '」（账号：' + uForm.acc + '）', ip: '10.20.0.5' });
       } else {
         let n = 1;
         store.ext.users.forEach(u => { const k = Number(String(u.id).slice(1)); if (k >= n) n = k + 1; });
-        store.ext.users.push({ id: 'u' + String(n).padStart(2, '0'), acc: uForm.acc, name: uForm.name, dept: uForm.dept, role: uForm.role, phone: uForm.phone, email: uForm.email, status: uForm.status, lastLogin: '—' });
+        const newUser = { id: 'u' + String(n).padStart(2, '0'), acc: uForm.acc, name: uForm.name, dept: uForm.dept, role: uForm.role, phone: uForm.phone, email: uForm.email, status: uForm.status, manager: uForm.manager, lastLogin: '—' };
+        store.ext.users.push(newUser);
+        // Sync to AUTH.users
+        AUTH.users[uForm.id || 'u' + String(n).padStart(2, '0')] = newUser;
         store.ext.logs.unshift({ time: sysNow(), who: '管理员', module: '系统', act: '新建', detail: '新增用户「' + uForm.name + '」（账号：' + uForm.acc + '，角色：' + uForm.role + '）', ip: '10.20.0.5' });
       }
       uDlg.show = false; ElMessage.success('已保存并写回用户列表');
     });
-    const uToggle = row => ElMessageBox.confirm(
-      row.status === '启用' ? '停用后「' + row.name + '」将立即失去登录权限，进行中的审批不受影响。' : '启用后该用户恢复登录与数据访问权限。',
-      row.status === '启用' ? '停用确认' : '启用确认', { type: 'warning', confirmButtonText: '确认', cancelButtonText: '取消' }).then(() => {
-      row.status = row.status === '启用' ? '停用' : '启用';
-      store.ext.logs.unshift({ time: sysNow(), who: '管理员', module: '系统', act: row.status === '停用' ? '停用' : '启用', detail: (row.status === '停用' ? '停用' : '启用') + '用户「' + row.name + '」', ip: '10.20.0.5' });
-      ElMessage.success('已' + (row.status === '停用' ? '停用' : '启用') + '：' + row.name);
-    }).catch(() => {});
+    const uToggle = row => {
+      const isLastAdmin = () => {
+        const admins = Object.values(AUTH.users || {}).filter(u => u.role === 'admin' && u.status === '启用');
+        return admins.length <= 1 && row.status === '启用' && row.role === 'admin';
+      };
+      if (isLastAdmin()) return ElMessage.warning('系统至少保留一个管理员账号');
+      ElMessageBox.confirm(
+        row.status === '启用' ? '停用后「' + row.name + '」将立即失去登录权限，进行中的审批不受影响。' : '启用后该用户恢复登录与数据访问权限。',
+        row.status === '启用' ? '停用确认' : '启用确认', { type: 'warning', confirmButtonText: '确认', cancelButtonText: '取消' }).then(() => {
+          row.status = row.status === '启用' ? '停用' : '启用';
+          // Sync to AUTH.users
+          if (AUTH.users && AUTH.users[row.id]) {
+            AUTH.users[row.id].status = row.status;
+          }
+          store.ext.logs.unshift({ time: sysNow(), who: '管理员', module: '系统', act: row.status === '停用' ? '停用' : '启用', detail: (row.status === '停用' ? '停用' : '启用') + '用户「' + row.name + '」', ip: '10.20.0.5' });
+          ElMessage.success('已' + (row.status === '停用' ? '停用' : '启用') + '：' + row.name);
+        }).catch(() => {});
+    };
     const uDrawer = reactive({ show: false, cur: null });
     const uShow = row => { uDrawer.cur = row; uDrawer.show = true; };
     const uLogs = computed(() => uDrawer.cur ? store.ext.logs.filter(l => l.who === uDrawer.cur.name).slice(0, 6) : []);
@@ -92,6 +111,10 @@ const SystemPage = {
       const r = role.value;
       r.menus = [...new Set(ck)];
       r.desc = rData.desc; r.dataScope = rData.scope; r.buttons = [...rData.btns]; r.fieldMask = [...rData.masks];
+      // Sync to AUTH.roles
+      if (AUTH.roles[r.key]) {
+        Object.assign(AUTH.roles[r.key], { menus: r.menus, desc: r.desc, dataScope: r.dataScope, buttons: r.buttons, fieldMask: r.fieldMask });
+      }
       store.ext.logs.unshift({ time: sysNow(), who: '管理员', module: '系统', act: '编辑', detail: '保存角色权限「' + r.name + '」（菜单 ' + r.menus.length + ' 项 · 数据范围：' + r.dataScope + '）', ip: '10.20.0.5' });
       ElMessage.success('角色「' + r.name + '」权限已保存并生效');
     };
@@ -508,7 +531,10 @@ const SystemPage = {
           <el-col :span="12"><el-form-item label="角色" prop="role"><el-select v-model="uForm.role" style="width:100%"><el-option v-for="r in store.ext.roles" :key="r.key" :label="r.name" :value="r.name"/></el-select></el-form-item></el-col>
         </el-row>
         <el-row :gutter="12">
+          <el-col :span="12"><el-form-item label="直属上级" prop="manager"><el-input v-model="uForm.manager"/></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="联系电话"><el-input v-model="uForm.phone"/></el-form-item></el-col>
+        </el-row>
+        <el-row :gutter="12">
           <el-col :span="12"><el-form-item label="邮箱"><el-input v-model="uForm.email"/></el-form-item></el-col>
         </el-row>
         <el-form-item label="状态"><el-radio-group v-model="uForm.status"><el-radio label="启用"/><el-radio label="停用"/></el-radio-group></el-form-item>

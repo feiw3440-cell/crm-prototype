@@ -32,15 +32,22 @@ const AuthDeptsPage = {
   </div>`,
   data() { return { depts: {}, form: { name: '', parentId: 'D00' } }; },
   mounted() {
-    this.depts = {
-      D00: { id: 'D00', name: '某某软件有限公司', parent: '', level: '公司', children: [
-        { id: 'D01', name: '总经办', parent: 'D00', level: '部门', children: [] },
-        { id: 'D02', name: '华东销售中心', parent: 'D00', level: '部门', children: [
-          { id: 'D03', name: '华东销售一部', parent: 'D02', level: '团队', children: [] },
-          { id: 'D04', name: '华东销售二部', parent: 'D02', level: '团队', children: [] }
-        ]}
-      ]}
-    };
+    const depts = AUTH.depts || {};
+    const nodeMap = {};
+    const roots = [];
+    for (const k of Object.keys(depts)) {
+      const d = { id: k, name: depts[k].name, level: depts[k].level, children: [] };
+      nodeMap[k] = d;
+      if (depts[k].parent === '') {
+        roots.push(d);
+      } else if (nodeMap[depts[k].parent]) {
+        nodeMap[depts[k].parent].children.push(d);
+      } else {
+        roots.push(d);
+      }
+    }
+    this.depts = roots;
+    this.form.parentId = 'D00';
     this.$nextTick(() => {});
   }
 };
@@ -105,6 +112,7 @@ const AuthUsersPage = {
         <template #default="{ row }">
           <el-button size="small" @click="editUser(row)" v-if="AUTH.authCanBtn('编辑')">编辑</el-button>
           <el-button size="small" type="danger" @click="doDisable(row)">停用</el-button>
+          <el-button size="small" @click="resetPwd(row)">重置密码</el-button>
     </el-table>
     <div style="margin-top:24px">
       <el-dialog title="停用用户" :visible="dialogVisible" width="400">
@@ -121,6 +129,7 @@ const AuthUsersPage = {
         <p>该用户将首次登录时被强制改密</p>
         <div style="margin-top:24px">
           <el-button @click="pwdDialogVisible = false">关闭</el-button>
+          <el-button type="primary" @click="confirmResetPwd">确定重置</el-button>
         </div>
       </el-dialog>
     </div>
@@ -128,7 +137,7 @@ const AuthUsersPage = {
   data() { return { 
     queryKey: '', queryDept: '', queryRole: '', queryStatus: '',
     dialogVisible: false, dialogName: '', dialogDeptName: '',
-    hasCustomers: 0, pwdDialogVisible: false, pwdSuffix: ''
+    hasCustomers: 0, pwdDialogVisible: false, pwdSuffix: '4'
   }; },
   mounted() {
   },
@@ -164,12 +173,30 @@ const AuthUsersPage = {
     },
     confirmDisable() {
       const u = AUTH.users ? AUTH.users[this.dialogName || ''] : undefined;
+      const adminCount = Object.values(AUTH.users || {}).filter(u => u.role === 'admin' && u.status === '启用').length;
       if (this.hasCustomers > 0) {
         ElMessage.warning('该用户下有客户，需指定接收人后才能停用');
+      } else if (u && u.role === 'admin' && adminCount <= 1) {
+        ElMessage.warning('系统至少保留一个管理员账号，不能停用最后一位管理员');
       } else {
+        if (u) u.status = '停用';
         this.dialogVisible = false;
         ElMessage.success('用户已停用');
       }
+    },
+    resetPwd(u) {
+      this.dialogName = u.name;
+      this.dialogDeptName = u.dept ? (this.depts[u.dept] ? this.depts[u.dept].name : '') : '';
+      this.pwdSuffix = '4';
+      this.pwdDialogVisible = true;
+    },
+    confirmResetPwd() {
+      const u = AUTH.users ? AUTH.users[this.dialogName || ''] : undefined;
+      if (!u) return;
+      u.pwd = 'Rst@' + this.pwdSuffix;
+      u.mustChange = true;
+      this.pwdDialogVisible = false;
+      ElMessage.success('密码已重置，临时密码为 Rst@' + this.pwdSuffix + '，请下次登录时修改');
     },
     selectReceiver() { this.dialogVisible = false; ElMessage.info('请在对话框中指定接收人'); },
     authResetDemo() { AUTH.authResetDemo(); this.search(); }

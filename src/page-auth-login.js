@@ -26,7 +26,7 @@ const LoginPage = {
     </div>
   </div>`,
   data() { return { loginForm: { account: '', pwd: '' }, loginRules: { account: { required: true, message: '账号或手机号不能为空' }, pwd: { required: true, message: '密码不能为空' } }, demoAccounts: [{ id: 'u01', account: 'admin', pwd: 'Crm@2026', role: '系统管理员', mustChange: false }, { id: 'u02', account: 'zhouzj', pwd: 'Crm@2026', role: '销售总监', mustChange: false }, { id: 'u03', account: 'zhangsan', pwd: 'Crm@2026', role: '销售经理', mustChange: false }, { id: 'u04', account: 'lisi', pwd: 'Crm@2026', role: '销售经理', mustChange: false }, { id: 'u05', account: 'wangwu', pwd: 'Crm@2026', role: '销售人员', mustChange: false }, { id: 'u06', account: 'zhaoliu', pwd: 'Crm@2026', role: '销售人员', mustChange: false }, { id: 'u07', account: 'wangfang', pwd: 'Crm@2026', role: '财务人员', mustChange: false }, { id: 'u08', account: 'chenyue', pwd: 'Crm@2026', role: '销售人员', mustChange: false, status: '停用' }, { id: 'u09', account: 'newbie', pwd: 'Init@1234', role: '销售人员', mustChange: true }], _dummy: [] }},
-  methods: { login() { const r = AUTH.authLogin(this.loginForm.account, this.loginForm.pwd); if (!r.ok) { ElMessage.error(r.msg); return; } if (r.user.mustChange) { location.hash = '#/change-password'; } else { location.hash = r.user.home || '/workbench'; } }, fillAccount(acc) { this.loginForm.account = acc.account; this.loginForm.pwd = acc.pwd; } }
+  methods: { login() { const r = AUTH.authLogin(this.loginForm.account, this.loginForm.pwd); if (!r.ok) { ElMessage.error(r.msg); return; } if (r.user.mustChange) { location.hash = '#/change-password'; } else { location.hash = AUTH.roles[r.user.role]?.home || '/workbench'; } }, fillAccount(acc) { this.loginForm.account = acc.account; this.loginForm.pwd = acc.pwd; } }
 };
 registerRoute('/login', LoginPage, 'auth-login');
 
@@ -51,7 +51,7 @@ const ChangePwdPage = {
     </el-form>
   </div>`,
   data() { return { pwdForm: { old: '', neu: '', neuConfirm: '' }, pwdRules: { old: { required: true, message: '旧密码不能为空' }, neu: { required: true, message: '新密码不能为空' }, neuConfirm: { required: true, message: '请再次输入新密码' } }, mustChange: false, _dummy: [] }},
-  methods: { changePwd() { this.$refs.pwdForm.validate((valid) => { if (valid) { const r = AUTH.authChangePwd(this.pwdForm.old, this.pwdForm.neu); if (!r.ok) { ElMessage.error(r.msg); return; } ElMessage.success(r.msg); location.hash = '#/workbench'; } else { ElMessage.error('请填写完整表单'); } }); }, goBack() { if (!this.mustChange) { location.hash = '#/workbench'; } } }
+  methods: { changePwd() { this.$refs.pwdForm.validate((valid) => { if (valid) { if (this.pwdForm.neu !== this.pwdForm.neuConfirm) { ElMessage.error('两次输入的密码不一致'); return; } const r = AUTH.authChangePwd(this.pwdForm.old, this.pwdForm.neu); if (!r.ok) { ElMessage.error(r.msg); return; } ElMessage.success(r.msg); location.hash = '#/workbench'; } else { ElMessage.error('请填写完整表单'); } }); }, goBack() { if (!this.mustChange) { location.hash = '#/workbench'; } } }
 };
 registerRoute('/change-password', ChangePwdPage, 'auth-changepw');
 
