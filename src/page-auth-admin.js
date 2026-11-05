@@ -30,7 +30,7 @@ const AuthDeptsPage = {
       </div>
     </div>
   </div>`,
-  data() { return { depts: {}, form: { name: '', parentId: 'D00' } }; },
+  data() { return { depts: {}, form: { name: '', parentId: 'D00' }, AUTH }; },
   mounted() {
     const depts = AUTH.depts || {};
     const nodeMap = {};
@@ -88,12 +88,12 @@ const AuthUsersPage = {
           <el-option label="停用" value="停用" />
         </el-select>
       </el-form-item>
-      <el-form-item>
+<el-form-item>
         <el-button type="primary" @click="search">查询</el-button>
         <el-button type="link" @click="authResetDemo">重置演示数据</el-button>
+        <el-button type="primary" @click="addDialogVisible = true">新增用户</el-button>
       </el-form-item>
     </el-form>
-    <el-table :data="filteredUsers" style="width:100%" border highlight-current-row>
       <el-table-column prop="account" label="账号" width="120" />
       <el-table-column prop="name" label="姓名" width="100" />
       <el-table-column prop="phone" label="手机号" width="130" align="center">
@@ -113,7 +113,9 @@ const AuthUsersPage = {
           <el-button size="small" @click="editUser(row)" v-if="AUTH.authCanBtn('编辑')">编辑</el-button>
           <el-button size="small" type="danger" @click="doDisable(row)">停用</el-button>
           <el-button size="small" @click="resetPwd(row)">重置密码</el-button>
-    </el-table>
+        </template>
+      </el-table-column>
+</el-table>
     <div style="margin-top:24px">
       <el-dialog title="停用用户" :visible="dialogVisible" width="400">
         <p>用户：{{ dialogName }}（{{ dialogDeptName }}）</p>
@@ -132,15 +134,35 @@ const AuthUsersPage = {
           <el-button type="primary" @click="confirmResetPwd">确定重置</el-button>
         </div>
       </el-dialog>
+      <el-dialog title="新增用户" :visible="addDialogVisible" width="460px" destroy-on-close>
+        <el-form :model="addForm" label-width="100px">
+          <el-row :gutter="12">
+            <el-col :span="12"><el-form-item label="账号" prop="acc"><el-input v-model="addForm.acc" placeholder="登录账号（唯一）"/></el-form-item></el-col>
+            <el-col :span="12"><el-form-item label="姓名" prop="name"><el-input v-model="addForm.name"/></el-form-item></el-col>
+          </el-row>
+          <el-row :gutter="12">
+            <el-col :span="12"><el-form-item label="所属部门" prop="dept"><el-select v-model="addForm.dept" filterable style="width:100%"><el-option v-for="d in store.ext.depts" :key="d.no" :label="d.name" :value="d.name"/></el-select></el-form-item></el-col>
+            <el-col :span="12"><el-form-item label="直属上级" prop="manager"><el-input v-model="addForm.manager"/></el-form-item></el-col>
+          </el-row>
+          <el-row :gutter="12">
+            <el-col :span="12"><el-form-item label="角色" prop="role"><el-select v-model="addForm.role" style="width:100%"><el-option v-for="r in Object.values(AUTH.roles||{})" :key="r.key" :label="r.name" :value="r.name"/></el-select></el-form-item></el-col>
+          </el-row>
+          <el-row :gutter="12">
+            <el-col :span="12"><el-form-item label="联系电话" prop="phone"><el-input v-model="addForm.phone"/></el-form-item></el-col>
+          </el-row>
+          <el-form-item label="状态"><el-radio-group v-model="addForm.status"><el-radio label="启用"/><el-radio label="停用"/></el-radio-group></el-form-item>
+        </el-form>
+        <template #footer><el-button @click="addDialogVisible = false">取消</el-button><el-button type="primary" @click="saveAddUser">保存</el-button></template>
+      </el-dialog>
     </div>
   </div>`,
-  data() { return { 
+data() { return { 
     queryKey: '', queryDept: '', queryRole: '', queryStatus: '',
     dialogVisible: false, dialogName: '', dialogDeptName: '',
-    hasCustomers: 0, pwdDialogVisible: false, pwdSuffix: '4'
-  }; },
-  mounted() {
-  },
+    dialogId: '', hasCustomers: 0, pwdDialogVisible: false, pwdSuffix: '4',
+    addDialogVisible: false, addForm: { acc: '', name: '', phone: '', dept: '', manager: '', role: '' }, AUTH
+  };
+},
   computed: {
     filteredUsers() {
       const all = Object.values(AUTH.users || {});
@@ -167,12 +189,13 @@ const AuthUsersPage = {
     },
     editUser(u) {
       this.dialogName = u.name;
+      this.dialogId = u.id;
       this.dialogDeptName = u.dept ? (this.depts[u.dept] ? this.depts[u.dept].name : '') : '';
       this.hasCustomers = this.hasCustomerCount(u.id);
       this.dialogVisible = true;
     },
     confirmDisable() {
-      const u = AUTH.users ? AUTH.users[this.dialogName || ''] : undefined;
+      const u = AUTH.users ? AUTH.users[this.dialogId] : undefined;
       const adminCount = Object.values(AUTH.users || {}).filter(u => u.role === 'admin' && u.status === '启用').length;
       if (this.hasCustomers > 0) {
         ElMessage.warning('该用户下有客户，需指定接收人后才能停用');
@@ -199,9 +222,61 @@ const AuthUsersPage = {
       ElMessage.success('密码已重置，临时密码为 Rst@' + this.pwdSuffix + '，请下次登录时修改');
     },
     selectReceiver() { this.dialogVisible = false; ElMessage.info('请在对话框中指定接收人'); },
-    authResetDemo() { AUTH.authResetDemo(); this.search(); }
-  }
-};
+    addUser() {
+      this.dialogName = '';
+      this.dialogId = '';
+      this.dialogDeptName = '';
+      this.hasCustomers = 0;
+      this.dialogVisible = true;
+    },
+    saveUser() {
+      const n = Math.max(1, ...Object.values(AUTH.users || {}).map(u => Number(String(u.id).slice(1)))) + 1;
+      const newUser = {
+        id: 'u' + String(n).padStart(2, '0'),
+        acc: this.dialogName || '',
+        name: this.dialogName || '',
+        dept: this.dialogDeptName || 'D00',
+        role: 'sales',
+        phone: '',
+        email: '',
+        status: '启用',
+        mustChange: true,
+        pwd: 'Init@1234',
+        lastLogin: '—'
+      };
+      store.ext.users.push(newUser);
+      const targetId = newUser.id;
+      AUTH.users[targetId] = newUser;
+      store.ext.logs.unshift({ time: '2026-11-05 10:00', who: '管理员', module: '系统', act: '新建', detail: '新增用户「' + newUser.name + '」（账号：' + newUser.acc + '，角色：' + newUser.role + '）', ip: '10.20.0.5' });
+      this.dialogVisible = false;
+      ElMessage.success('用户已新增');
+      this.search();
+    },
+    authResetDemo() { AUTH.authResetDemo(); this.search(); },
+    saveAddUser() {
+      const n = Math.max(1, ...Object.values(AUTH.users || {}).map(u => Number(String(u.id).slice(1)))) + 1;
+      const newUser = {
+        id: 'u' + String(n).padStart(2, '0'),
+        acc: this.addForm.acc,
+        name: this.addForm.name,
+        dept: this.addForm.dept || 'D00',
+        role: this.addForm.role || 'sales',
+        phone: this.addForm.phone || '',
+        email: '',
+        status: this.addForm.status || '启用',
+        mustChange: true,
+        pwd: 'Init@1234',
+        lastLogin: '—'
+      };
+      store.ext.users.push(newUser);
+      AUTH.users[newUser.id] = newUser;
+      store.ext.logs.unshift({ time: '2026-11-05 10:00', who: '管理员', module: '系统', act: '新建', detail: '新增用户「' + newUser.name + '」（账号：' + newUser.acc + '，角色：' + newUser.role + '）', ip: '10.20.0.5' });
+      this.addDialogVisible = false;
+      ElMessage.success('用户已新增');
+      this.search();
+    }
+}
+}
 registerRoute('/system/auth/users', AuthUsersPage, 'auth-users');
 
 const AuthRolesPage = {
@@ -231,22 +306,57 @@ const AuthRolesPage = {
     </el-form>
     <p style="margin-top:24px;color:#909399;">财务角色固定：不能修改销售跟进</p>
     <div style="margin-top:24px">
-      <el-button type="primary">保存</el-button>
+      <el-button type="primary" @click="roleSave">保存</el-button>
       <el-button type="link">重置</el-button>
     </div>
     <div style="margin-top:24px;padding:16px;border:1px dashed #dcdfe6">
       <p>当前角色拥有的权限摘要：</p>
-      <p>菜单: 工作台, 线索管理, 客户管理, 联系人管理, 商机管理, 报价管理, 合同管理, 订单管理, 回款管理, 活动管理, 数据分析</p>
-      <p>按钮: 新增, 编辑, 导出, 分配</p>
-      <p>数据范围: 本人</p>
-      <p>查看手机号: 开</p>
+      <p>菜单: {{ roleForm.menus.join('、') || '—' }}</p>
+      <p>按钮: {{ roleForm.buttons.join('、') || '—' }}</p>
+      <p>数据范围: {{ roleForm.scope }}</p>
+      <p>查看手机号: {{ roleForm.phoneFull ? '开' : '闭' }}</p>
     </div>
   </div>`,
   data() { return { 
-    roleForm: { name: '系统管理员', desc: '', menus: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析'], buttons: ['新增', '编辑', '删除', '导出', '分配'], scope: '全部', phoneFull: true },
+    roleForm: { name: '', desc: '', menus: [], buttons: [], scope: '全部', phoneFull: true },
     menuOptions: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析', '系统管理'],
-    buttonOptions: ['新增', '编辑', '删除', '导出', '分配']
+    buttonOptions: ['新增', '编辑', '删除', '导出', '分配'], AUTH
   }; },
-  methods: { authResetDemo() { AUTH.authResetDemo(); } }
+  computed: {
+    currentRole() {
+      const role = AUTH.authRole();
+      if (!role) return null;
+      return role;
+    }
+  },
+  mounted() {
+    if (this.currentRole) {
+      this.roleForm = {
+        name: this.currentRole.name,
+        desc: this.currentRole.desc,
+        menus: [...this.currentRole.menus],
+        buttons: [...this.currentRole.buttons],
+        scope: this.currentRole.scope,
+        phoneFull: this.currentRole.phoneFull
+      };
+    }
+  },
+  methods: {
+    roleSave() {
+      const r = this.currentRole;
+      if (!r) return;
+      r.menus = [...new Set(this.roleForm.menus)];
+      r.desc = this.roleForm.desc;
+      r.scope = this.roleForm.scope;
+      r.buttons = [...this.roleForm.buttons];
+      r.phoneFull = this.roleForm.phoneFull;
+      if (AUTH.roles[r.key]) {
+        Object.assign(AUTH.roles[r.key], { menus: r.menus, desc: r.desc, dataScope: r.scope, buttons: r.buttons, phoneFull: r.phoneFull });
+      }
+      AUTH.save();
+      ElMessage.success('角色「' + r.name + '」权限已保存并生效');
+    },
+    authResetDemo() { AUTH.authResetDemo(); }
+  }
 };
 registerRoute('/system/auth/roles', AuthRolesPage, 'auth-roles');

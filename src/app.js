@@ -68,7 +68,7 @@ const App = {
     const unread = computed(() => store.messages.filter(m => !m.read).length);
     const todoCount = computed(() => store.approvals.filter(a => a.tab === 'todo').length + (store.ext ? store.ext.activities.filter(a => a.owner === '张三' && a.status === '计划中').length : 0));
     const readAll = () => store.messages.forEach(m => m.read = true);
-    onMounted(() => { if (!isMobile.value) authGuardInstall(); });
+    onMounted(() => { if (!isMobile.value) AUTH.authGuardInstall(); });
     const currentUser = computed(() => AUTH.authUser());
     const currentRole = computed(() => AUTH.authRole());
     const handleRoleSwitch = key => { if (!key) return; AUTH.authSwitchRole(key); };
@@ -107,7 +107,7 @@ const App = {
     const filteredNAV = computed(() => {
       return NAV.filter(n => authCanMenu(n.title));
     });
-    return { path, view, active, standalone, menu, opened, NAV, filteredNAV, kw, searchFn, selectSearch, unread, todoCount, store, go, readAll, theme, applyTheme, notLogged, isMobile, authRowVisibleAuth, authCanMenu, authCanBtn, fmtY, yuan, fmtC, TODAY, daysBetween, go, cno, currentUser, currentRole, handleRoleSwitch, handleUserCmd, redirectTo };
+    return { path, view, active, standalone, menu, opened, NAV, filteredNAV, kw, searchFn, selectSearch, unread, todoCount, store, go, readAll, theme, applyTheme, notLogged, isMobile, authRowVisibleAuth, authCanMenu, authCanBtn, fmtY, yuan, fmtC, TODAY, daysBetween, go, cno, currentUser, currentRole, handleRoleSwitch, handleUserCmd, redirectTo, AUTH };
   },
   template: `<div class="layout" :class="{standalone}">
     <div class="topbar" v-if="!standalone && !notLogged">

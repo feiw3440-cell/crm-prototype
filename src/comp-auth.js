@@ -140,18 +140,31 @@ const AUTH = {
   authVisibleOwners() {
     const user = this.authUser();
     if (!user) return new Set();
+    if (user.role === 'finance') {
+      const result = new Set();
+      result.add(user.name);
+      return result;
+    }
+    const role = this.roles[user.role] || { scope: '全部' };
+    const scope = role.scope;
+    if (scope === '全部') return null;
     const deptId = user.dept;
     const result = new Set();
-    if (user.role === 'admin') return null;
     for (const k of Object.keys(this.users)) {
       const u = this.users[k];
       if (u.status !== '启用') continue;
-      if (u.id === user.id) result.add(u.name);
-      else if (deptId && u.dept === deptId) result.add(u.name);
-      else {
-        const descendants = this._deptDescendants(deptId);
-        if (descendants.has(u.dept)) result.add(u.name);
-        if (u.manager === user.id || u.manager === user.name) result.add(u.name);
+      if (scope === '本人') {
+        if (u.id === user.id) result.add(u.name);
+      } else if (scope === '本部门') {
+        if (u.id === user.id) result.add(u.name);
+        else if (deptId && u.dept === deptId) result.add(u.name);
+      } else if (scope === '本部门及下级') {
+        if (u.id === user.id) result.add(u.name);
+        else if (deptId && u.dept === deptId) result.add(u.name);
+        else if (deptId) {
+          const descendants = this._deptDescendants(deptId);
+          if (descendants.has(u.dept)) result.add(u.name);
+        }
       }
     }
     return result;
@@ -181,8 +194,7 @@ const AUTH = {
 
   authFilter(rows) {
     if (!rows || rows.length === 0) return rows;
-    const visible = this.authRowVisible;
-    const filtered = rows.filter(visible);
+    const filtered = rows.filter(r => this.authRowVisible(r));
     const hasOwner = rows.some(r => r && r.owner);
     return hasOwner ? filtered : rows;
   },
@@ -246,7 +258,7 @@ const AUTH = {
       '编辑': '编辑', '修改': '编辑',
       '删除': '删除', '作废': '删除',
       '导出': '导出',
-      '分配': '分配', '转移': '分配', '指派': '分配',
+      '分配': '分配', '转移': '分配', '指派': '分配', '批量分配': '分配',
     };
     const parts = label.split('/').map(s => s.trim());
     const kind = parts.reduce((acc, part) => acc || kindMap[part], null);

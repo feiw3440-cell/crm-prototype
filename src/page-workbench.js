@@ -66,7 +66,7 @@ const WorkbenchPage = {
     const paidMonth = computed(() => wan(store.pay.records.filter(r => r.date >= '2026-11-01' && r.date < '2026-12-01').reduce((s, r) => s + (r.confirm === '财务已确认' ? r.amount : 0), 0) / 100));
     const readMsg = m => { m.read = true; };
     const readAll = () => store.messages.forEach(m => m.read = true);
-    return { period, funnelOpt, funnelC, funnelA, funnelW, perfColor, perfPeriod, perf, msgs, unread, todos, recent, sched, quick, readMsg, readAll, myCusts, myNewCusts, txnAmt, paidMonth, plannedActs, yuan, fmtY, store };
+    return { period, funnelOpt, funnelC, funnelA, funnelW, perfColor, perfPeriod, perf, msgs, unread, todos, recent, sched, quick, readMsg, readAll, myCusts, myNewCusts, txnAmt, paidMonth, plannedActs, yuan, fmtY, authUser, authRole, store };
   },
   template: `<div>
     <el-breadcrumb separator="/" class="crumb"><el-breadcrumb-item>工作台</el-breadcrumb-item><el-breadcrumb-item>个人工作台</el-breadcrumb-item></el-breadcrumb>

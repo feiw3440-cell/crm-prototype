@@ -45,7 +45,7 @@ const ChangePwdPage = {
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="changePwd">保存</el-button>
-        <el-button @click="goBack">返回</el-button>
+        <el-button v-if="!mustChange" @click="goBack">返回</el-button>
       </el-form-item>
       <template v-if="mustChange"><p style="color:#e96e00;margin:16px 0;font-size:13px">当前为强制改密状态，请务必修改密码</p></template>
     </el-form>

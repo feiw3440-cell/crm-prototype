@@ -63,7 +63,7 @@ const CustomersPage = {
     };
     const openDrawerInit = row => { quick.level = row.level; quick.status = row.status; };
     const saveQuick = (row, close) => { row.level = quick.level; row.status = quick.status; ElMessage.success('已保存（快捷编辑）'); close(); };
-    return { rows, t, TABS, cat, stats, cols, dlg, target, tf, quick, openTransfer, doTransfer, claim, openDrawerInit, saveQuick, OWNERS, INDUSTRIES, go, fmtY, tab: computed(() => props.tab), totalText, levelTag: LEVEL_TAG, stTag: CUST_STATUS_TAG };
+    return { rows, t, TABS, cat, stats, cols, dlg, target, tf, quick, openTransfer, doTransfer, claim, openDrawerInit, saveQuick, OWNERS, INDUSTRIES, go, fmtY, tab: computed(() => props.tab), totalText, levelTag: LEVEL_TAG, stTag: CUST_STATUS_TAG, AUTH };
   },
   template: `<div>
     <list-page :crumbs="['客户管理', t]" :title="t" :total-text="totalText" :stats="stats" :rows="rows" :cols="cols" :action-width="230" drawer-title="客户快速查看 / 快捷编辑"
@@ -76,7 +76,7 @@ const CustomersPage = {
         <el-button type="primary" icon="Plus" @click="$msg.info('示例：新增客户表单（必填项标星，保存前校验格式）')">新增客户</el-button>
         <el-button icon="Upload" @click="$msg.info('示例：导入客户（查重 → 必填校验 → 错误行反馈 → 结果统计）')">导入</el-button>
         <el-button icon="Download" @click="$msg.info('示例：导出（敏感字段按权限脱敏）')">导出</el-button>
-        <el-button icon="Switch" @click="openTransfer(sel)">批量分配 / 转移<template v-if="sel.length">（{{ sel.length }}）</template></el-button>
+        <el-button icon="Switch" @click="openTransfer(sel)" v-if="AUTH.authCanBtn('分配')">批量分配 / 转移<template v-if="sel.length">（{{ sel.length }}）</template></el-button>
       </template>
       <template #cell-name="{row}"><a class="link" @click="$go('/customer/'+row.no)">{{ row.name }}</a><el-tag v-if="row.key" size="small" type="danger" effect="plain" style="margin-left:6px;transform:scale(.9)">重点</el-tag></template>
       <template #cell-owner="{row}"><span v-if="row.owner">{{ row.owner }}</span><span v-else class="muted">（公海）</span></template>
