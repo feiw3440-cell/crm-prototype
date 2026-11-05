@@ -1,16 +1,15 @@
 const LoginPage = {
   template: `<div class="card card-pad" style="max-width:400px;margin:80px auto">
-    <div class="brand">CRM 登录</div>
-    <h2>登录</h2>
-    <el-form :model="loginForm" :rules="loginRules" ref="loginForm" inline class="form-gutter">
+    <h2 style="margin:0 0 16px;text-align:center">CRM 登录</h2>
+    <el-form :model="loginForm" :rules="loginRules" ref="loginForm" class="form-gutter">
       <el-form-item label="账号或手机号" prefix-icon="User">
-        <el-input v-model="loginForm.account" placeholder="请输入账号或手机号" clearable />
+        <el-input v-model="loginForm.account" placeholder="请输入账号或手机号" clearable style="width:100%" />
       </el-form-item>
       <el-form-item label="密码" prefix-icon="Lock">
-        <el-input v-model="loginForm.pwd" type="password" placeholder="请输入密码" clearable />
+        <el-input v-model="loginForm.pwd" type="password" placeholder="请输入密码" clearable style="width:100%" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="login">登录</el-button>
+        <el-button type="primary" @click="login" style="width:100%">登录</el-button>
       </el-form-item>
     </el-form>
     <div style="margin-top:24px">
@@ -26,7 +25,7 @@ const LoginPage = {
     </div>
   </div>`,
   data() { return { loginForm: { account: '', pwd: '' }, loginRules: { account: { required: true, message: '账号或手机号不能为空' }, pwd: { required: true, message: '密码不能为空' } }, demoAccounts: [{ id: 'u01', account: 'admin', pwd: 'Crm@2026', role: '系统管理员', mustChange: false }, { id: 'u02', account: 'zhouzj', pwd: 'Crm@2026', role: '销售总监', mustChange: false }, { id: 'u03', account: 'zhangsan', pwd: 'Crm@2026', role: '销售经理', mustChange: false }, { id: 'u04', account: 'lisi', pwd: 'Crm@2026', role: '销售经理', mustChange: false }, { id: 'u05', account: 'wangwu', pwd: 'Crm@2026', role: '销售人员', mustChange: false }, { id: 'u06', account: 'zhaoliu', pwd: 'Crm@2026', role: '销售人员', mustChange: false }, { id: 'u07', account: 'wangfang', pwd: 'Crm@2026', role: '财务人员', mustChange: false }, { id: 'u08', account: 'chenyue', pwd: 'Crm@2026', role: '销售人员', mustChange: false, status: '停用' }, { id: 'u09', account: 'newbie', pwd: 'Init@1234', role: '销售人员', mustChange: true }], _dummy: [] }},
-  methods: { login() { const r = AUTH.authLogin(this.loginForm.account, this.loginForm.pwd); if (!r.ok) { ElMessage.error(r.msg); return; } if (r.user.mustChange) { location.hash = '#/change-password'; } else { location.hash = AUTH.roles[r.user.role]?.home || '/workbench'; } }, fillAccount(acc) { this.loginForm.account = acc.account; this.loginForm.pwd = acc.pwd; } }
+  methods: { login() { const r = AUTH.authLogin(this.loginForm.account, this.loginForm.pwd); if (!r.ok) { ElMessage.error(r.msg); return; } if (r.user.mustChange) { location.hash = '#/change-password'; } else { location.hash = AUTH.roles[r.user.role]?.home || '/workbench'; } }, authResetDemo() { AUTH.authResetDemo(); ElMessage.success('演示数据已重置'); }, fillAccount(acc) { this.loginForm.account = acc.account; this.loginForm.pwd = acc.pwd; } }
 };
 registerRoute('/login', LoginPage, 'auth-login');
 

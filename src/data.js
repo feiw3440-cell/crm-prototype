@@ -31,7 +31,7 @@ const NAV = [
   { key: 'analytics', title: '数据分析', icon: 'DataAnalysis', children: [
     { path: '/analytics', title: '经营报表' } ] },
   { key: 'system', title: '系统管理', icon: 'Setting', children: [
-    { path: '/system', title: '用户管理' }, { path: '/system/roles', title: '角色权限' }, { path: '/system/org', title: '组织架构' },
+    { path: '/system/auth/users', title: '用户管理' }, { path: '/system/auth/roles', title: '角色权限' }, { path: '/system/auth/depts', title: '组织架构' },
     { path: '/system/logs', title: '操作日志' }, { path: '/system/pool-rules', title: '公海规则' }, { path: '/approvals/templates', title: '审批模板' } ] },
 ];
 

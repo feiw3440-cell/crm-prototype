@@ -145,15 +145,18 @@ const App = {
         <el-dropdown trigger="click" @command="handleUserCmd"><div class="user-chip"><div class="avatar">{{ currentUser ? currentUser.name[0] : '?' }}</div><div style="line-height:1.2"><div style="font-size:13px;font-weight:600">{{ currentUser ? currentUser.name : '' }}</div><div style="font-size:11px;color:var(--sub)"> {{ currentRole ? currentRole.name : '' }}</div></div><el-icon><arrow-down/></el-icon></div><template #dropdown><el-dropdown-menu><el-dropdown-item command="profile">个人设置</el-dropdown-item><el-dropdown-item command="changepwd">修改密码</el-dropdown-item><el-dropdown-item divided command="logout">退出登录</el-dropdown-item></el-dropdown-menu></template></el-dropdown>
       </div>
     </div>
-    <div class="sidebar" v-if="!standalone && !notLogged">
-      <el-menu ref="menu" :default-active="active" :default-openeds="opened" unique-opened @select="p => go(p)">
-        <template v-for="n in filteredNAV" :key="n.key">
-          <el-sub-menu v-if="n.children" :index="n.key"><template #title><el-icon><component :is="n.icon"/></el-icon><span>{{ n.title }}</span></template><el-menu-item v-for="c in n.children" :key="c.path" :index="c.path">{{ c.title }}</el-menu-item></el-sub-menu><el-menu-item v-else :index="n.path"><el-icon><component :is="n.icon"/></el-icon><span>{{ n.title }}</span></el-menu-item>
-        </template>
-      </el-menu>
+    <div class="body">
+      <div class="sidebar" v-if="!standalone && !notLogged">
+        <el-menu ref="menu" :default-active="active" :default-openeds="opened" unique-opened @select="p => go(p)">
+          <template v-for="n in filteredNAV" :key="n.key">
+            <el-sub-menu v-if="n.children" :index="n.key"><template #title><el-icon><component :is="n.icon"/></el-icon><span>{{ n.title }}</span></template><el-menu-item v-for="c in n.children" :key="c.path" :index="c.path">{{ c.title }}</el-menu-item></el-sub-menu><el-menu-item v-else :index="n.path"><el-icon><component :is="n.icon"/></el-icon><span>{{ n.title }}</span></el-menu-item>
+          </template>
+        </el-menu>
+      </div>
+      <div class="main" :class="{mfull:standalone}"><component :is="view.comp" :key="path" v-bind="view.props"/></div>
+      <doc-panel v-if="!standalone && !notLogged"/>
     </div>
-    <div class="main" :class="{mfull:standalone}"><component :is="view.comp" :key="path" v-bind="view.props"/></div>
-    <doc-panel v-if="!standalone && !notLogged"/><doc-panel v-if="notLogged && view.docKey === 'auth-login'"/><doc-panel v-if="notLogged && view.docKey === 'auth-changepw'"/><doc-panel v-if="notLogged && view.docKey === 'auth-nopermission'"/>
+    <doc-panel v-if="notLogged && view.docKey === 'auth-login'"/><doc-panel v-if="notLogged && view.docKey === 'auth-changepw'"/><doc-panel v-if="notLogged && view.docKey === 'auth-nopermission'"/>
   </div>`,
 };
 const app = Vue.createApp(App);
