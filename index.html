@@ -2201,6 +2201,318 @@ const NotFoundPage = {
 
 /* ===== 占位模块路由说明：analytics / system 已由 page-analytics.js / page-system.js 替代，此处不再注册占位路由 ===== */
 
+const AUTH = {
+  depts: {},
+  users: {},
+  roles: {},
+  session: null,
+  init() {
+    const stored = localStorage.getItem('crm_auth_v1');
+    if (stored) {
+      const data = JSON.parse(stored);
+      this.depts = data.depts || {};
+      this.users = data.users || {};
+      this.roles = data.roles || {};
+    }
+    this._loadDemoIfNeeded();
+    this.session = JSON.parse(localStorage.getItem('crm_auth_session') || 'null');
+  },
+  save() {
+    localStorage.setItem('crm_auth_v1', JSON.stringify({ depts: this.depts, users: this.users, roles: this.roles }));
+  },
+  _loadDemoIfNeeded() {
+    if (Object.keys(this.users).length > 0) return;
+    const depts = {
+      D00: { id: 'D00', name: '某某软件有限公司', parent: '', level: '公司' },
+      D01: { id: 'D01', name: '总经办', parent: 'D00', level: '部门' },
+      D02: { id: 'D02', name: '华东销售中心', parent: 'D00', level: '部门' },
+      D03: { id: 'D03', name: '华东销售一部', parent: 'D02', level: '团队' },
+      D04: { id: 'D04', name: '华东销售二部', parent: 'D02', level: '团队' },
+      D06: { id: 'D06', name: '财务部', parent: 'D00', level: '部门' },
+    };
+    this.depts = depts;
+    const users = {
+      u01: { id: 'u01', acc: 'admin', name: '管理员', phone: '13900000001', pwd: 'Crm@2026', mustChange: false, status: '启用', dept: 'D01', manager: '', role: 'admin' },
+      u02: { id: 'u02', acc: 'zhouzj', name: '周总监', phone: '13700005505', pwd: 'Crm@2026', mustChange: false, status: '启用', dept: 'D02', manager: 'u01', role: 'director' },
+      u03: { id: 'u03', acc: 'zhangsan', name: '张三', phone: '13700005501', pwd: 'Crm@2026', mustChange: false, status: '启用', dept: 'D03', manager: 'u02', role: 'manager' },
+      u04: { id: 'u04', acc: 'lisi', name: '李四', phone: '13700005502', pwd: 'Crm@2026', mustChange: false, status: '启用', dept: 'D04', manager: 'u02', role: 'manager' },
+      u05: { id: 'u05', acc: 'wangwu', name: '王五', phone: '13700005503', pwd: 'Crm@2026', mustChange: false, status: '启用', dept: 'D03', manager: 'u03', role: 'sales' },
+      u06: { id: 'u06', acc: 'zhaoliu', name: '赵六', phone: '13700005504', pwd: 'Crm@2026', mustChange: false, status: '启用', dept: 'D04', manager: 'u04', role: 'sales' },
+      u07: { id: 'u07', acc: 'wangfang', name: '王芳', phone: '13700005508', pwd: 'Crm@2026', mustChange: false, status: '启用', dept: 'D06', manager: '', role: 'finance' },
+      u08: { id: 'u08', acc: 'chenyue', name: '陈悦', phone: '13700005513', pwd: 'Crm@2026', mustChange: false, status: '停用', dept: 'D03', manager: 'u03', role: 'sales' },
+      u09: { id: 'u09', acc: 'newbie', name: '新同事', phone: '13700005520', pwd: 'Init@1234', mustChange: true, status: '启用', dept: 'D04', manager: 'u04', role: 'sales' },
+    };
+    this.users = users;
+    const roles = {
+      admin: { key: 'admin', name: '系统管理员', desc: '', menus: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析', '系统管理'], buttons: ['新增', '编辑', '删除', '导出', '分配'], scope: '全部', phoneFull: true, noFollowUp: false, home: '/system/auth/users', demoUid: 'u01' },
+      director: { key: 'director', name: '销售总监', desc: '', menus: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析'], buttons: ['新增', '编辑', '删除', '导出', '分配'], scope: '本部门及下属', phoneFull: true, noFollowUp: false, home: '/workbench', demoUid: 'u02' },
+      manager: { key: 'manager', name: '销售经理', desc: '', menus: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析'], buttons: ['新增', '编辑', '导出', '分配'], scope: '本部门', phoneFull: true, noFollowUp: false, home: '/workbench', demoUid: 'u03' },
+      sales: { key: 'sales', name: '销售人员', desc: '', menus: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '报价管理', '活动管理', '服务管理'], buttons: ['新增', '编辑'], scope: '本人', phoneFull: true, noFollowUp: false, home: '/workbench', demoUid: 'u05' },
+      finance: { key: 'finance', name: '财务人员', desc: '', menus: ['工作台', '合同管理', '订单管理', '回款管理', '数据分析'], buttons: ['导出'], scope: '全部', phoneFull: false, noFollowUp: true, home: '/payments', demoUid: 'u07' },
+    };
+    this.roles = roles;
+    this.save();
+  },
+
+  // ===== 会话与登录 =====
+  authUser() { return this.session ? this.users[this.session.uid] || null : null; },
+  authRole() { return this.session ? this.roles[this.users[this.session.uid]?.role || ''] || null : null; },
+  authLoggedIn() { return this.session !== null; },
+
+  authLogin(account, pwd) {
+    let user = null;
+    for (const k of Object.keys(this.users)) {
+      const u = this.users[k];
+      if ((u.acc === account || u.phone === account) && u.pwd === pwd) {
+        if (u.status === '停用') return { ok: false, msg: '该账号已停用，请联系管理员', user: null };
+        user = u; break;
+      }
+    }
+    if (!user) return { ok: false, msg: '账号或密码错误', user: null };
+    this.session = { uid: user.id };
+    localStorage.setItem('crm_auth_session', JSON.stringify(this.session));
+    return { ok: true, msg: '登录成功', user };
+  },
+
+  authResetDemo() {
+    this.depts = {}; this.users = {}; this.roles = {};
+    this.session = null;
+    localStorage.removeItem('crm_auth_session');
+    localStorage.removeItem('crm_auth_v1');
+    this._loadDemoIfNeeded();
+    this.save();
+  },
+
+  authLogout(stay) {
+    this.session = null;
+    localStorage.removeItem('crm_auth_session');
+    if (!stay) location.hash = '#/login';
+  },
+
+  // ===== 密码改动 =====
+  authChangePwd(old, neu) {
+    const user = this.authUser();
+    if (!user) return { ok: false, msg: '未登录' };
+    if (user.pwd !== old) return { ok: false, msg: '旧密码错误' };
+    if (neu.length < 8) return { ok: false, msg: '新密码至少8位' };
+    if (!/[a-zA-Z]/.test(neu) || !/[0-9]/.test(neu)) return { ok: false, msg: '新密码需包含字母和数字' };
+    if (neu === old) return { ok: false, msg: '新密码不能与旧密码相同' };
+    user.pwd = neu;
+    user.mustChange = false;
+    this.save();
+    localStorage.removeItem('crm_auth_session');
+    this.session = null;
+    return { ok: true, msg: '密码修改成功' };
+  },
+
+  // ===== 角色切换 =====
+  authSwitchRole(roleKey) {
+    const role = this.roles[roleKey];
+    if (!role) return;
+    this.session = { uid: role.demoUid };
+    localStorage.setItem('crm_auth_session', JSON.stringify(this.session));
+    location.hash = `#${role.home}`;
+  },
+
+  // ===== 菜单权限 =====
+  authCanMenu(menuTitle) {
+    const role = this.authRole();
+    if (!role) return false;
+    return role.menus && role.menus.includes(menuTitle);
+  },
+
+  authCanBtn(kind) {
+    const user = this.authUser();
+    if (!user) return false;
+    const role = this.roles[user.role || ''];
+    if (!role) return false;
+    const btns = role.buttons || [];
+    if (kind && btns.indexOf(kind) >= 0) return true;
+    if (!kind) return true;
+    return false;
+  },
+
+  authScope() {
+    const user = this.authUser();
+    if (!user) return '全部';
+    const role = this.roles[user.role || ''];
+    return role ? role.scope : '全部';
+  },
+
+  // ===== 数据可见性 =====
+  authVisibleOwners() {
+    const user = this.authUser();
+    if (!user) return new Set();
+    const deptId = user.dept;
+    const result = new Set();
+    if (user.role === 'admin') return null;
+    for (const k of Object.keys(this.users)) {
+      const u = this.users[k];
+      if (u.status !== '启用') continue;
+      if (u.id === user.id) result.add(u.name);
+      else if (deptId && u.dept === deptId) result.add(u.name);
+      else {
+        const descendants = this._deptDescendants(deptId);
+        if (descendants.has(u.dept)) result.add(u.name);
+        if (u.manager === user.id || u.manager === user.name) result.add(u.name);
+      }
+    }
+    return result;
+  },
+
+  _deptDescendants(deptId) {
+    const result = new Set();
+    const visit = [deptId];
+    while (visit.length) {
+      const id = visit.shift();
+      for (const d of Object.values(this.depts)) {
+        if (d.parent === id && !result.has(d.id)) {
+          result.add(d.id);
+          visit.push(d.id);
+        }
+      }
+    }
+    return result;
+  },
+
+  authRowVisible(row) {
+    const owners = this.authVisibleOwners();
+    if (owners === null) return true;
+    if (!row || !row.owner) return true;
+    return owners.has(row.owner);
+  },
+
+  authFilter(rows) {
+    if (!rows || rows.length === 0) return rows;
+    const visible = this.authRowVisible;
+    const filtered = rows.filter(visible);
+    const hasOwner = rows.some(r => r && r.owner);
+    return hasOwner ? filtered : rows;
+  },
+
+  // ===== 手机号脱敏 =====
+  authMaskPhone(p) {
+    if (p === '' || p === undefined || p === null) return '';
+    const phoneFull = this.authRole() && this.authRole().phoneFull;
+    if (phoneFull) {
+      const stars = p.indexOf('*');
+      if (stars >= 0) {
+        const prefix = p.slice(0, stars);
+        const suffix = p.slice(stars + 4);
+        if (prefix.length >= 3 && suffix.length >= 4) return prefix + '****' + suffix;
+      }
+      return p;
+    }
+    return p.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2');
+  },
+
+  // ===== 路由权限 =====
+  authRouteAllowed(path) {
+    if (path === '/login' || path === '/change-password' || path === '/no-permission') return { ok: true };
+    const role = this.authRole();
+    if (!role) return { ok: false, reason: '未登录，请先登录' };
+    const menuTitle = this._pathToMenu(path);
+    if (!menuTitle) return { ok: false, reason: '无菜单权限' };
+    if (!this.authCanMenu(menuTitle)) {
+      return { ok: false, reason: `您的角色「${role.name}」没有「${menuTitle}」模块的访问权限` };
+    }
+    return { ok: true };
+  },
+
+  _pathToMenu(path) {
+    const map = {
+      '/workbench': '工作台', '/approvals': '审批中心', '/mobile': '移动端预览',
+      '/leads': '线索管理', '/lead/': '线索管理',
+      '/customers': '客户管理', '/customer/': '客户管理',
+      '/opps': '商机管理', '/opp/': '商机管理',
+      '/products': '产品管理', '/pricebooks,/product/': '产品管理',
+      '/quotes': '报价管理', '/quote/': '报价管理',
+      '/contracts': '合同管理', '/contract/': '合同管理',
+      '/orders': '订单管理', '/order/': '订单管理',
+      '/payments': '回款管理', '/payments': '回款管理',
+      '/activities': '活动管理', '/activity/': '活动管理',
+      '/delivery': '交付管理', '/delivery': '交付管理',
+      '/service': '服务管理', '/ticket/': '服务管理',
+      '/analytics': '数据分析', '/system': '系统管理', '/approvals/templates': '系统管理',
+      '/mobile,/m': null,
+    };
+    for (const [k, v] of Object.entries(map)) {
+      if (path === k || path.startsWith(k)) return v;
+    }
+    return null;
+  },
+
+  // ===== 按钮权限 =====
+  authBtnAllowed(label) {
+    const kindMap = {
+      '新增': '新增', '新建': '新增', '添加': '新增', '创建': '新增',
+      '编辑': '编辑', '修改': '编辑',
+      '删除': '删除', '作废': '删除',
+      '导出': '导出',
+      '分配': '分配', '转移': '分配', '指派': '分配',
+    };
+    const kind = kindMap[label];
+    if (kind) {
+      if (kind === '分配') {
+        const user = this.authUser();
+        const role = this.roles[user.role || ''];
+        if (role && role.noFollowUp && label.includes('跟进')) return false;
+      }
+      return this.authCanBtn(kind);
+    }
+    return true;
+  },
+
+  // ===== 权限守卫（点击拦截 + 隐藏）=====
+  authGuardInstall() {
+    const main = document.querySelector('.main');
+    if (!main) return;
+    const dialogLabels = ['确定', '取消', '保存', '提交'];
+    const selectors = '.el-button,.row-actions a,.row-actions button,.ops button';
+    const btnText = el => (el.textContent || '').trim();
+    const isDialogBtn = el => !!el.closest('.el-dialog,.el-message-box__wrapper');
+    const check = el => {
+      if (!el || !main.contains(el) || isDialogBtn(el)) return;
+      const t = btnText(el);
+      if (dialogLabels.indexOf(t) >= 0) return;
+      if (!AUTH.authBtnAllowed(t)) el.style.display = 'none';
+    };
+    document.addEventListener('click', e => {
+      if (!main || !main.contains(e.target)) return;
+      const el = e.target.closest(selectors);
+      if (!el) return;
+      const t = btnText(el);
+      if (dialogLabels.indexOf(t) >= 0) return;
+      if (!AUTH.authBtnAllowed(t)) {
+        e.stopPropagation();
+        e.preventDefault();
+        ElMessage.error('无权限：当前角色不能执行「' + t + '」');
+      }
+    }, true);
+    let raf = null;
+    new MutationObserver(() => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => { raf = null; main.querySelectorAll(selectors).forEach(check); });
+    }).observe(main, { childList: true, subtree: true });
+  },
+
+  // ===== 辅助函数 =====
+  authDeptDescendants(deptId) {
+    return this._deptDescendants(deptId);
+  },
+  authDeptName(id) {
+    return this.depts[id] ? this.depts[id].name : '';
+  },
+  authUserName(id) {
+    for (const k of Object.keys(this.users)) {
+      if (this.users[k].id === id) return this.users[k].name;
+    }
+    return '';
+  },
+};
+
+AUTH.init();
+window.AUTH = AUTH;
 /* ===== 需求文档说明面板：三种状态（隐藏 / 半隐藏 / 完全展开），内容可增删改，存 localStorage ===== */
 const DOC_STATE_KEY = 'crm_doc_state';
 const DOC_DATA_KEY = 'crm_docs_v1';
@@ -3934,6 +4246,297 @@ const ApprovalsPage = {
 };
 registerRoute('/approvals', ApprovalsPage, 'approvals');
 
+const AuthDeptsPage = {
+  template: `<div class="card card-pad">
+    <h2>部门管理</h2>
+    <el-tree :data="depts" node-key="id" :props="{ label: 'name', children: 'children' }" style="width:200px;height:400px;margin-right:24px;float:left">
+      <template #label="{ node }">{{ node.name }}({{ node.level }})</template>
+    </el-tree>
+    <div style="margin-top:24px;overflow:auto">
+      <el-button type="primary" style="float:left;margin-right:16px" v-if="AUTH.authCanBtn('新增')">新增</el-button>
+      <el-button type="success" style="float:left;margin-right:16px" v-if="AUTH.authCanBtn('编辑')">编辑</el-button>
+      <el-button type="danger" style="float:left;margin-right:16px" v-if="AUTH.authCanBtn('删除')">删除</el-button>
+      <el-button type="warning" style="float:left">重置演示数据</el-button>
+      <div style="clearfix"></div>
+      <div style="margin-top:24px;border:1px dashed #dcdfe6;padding:16px">
+        <p>部门树规则：公司只能建部门，部门只能建团队，团队不可再建</p>
+        <el-form :model="form" inline class="form-gutter" style="max-width:400px">
+          <el-form-item label="父级部门" prefix-icon="Folder">
+            <el-select v-model="form.parentId" style="width:100%">
+              <el-option label="公司" value="D00" />
+              <el-option label="总经办" value="D01" />
+              <el-option label="华东销售中心" value="D02" />
+              <el-option label="华东销售一部" value="D03" />
+              <el-option label="华东销售二部" value="D04" />
+              <el-option label="财务部" value="D06" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="部门名称" prefix-icon="Name">
+            <el-input v-model="form.name" placeholder="请输入部门名称" />
+          </el-form-item>
+        </el-form>
+      </div>
+    </div>
+  </div>`,
+  data() { return { depts: {}, form: { name: '', parentId: 'D00' } }; },
+  mounted() {
+    this.depts = {
+      D00: { id: 'D00', name: '某某软件有限公司', parent: '', level: '公司', children: [
+        { id: 'D01', name: '总经办', parent: 'D00', level: '部门', children: [] },
+        { id: 'D02', name: '华东销售中心', parent: 'D00', level: '部门', children: [
+          { id: 'D03', name: '华东销售一部', parent: 'D02', level: '团队', children: [] },
+          { id: 'D04', name: '华东销售二部', parent: 'D02', level: '团队', children: [] }
+        ]}
+      ]}
+    };
+    this.$nextTick(() => {});
+  }
+};
+registerRoute('/system/auth/depts', AuthDeptsPage, 'auth-depts');
+
+const AuthUsersPage = {
+  template: `<div class="card card-pad">
+    <h2>用户管理</h2>
+    <el-form inline class="form-gutter" style="margin-bottom:16px">
+      <el-form-item label="关键字" :width="80">
+        <el-input v-model="queryKey" placeholder="账号/姓名/手机" />
+      </el-form-item>
+      <el-form-item label="部门" :width="100">
+        <el-select v-model="queryDept" style="width:100%">
+          <el-option label="全部" value="" />
+          <el-option label="某某软件有限公司" value="D00" />
+          <el-option label="总经办" value="D01" />
+          <el-option label="华东销售中心" value="D02" />
+          <el-option label="华东销售一部" value="D03" />
+          <el-option label="华东销售二部" value="D04" />
+          <el-option label="财务部" value="D06" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="角色" :width="100">
+        <el-select v-model="queryRole" style="width:100%">
+          <el-option label="全部" value="" />
+          <el-option label="系统管理员" value="admin" />
+          <el-option label="销售总监" value="director" />
+          <el-option label="销售经理" value="manager" />
+          <el-option label="销售人员" value="sales" />
+          <el-option label="财务人员" value="finance" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="状态" :width="100">
+        <el-select v-model="queryStatus" style="width:100%">
+          <el-option label="全部" value="" />
+          <el-option label="启用" value="启用" />
+          <el-option label="停用" value="停用" />
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="search">查询</el-button>
+        <el-button type="link" @click="authResetDemo">重置演示数据</el-button>
+      </el-form-item>
+    </el-form>
+    <el-table :data="filteredUsers" style="width:100%" border highlight-current-row>
+      <el-table-column prop="account" label="账号" width="120" />
+      <el-table-column prop="name" label="姓名" width="100" />
+      <el-table-column prop="phone" label="手机号" width="130" align="center">
+        <template #default="{ row }">{{ AUTH.authMaskPhone(row.phone) }}</template>
+      </el-table-column>
+      <el-table-column prop="dept" label="部门" width="100" />
+      <el-table-column prop="manager" label="直属上级" width="100" />
+      <el-table-column prop="role" label="角色" width="100" />
+      <el-table-column prop="status" label="状态" width="80" align="center">
+        <template #default="{ row }">{{ row.status }}</template>
+      </el-table-column>
+      <el-table-column prop="mustChange" label="待改密" width="80" align="center">
+        <template #default="{ row }">{{ row.mustChange ? '是' : '否' }}</template>
+      </el-table-column>
+      <el-table-column label="操作" width="120" align="center">
+        <template #default="{ row }">
+          <el-button size="small" @click="editUser(row)" v-if="AUTH.authCanBtn('编辑')">编辑</el-button>
+          <el-button size="small" type="danger" @click="doDisable(row)">停用</el-button>
+    </el-table>
+    <div style="margin-top:24px">
+      <el-dialog title="停用用户" :visible="dialogVisible" width="400">
+        <p>用户：{{ dialogName }}（{{ dialogDeptName }}）</p>
+        <p v-if="hasCustomers > 0">该用户下有 {{ hasCustomers }} 个客户，<el-button type="primary" @click="selectReceiver">指定接收人</el-button> 后才能停用</p>
+        <p v-else>确定要停用该用户吗？</p>
+        <div style="margin-top:24px">
+          <el-button @click="dialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="confirmDisable">确定停用</el-button>
+        </div>
+      </el-dialog>
+      <el-dialog title="重置密码" :visible="pwdDialogVisible" width="400">
+        <p>生成临时密码：Rst@{{ pwdSuffix }}</p>
+        <p>该用户将首次登录时被强制改密</p>
+        <div style="margin-top:24px">
+          <el-button @click="pwdDialogVisible = false">关闭</el-button>
+        </div>
+      </el-dialog>
+    </div>
+  </div>`,
+  data() { return { 
+    queryKey: '', queryDept: '', queryRole: '', queryStatus: '',
+    dialogVisible: false, dialogName: '', dialogDeptName: '',
+    hasCustomers: 0, pwdDialogVisible: false, pwdSuffix: ''
+  }; },
+  mounted() {
+  },
+  computed: {
+    filteredUsers() {
+      const all = Object.values(AUTH.users || {});
+      let res = all;
+      if (this.queryKey) {
+        res = res.filter(u => u.acc.includes(this.queryKey) || u.name.includes(this.queryKey) || u.phone.includes(this.queryKey));
+      }
+      if (this.queryDept) res = res.filter(u => u.dept === this.queryDept);
+      if (this.queryRole) res = res.filter(u => u.role === this.queryRole);
+      if (this.queryStatus) res = res.filter(u => u.status === this.queryStatus);
+      return res;
+    }
+  },
+  methods: {
+    search() {},
+    hasCustomerCount(uid) {
+      const u = AUTH.users ? AUTH.users[uid] : undefined;
+      if (!u) return 0;
+      let count = 0;
+      for (const c of Object.values(store.customers || {})) {
+        if (c.owner === u.name) count++;
+      }
+      return count;
+    },
+    editUser(u) {
+      this.dialogName = u.name;
+      this.dialogDeptName = u.dept ? (this.depts[u.dept] ? this.depts[u.dept].name : '') : '';
+      this.hasCustomers = this.hasCustomerCount(u.id);
+      this.dialogVisible = true;
+    },
+    confirmDisable() {
+      const u = AUTH.users ? AUTH.users[this.dialogName || ''] : undefined;
+      if (this.hasCustomers > 0) {
+        ElMessage.warning('该用户下有客户，需指定接收人后才能停用');
+      } else {
+        this.dialogVisible = false;
+        ElMessage.success('用户已停用');
+      }
+    },
+    selectReceiver() { this.dialogVisible = false; ElMessage.info('请在对话框中指定接收人'); },
+    authResetDemo() { AUTH.authResetDemo(); this.search(); }
+  }
+};
+registerRoute('/system/auth/users', AuthUsersPage, 'auth-users');
+
+const AuthRolesPage = {
+  template: `<div class="card card-pad">
+    <h2>角色管理</h2>
+    <el-form :model="roleForm" inline>
+      <el-form-item label="角色名称" prop="name">
+        <el-input v-model="roleForm.name" disabled />
+      </el-form-item>
+      <el-form-item label="说明" prop="desc">
+        <el-input v-model="roleForm.desc" disabled />
+      </el-form-item>
+      <el-form-item label="菜单权限" prop="menus">
+        <el-checkbox-group :options="menuOptions" v-model="roleForm.menus" />
+      </el-form-item>
+      <el-form-item label="按钮权限" prop="buttons">
+        <el-checkbox-group :options="buttonOptions" v-model="roleForm.buttons" />
+      </el-form-item>
+      <el-form-item label="数据范围" prop="scope">
+        <el-radio-group v-model="roleForm.scope">
+          <el-radio label="本人" /> <el-radio label="本部门" /> <el-radio label="本部门及下属" /> <el-radio label="全部" />
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item label="查看完整手机号">
+        <el-switch v-model="roleForm.phoneFull" />
+      </el-form-item>
+    </el-form>
+    <p style="margin-top:24px;color:#909399;">财务角色固定：不能修改销售跟进</p>
+    <div style="margin-top:24px">
+      <el-button type="primary">保存</el-button>
+      <el-button type="link">重置</el-button>
+    </div>
+    <div style="margin-top:24px;padding:16px;border:1px dashed #dcdfe6">
+      <p>当前角色拥有的权限摘要：</p>
+      <p>菜单: 工作台, 线索管理, 客户管理, 联系人管理, 商机管理, 报价管理, 合同管理, 订单管理, 回款管理, 活动管理, 数据分析</p>
+      <p>按钮: 新增, 编辑, 导出, 分配</p>
+      <p>数据范围: 本人</p>
+      <p>查看手机号: 开</p>
+    </div>
+  </div>`,
+  data() { return { 
+    roleForm: { name: '系统管理员', desc: '', menus: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析'], buttons: ['新增', '编辑', '删除', '导出', '分配'], scope: '全部', phoneFull: true },
+    menuOptions: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析', '系统管理'],
+    buttonOptions: ['新增', '编辑', '删除', '导出', '分配']
+  }; },
+  methods: { authResetDemo() { AUTH.authResetDemo(); } }
+};
+registerRoute('/system/auth/roles', AuthRolesPage, 'auth-roles');
+const LoginPage = {
+  template: `<div class="card card-pad" style="max-width:400px;margin:80px auto">
+    <div class="brand">CRM 登录</div>
+    <h2>登录</h2>
+    <el-form :model="loginForm" :rules="loginRules" ref="loginForm" inline class="form-gutter">
+      <el-form-item label="账号或手机号" prefix-icon="User">
+        <el-input v-model="loginForm.account" placeholder="请输入账号或手机号" clearable />
+      </el-form-item>
+      <el-form-item label="密码" prefix-icon="Lock">
+        <el-input v-model="loginForm.pwd" type="password" placeholder="请输入密码" clearable />
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="login">登录</el-button>
+      </el-form-item>
+    </el-form>
+    <div style="margin-top:24px">
+      <el-button type="danger" @click="authResetDemo">重置演示数据</el-button>
+    </div>
+    <div style="margin-top:24px;max-height:300px;overflow:auto">
+      <el-tag type="primary" effect="plain">演示账号</el-tag>
+      <table style="width:100%;border-collapse:collapse;margin-top:10px">
+        <tr style="background:#f5f7fa"><th style="padding:8px">账号</th><th style="padding:8px">密码</th><th style="padding:8px">角色</th><th style="padding:8px">首次改密</th><th style="padding:8px">操作</th></tr>
+        <tr v-for="acc in demoAccounts" :key="acc.id" style="border-bottom:1px solid #eee"><td style="padding:8px">{{ acc.account }}</td><td style="padding:8px">{{ acc.pwd }}</td><td style="padding:8px">{{ acc.role }}</td><td style="padding:8px">{{ acc.mustChange ? '是' : '否' }}</td><td style="padding:8px"><el-button size="small" @click="fillAccount(acc)">一键填入</el-button></td></tr>
+        <tr><td colspan="5" style="padding:8px;text-align:center">---</td></tr>
+      </table>
+    </div>
+  </div>`,
+  data() { return { loginForm: { account: '', pwd: '' }, loginRules: { account: { required: true, message: '账号或手机号不能为空' }, pwd: { required: true, message: '密码不能为空' } }, demoAccounts: [{ id: 'u01', account: 'admin', pwd: 'Crm@2026', role: '系统管理员', mustChange: false }, { id: 'u02', account: 'zhouzj', pwd: 'Crm@2026', role: '销售总监', mustChange: false }, { id: 'u03', account: 'zhangsan', pwd: 'Crm@2026', role: '销售经理', mustChange: false }, { id: 'u04', account: 'lisi', pwd: 'Crm@2026', role: '销售经理', mustChange: false }, { id: 'u05', account: 'wangwu', pwd: 'Crm@2026', role: '销售人员', mustChange: false }, { id: 'u06', account: 'zhaoliu', pwd: 'Crm@2026', role: '销售人员', mustChange: false }, { id: 'u07', account: 'wangfang', pwd: 'Crm@2026', role: '财务人员', mustChange: false }, { id: 'u08', account: 'chenyue', pwd: 'Crm@2026', role: '销售人员', mustChange: false, status: '停用' }, { id: 'u09', account: 'newbie', pwd: 'Init@1234', role: '销售人员', mustChange: true }], _dummy: [] }},
+  methods: { login() { AUTH.authLogin(this.loginForm.account, this.loginForm.pwd).then(r => { if (r.ok) { if (r.user.mustChange) { location.hash = '#/change-password'; } else { location.hash = r.user.home || '/workbench'; } } else { ElMessage.error(r.msg); } }).catch(() => {}); }, fillAccount(acc) { this.loginForm.account = acc.account; this.loginForm.pwd = acc.pwd; } }
+};
+registerRoute('/login', LoginPage, 'auth-login');
+
+const ChangePwdPage = {
+  template: `<div class="card card-pad" style="max-width:400px;margin:80px auto">
+    <h2>修改密码</h2>
+    <el-form :model="pwdForm" :rules="pwdRules" ref="pwdForm" inline class="form-gutter">
+      <el-form-item label="旧密码" prefix-icon="Lock">
+        <el-input v-model="pwdForm.old" type="password" placeholder="请输入旧密码" clearable />
+      </el-form-item>
+      <el-form-item label="新密码" prefix-icon="Lock">
+        <el-input v-model="pwdForm.neu" type="password" placeholder="请输入新密码" clearable />
+      </el-form-item>
+      <el-form-item label="确认新密码">
+        <el-input v-model="pwdForm.neuConfirm" type="password" placeholder="请再次输入新密码" clearable />
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="changePwd">保存</el-button>
+        <el-button @click="goBack">返回</el-button>
+      </el-form-item>
+      <template v-if="mustChange"><p style="color:#e96e00;margin:16px 0;font-size:13px">当前为强制改密状态，请务必修改密码</p></template>
+    </el-form>
+  </div>`,
+  data() { return { pwdForm: { old: '', neu: '', neuConfirm: '' }, pwdRules: { old: { required: true, message: '旧密码不能为空' }, neu: { required: true, message: '新密码不能为空' }, neuConfirm: { required: true, message: '请再次输入新密码' } }, mustChange: false, _dummy: [] }},
+  methods: { changePwd() { this.$refs.pwdForm.validate((valid) => { if (valid) { AUTH.authChangePwd(this.pwdForm.old, this.pwdForm.neu).then(r => { ElMessage.success(r.msg); if (r.ok && !this.mustChange) { location.hash = '#/workbench'; } else { location.hash = r.user.home || '/workbench'; } }).catch(() => {}); } else { ElMessage.error('请填写完整表单'); } }); }, goBack() { if (!this.mustChange) { location.hash = '#/workbench'; } } }
+};
+registerRoute('/change-password', ChangePwdPage, 'auth-changepw');
+
+const NoPermissionPage = {
+  props: { reason: String },
+  template: `<div class="card card-pad">
+    <el-alert type="error" show-icon :closable="false" style="margin-bottom:24px" title="无权限访问"/>
+    <p style="margin:0 0 24px;font-size:13px">{{ reason }}</p>
+    <el-button type="primary" @click="$go('/workbench')">返回我的工作台</el-button>
+  </div>`
+};
+registerRoute('/no-permission', NoPermissionPage, 'auth-nopermission');
 /* ===== 第 3 阶段：联系人列表 /contacts + 联系人详情 /contact/:no ===== */
 const custByName = name => store.customers.find(c => c.name === name);
 const CONTACT_ROLES = ['决策人', '使用人', '采购人', '财务', '技术'];
@@ -6533,6 +7136,88 @@ registerMScreen('schedule-new', MScheduleNewScreen, { title: '新建日程', doc
 registerMScreen('todo', MTodoScreen, { title: '待办', doc: 'm-todo', tab: 'todo' });
 registerMScreen('me', MMeScreen, { title: '我的', doc: 'm-me', tab: 'me' });
 
+/* ===== 移动端登录/改密屏 ===== */
+const MLoginScreen = {
+  components: { MForm, MField, MCard, MEmpty },
+  template: `<div class="m-page" :class="{'no-tabbar': true}">
+    <m-card title="登录">
+      <m-form>
+        <m-field label="账号或手机号" required>
+          <el-input v-model="account" placeholder="请输入账号或手机号"/>
+        </m-field>
+        <m-field label="密码" required>
+          <el-input v-model="pwd" type="password" placeholder="请输入密码"/>
+        </m-field>
+        <el-button type="primary" style="width:100%" @click="login">登录</el-button>
+      </m-form>
+    </m-card>
+    <div class="m-demo-hint">
+      <span>演示账号：</span>
+      <table style="width:100%;border-collapse:collapse;margin-top:6px">
+        <tr v-for="u in demoUsers" :key="u.id" style="font-size:12px;">
+          <td style="padding:2px 4px;width:30%;"><b>{{ u.acc }}</b></td>
+          <td style="padding:2px 4px;width:30%;"><b>{{ u.pwd }}</b></td>
+          <td style="padding:2px 4px;width:20%;"><b>{{ u.name }}</b></td>
+          <td style="padding:2px 4px;width:20%;"><b>{{ u.mustChange ? '需改密' : '' }}</b></td>
+        </tr>
+      </table>
+      <el-button size="mini" style="margin-top:4px;float:right" @click="resetDemo">重置演示数据</el-button>
+    </div>`,
+  setup() {
+    const AUTH = window.AUTH;
+    const account = ref(''); const pwd = ref('');
+    const demoUsers = computed(() => {
+      const users = {}; let k = Object.keys(AUTH.users || {}); while (k.length) { const u = AUTH.users[k.shift()]; users[u.id] = u; } return Object.values(users);
+    });
+    const login = () => {
+      const r = AUTH.authLogin(account.value.trim(), pwd.value.trim());
+      if (!r.ok) { mToast(r.msg, 'error'); return; }
+      if (r.user.mustChange) { mgo('changepw'); } else { mgo('home'); }
+    };
+    const resetDemo = () => { AUTH.authResetDemo(); mToast('演示数据已重置', 'success'); };
+    return { account, pwd, login, resetDemo, mToast, mgo, demoUsers };
+  }
+};
+
+const MChangePwdScreen = {
+  components: { MForm, MField, MCard, MEmpty },
+  template: `<div class="m-page" :class="{'no-tabbar': true}">
+    <m-card title="修改密码">
+      <m-form>
+        <m-field label="旧密码" required>
+          <el-input v-model="oldPwd" type="password" placeholder="请输入旧密码"/>
+        </m-field>
+        <m-field label="新密码" required>
+          <el-input v-model="newPwd" type="password" placeholder="请输入新密码"/>
+        </m-field>
+        <m-field label="确认新密码" required>
+          <el-input v-model="confirmPwd" type="password" placeholder="请再次输入新密码"/>
+        </m-field>
+        <el-button type="primary" style="width:100%" @click="save">保存</el-button>
+      </m-form>
+      <div v-if="mustChange" style="margin:8px 0;padding:4px;background:#fff8e1;border-left:3px solid #f5a623;font-size:12px;">
+        当前为强制改密状态，请务必修改密码
+      </div>
+    </m-card>
+  </m-card>`,
+  setup() {
+    const AUTH = window.AUTH;
+    const oldPwd = ref(''); const newPwd = ref(''); const confirmPwd = ref('');
+    const user = computed(() => AUTH.authUser());
+    const mustChange = computed(() => user.value && user.value.mustChange === true);
+    const save = () => {
+      if (newPwd.value !== confirmPwd.value) { mToast('两次输入密码不一致', 'error'); return; }
+      const r = AUTH.authChangePwd(oldPwd.value.trim(), newPwd.value.trim());
+      if (!r.ok) { mToast(r.msg, 'error'); return; }
+      mToast('密码修改成功', 'success');
+      mgo('home');
+    };
+    return { oldPwd, newPwd, confirmPwd, save, mustChange, mToast, mgo };
+  }
+};
+
+registerMScreen('login', MLoginScreen, { title: '登录', doc: 'm-login', tab: '' });
+registerMScreen('changepw', MChangePwdScreen, { title: '修改密码', doc: 'm-changepw', tab: '' });
 /* ===== 第 8 阶段：移动端其余屏幕（线索 / 商机 / 跟进 / 审批 / 回款 / 工单 / 通知） ===== */
 
 /* 补充几条通知（每次加载 store 都是新数据，可直接追加） */
@@ -10421,6 +11106,258 @@ const WorkbenchPage = {
 };
 registerRoute('/workbench', WorkbenchPage, 'workbench');
 
+const PZ_DOC_AUTH_CFG = {
+  'auth-login': {
+    name: '登录', module: '认证',
+    goal: '为用户提供登录入口，支持账号/手机号和密码验证，登录成功后根据角色权限跳转对应首页；强制改密时跳转改密页',
+    roles: [
+      '所有角色均可访问登录页', '账号或密码错误提示“账号或密码错误”', '账号停用提示“该账号已停用，请联系管理员”', '演示账号表格展示各角色账号密码及首次改密状态，每行具有一键填入按钮，点击后自动填充登录表单'
+    ],
+    enter: [
+      '左上角品牌区', '账号或手机号输入框', '密码输入框', '登录按钮', '演示账号表格：列出admin/zhouzj/zhangsan/lisi/wangwu/zhaoliu/wangfang/chenyue/newbie八个演示账号，含账号/密码/角色/首次改密四列，每行有一键填入按钮', '重置演示数据链接：点击后恢复演示数据并清除会话'
+    ],
+    layout: [
+      '卡片式布局，最大宽度400px，居中显示', '顶部：登录标题', '中部：el-form包含账号/手机号和密码两项，使用el-form进行验证', '底部：重置演示数据按钮、演示账号标签及表格', '表格列：账号、密码、角色、首次改密，每行有一键填入按钮'
+    ],
+    fields: [
+      '账号/手机号：文本类型，必填，支持账号格式和完整手机号两种格式', '密码：密码框类型，必填，至少6位'
+    ],
+    rules: [
+      '账号或手机号为必填项，为空时提示“账号或手机号不能为空”', '密码为必填项，为空时提示“密码不能为空”', '登录成功后若用户mustChange字段为真，强制跳转至/change-password路由'
+    ],
+    flow: [
+      '用户输入账号/密码并点击登录', 'AUTH.authLogin验证账号密码是否匹配', '匹配成功写入session并跳转至角色首页(r.user.home)或/workbench', '匹配失败弹出红色提示条展示错误信息', '若用户status为停用，弹出“该账号已停用”提示', '若用户mustChange为真，自动跳转至/change-password'
+    ],
+    errors: [
+      '账号或密码错误：登录失败时红色提示条展示“账号或密码错误”', '账号停用：登录失败时红色提示条展示“该账号已停用，请联系管理员”', '验证表单失败：未填写必填项时提示相应错误信息'
+    ],
+    api: [
+      '登录接口：AUTH.authLogin(account, pwd)，返回{ok, msg, user}', '演示数据重置：AUTH.authResetDemo()'
+    ],
+    accept: [
+      '无控制台报错', '登录成功后页面正确跳转', '演示账号表格可用，一键填入功能正常', '重置演示数据链接恢复演示状态'
+    ]
+  },
+  'auth-changepw': {
+    name: '修改密码', module: '认证',
+    goal: '为必须改密的用户提供密码修改入口，支持旧密码验证和新密码设置，规则文案置于表单下方；正常修改可返回工作台，强制改密状态无返回按钮',
+    roles: [
+      'mustChange=true的用户可访问', '普通用户访问该页被拦截并引导至/login', '密码修改成功后清除mustChange标记并写入localStorage'
+    ],
+    enter: [
+      '修改密码表单：旧密码、新密码、确认新密码三项', '保存按钮，点击后验证旧密码并写入新密码', '橙色提示“当前为强制改密状态，请务必修改密码”置于表单下方', '返回按钮：正常修改状态下点击返回跳转至/workbench'
+    ],
+    layout: [
+      '卡片式布局，最大宽度400px，居中显示', '顶部：修改密码标题', '中部：el-form包含旧密码、新密码、确认新密码三项，规则文案置于表单下方', '底部：保存按钮与返回按钮（normal状态有，mustChange状态无）'
+    ],
+    fields: [
+      '旧密码：密码框类型，必填，必需为当前登录用户的旧密码', '新密码：密码框类型，必填，至少8位且含字母和数字', '确认新密码：密码框类型，必填，需与新密码一致'
+    ],
+    rules: [
+      '旧密码为必填，为空时提示“旧密码不能为空”', '新密码至少8位，不足时提示“新密码至少8位”', '新密码需包含字母和数字，缺失时提示“新密码需包含字母和数字”', '新密码不能等于旧密码，相同时提示“新密码不能与旧密码相同”', '两次输入的新密码不一致时提示“两次输入密码不一致”', '保存成功后弹出成功提示，normal状态下返回/workbench，mustChange状态下保持当前页'
+    ],
+    flow: [
+      '用户输入旧密码和新密码并确认', '前端验证旧密码正确性、新密码格式和确认一致性', 'AUTH.authChangePwd(old, neu)写入新密码并清除mustChange', '成功后清除session并根据mustChange状态决定跳转路径'
+    ],
+    errors: [
+      '旧密码错误：提示“旧密码错误”', '新密码不足8位：提示“新密码至少8位”', '新密码缺字母或数字：提示“新密码需包含字母和数字”', '新密码等于旧密码：提示“新密码不能与旧密码相同”', '两次新密码输入不一致：提示“两次输入密码不一致”'
+    ],
+    api: [
+      '密码修改接口：AUTH.authChangePwd(old, neu)，返回{ok, msg}'
+    ],
+    accept: [
+      '无控制台报错', '密码修改成功后控制台无错误', 'mustChange状态下无“返回”按钮，normal状态下有返回', '密码修改后自动清除会话并跳转'
+    ]
+  },
+  'auth-nopermission': {
+    name: '无权限访问', module: '认证',
+    goal: '当用户访问没有权限的路由时展示无权限页面，显示原因和返回按钮',
+    roles: [
+      '访问无权限路由的用户', '显示具体的无权限原因提示'
+    ],
+    enter: [
+      '无权限访问页面：标题“无权限访问”，红色el-alert展示', '具体原因由后端通过authRouteAllowed返回的reason参数展示', '返回我的工作台按钮，点击后跳转至/workbench'
+    ],
+    layout: [
+      '卡片式布局，居中显示', '顶部：el-alert类型error，显示“无权限访问”', '中部：原因文字，字体稍大展示reason', '底部：返回我的工作台按钮'
+    ],
+    fields: [
+      'reason：错误原因字符串，由authRouteAllowed返回，描述具体无权限原因'
+    ],
+    rules: [
+      'reason必填，否则页面无法展示具体原因', '返回按钮始终可用，点击后跳转至/workbench'
+    ],
+    flow: [
+      '用户访问无权限路由时，view computed返回NoPermissionPage并传入reason', '页面展示原因和返回按钮', '用户点击返回按钮跳转至/workbench'
+    ],
+    errors: [
+      'reason为空时页面逻辑可能有误', '返回按钮失效时用户无法恢复'
+    ],
+    api: [
+      '无权限检查：AUTH.authRouteAllowed(path)返回{ok:false, reason:...}'
+    ],
+    accept: [
+      '无控制台报错', '原因文字正确展示', '返回按钮点击后跳转至工作台'
+    ]
+  },
+  'auth-depts': {
+    name: '部门管理', module: '系统管理',
+    goal: '提供部门树的可视化管理界面，支持新增、编辑、删除部门，遵循公司→部门→团队的层级关系；部门树展示类型标签和节点人数',
+    roles: [
+      '系统管理员可全量管理部门', '其他角色仅可查看', '新增时遵循：公司只能建部门，部门只能建团队，团队不可再建'
+    ],
+    enter: [
+      '部门树：左侧el-tree展示三级部门结构，节点显示类型标签和人数', '右侧：选中部门后显示部门信息，支持新增子部门、编辑名称、删除', '新增弹窗：选择父级部门和输入部门名称', '编辑弹窗：修改部门名称'
+    ],
+    layout: [
+      '两栏布局：左侧200px树区域，右侧主区域', '顶部：页面标题“部门管理”及新增/编辑/删除按钮', '中部：el-tree树展示部门层级结构', '底部：选中部门信息表单和操作按钮'
+    ],
+    fields: [
+      '部门名称：文本类型，必填', '父级部门：下拉选择，公司下仅显示部门选项，部门下仅显示团队选项'
+    ],
+    rules: [
+      '新增时父级为公司时仅允许选择部门类型，父级为部门时仅允许选择团队类型', '删除时若有子部门或有成员则拦截并提示', '部门名称不可重复'
+    ],
+    flow: [
+      '用户点击新增弹出新增弹窗', '选择父级部门并输入部门名称', '点击确认写入新部门并刷新树', '用户点击编辑修改部门名称', '用户点击删除若有子部门/成员则提示失败，否则删除'
+    ],
+    errors: [
+      '父级选择不当（如团队下再建）时前端拦截并提示', '删除有子部门或成员时提示“该部门下有子部门或成员，不允许删除”', '部门名称已存在时提示重名错误'
+    ],
+    api: [
+      '部门树查询：返回三层部门结构', '部门新增/编辑/删除接口'
+    ],
+    accept: [
+      '无控制台报错', '部门树结构正确展示三层', '新增受层级规则限制', '删除有子部门/成员时正确拦截'
+    ]
+  },
+  'auth-users': {
+    name: '用户管理', module: '系统管理',
+    goal: '提供用户的增删改查界面，支持关键字、部门、角色、状态筛选；新增/编辑用户包含所属部门、直属上级(不能选自己及下属)、角色；停用/启用需检查客户数并可指定接收人；重置密码生成临时密码Rst@+4位并设mustChange=true；不可删除用户，仅停用',
+    roles: [
+      '系统管理员可全量管理用户', '销售经理可查看本部门及下级用户', '销售人员可查看本人账号', '停用操作受数据权限限制'
+    ],
+    enter: [
+      '筛选区：关键字、部门、角色、状态四项筛选', '用户表格：账号、姓名、手机号(脱敏)、部门、直属上级、角色、状态、待改密', '新增/编辑弹窗：填写所属部门、直属上级、角色、状态', '停用确认弹窗：检查客户数>0时弹出指定接收人弹窗', '重置密码弹窗：生成临时密码Rst@+4位'
+    ],
+    layout: [
+      '两部分布局：上方筛选区和表格，下方为新增/编辑弹窗', '顶部：页面标题“用户管理”及重置演示数据按钮', '中部：带筛选条件的el-table展示用户列表', '右侧/底部：用户新增/编辑表单和操作按钮'
+    ],
+    fields: [
+      '账号：文本类型，必填，唯一', '姓名：文本类型，必填', '手机号：文本类型，必填，展示时调用authMaskPhone脱敏', '部门：下拉选择，来自部门树', '直属上级：用户选择，不能选自己及自己的下属', '角色：下拉选择，来自5个预置角色', '状态：枚举(启用/停用)', '待改密：布尔标记，mustChange=true时标红'
+    ],
+    rules: [
+      '关键字搜索模糊匹配账号/姓名/手机', '部门、角色筛选精确匹配', '新增时必填：账号、姓名、部门、角色', '编辑时账号不可改', '停用前检查store.customers中owner===name的客户数', '客户数>0时必须指定接收人(其他启用的销售类用户)并批量转移', '最后一个系统管理员不能停用', '最后一个管理员的角色不能改成非管理员角色', '不能直接删除用户，只能停用', '重置密码生成格式为Rst@+4位的临时密码'
+    ],
+    flow: [
+      '用户打开用户管理页', '输入关键字/选择部门/角色/状态进行筛选', '表格展示符合筛选条件的用户', '点击新增弹出编辑弹窗，填写信息后保存', '点击编辑对现有用户进行修改', '点击停用弹出确认对话框，检查客户数', '有客户时弹出指定接收人弹窗，无客户时直接停用', '点击重置密码生成Rst@+4位临时密码并设mustChange=true'
+    ],
+    errors: [
+      '筛选无结果时表格展示空态', '新增未填必填项时提示相应字段', '停用有客户时未指定接收人被拦截', '最后一个管理员停用被拦截提示“系统至少保留一个管理员”', '角色改成非管理员被拦截'
+    ],
+    api: [
+      '用户查询接口：按条件返回用户列表', '用户新增/编辑接口：写入/更新用户数据', '用户停用接口：设置用户状态为停用', '重置密码接口：生成临时密码并设mustChange'
+    ],
+    accept: [
+      '无控制台报错', '筛选条件正确生效', '停用客户数检查正确', '密码重置格式正确(Rst@+4位)', '不能删除用户，仅停用'
+    ]
+  },
+  'auth-roles': {
+    name: '角色管理', module: '系统管理',
+    goal: '提供5个预置角色的查看与编辑界面，左侧列出5个角色，右侧可编辑名称(只读预置)、菜单勾选(一级菜单名+系统管理)、按钮勾选(新增/编辑/删除/导出/分配)、数据范围单选(本人/本部门/本部门及下属/全部)、字段权限开关(可查看完整手机号)；财务角色额外显示说明“不能修改销售跟进(固定规则)”; 保存后立即生效并持久化；系统管理员角色不能取消“系统管理”菜单(防锁死); 页面底部只读预览“当前角色拥有的权限摘要”',
+    roles: [
+      '5个预置角色均可查看和编辑', '系统管理员拥有全部权限且不能取消系统管理菜单(防锁死)', '其他角色可编辑但受权限限制', '财务角色额外受noFollowUp限制，无法分配按钮中的跟进'
+    ],
+    enter: [
+      '左侧：5个角色列表(admin/director/manager/sales/finance)，当前高亮', '右侧：角色编辑表单，包含名称(只读)、说明(只读)、菜单权限、按钮权限、数据范围、字段权限', '保存按钮：点击后立即生效并持久化入localStorage', '底部：只读权限摘要展示当前角色的菜单按钮数据范围'
+    ],
+    layout: [
+      '两栏布局：左侧100px角色列表区，右侧主编辑区', '顶部：页面标题“角色管理”及保存按钮', '中部：角色编辑表单，菜单为el-checkbox-group，按钮为el-checkbox-group，数据范围为el-radio，字段权限为el-switch', '底部：只读权限摘要展示当前角色的菜单按钮数据范围'
+    ],
+    fields: [
+      '角色名称：只读预置值，admin=“系统管理员”、director=“销售总监”manager=“销售经理”sales=“销售人员”finance=“财务人员”', '菜单权限：el-checkbox-group，选项为一级菜单名加“系统管理”', '按钮权限：el-checkbox-group，选项为新增/编辑/删除/导出/分配', '数据范围：el-radio，四选一(本人/本部门/本部门及下属/全部)', '查看完整手机号：el-switch，true表示phoneFull，false表示不查看完整手机号'
+    ],
+    rules: [
+      '保存后立即生效并写入localStorage持久化', '系统管理员不可取消“系统管理”菜单(防锁死)', '财务角色phoneFull默认false，noFollowUp=true，展示“不能修改销售跟进(固定规则)”说明', '按钮权限勾选遵循authCanBtn(kind)逻辑', '保存前必填检查菜单和按钮至少勾选一项'
+    ],
+    flow: [
+      '用户打开角色管理页', '左侧角色列表当前高亮展示当前角色', '右侧展示当前角色的所有权限配置', '修改菜单/按钮勾选、数据范围、字段权限开关', '点击保存，权限立即写入AUTH.roles并持久化', '页面底部即时更新权限摘要展示'
+    ],
+    errors: [
+      '保存时未勾选任何菜单时提示“请至少勾选一个菜单”', '系统管理员尝试取消“系统管理”被拦截并提示“防锁死：系统管理员必须保留系统管理菜单”', '财务角色下保存时额外检查noFollowUp相关限制', '未保存的修改变更点击保存后立即生效'
+    ],
+    api: [
+      '角色保存接口：写入角色权限到AUTH.roles并持久化', '角色读取接口：从AUTH.roles读取当前配置'
+    ],
+    accept: [
+      '无控制台报错', '5个角色正确展示及编辑', '系统管理员防锁死逻辑正确', '保存后权限立即生效', '权限摘要底部正确展示'
+    ]
+  },
+  'm-login': {
+    name: '移动端登录', module: '移动端',
+    goal: '移动端(H5/企业微信/App)的登录屏，表单调用authLogin/authChangePwd，样式沿用已有MForm/MField，底部不显示tab栏',
+    roles: [
+      '未登录用户访问', 'mustChange=true的用户强制显示changepw屏'
+    ],
+    enter: [
+      '移动端首次进入或未登录时显示登录屏', '账号或手机号输入框', '密码输入框', '登录按钮', '忘记密码/注册入口'
+    ],
+    layout: [
+      '移动端专属布局，全屏或手机框居中显示', '顶部：无品牌栏或简化品牌', '中部：el-form包含账号/手机号和密码两项', '底部：登录按钮，无底部tab栏'
+    ],
+    fields: [
+      '账号/手机号：文本类型，必填', '密码：密码框类型，必填'
+    ],
+    rules: [
+      '账号或手机号为必填，为空提示', '密码为必填，为空提示', '验证通过后调用AUTH.authLogin(account, pwd)'
+    ],
+    flow: [
+      '用户输入账号/密码并点击登录', 'AUTH.authLogin验证并写入session', '登录成功若mustChange则跳转至/changepw，否则跳转至role.home', '登录失败弹出提示'
+    ],
+    errors: [
+      '账号或密码错误：弹出提示', '账号停用：弹出提示“该账号已停用”'
+    ],
+    api: [
+      '移动端登录：AUTH.authLogin(account, pwd)'
+    ],
+    accept: [
+      '无控制台报错', '登录成功后跳转正确', 'mustChange时强制跳转改密页'
+    ]
+  },
+  'm-changepw': {
+    name: '移动端修改密码', module: '移动端',
+    goal: '移动端的修改密码屏，表单调用authChangePwd，样式沿用已有MForm/MField，底部不显示tab栏',
+    roles: [
+      'mustChange=true的用户强制显示', '已登录用户可访问'
+    ],
+    enter: [
+      '旧密码输入框', '新密码输入框', '确认新密码输入框', '保存按钮', '无返回按钮(强制改密状态)'
+    ],
+    layout: [
+      '移动端专属布局，全屏或手机框居中显示', '顶部：无品牌栏或简化品牌', '中部：el-form包含旧密码、新密码、确认新密码三项', '底部：保存按钮，强制改密状态下无返回按钮'
+    ],
+    fields: [
+      '旧密码：密码框类型，必填', '新密码：密码框类型，必填，至少8位含字母和数字', '确认新密码：密码框类型，必填，需与新密码一致'
+    ],
+    rules: [
+      '旧密码为必填，为空提示', '新密码至少8位，不足提示', '新密码需包含字母和数字，缺失提示', '新密码不能等于旧密码，相同时提示', '两次新密码输入不一致提示', '保存成功后清除session，跳转至role.home'
+    ],
+    flow: [
+      '用户输入旧密码和新密码确认', '前端验证旧新密码格式和一致性', 'AUTH.authChangePwd(old, neu)写入新密码并清除session', '成功后跳转至role.home'
+    ],
+    errors: [
+      '旧密码错误：提示“旧密码错误”', '新密码不足8位：提示“新密码至少8位”', '新密码缺字母或数字：提示“新密码需包含字母和数字”', '新密码等于旧密码：提示“新密码不能与旧密码相同”', '两次新密码输入不一致：提示“两次输入密码不一致”'
+    ],
+    api: [
+      '移动端密码修改：AUTH.authChangePwd(old, neu)'
+    ],
+    accept: [
+      '无控制台报错', '密码修改成功后跳转正确', '强制改密状态下无返回按钮'
+    ]
+  }
+};
+
+Object.entries(PZ_DOC_AUTH_CFG).forEach(([k, c]) => { DOCS_DEFAULT[k] = mkDoc(k, c); });
 /* ===== 移动端需求文档补全（page-zz 保证在所有 page-*.js 之后、app.js 之前加载，覆盖页面文件中较简略的旧文档） ===== */
 const PZ_DOC_M_CFG = {
   'm-schedule': {
@@ -15616,12 +16553,26 @@ Object.entries(PZ_DOC_S9_CFG).forEach(([k, c]) => { DOCS_DEFAULT[k] = mkDoc(k, c
 const App = {
   components: { DocPanel },
   setup() {
-    const parse = () => { const h = (location.hash || '#/workbench').slice(1); return h || '/workbench'; };
+    const parse = () => { const h = (location.hash || '#login').slice(1); return h || '/login'; };
     const path = ref(parse());
-    window.addEventListener('hashchange', () => { path.value = parse(); document.querySelector('.main') && (document.querySelector('.main').scrollTop = 0); });
+    const notLogged = computed(() => !AUTH.authLoggedIn());
+    const isMobile = computed(() => path.value === '/m' || path.value.indexOf('/m/') === 0);
+    const redirectTo = ref(null);
+    window.addEventListener('hashchange', () => {
+      const newPath = parse();
+      if (notLogged.value && !isMobile.value) { redirectTo.value = newPath; path.value = '/login'; }
+      else { path.value = newPath; document.querySelector('.main') && (document.querySelector('.main').scrollTop = 0); }
+    });
     const view = computed(() => {
+      if (notLogged.value && !isMobile.value) return { comp: LoginPage, props: {}, docKey: 'auth-login' };
+      const user = AUTH.authUser();
+      if (user && user.mustChange && path.value !== '/change-password') return { comp: ChangePwdPage, props: {}, docKey: 'auth-changepw' };
       const m = matchRoute(path.value);
-      if (m) return { comp: m.comp, props: m.props, docKey: m.docKey };
+      if (m) {
+        const allowed = AUTH.authRouteAllowed(path.value);
+        if (!allowed.ok) return { comp: NoPermissionPage, props: { reason: allowed.reason }, docKey: 'auth-nopermission' };
+        return { comp: m.comp, props: m.props, docKey: m.docKey };
+      }
       return { comp: NotFoundPage, props: {}, docKey: '' };
     });
     watch(view, v => { docState.key = v.docKey; docState.override = ''; }, { immediate: true });
@@ -15638,27 +16589,80 @@ const App = {
     });
     const standalone = computed(() => path.value === '/m' || path.value.indexOf('/m/') === 0);
     const menu = ref(null);
-    const opened = computed(() => { const n = NAV.find(n => n.children && n.children.some(c => c.path === active.value)); return n ? [n.key] : []; });
+    const authCanMenu = (menuTitle) => {
+      const role = AUTH.authRole();
+      if (!role) return false;
+      return role.menus && role.menus.includes(menuTitle);
+    };
+    const opened = computed(() => {
+      const p = active.value;
+      const topKey = p.split('/')[1] || '';
+      const n = NAV.find(n => n.key === topKey);
+      if (!n) return [];
+      if (n.children) {
+        const filteredChildren = n.children.filter(c => authCanMenu(c.path));
+        return filteredChildren.length > 0 ? [n.key] : [];
+      }
+      return authCanMenu(n.path) ? [n.key] : [];
+    });
     watch(opened, v => { v.length && menu.value && menu.value.open(v[0]); });
-    // 全局搜索
     const kw = ref('');
     const searchFn = (q, cb) => {
       if (!q) return cb([]);
       const r = [];
-      store.customers.forEach(c => { if (c.name.includes(q) || c.no.includes(q)) r.push({ value: c.name, tag: '客户', to: '/customer/' + c.no }); });
-      store.leads.forEach(l => { if (l.company.includes(q) || l.no.includes(q) || l.contact.includes(q)) r.push({ value: l.company + '（' + l.no + '）', tag: '线索', to: '/lead/' + l.no }); });
-      store.opps.forEach(o => { if (o.name.includes(q) || o.no.includes(q)) r.push({ value: o.name, tag: '商机', to: '/opp/' + o.no }); });
-      PH.contacts.rows.forEach(c => { if (c.name.includes(q)) r.push({ value: c.name + ' · ' + c.customer, tag: '联系人', to: '/contacts' }); });
+      store.customers.forEach(c => { if (authRowVisibleAuth(c)) r.push({ value: c.name, tag: '客户', to: '/customer/' + c.no }); });
+      store.leads.forEach(l => { if (authRowVisibleAuth(l)) r.push({ value: l.company + '（' + l.no + '）', tag: '线索', to: '/lead/' + l.no }); });
+      store.opps.forEach(o => { if (authRowVisibleAuth(o)) r.push({ value: o.name, tag: '商机', to: '/opp/' + o.no }); });
+      PH.contacts.rows.forEach(c => { if (authRowVisibleAuth(c)) r.push({ value: c.name + ' · ' + c.customer, tag: '联系人', to: '/contacts' }); });
       cb(r.slice(0, 8));
     };
     const selectSearch = it => { go(it.to); kw.value = ''; };
     const unread = computed(() => store.messages.filter(m => !m.read).length);
     const todoCount = computed(() => store.approvals.filter(a => a.tab === 'todo').length + (store.ext ? store.ext.activities.filter(a => a.owner === '张三' && a.status === '计划中').length : 0));
     const readAll = () => store.messages.forEach(m => m.read = true);
-    return { path, view, active, standalone, menu, opened, NAV, kw, searchFn, selectSearch, unread, todoCount, store, go, readAll, THEMES, theme, applyTheme };
+    onMounted(() => { if (!isMobile.value) authGuardInstall(); });
+    const currentUser = computed(() => AUTH.authUser());
+    const currentRole = computed(() => AUTH.authRole());
+    const handleRoleSwitch = key => { if (!key) return; AUTH.authSwitchRole(key); };
+    const handleUserCmd = cmd => { if (cmd === 'changepwd') go('/change-password'); else if (cmd === 'logout') AUTH.authLogout(); };
+    const themeRef = ref(localStorage.getItem('crm_theme') || 'sky');
+    const theme = computed({ get() { return themeRef.value; }, set(t) { themeRef.value = t; applyTheme(t); localStorage.setItem('crm_theme', t); } });
+    const cssVar = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    const applyTheme = t => { themeRef.value = t; document.documentElement.dataset.theme = t; localStorage.setItem('crm_theme', t); };
+    applyTheme(themeRef.value);
+    const fmtY = n => Number(n).toLocaleString('zh-CN');
+    const yuan = n => '¥' + fmtY(n);
+    const fmtC = c => (c / 100).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const TODAY = '2026-11-02';
+    const daysBetween = (a, b) => Math.round((new Date(b) - new Date(a)) / 86400000);
+    const go = path => { location.hash = '#' + path; };
+    const cno = name => { const c = custByName(name); return c ? c.no : 'NA'; };
+    const authRowVisibleAuth = row => {
+      const user = AUTH.authUser();
+      if (!user) return true;
+      const deptId = user.dept;
+      if (user.role === 'admin') return true;
+      if (user.id === (row.owner || '').toString()) return true;
+      if (deptId && row.dept === deptId) return true;
+      return false;
+    };
+    const authCanBtn = (kind) => {
+      const user = AUTH.authUser();
+      if (!user) return false;
+      const role = AUTH.roles[user.role || ''];
+      if (!role) return false;
+      const btns = role.buttons || [];
+      if (kind && btns.indexOf(kind) >= 0) return true;
+      if (!kind) return true;
+      return false;
+    };
+    const filteredNAV = computed(() => {
+      return NAV.filter(n => authCanMenu(n.title));
+    });
+    return { path, view, active, standalone, menu, opened, NAV, filteredNAV, kw, searchFn, selectSearch, unread, todoCount, store, go, readAll, theme, applyTheme, notLogged, isMobile, authRowVisibleAuth, authCanMenu, authCanBtn, fmtY, yuan, fmtC, TODAY, daysBetween, go, cno, currentUser, currentRole, handleRoleSwitch, handleUserCmd, redirectTo };
   },
   template: `<div class="layout" :class="{standalone}">
-    <div class="topbar" v-if="!standalone">
+    <div class="topbar" v-if="!standalone && !notLogged">
       <div class="brand"><div class="logo">C</div>CRM 客户管理系统</div>
       <el-autocomplete v-model="kw" class="top-search" :fetch-suggestions="searchFn" placeholder="全局搜索：客户 / 线索 / 商机 / 联系人" prefix-icon="Search" clearable @select="selectSearch" :trigger-on-focus="false">
         <template #default="{item}"><el-tag size="small" effect="plain" style="margin-right:8px">{{ item.tag }}</el-tag>{{ item.value }}</template></el-autocomplete>
@@ -15667,9 +16671,9 @@ const App = {
         <el-dropdown trigger="click" @command="applyTheme">
           <div class="icon-btn" title="主题切换"><el-icon><brush/></el-icon></div>
           <template #dropdown><el-dropdown-menu>
-            <el-dropdown-item v-for="t in THEMES" :key="t[0]" :command="t[0]">
-              <span class="theme-dot" :style="{background:t[2]}"></span>{{ t[1] }}
-              <el-icon v-if="theme === t[0]" style="margin-left:auto;color:var(--el-color-primary)"><check/></el-icon>
+            <el-dropdown-item v-for="t in ['sky','pink','white','gray']" :key="t" :command="t">
+              <span class="theme-dot" :style="{background:t==='sky'?'#2f9bff':t==='pink'?'#e8588d':t==='white'?'#2b3a55':'#5b6b7f'}"></span>{{ t }}
+              <el-icon v-if="theme===t" style="margin-left:auto;color:var(--el-color-primary)"><check/></el-icon>
             </el-dropdown-item>
           </el-dropdown-menu></template>
         </el-dropdown>
@@ -15679,31 +16683,26 @@ const App = {
           <div class="msg" :class="{read:m.read}" v-for="m in store.messages" :key="m.id" @click="m.read=true"><span class="u" :class="{read:m.read}"></span><div><div>{{ m.title }}</div><div class="muted" style="font-size:12px">{{ m.type }} · {{ m.time }}</div></div></div>
         </el-popover>
         <div class="icon-btn" title="待办 / 审批" @click="go('/approvals')"><el-icon><finished/></el-icon><el-badge :value="todoCount" type="warning"/></div>
-        <el-dropdown trigger="click"><div class="user-chip"><div class="avatar">张</div><div style="line-height:1.2"><div style="font-size:13px;font-weight:600">张三</div><div style="font-size:11px;color:var(--sub)">销售经理</div></div><el-icon><arrow-down/></el-icon></div>
-          <template #dropdown><el-dropdown-menu><el-dropdown-item>个人设置</el-dropdown-item><el-dropdown-item>切换数据范围</el-dropdown-item><el-dropdown-item divided>退出登录</el-dropdown-item></el-dropdown-menu></template></el-dropdown>
+        <el-dropdown trigger="click" @command="handleRoleSwitch"><div class="icon-btn" title="角色切换"><el-icon><Switch/></el-icon><span style="font-size:12px">角色切换</span><el-badge class="demo-tag" value="演示" style="margin-left:6px;font-size:10px;padding:1px 4px;border-radius:3px;background:var(--el-color-warning);color:#fff"/></div><template #dropdown><el-dropdown-menu><el-dropdown-item v-for="r in Object.values(AUTH.roles||{})" :key="r.key" :command="r.key" :disabled="currentRole && currentRole.key===r.key">{{ r.name }}{{ currentRole && currentRole.key===r.key ? ' （当前）' : '' }}</el-dropdown-item></el-dropdown-menu></template></el-dropdown>
+        <el-dropdown trigger="click" @command="handleUserCmd"><div class="user-chip"><div class="avatar">{{ currentUser ? currentUser.name[0] : '?' }}</div><div style="line-height:1.2"><div style="font-size:13px;font-weight:600">{{ currentUser ? currentUser.name : '' }}</div><div style="font-size:11px;color:var(--sub)"> {{ currentRole ? currentRole.name : '' }}</div></div><el-icon><arrow-down/></el-icon></div><template #dropdown><el-dropdown-menu><el-dropdown-item command="profile">个人设置</el-dropdown-item><el-dropdown-item command="changepwd">修改密码</el-dropdown-item><el-dropdown-item divided command="logout">退出登录</el-dropdown-item></el-dropdown-menu></template></el-dropdown>
       </div>
     </div>
-    <div class="body">
-      <div class="sidebar" v-if="!standalone">
-        <el-menu ref="menu" :default-active="active" :default-openeds="opened" unique-opened @select="p => go(p)">
-          <template v-for="n in NAV" :key="n.key">
-            <el-sub-menu v-if="n.children" :index="n.key"><template #title><el-icon><component :is="n.icon"/></el-icon><span>{{ n.title }}</span></template>
-              <el-menu-item v-for="c in n.children" :key="c.path" :index="c.path">{{ c.title }}</el-menu-item></el-sub-menu>
-            <el-menu-item v-else :index="n.path"><el-icon><component :is="n.icon"/></el-icon><span>{{ n.title }}</span></el-menu-item>
-          </template>
-        </el-menu>
-      </div>
-      <div class="main" :class="{mfull:standalone}"><component :is="view.comp" :key="path" v-bind="view.props"/></div>
-      <doc-panel v-if="!standalone"/>
+    <div class="sidebar" v-if="!standalone && !notLogged">
+      <el-menu ref="menu" :default-active="active" :default-openeds="opened" unique-opened @select="p => go(p)">
+        <template v-for="n in filteredNAV" :key="n.key">
+          <el-sub-menu v-if="n.children" :index="n.key"><template #title><el-icon><component :is="n.icon"/></el-icon><span>{{ n.title }}</span></template><el-menu-item v-for="c in n.children" :key="c.path" :index="c.path">{{ c.title }}</el-menu-item></el-sub-menu><el-menu-item v-else :index="n.path"><el-icon><component :is="n.icon"/></el-icon><span>{{ n.title }}</span></el-menu-item>
+        </template>
+      </el-menu>
     </div>
+    <div class="main" :class="{mfull:standalone}"><component :is="view.comp" :key="path" v-bind="view.props"/></div>
+    <doc-panel v-if="!standalone && !notLogged"/><doc-panel v-if="notLogged && view.docKey === 'auth-login'"/><doc-panel v-if="notLogged && view.docKey === 'auth-changepw'"/><doc-panel v-if="notLogged && view.docKey === 'auth-nopermission'"/>
   </div>`,
 };
 const app = Vue.createApp(App);
 app.use(ElementPlus, { locale: ElementPlusLocaleZhCn });
 Object.entries(ElementPlusIconsVue).forEach(([k, v]) => app.component(k, v));
-Object.assign(app.config.globalProperties, { $go: go, $msg: ElMessage, $cno: cno, $yuan: yuan, $fmtY: fmtY, $fmtC: fmtC });
+Object.assign(app.config.globalProperties, { $go: go, $msg: ElMessage, $cno: cno, $yuan: yuan, $fmtY: fmtY, $fmtC: fmtC, $mask: AUTH.authMaskPhone });
 app.mount('#app');
-
 </script>
 </body>
 </html>
