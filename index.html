@@ -2215,6 +2215,16 @@ const AUTH = {
       this.roles = data.roles || {};
     }
     this._loadDemoIfNeeded();
+    // Migrate old data: add '移动端预览' to roles that have '工作台' but not '移动端预览'
+    let changed = false;
+    for (const key of Object.keys(this.roles)) {
+      const role = this.roles[key];
+      if (role.menus && role.menus.includes('工作台') && !role.menus.includes('移动端预览')) {
+        role.menus.push('移动端预览');
+        changed = true;
+      }
+    }
+    if (changed) this.save();
     this.session = JSON.parse(localStorage.getItem('crm_auth_session') || 'null');
   },
   save() {
@@ -2244,11 +2254,11 @@ const AUTH = {
     };
     this.users = users;
     const roles = {
-      admin: { key: 'admin', name: '系统管理员', desc: '', menus: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析', '系统管理', '审批中心'], buttons: ['新增', '编辑', '删除', '导出', '分配'], scope: '全部', phoneFull: true, noFollowUp: false, home: '/system/auth/users', demoUid: 'u01' },
-      director: { key: 'director', name: '销售总监', desc: '', menus: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析', '审批中心'], buttons: ['新增', '编辑', '删除', '导出', '分配'], scope: '本部门及下属', phoneFull: true, noFollowUp: false, home: '/workbench', demoUid: 'u02' },
-      manager: { key: 'manager', name: '销售经理', desc: '', menus: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析', '审批中心'], buttons: ['新增', '编辑', '导出', '分配'], scope: '本部门', phoneFull: true, noFollowUp: false, home: '/workbench', demoUid: 'u03' },
-      sales: { key: 'sales', name: '销售人员', desc: '', menus: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '报价管理', '活动管理', '服务管理', '审批中心'], buttons: ['新增', '编辑'], scope: '本人', phoneFull: true, noFollowUp: false, home: '/workbench', demoUid: 'u05' },
-      finance: { key: 'finance', name: '财务人员', desc: '', menus: ['工作台', '合同管理', '订单管理', '回款管理', '数据分析', '审批中心'], buttons: ['导出'], scope: '全部', phoneFull: false, noFollowUp: true, home: '/payments', demoUid: 'u07' },
+      admin: { key: 'admin', name: '系统管理员', desc: '', menus: ['工作台', '移动端预览', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析', '系统管理', '审批中心'], buttons: ['新增', '编辑', '删除', '导出', '分配'], scope: '全部', phoneFull: true, noFollowUp: false, home: '/system/auth/users', demoUid: 'u01' },
+      director: { key: 'director', name: '销售总监', desc: '', menus: ['工作台', '移动端预览', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析', '审批中心'], buttons: ['新增', '编辑', '删除', '导出', '分配'], scope: '本部门及下属', phoneFull: true, noFollowUp: false, home: '/workbench', demoUid: 'u02' },
+      manager: { key: 'manager', name: '销售经理', desc: '', menus: ['工作台', '移动端预览', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析', '审批中心'], buttons: ['新增', '编辑', '导出', '分配'], scope: '本部门', phoneFull: true, noFollowUp: false, home: '/workbench', demoUid: 'u03' },
+      sales: { key: 'sales', name: '销售人员', desc: '', menus: ['工作台', '移动端预览', '线索管理', '客户管理', '联系人管理', '商机管理', '报价管理', '活动管理', '服务管理', '审批中心'], buttons: ['新增', '编辑'], scope: '本人', phoneFull: true, noFollowUp: false, home: '/workbench', demoUid: 'u05' },
+      finance: { key: 'finance', name: '财务人员', desc: '', menus: ['工作台', '移动端预览', '合同管理', '订单管理', '回款管理', '数据分析', '审批中心'], buttons: ['导出'], scope: '全部', phoneFull: false, noFollowUp: true, home: '/payments', demoUid: 'u07' },
     };
     this.roles = roles;
     this.save();
@@ -2431,6 +2441,7 @@ authFilter(rows) {
   // ===== 路由权限 =====
   authRouteAllowed(path) {
     if (path === '/login' || path === '/change-password' || path === '/no-permission') return { ok: true };
+    if (path === '/m' || path.startsWith('/m/')) return { ok: true };
     const role = this.authRole();
     if (!role) return { ok: false, reason: '未登录，请先登录' };
     const menuTitle = this._pathToMenu(path);
@@ -2443,20 +2454,19 @@ authFilter(rows) {
 
   _pathToMenu(path) {
     const map = {
-      '/workbench': '工作台', '/approvals': '审批中心', '/mobile': '移动端预览',
-      '/leads': '线索管理', '/lead/': '线索管理',
+      '/mobile': '移动端预览', '/m': '移动端预览',
+      '/workbench': '工作台', '/approvals': '审批中心', '/leads': '线索管理', '/lead/': '线索管理',
       '/customers': '客户管理', '/customer/': '客户管理',
       '/opps': '商机管理', '/opp/': '商机管理',
       '/products': '产品管理', '/pricebooks,/product/': '产品管理',
       '/quotes': '报价管理', '/quote/': '报价管理',
       '/contracts': '合同管理', '/contract/': '合同管理',
       '/orders': '订单管理', '/order/': '订单管理',
-      '/payments': '回款管理', '/payments': '回款管理',
+      '/payments': '回款管理',
       '/activities': '活动管理', '/activity/': '活动管理',
-      '/delivery': '交付管理', '/delivery': '交付管理',
+      '/delivery': '交付管理',
       '/service': '服务管理', '/ticket/': '服务管理',
       '/analytics': '数据分析', '/system': '系统管理', '/approvals/templates': '系统管理',
-      '/mobile,/m': null,
     };
     for (const [k, v] of Object.entries(map)) {
       if (path === k || path.startsWith(k)) return v;
@@ -4674,7 +4684,7 @@ const AuthRolesPage = {
   </div>`,
   data() { return { 
     roleForm: { name: '', desc: '', menus: [], buttons: [], scope: '全部', phoneFull: true },
-    menuOptions: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析', '系统管理'],
+    menuOptions: ['工作台', '移动端预览', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析', '系统管理'],
     buttonOptions: ['新增', '编辑', '删除', '导出', '分配'],
     selectedKey: 'sales',
     AUTH

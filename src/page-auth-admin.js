@@ -402,7 +402,7 @@ const AuthRolesPage = {
   </div>`,
   data() { return { 
     roleForm: { name: '', desc: '', menus: [], buttons: [], scope: '全部', phoneFull: true },
-    menuOptions: ['工作台', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析', '系统管理'],
+    menuOptions: ['工作台', '移动端预览', '线索管理', '客户管理', '联系人管理', '商机管理', '产品管理', '报价管理', '合同管理', '订单管理', '回款管理', '活动管理', '数据分析', '系统管理'],
     buttonOptions: ['新增', '编辑', '删除', '导出', '分配'],
     selectedKey: 'sales',
     AUTH
